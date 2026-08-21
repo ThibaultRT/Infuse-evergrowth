@@ -1,7 +1,7 @@
 import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
-import type { DamageType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
+import type { DamageType, InventoryState, LootType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v4';
+const SAVE_KEY = 'infuse-evergrowth-save-v5';
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -14,8 +14,12 @@ export function nextLocalMidnightMs(now = new Date()): number {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0).getTime();
 }
 
+export function rollLoot(): LootType {
+  return Math.random() < 0.5 ? 'hp' : 'blunt';
+}
+
 export function emptySpawnState(): Record<string, SavedSpawnState> {
-  return Object.fromEntries(SPAWNS.map((s) => [s.id, { killsToday: 0, respawnAt: null }]));
+  return Object.fromEntries(SPAWNS.map((s) => [s.id, { killsToday: 0, respawnAt: null, defeatedAt: null, loot: rollLoot() }]));
 }
 
 function freshStat(base: number): StatSources {
@@ -30,6 +34,13 @@ function freshStats(): PlayerStats {
   };
 }
 
+function freshInventory(): InventoryState {
+  return {
+    items: [],
+    equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null }
+  };
+}
+
 function normalizeStat(stat: Partial<StatSources> | undefined, base: number): StatSources {
   const fresh = freshStat(base);
   return {
@@ -40,20 +51,21 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 }
 
 function loadSave(): SaveData {
-  const fresh: SaveData = { version: 4, dailyKey: localDailyKey(), stats: freshStats(), spawns: emptySpawnState() };
+  const fresh: SaveData = { version: 5, dailyKey: localDailyKey(), stats: freshStats(), inventory: freshInventory(), spawns: emptySpawnState() };
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Partial<SaveData>;
-    if (parsed.version !== 4 || !parsed.stats) return fresh;
+    if (parsed.version !== 5 || !parsed.stats) return fresh;
     return {
-      version: 4,
+      version: 5,
       dailyKey: localDailyKey(),
       stats: {
         maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
         attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK) },
         regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN)
       },
+      inventory: parsed.inventory ?? freshInventory(),
       spawns: parsed.dailyKey === localDailyKey() ? { ...emptySpawnState(), ...(parsed.spawns ?? {}) } : emptySpawnState()
     };
   } catch {
