@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Infuse Evergrowth">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="1" y2="0">
+      <stop offset="0" stop-color="#1b2432"/>
+      <stop offset="1" stop-color="#79d68c"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <path d="M256 92c22 60 54 100 112 126-58 26-90 66-112 126-22-60-54-100-112-126 58-26 90-66 112-126Z" fill="#f6f7fb" opacity=".96"/>
+  <circle cx="256" cy="256" r="42" fill="#111823"/>
+</svg>
