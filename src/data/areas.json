@@ -1,0 +1,91 @@
+{
+  "areas": [
+    {
+      "id": 1,
+      "name": "Area 1",
+      "worldOrigin": { "x": 0, "z": 0 },
+      "bossSpawnId": "area1-legendary-01",
+      "portals": [
+        {
+          "id": "area1-to-area2",
+          "tag": "portal - area 2",
+          "targetAreaId": 2,
+          "x": 0,
+          "z": -24,
+          "requiresBossDefeated": true
+        }
+      ],
+      "spawns": [
+        { "id": "area1-crystal-01", "tier": "crystal", "x": -4, "z": 7 },
+        { "id": "area1-crystal-02", "tier": "crystal", "x": 4, "z": 8 },
+        { "id": "area1-crystal-03", "tier": "crystal", "x": -8, "z": 2 },
+        { "id": "area1-crystal-04", "tier": "crystal", "x": 8, "z": 1 },
+        { "id": "area1-crystal-05", "tier": "crystal", "x": -10, "z": -6 },
+        { "id": "area1-crystal-06", "tier": "crystal", "x": 10, "z": -7 },
+        { "id": "area1-common-a1", "tier": "common", "x": -8, "z": 14, "group": "area1-common-a" },
+        { "id": "area1-common-a2", "tier": "common", "x": -6, "z": 15, "group": "area1-common-a" },
+        { "id": "area1-common-a3", "tier": "common", "x": -4, "z": 14, "group": "area1-common-a" },
+        { "id": "area1-common-a4", "tier": "common", "x": -7, "z": 12, "group": "area1-common-a" },
+        { "id": "area1-common-a5", "tier": "common", "x": -5, "z": 12, "group": "area1-common-a" },
+        { "id": "area1-common-a6", "tier": "common", "x": -3, "z": 13, "group": "area1-common-a" },
+        { "id": "area1-common-b1", "tier": "common", "x": 5, "z": -13, "group": "area1-common-b" },
+        { "id": "area1-common-b2", "tier": "common", "x": 7, "z": -14, "group": "area1-common-b" },
+        { "id": "area1-common-b3", "tier": "common", "x": 9, "z": -13, "group": "area1-common-b" },
+        { "id": "area1-common-b4", "tier": "common", "x": 4, "z": -15, "group": "area1-common-b" },
+        { "id": "area1-common-b5", "tier": "common", "x": 6, "z": -16, "group": "area1-common-b" },
+        { "id": "area1-common-b6", "tier": "common", "x": 8, "z": -16, "group": "area1-common-b" },
+        { "id": "area1-common-b7", "tier": "common", "x": 10, "z": -15, "group": "area1-common-b" },
+        { "id": "area1-common-b8", "tier": "common", "x": 11, "z": -12, "group": "area1-common-b" },
+        { "id": "area1-uncommon-a1", "tier": "uncommon", "x": 9, "z": 15, "group": "area1-uncommon-a" },
+        { "id": "area1-uncommon-a2", "tier": "uncommon", "x": 12, "z": 14, "group": "area1-uncommon-a" },
+        { "id": "area1-uncommon-b1", "tier": "uncommon", "x": -12, "z": -13, "group": "area1-uncommon-b" },
+        { "id": "area1-uncommon-b2", "tier": "uncommon", "x": -9, "z": -15, "group": "area1-uncommon-b" },
+        { "id": "area1-rare-01", "tier": "rare", "x": -14, "z": 19 },
+        { "id": "area1-rare-02", "tier": "rare", "x": 14, "z": 20 },
+        { "id": "area1-rare-03", "tier": "rare", "x": 0, "z": -21 },
+        { "id": "area1-epic-01", "tier": "epic", "x": -14, "z": -21 },
+        { "id": "area1-epic-02", "tier": "epic", "x": 14, "z": -20 },
+        { "id": "area1-legendary-01", "tier": "legendary", "x": 0, "z": 23 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Area 2",
+      "worldOrigin": { "x": 60, "z": 0 },
+      "bossSpawnId": "area2-legendary-01",
+      "portals": [],
+      "spawns": [
+        { "id": "area2-crystal-01", "tier": "crystal", "x": -4, "z": 7 },
+        { "id": "area2-crystal-02", "tier": "crystal", "x": 4, "z": 8 },
+        { "id": "area2-crystal-03", "tier": "crystal", "x": -8, "z": 2 },
+        { "id": "area2-crystal-04", "tier": "crystal", "x": 8, "z": 1 },
+        { "id": "area2-crystal-05", "tier": "crystal", "x": -10, "z": -6 },
+        { "id": "area2-crystal-06", "tier": "crystal", "x": 10, "z": -7 },
+        { "id": "area2-common-a1", "tier": "common", "x": -8, "z": 14, "group": "area2-common-a" },
+        { "id": "area2-common-a2", "tier": "common", "x": -6, "z": 15, "group": "area2-common-a" },
+        { "id": "area2-common-a3", "tier": "common", "x": -4, "z": 14, "group": "area2-common-a" },
+        { "id": "area2-common-a4", "tier": "common", "x": -7, "z": 12, "group": "area2-common-a" },
+        { "id": "area2-common-a5", "tier": "common", "x": -5, "z": 12, "group": "area2-common-a" },
+        { "id": "area2-common-a6", "tier": "common", "x": -3, "z": 13, "group": "area2-common-a" },
+        { "id": "area2-common-b1", "tier": "common", "x": 5, "z": -13, "group": "area2-common-b" },
+        { "id": "area2-common-b2", "tier": "common", "x": 7, "z": -14, "group": "area2-common-b" },
+        { "id": "area2-common-b3", "tier": "common", "x": 9, "z": -13, "group": "area2-common-b" },
+        { "id": "area2-common-b4", "tier": "common", "x": 4, "z": -15, "group": "area2-common-b" },
+        { "id": "area2-common-b5", "tier": "common", "x": 6, "z": -16, "group": "area2-common-b" },
+        { "id": "area2-common-b6", "tier": "common", "x": 8, "z": -16, "group": "area2-common-b" },
+        { "id": "area2-common-b7", "tier": "common", "x": 10, "z": -15, "group": "area2-common-b" },
+        { "id": "area2-common-b8", "tier": "common", "x": 11, "z": -12, "group": "area2-common-b" },
+        { "id": "area2-uncommon-a1", "tier": "uncommon", "x": 9, "z": 15, "group": "area2-uncommon-a" },
+        { "id": "area2-uncommon-a2", "tier": "uncommon", "x": 12, "z": 14, "group": "area2-uncommon-a" },
+        { "id": "area2-uncommon-b1", "tier": "uncommon", "x": -12, "z": -13, "group": "area2-uncommon-b" },
+        { "id": "area2-uncommon-b2", "tier": "uncommon", "x": -9, "z": -15, "group": "area2-uncommon-b" },
+        { "id": "area2-rare-01", "tier": "rare", "x": -14, "z": 19 },
+        { "id": "area2-rare-02", "tier": "rare", "x": 14, "z": 20 },
+        { "id": "area2-rare-03", "tier": "rare", "x": 0, "z": -21 },
+        { "id": "area2-epic-01", "tier": "epic", "x": -14, "z": -21 },
+        { "id": "area2-epic-02", "tier": "epic", "x": 14, "z": -20 },
+        { "id": "area2-legendary-01", "tier": "legendary", "x": 0, "z": 23 }
+      ]
+    }
+  ]
+}
