@@ -13,6 +13,7 @@ export type GameEventMap = {
   areaEntered: { areaId: number };
   equipmentDropped: { sourceId: string; areaId: number; itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number };
   equipmentEquipped: { itemId: string; hand: HandSlotId };
+  equipmentUnequipped: { itemId: string; hand: HandSlotId };
   weaponAscended: { itemId: string; previousAscend: number; newAscend: number };
 };
 

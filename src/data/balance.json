@@ -5,7 +5,8 @@
     "baseRegenHpPerSecond": 0.1,
     "moveSpeed": 7.6,
     "bareHandsRangeMeters": 2.15,
-    "attackCooldownSeconds": 1
+    "attackCooldownSeconds": 1,
+    "respawnDelaySeconds": 5
   },
   "enemy": {
     "commonBaseHp": 32,

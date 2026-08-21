@@ -50,6 +50,12 @@ export function equip(itemId: string, hand: HandSlotId): void {
   save.inventory.equipped[hand] = itemId;
 }
 
+export function unequip(hand: HandSlotId): string | null {
+  const itemId = save.inventory.equipped[hand];
+  save.inventory.equipped[hand] = null;
+  return itemId;
+}
+
 export function ascend(itemId: string): boolean {
   const owned = save.inventory.items[itemId];
   if (!owned || owned.level < balance.equipmentProgression.ascendLevel) return false;

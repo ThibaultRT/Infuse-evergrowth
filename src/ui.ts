@@ -1,6 +1,6 @@
 import './reward-popups.css';
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from './icons';
-import { statAdditiveTotal, statTotal } from './save';
+import { save, statAdditiveTotal, statTotal } from './save';
 import { EQUIPMENT_BY_ID, equipmentDamage } from './systems/EquipmentSystem';
 import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, PlayerStats, StatSources } from './types';
 
@@ -166,7 +166,7 @@ export function renderInventory(inventory: InventoryState): void {
     const locked = slot.startsWith('orbit');
     const itemId = inventory.equipped[slot];
     const value = locked ? 'LOCKED' : itemId ? itemNames.get(itemId) ?? 'ITEM' : 'EMPTY';
-    return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"><span>${SLOT_LABELS[slot]}</span><strong>${value}</strong></div>`;
+    return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"${itemId && !locked ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span><strong>${value}</strong></div>`;
   }).join('');
 
   ui.quickSlots.forEach((slotEl) => {
@@ -178,18 +178,18 @@ export function renderInventory(inventory: InventoryState): void {
 
   const items = Object.values(inventory.items);
   ui.inventoryBag.innerHTML = items.length
-    ? items.map((item) => `<button class="inventory-item rarity-${EQUIPMENT_BY_ID.get(item.itemId)?.rarity ?? 'common'}" type="button" data-item-id="${item.itemId}"><strong>${item.itemId}</strong><span>Lv ${item.level} · A${item.ascend}</span></button>`).join('')
+    ? items.map((item) => `<button class="inventory-item rarity-${EQUIPMENT_BY_ID.get(item.itemId)?.rarity ?? 'common'}" type="button" data-item-id="${item.itemId}" draggable="true"><strong>${item.itemId}</strong><span>Lv ${item.level} · A${item.ascend}</span></button>`).join('')
     : '<div class="inventory-empty">No equipment found yet.</div>';
 }
 
 export function renderWeaponDetail(owned: OwnedEquipment | null): void {
   const item = owned ? EQUIPMENT_BY_ID.get(owned.itemId) : undefined;
   if (!owned || !item) { ui.weaponDetail.innerHTML = ''; return; }
-  const equipped = (['hand1', 'hand2'] as const).find((hand) => (document.querySelector(`[data-slot="${hand}"] strong`)?.textContent === item.id));
+  const equipped = (['hand1', 'hand2'] as const).find((hand) => save.inventory.equipped[hand] === item.id);
   ui.weaponDetail.innerHTML = `<div class="weapon-art rarity-${item.rarity}">${damageTypeIcon(item.damageType, 52)}</div>
     <h3>${item.id}</h3><div class="weapon-meta">${item.rarity} · ${item.weaponClass}</div>
     <div class="weapon-values"><span>Level <strong>${owned.level}</strong></span><span>Ascend <strong>${owned.ascend}</strong></span><span>Damage <strong>${Math.round(equipmentDamage(item, owned))} ${damageTypeIcon(item.damageType, 12)}</strong></span><span>Per level <strong>+${item.baseDamagePerLevel * 2 ** owned.ascend}</strong></span></div>
-    <div class="weapon-actions"><button data-equip="hand1" data-item-id="${item.id}">Equip H1</button><button data-equip="hand2" data-item-id="${item.id}">Equip H2</button><button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div>
+    <div class="weapon-actions"><button data-equip="hand1" data-item-id="${item.id}">Equip H1</button><button data-equip="hand2" data-item-id="${item.id}">Equip H2</button>${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : ''}<button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div>
     <p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p>${equipped ? `<small>Equipped ${equipped.toUpperCase()}</small>` : ''}`;
 }
 

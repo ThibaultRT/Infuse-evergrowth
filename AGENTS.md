@@ -52,3 +52,4 @@ The Vite production base is `/Infuse-evergrowth/` for GitHub Pages. Deployment i
 - Do not edit generated `dist/` output or dependency contents.
 - Run `npm run build` after code changes. For visible web-app changes, also inspect the running app at a mobile-sized viewport and capture a screenshot when tooling permits.
 - Before committing, review `git diff` and `git status`. Commit changes on the current branch.
+- Systematically increment the package version before creating a pull request. Use `package.json` as the single source of truth and apply semantic versioning appropriate to the change.
