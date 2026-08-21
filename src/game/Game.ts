@@ -14,7 +14,8 @@ import {
   TIER_CONFIG,
   areaById,
   enemyAttack,
-  enemyMaxHp
+  enemyMaxHp,
+  enemyStatReward
 } from '../config';
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
@@ -127,6 +128,7 @@ class SpawnEntity {
   readonly spawnPosition: THREE.Vector3;
   readonly maxHp: number;
   readonly damage: number;
+  readonly statReward: number;
   readonly damageType: CombatAffinity;
   readonly targetUi = document.createElement('div');
   readonly lootLabel = document.createElement('div');
@@ -142,6 +144,7 @@ class SpawnEntity {
     this.maxHp = enemyMaxHp(def.areaId, def.tier);
     this.hp = this.maxHp;
     this.damage = enemyAttack(def.areaId, def.tier);
+    this.statReward = enemyStatReward(def.areaId, def.tier);
     this.damageType = areaById(def.areaId).enemyWeapon;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
@@ -171,7 +174,7 @@ class SpawnEntity {
   renderLoot(): void {
     const loot = save.spawns[this.def.id].loot;
     this.lootLabel.className = `world-loot ${loot}`;
-    this.lootLabel.innerHTML = `<span>${formatRewardAmount(this.config.statReward)}</span>${lootIcon(loot)}`;
+    this.lootLabel.innerHTML = `<span>${formatRewardAmount(this.statReward)}</span>${lootIcon(loot)}`;
   }
 
   syncAreaVisibility(): void {
@@ -222,7 +225,7 @@ class SpawnEntity {
     state.respawnAt = Math.min(now + timer, nextLocalMidnightMs());
 
     const stat = state.loot;
-    const amount = this.config.statReward;
+    const amount = this.statReward;
     events.emit('enemyDefeated', { enemyId: this.def.id });
     if (stat === 'hp') {
       const oldMax = maxHeroHp();

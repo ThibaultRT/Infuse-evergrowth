@@ -57,7 +57,16 @@
       "enemyWeakness": "pierce",
       "worldOrigin": { "x": 60, "z": 0 },
       "bossSpawnId": "area2-legendary-01",
-      "portals": [],
+      "portals": [
+        {
+          "id": "area2-to-area1",
+          "tag": "portal - area 1",
+          "targetAreaId": 1,
+          "x": 0,
+          "z": -24,
+          "requiresBossDefeated": false
+        }
+      ],
       "spawns": [
         { "id": "area2-crystal-01", "tier": "crystal", "x": -4, "z": 7 },
         { "id": "area2-crystal-02", "tier": "crystal", "x": 4, "z": 8 },

@@ -30,7 +30,7 @@ export function attackProfile(hand: HandSlotId): AttackProfile {
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
   const owned = itemId ? save.inventory.items[itemId] : undefined;
   return item && owned
-    ? { damage: equipmentDamage(item, owned), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds }
+    ? { damage: equipmentDamage(item, owned) + heroDamage(item.damageType), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds }
     : { damage: heroDamage('blunt'), damageType: 'blunt', cooldownSeconds: 1 };
 }
 

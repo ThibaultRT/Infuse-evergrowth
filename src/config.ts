@@ -72,6 +72,10 @@ export function enemyAttack(areaId: number, tier: Tier): number {
   return Math.max(1, Math.round(commonAttack * TIER_CONFIG[tier].statMultiplier));
 }
 
+export function enemyStatReward(areaId: number, tier: Tier): number {
+  return TIER_CONFIG[tier].statReward * balance.areaScaling.statRewardMultiplierPerArea ** (areaId - 1);
+}
+
 export const BASE_RESPAWN_MS = balance.respawn.baseSeconds * 1000;
 export const BASE_HERO_MAX_HP = balance.hero.baseMaxHp;
 export const BASE_HERO_BLUNT_ATTACK = balance.hero.baseBluntAttack;

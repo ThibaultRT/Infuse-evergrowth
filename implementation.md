@@ -183,6 +183,8 @@ Portal definitions are destination-based, so several portals from several source
 
 - another 30-target map with the same tier/group structure;
 - world layout is similar to Area 1;
+- enemies grant twice the permanent-stat rewards of equivalent Area 1 enemies;
+- contains an always-open portal at the bottom of the map that returns to Area 1;
 - enemy HP and attack are calculated from Area 2 scaling rather than duplicated values;
 - Area 2 has its own Legendary boss ID ready for later progression logic.
 

@@ -89,9 +89,11 @@
     "plannedAreaCount": 15,
     "hpGrowthPerArea": 4.65,
     "attackMultiplierPerArea": 1,
+    "statRewardMultiplierPerArea": 2,
     "formulaNotes": {
       "hp": "commonBaseHp * hpGrowthPerArea^(area - 1)",
-      "attack": "commonBaseAttack * area * attackMultiplierPerArea"
+      "attack": "commonBaseAttack * area * attackMultiplierPerArea",
+      "statReward": "tierStatReward * statRewardMultiplierPerArea^(area - 1)"
     }
   }
 }

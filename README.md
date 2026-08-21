@@ -2,13 +2,14 @@
 
 An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
-## v0.32 vertical slice
+## v0.33 vertical slice
 
 - Two authored areas with 30 fixed targets each across Crystal → Legendary tiers
 - Area 1's Legendary target is the current boss
 - Area 1 contains a boss-gated portal tagged `portal - area 2`
 - Defeating the boss opens the portal, briefly focuses the camera on it, and unlocks Area 2
-- Walking into the open portal moves the hero to Area 2
+- Walking into the open portal moves the hero to Area 2, whose always-open return portal leads back to Area 1
+- Area 2 enemies grant twice the permanent-stat rewards of their Area 1 counterparts
 - Low-poly human placeholders for combat enemies and a human hero in starter underwear
 - Hero starts at **20 Max HP**, **5 Blunt Attack**, and **0.10 HP/s** passive regeneration
 - Central touch joystick for iPhone plus WASD / arrow keys on desktop
