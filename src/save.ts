@@ -1,7 +1,7 @@
-import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
+import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, LOOT_HP_WEIGHT, SPAWNS } from './config';
 import type { DamageType, InventoryState, LootType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v6';
+const SAVE_KEY = 'infuse-evergrowth-save-v7';
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -15,7 +15,7 @@ export function nextLocalMidnightMs(now = new Date()): number {
 }
 
 export function rollLoot(): LootType {
-  return Math.random() < 0.5 ? 'hp' : 'blunt';
+  return Math.random() < LOOT_HP_WEIGHT ? 'hp' : 'blunt';
 }
 
 export function emptySpawnState(): Record<string, SavedSpawnState> {
@@ -35,10 +35,7 @@ function freshStats(): PlayerStats {
 }
 
 function freshInventory(): InventoryState {
-  return {
-    items: [],
-    equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null }
-  };
+  return { items: [], equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null } };
 }
 
 function normalizeStat(stat: Partial<StatSources> | undefined, base: number): StatSources {
@@ -51,15 +48,29 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 }
 
 function loadSave(): SaveData {
-  const fresh: SaveData = { version: 6, dailyKey: localDailyKey(), stats: freshStats(), inventory: freshInventory(), spawns: emptySpawnState() };
+  const fresh: SaveData = {
+    version: 7,
+    dailyKey: localDailyKey(),
+    currentAreaId: 1,
+    unlockedAreas: [1],
+    defeatedBosses: [],
+    stats: freshStats(),
+    inventory: freshInventory(),
+    spawns: emptySpawnState()
+  };
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Partial<SaveData>;
-    if (parsed.version !== 6 || !parsed.stats) return fresh;
+    if (parsed.version !== 7 || !parsed.stats) return fresh;
+    const unlockedAreas = Array.from(new Set([1, ...(parsed.unlockedAreas ?? [])]));
+    const requestedArea = parsed.currentAreaId ?? 1;
     return {
-      version: 6,
+      version: 7,
       dailyKey: localDailyKey(),
+      currentAreaId: unlockedAreas.includes(requestedArea) ? requestedArea : 1,
+      unlockedAreas,
+      defeatedBosses: parsed.defeatedBosses ?? [],
       stats: {
         maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
         attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK) },
