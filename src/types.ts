@@ -6,9 +6,28 @@ export type EquipmentSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
 export type SpawnDefinition = {
   id: string;
   tier: Tier;
+  areaId: number;
   x: number;
   z: number;
   group?: string;
+};
+
+export type AreaDefinition = {
+  id: number;
+  name: string;
+  originX: number;
+  originZ: number;
+  bossSpawnId: string;
+};
+
+export type PortalDefinition = {
+  id: string;
+  tag: string;
+  sourceAreaId: number;
+  targetAreaId: number;
+  x: number;
+  z: number;
+  requiresBossDefeated: boolean;
 };
 
 export type SavedSpawnState = {
@@ -41,8 +60,11 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 6;
+  version: 7;
   dailyKey: string;
+  currentAreaId: number;
+  unlockedAreas: number[];
+  defeatedBosses: string[];
   stats: PlayerStats;
   inventory: InventoryState;
   spawns: Record<string, SavedSpawnState>;
