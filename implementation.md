@@ -34,11 +34,11 @@ Crystals are a special tier:
 - never retaliate;
 - smallest reward tier.
 
-All combat enemies are human placeholders in v0.1. Skins/species can be replaced later without changing spawn/tier logic.
+All combat enemies are human placeholders for now. Skins/species can be replaced later without changing spawn/tier logic.
 
 ### Permanent stat rewards
 
-Enemies do **not** drop Essence or another intermediary currency. Defeating a target directly increases one permanent hero stat: **Max HP** or **Blunt Attack**, chosen 50/50 for now.
+Enemies do **not** drop Essence or another intermediary currency. Defeating a target directly increases one permanent hero stat: **Max HP** or **Blunt Attack**.
 
 | Tier | Stat multiplier | Permanent stat reward | Respawn multiplier |
 | --- | ---: | ---: | ---: |
@@ -49,9 +49,16 @@ Enemies do **not** drop Essence or another intermediary currency. Defeating a ta
 | Epic | 8x | +1.75 HP or Blunt | 9x |
 | Legendary | 14x | +2.00 HP or Blunt | 15x |
 
-These reward values are initial balancing placeholders. Commons grant exactly **+1 HP or +1 Blunt Attack**, while higher tiers scale only gradually.
+Commons grant exactly **+1 HP or +1 Blunt Attack**, while higher tiers scale only gradually.
 
-The stats tracking page keeps and displays decimal precision to two decimal places. In the active game/combat HUD, HP and damage values are displayed as rounded whole numbers. Enemy health bars are small world-space overlays with no names or numeric values.
+In v0.31, each target rolls its reward once when it spawns. The rolled reward is saved for that life and displayed above the target HP bar as only a value plus icon:
+
+- heart icon = Max HP;
+- hammer icon = Blunt Attack.
+
+After the target respawns, its next reward is rolled again.
+
+The stats tracking page keeps and displays decimal precision to two places. Active combat values are displayed as rounded whole numbers.
 
 ### Stat source model
 
@@ -65,8 +72,6 @@ Calculation order:
 
 `total = (base + sum(additive sources)) × product(multiplicative sources)`
 
-The source maps are intentionally extensible so future systems can add named sources without changing the calculation model.
-
 Current base stats:
 
 - Max HP: `120.00`;
@@ -75,7 +80,7 @@ Current base stats:
 
 Kills add only to the `kills` additive source for Max HP or Blunt Attack.
 
-Health regeneration restores the current hero HP continuously up to Max HP. It uses the same base/additive/multiplicative source model and is persisted like the other stats.
+Health regeneration restores current hero HP continuously up to Max HP and uses the same source model.
 
 ### Damage types
 
@@ -83,9 +88,14 @@ Attack stats are stored by damage type rather than as one generic Attack number.
 
 Current damage types:
 
-- **Blunt** — used by bare hands in v0.3 and represented by a hammer icon in the HUD/stats page.
+- **Blunt** — used by bare hands and all current enemy attacks, represented by a hammer icon.
 
-Bare hands currently deal only Blunt damage. Future weapons can introduce additional damage types and can use their own attack ranges.
+Bare hands currently deal only Blunt damage. Future weapons can introduce additional damage types and their own attack ranges.
+
+v0.31 combat feedback:
+
+- hero hits: floating whole-number damage + damage-type icon over the target;
+- enemy hits: floating red negative whole-number damage + damage-type icon over the hero.
 
 ## Respawn rules
 
@@ -108,6 +118,19 @@ Examples for an Uncommon spawn:
 - second defeat: 18 min
 - third defeat: 36 min
 
+### Group respawn indicator
+
+Common and Uncommon packs have explicit group IDs.
+
+When **every member of one group is dead**, v0.31 shows a circular countdown at the group center:
+
+- the circle is full when the last group member dies;
+- it drains continuously;
+- the countdown targets the **earliest scheduled respawn** among the dead members;
+- as soon as one member respawns, the group is no longer fully dead and the indicator disappears.
+
+`defeatedAt` is persisted per spawn so the circular progress remains correct after reopening the PWA.
+
 ### Midnight reset
 
 Midnight is based on the device's **local calendar time**.
@@ -117,19 +140,18 @@ At local midnight:
 1. all `killsToday` counters reset to zero;
 2. all dead enemies/crystals respawn immediately;
 3. all outstanding respawn timers are discarded;
-4. permanent hero stats are **not** reset.
+4. new loot is rolled for each spawn;
+5. permanent hero stats are **not** reset.
 
 Therefore a target may be killed at `23:59:50` and be alive again at `00:00:00`, allowing another kill at `00:00:01`.
 
 Implementation rule: every calculated `respawnAt` is capped to the next local midnight.
 
-### v0.1 assumption
-
-Respawn escalation is **per individual fixed spawn point**, not per pack. This is intentionally documented so it can be changed later if pack-level timers feel better.
+Respawn escalation remains **per individual fixed spawn point**, not per pack.
 
 ## Hero
 
-The hero is human with an original stylized anime-fantasy look. v0.1 uses primitive low-poly geometry; no third-party character assets are required.
+The hero is human with an original stylized anime-fantasy look. Current visuals use primitive low-poly geometry.
 
 Starting state:
 
@@ -138,10 +160,26 @@ Starting state:
 - 0.10 HP/s passive health regeneration;
 - starter underwear only;
 - two unlocked hand weapon slots;
-- two additional locked weapon slots;
-- the future extra slots are intended for weapons that float/orbit and follow the hero while the first two weapons remain hand-held.
+- two additional locked orbit weapon slots.
 
-v0.1 has no actual equipment items yet. The four slots are exposed in the HUD so the model is part of the architecture from the beginning.
+Future orbit weapons are intended to float/follow the hero while the first two weapons remain hand-held.
+
+## Equipment and inventory
+
+v0.31 moves the four equipment squares out of the top HUD and into a compact bottom dock:
+
+- Hand 1;
+- Hand 2;
+- Orbit 1 (locked);
+- Orbit 2 (locked).
+
+An **Inventory** button opens a dedicated equipment window with:
+
+- the four equipped slots;
+- an inventory/bag area;
+- persistent inventory/equipped state in the save model.
+
+There are no actual equipment items yet; the UI/data structure is ready for later item drops and equip interactions.
 
 ## Controls
 
@@ -152,7 +190,8 @@ Mobile-first:
 - the hero automatically attacks the nearest living target within the current weapon range;
 - bare-hand range: `2.15` world units;
 - future weapons may provide different ranges, including long-range bows;
-- Stats button: open the permanent-stat tracking page.
+- Stats button: open permanent-stat tracking;
+- Inventory button: open equipment/inventory.
 
 Desktop development controls:
 
@@ -161,22 +200,26 @@ Desktop development controls:
 
 ## Persistence
 
-v0.3 stores locally:
+v0.31 uses save schema/version `5` and stores locally:
 
-- source-aware Max HP, damage-type Attack stats, and Health Regeneration, including decimal precision;
-- additive gains by named source (currently kills/equipment/other);
-- multiplicative modifiers by named source (currently equipment/other);
+- source-aware Max HP, damage-type Attack stats, and Health Regeneration;
+- additive and multiplicative stat sources;
+- inventory items and equipped-slot references;
 - daily key;
 - per-spawn kills today;
-- per-spawn respawn deadline.
+- per-spawn respawn deadline;
+- per-spawn defeat timestamp;
+- current per-life loot roll.
 
 During early development, save migrations are intentionally not maintained. A schema/save-key change may start the player from a fresh save.
 
 Storage is local to the browser. Cloud saves/accounts are intentionally out of scope for this slice.
 
-## Presentation changes
+## Presentation
 
-- Camera is pulled farther back to show significantly more of the surrounding map.
-- Enemy/target health is represented by a compact bar projected above the target in the world.
-- Target health bars intentionally show no target name and no numeric HP value.
-- v0.3 displays a tiny `0.3` version marker in the top-right corner.
+- Camera is pulled back to show more surrounding map.
+- Each living target has a compact floating HP bar with no name or numeric HP.
+- Loot value + icon appears directly above the target HP bar.
+- Fully defeated packs show the circular group respawn countdown.
+- Combat damage text floats briefly at the hit location.
+- v0.31 displays a tiny `0.31` version marker in the top-right corner.

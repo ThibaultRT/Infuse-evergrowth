@@ -1,6 +1,6 @@
 import { bluntHammerIcon } from './icons';
 import { statAdditiveTotal, statTotal } from './save';
-import type { PlayerStats, StatSources } from './types';
+import type { EquipmentSlotId, InventoryState, PlayerStats, StatSources } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app');
@@ -9,7 +9,7 @@ app.innerHTML = `
 <div id="game-shell">
   <div id="canvas-host"></div>
   <div class="hud">
-    <div class="version-tag">0.3</div>
+    <div class="version-tag">0.31</div>
     <div class="topbar">
       <div class="card hp-wrap">
         <div class="brand">Infuse: Evergrowth</div>
@@ -21,26 +21,41 @@ app.innerHTML = `
           <div class="damage-hud" title="Blunt damage">${bluntHammerIcon(13)}<span id="attack-stat">5</span></div>
         </div>
       </div>
-      <div class="hud-actions">
-        <button id="stats-button" class="card stats-button" type="button">STATS</button>
-        <div class="card weapon-slots" aria-label="weapon slots">
-          <div class="slot">HAND 1<br>EMPTY</div><div class="slot">HAND 2<br>EMPTY</div>
-          <div class="slot locked">ORBIT 1<br>LOCKED</div><div class="slot locked">ORBIT 2<br>LOCKED</div>
-        </div>
-      </div>
+      <button id="stats-button" class="card stats-button" type="button">STATS</button>
     </div>
     <div class="reset-note">Daily spawn reset: local midnight</div>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
+    <div class="bottom-dock card">
+      <div class="quick-slots" aria-label="equipped weapon slots">
+        <div class="quick-slot" data-slot="hand1"><span>H1</span></div>
+        <div class="quick-slot" data-slot="hand2"><span>H2</span></div>
+        <div class="quick-slot locked" data-slot="orbit1"><span>O1</span></div>
+        <div class="quick-slot locked" data-slot="orbit2"><span>O2</span></div>
+      </div>
+      <button id="inventory-button" class="dock-button" type="button">INVENTORY</button>
+    </div>
     <div id="toast" class="toast"></div>
-    <div id="stats-panel" class="stats-panel" aria-hidden="true">
-      <div class="card stats-sheet">
-        <div class="stats-sheet-header">
+    <div id="stats-panel" class="modal-panel" aria-hidden="true">
+      <div class="card modal-sheet stats-sheet">
+        <div class="modal-header">
           <div><div class="brand">Permanent growth</div><h2>Hero stats</h2></div>
-          <button id="stats-close" class="stats-close" type="button">CLOSE</button>
+          <button id="stats-close" class="modal-close" type="button">CLOSE</button>
         </div>
         <div id="stats-content"></div>
         <p class="stats-help">Stats keep decimal precision here. Combat HUD values are rounded to whole numbers.</p>
+      </div>
+    </div>
+    <div id="inventory-panel" class="modal-panel" aria-hidden="true">
+      <div class="card modal-sheet inventory-sheet">
+        <div class="modal-header">
+          <div><div class="brand">Equipment</div><h2>Inventory</h2></div>
+          <button id="inventory-close" class="modal-close" type="button">CLOSE</button>
+        </div>
+        <div class="inventory-section-title">Equipped</div>
+        <div id="inventory-equipped" class="inventory-equipped"></div>
+        <div class="inventory-section-title">Bag</div>
+        <div id="inventory-bag" class="inventory-bag"></div>
       </div>
     </div>
   </div>
@@ -52,7 +67,10 @@ export const ui = {
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), joystick: q<HTMLDivElement>('#joystick'),
   joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
-  statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host')
+  statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
+  inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
+  inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
+  inventoryBag: q<HTMLDivElement>('#inventory-bag'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
 };
 
 let toastTimer: number | null = null;
@@ -83,4 +101,28 @@ export function renderStats(stats: PlayerStats): void {
     renderBreakdown(bluntLabel, stats.attack.blunt),
     renderBreakdown('Health regeneration', stats.regen, ' HP/s')
   ].join('');
+}
+
+const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Hand 1', hand2: 'Hand 2', orbit1: 'Orbit 1', orbit2: 'Orbit 2' };
+const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2'];
+
+export function renderInventory(inventory: InventoryState): void {
+  const itemNames = new Map(inventory.items.map((item) => [item.id, item.name]));
+  ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
+    const locked = slot.startsWith('orbit');
+    const itemId = inventory.equipped[slot];
+    const value = locked ? 'LOCKED' : itemId ? itemNames.get(itemId) ?? 'ITEM' : 'EMPTY';
+    return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"><span>${SLOT_LABELS[slot]}</span><strong>${value}</strong></div>`;
+  }).join('');
+
+  ui.quickSlots.forEach((slotEl) => {
+    const slot = slotEl.dataset.slot as EquipmentSlotId;
+    const itemId = inventory.equipped[slot];
+    const label = slot === 'hand1' ? 'H1' : slot === 'hand2' ? 'H2' : slot === 'orbit1' ? 'O1' : 'O2';
+    slotEl.innerHTML = itemId ? `<span>${label}</span><strong>${itemNames.get(itemId) ?? 'ITEM'}</strong>` : `<span>${label}</span>`;
+  });
+
+  ui.inventoryBag.innerHTML = inventory.items.length
+    ? inventory.items.map((item) => `<button class="inventory-item" type="button" data-item-id="${item.id}">${item.name}</button>`).join('')
+    : '<div class="inventory-empty">No equipment found yet.</div>';
 }
