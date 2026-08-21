@@ -1,7 +1,7 @@
 import './reward-popups.css';
-import { bluntHammerIcon, heartIcon } from './icons';
+import { bluntHammerIcon, combatAffinityIcon, heartIcon } from './icons';
 import { statAdditiveTotal, statTotal } from './save';
-import type { EquipmentSlotId, InventoryState, PlayerStats, StatSources } from './types';
+import type { AreaDefinition, EquipmentSlotId, InventoryState, PlayerStats, StatSources } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app');
@@ -21,8 +21,12 @@ app.innerHTML = `
           </div>
           <div class="damage-hud" title="Blunt damage">${bluntHammerIcon(13)}<span id="attack-stat">5</span></div>
         </div>
+        <div id="enemy-affinities" class="enemy-affinities"></div>
       </div>
-      <button id="stats-button" class="card stats-button" type="button">STATS</button>
+      <div class="debug-actions">
+        <button id="stats-button" class="card stats-button" type="button">STATS</button>
+        <button id="spawn-button" class="card stats-button" type="button" title="Reset active respawn cooldowns">SPAWN</button>
+      </div>
     </div>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
@@ -65,14 +69,23 @@ app.innerHTML = `
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
   hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), attackText: q<HTMLSpanElement>('#attack-stat'),
+  enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
+  spawnButton: q<HTMLButtonElement>('#spawn-button'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
   inventoryBag: q<HTMLDivElement>('#inventory-bag'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
 };
+
+export function renderEnemyAffinities(area: AreaDefinition): void {
+  const weapon = combatAffinityIcon(area.enemyWeapon, 11);
+  const weakness = combatAffinityIcon(area.enemyWeakness, 11);
+  ui.enemyAffinities.innerHTML = `<span>Enemy attack ${weapon}</span><span>Weakness to ${weakness}</span>`;
+  ui.enemyAffinities.setAttribute('aria-label', `Enemy attack ${area.enemyWeapon}; weakness to ${area.enemyWeakness}`);
+}
 
 const gainItems: HTMLDivElement[] = [];
 

@@ -3,6 +3,8 @@
     {
       "id": 1,
       "name": "Area 1",
+      "enemyWeapon": "blunt",
+      "enemyWeakness": "slash",
       "worldOrigin": { "x": 0, "z": 0 },
       "bossSpawnId": "area1-legendary-01",
       "portals": [
@@ -51,6 +53,8 @@
     {
       "id": 2,
       "name": "Area 2",
+      "enemyWeapon": "slash",
+      "enemyWeakness": "pierce",
       "worldOrigin": { "x": 60, "z": 0 },
       "bossSpawnId": "area2-legendary-01",
       "portals": [],

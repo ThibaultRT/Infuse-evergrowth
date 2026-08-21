@@ -9,7 +9,7 @@
   },
   "enemy": {
     "commonBaseHp": 32,
-    "commonBaseAttack": 5,
+    "commonBaseAttack": 2,
     "aggroRadiusMeters": 5,
     "leashRadiusMeters": 7,
     "attackRangeVsBareHandsMultiplier": 1.05,
