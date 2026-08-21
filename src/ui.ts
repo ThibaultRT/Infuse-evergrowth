@@ -1,3 +1,4 @@
+import { bluntHammerIcon } from './icons';
 import { statAdditiveTotal, statTotal } from './save';
 import type { PlayerStats, StatSources } from './types';
 
@@ -8,15 +9,16 @@ app.innerHTML = `
 <div id="game-shell">
   <div id="canvas-host"></div>
   <div class="hud">
+    <div class="version-tag">0.3</div>
     <div class="topbar">
       <div class="card hp-wrap">
-        <div class="brand">Infuse: Evergrowth · v0.2</div>
+        <div class="brand">Infuse: Evergrowth</div>
         <div class="stats">
           <div style="flex:1">
             <div class="hp-label"><span>HP</span><span id="hp-text">120 / 120</span></div>
             <div class="bar"><span id="hp-bar"></span></div>
           </div>
-          <div>ATK <span id="attack-stat">20</span></div>
+          <div class="damage-hud" title="Blunt damage">${bluntHammerIcon(13)}<span id="attack-stat">5</span></div>
         </div>
       </div>
       <div class="hud-actions">
@@ -75,5 +77,10 @@ function renderBreakdown(label: string, stat: StatSources, suffix = ''): string 
 }
 
 export function renderStats(stats: PlayerStats): void {
-  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown('Attack', stats.attack), renderBreakdown('Health regeneration', stats.regen, ' HP/s')].join('');
+  const bluntLabel = `<span class="stat-title-with-icon">${bluntHammerIcon(14)} Blunt attack</span>`;
+  ui.statsContent.innerHTML = [
+    renderBreakdown('Max HP', stats.maxHp),
+    renderBreakdown(bluntLabel, stats.attack.blunt),
+    renderBreakdown('Health regeneration', stats.regen, ' HP/s')
+  ].join('');
 }
