@@ -4,6 +4,10 @@ import {
   AREAS,
   BARE_HANDS_DAMAGE_TYPE,
   BASE_RESPAWN_MS,
+  ENEMY_AGGRO_RADIUS,
+  ENEMY_ATTACK_COOLDOWN,
+  ENEMY_ATTACK_RANGE,
+  ENEMY_LEASH_RADIUS,
   HERO_ATTACK_COOLDOWN,
   HERO_ATTACK_RANGE,
   HERO_SPEED,
@@ -232,28 +236,32 @@ class SpawnEntity {
       }
       return;
     }
-    if (this.def.areaId !== currentAreaId || !this.config.hostile || !this.provoked || heroDead) return;
+    if (this.def.areaId !== currentAreaId || !this.config.hostile || heroDead) return;
 
     const toHero = hero.position.clone().sub(this.root.position);
     const distance = toHero.length();
     const fromSpawn = this.root.position.distanceTo(this.spawnPosition);
-    const maxLeash = 7;
-    if (distance > 1.35 && fromSpawn < maxLeash) {
-      toHero.normalize();
-      this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
-      this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
+
+    if (!this.provoked && distance <= ENEMY_AGGRO_RADIUS && fromSpawn < ENEMY_LEASH_RADIUS) this.provoked = true;
+    if (this.provoked && fromSpawn >= ENEMY_LEASH_RADIUS) this.provoked = false;
+
+    if (this.provoked) {
+      if (distance > ENEMY_ATTACK_RANGE) {
+        toHero.normalize();
+        this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
+        this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
+      }
+      this.attackCooldown = Math.max(0, this.attackCooldown - dt);
+      if (distance <= ENEMY_ATTACK_RANGE && this.attackCooldown === 0) {
+        damageHero(this.damage, ENEMY_DAMAGE_TYPE);
+        this.attackCooldown = ENEMY_ATTACK_COOLDOWN;
+      }
+      return;
     }
-    this.attackCooldown = Math.max(0, this.attackCooldown - dt);
-    if (distance <= 1.45 && this.attackCooldown === 0) {
-      damageHero(this.damage, ENEMY_DAMAGE_TYPE);
-      this.attackCooldown = 1.15;
-    }
-    if (fromSpawn >= maxLeash && distance > 3.5) this.provoked = false;
-    if (!this.provoked) {
-      const back = this.spawnPosition.clone().sub(this.root.position);
-      if (back.length() > .08) this.root.position.addScaledVector(back.normalize(), 3 * dt);
-      else this.root.position.copy(this.spawnPosition);
-    }
+
+    const back = this.spawnPosition.clone().sub(this.root.position);
+    if (back.length() > .08) this.root.position.addScaledVector(back.normalize(), 3 * dt);
+    else this.root.position.copy(this.spawnPosition);
   }
 }
 
@@ -319,7 +327,7 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   }
 }
 
-type GroupRespawnIndicator = {
+type RespawnIndicator = {
   members: SpawnEntity[];
   center: THREE.Vector3;
   element: HTMLDivElement;
@@ -334,7 +342,11 @@ for (const entity of entities) {
   members.push(entity);
   groupMembers.set(entity.def.group, members);
 }
-const groupIndicators: GroupRespawnIndicator[] = Array.from(groupMembers.values()).map((members) => {
+const respawnSpawnerMembers: SpawnEntity[][] = [
+  ...Array.from(groupMembers.values()),
+  ...entities.filter((entity) => entity.def.tier === 'crystal').map((entity) => [entity])
+];
+const respawnIndicators: RespawnIndicator[] = respawnSpawnerMembers.map((members) => {
   const center = members.reduce((sum, entity) => sum.add(entity.spawnPosition), new THREE.Vector3()).multiplyScalar(1 / members.length);
   const element = document.createElement('div');
   element.className = 'group-respawn hidden';
@@ -540,9 +552,9 @@ function formatCountdown(ms: number): string {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
-function updateGroupRespawns(): void {
+function updateRespawnIndicators(): void {
   const now = Date.now();
-  for (const indicator of groupIndicators) {
+  for (const indicator of respawnIndicators) {
     if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.every((member) => !member.alive)) {
       indicator.element.classList.add('hidden');
       continue;
@@ -558,7 +570,7 @@ function updateGroupRespawns(): void {
     const progress = THREE.MathUtils.clamp((end - now) / (end - start), 0, 1);
     indicator.progress.style.strokeDashoffset = `${GROUP_CIRCUMFERENCE * (1 - progress)}`;
     indicator.timer.textContent = formatCountdown(end - now);
-    projectWorldElement(indicator.center, indicator.element, 1.1);
+    projectWorldElement(indicator.center, indicator.element, indicator.members[0].def.tier === 'crystal' ? .9 : 1.1);
   }
 }
 
@@ -585,7 +597,7 @@ function updateHud(): void {
   ui.hpBar.style.width = `${heroHp / maxHp * 100}%`;
   ui.attackText.textContent = String(Math.round(heroDamage(BARE_HANDS_DAMAGE_TYPE)));
   updateTargetUi();
-  updateGroupRespawns();
+  updateRespawnIndicators();
 }
 
 addEventListener('resize', () => {

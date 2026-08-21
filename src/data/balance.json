@@ -10,6 +10,10 @@
   "enemy": {
     "commonBaseHp": 32,
     "commonBaseAttack": 5,
+    "aggroRadius": 5,
+    "leashRadius": 7,
+    "attackRangeVsBareHandsMultiplier": 1.05,
+    "attackCooldownSeconds": 1.15,
     "tiers": {
       "crystal": {
         "label": "Crystal",
