@@ -24,7 +24,6 @@ app.innerHTML = `
       </div>
       <button id="stats-button" class="card stats-button" type="button">STATS</button>
     </div>
-    <div class="reset-note">Daily spawn reset: local midnight</div>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
     <div class="bottom-dock card">
