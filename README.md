@@ -31,7 +31,7 @@ An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 All tunable gameplay numbers live in [`src/data/balance.json`](src/data/balance.json), including:
 
 - hero base HP / attack / regeneration;
-- movement and bare-hand combat values;
+- movement and bare-hand combat values (all configured distances are in meters);
 - Common enemy base HP / attack;
 - tier multipliers, loot rewards, respawn multipliers and colors;
 - respawn base time;

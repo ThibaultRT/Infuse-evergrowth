@@ -3,12 +3,12 @@ import {
   AREAS,
   BARE_HANDS_DAMAGE_TYPE,
   BASE_RESPAWN_MS,
-  ENEMY_AGGRO_RADIUS,
+  ENEMY_AGGRO_RADIUS_METERS,
   ENEMY_ATTACK_COOLDOWN,
-  ENEMY_ATTACK_RANGE,
-  ENEMY_LEASH_RADIUS,
+  ENEMY_ATTACK_RANGE_METERS,
+  ENEMY_LEASH_RADIUS_METERS,
   HERO_ATTACK_COOLDOWN,
-  HERO_ATTACK_RANGE,
+  HERO_ATTACK_RANGE_METERS,
   HERO_SPEED,
   PORTALS,
   SPAWNS,
@@ -41,7 +41,6 @@ scene.fog = new THREE.Fog(0x93b8cf, 42, 82);
 const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 180);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -253,17 +252,19 @@ class SpawnEntity {
     const distance = toHero.length();
     const fromSpawn = this.root.position.distanceTo(this.spawnPosition);
 
-    if (!this.provoked && distance <= ENEMY_AGGRO_RADIUS && fromSpawn < ENEMY_LEASH_RADIUS) this.provoked = true;
-    if (this.provoked && fromSpawn >= ENEMY_LEASH_RADIUS) this.provoked = false;
+    if (!this.provoked && distance <= ENEMY_AGGRO_RADIUS_METERS && fromSpawn < ENEMY_LEASH_RADIUS_METERS) this.provoked = true;
+    if (this.provoked && fromSpawn >= ENEMY_LEASH_RADIUS_METERS) this.provoked = false;
 
     if (this.provoked) {
-      if (distance > ENEMY_ATTACK_RANGE) {
+      // An enemy can land the first hit at its slightly longer range, but keeps
+      // closing until it is safely inside the hero's bare-hands reach.
+      if (distance >= HERO_ATTACK_RANGE_METERS * .95) {
         toHero.normalize();
         this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
         this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
       }
       this.attackCooldown = Math.max(0, this.attackCooldown - dt);
-      if (distance <= ENEMY_ATTACK_RANGE && this.attackCooldown === 0) {
+      if (distance <= ENEMY_ATTACK_RANGE_METERS && this.attackCooldown === 0) {
         damageHero(this.damage, ENEMY_DAMAGE_TYPE);
         this.attackCooldown = ENEMY_ATTACK_COOLDOWN;
       }
@@ -402,7 +403,7 @@ function damageHero(amount: number, type: DamageType): void {
   }, 1200);
 }
 
-function nearestTarget(maxDistance = HERO_ATTACK_RANGE): SpawnEntity | null {
+function nearestTarget(maxDistance = HERO_ATTACK_RANGE_METERS): SpawnEntity | null {
   let best: SpawnEntity | null = null;
   let distance = maxDistance;
   for (const entity of entities) {
@@ -565,12 +566,19 @@ function updateHud(): void {
   updateRespawnIndicators();
 }
 
-addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
+function resizeViewport(): void {
+  const viewportHeight = window.visualViewport?.height ?? innerHeight;
+  document.documentElement.style.setProperty('--viewport-height', `${viewportHeight}px`);
+  const width = ui.canvasHost.clientWidth;
+  const height = ui.canvasHost.clientHeight;
+  camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
+  renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-});
+}
+addEventListener('resize', resizeViewport);
+window.visualViewport?.addEventListener('resize', resizeViewport);
+resizeViewport();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     resetAtMidnightIfNeeded();

@@ -4,14 +4,14 @@
     "baseBluntAttack": 5,
     "baseRegenHpPerSecond": 0.1,
     "moveSpeed": 7.6,
-    "bareHandsRange": 2.15,
+    "bareHandsRangeMeters": 2.15,
     "attackCooldownSeconds": 0.5
   },
   "enemy": {
     "commonBaseHp": 32,
     "commonBaseAttack": 5,
-    "aggroRadius": 5,
-    "leashRadius": 7,
+    "aggroRadiusMeters": 5,
+    "leashRadiusMeters": 7,
     "attackRangeVsBareHandsMultiplier": 1.05,
     "attackCooldownSeconds": 1.15,
     "tiers": {
