@@ -33,6 +33,23 @@ export function makeTierRing(color: number): THREE.Mesh {
   ring.rotation.x = -Math.PI / 2; ring.position.y = 0.025; return ring;
 }
 
+export function makePortal(): { root: THREE.Group; barrier: THREE.Mesh; glow: THREE.MeshStandardMaterial } {
+  const root = new THREE.Group();
+  const stone = new THREE.MeshStandardMaterial({ color: 0x505866, roughness: 0.9 });
+  const glow = new THREE.MeshStandardMaterial({ color: 0x6ad8ff, emissive: 0x6ad8ff, emissiveIntensity: 0.18, roughness: 0.35 });
+  const barrierMaterial = new THREE.MeshStandardMaterial({ color: 0x222b38, emissive: 0x101722, emissiveIntensity: 0.15, transparent: true, opacity: 0.92, roughness: 0.55 });
+
+  const left = new THREE.Mesh(new THREE.BoxGeometry(0.48, 3.5, 0.58), stone); left.position.set(-1.18, 1.75, 0);
+  const right = new THREE.Mesh(new THREE.BoxGeometry(0.48, 3.5, 0.58), stone); right.position.set(1.18, 1.75, 0);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(2.84, 0.48, 0.58), stone); top.position.set(0, 3.28, 0);
+  const inner = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.09, 8, 32, Math.PI), glow); inner.rotation.z = Math.PI; inner.position.y = 2.02;
+  const barrier = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 2.75), barrierMaterial); barrier.position.set(0, 1.63, 0.08);
+
+  root.add(left, right, top, inner, barrier);
+  root.traverse((object) => { if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; } });
+  return { root, barrier, glow };
+}
+
 export function addRock(scene: THREE.Scene, x: number, z: number, scale: number): void {
   const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(scale, 0), new THREE.MeshStandardMaterial({ color: 0x68706e, roughness: 1 }));
   rock.position.set(x, scale * 0.55, z); rock.scale.y = 0.72; rock.rotation.set(x * 0.17, z * 0.11, x * z * 0.01); rock.castShadow = true; rock.receiveShadow = true; scene.add(rock);

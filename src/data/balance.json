@@ -1,0 +1,80 @@
+{
+  "hero": {
+    "baseMaxHp": 20,
+    "baseBluntAttack": 5,
+    "baseRegenHpPerSecond": 0.1,
+    "moveSpeed": 7.6,
+    "bareHandsRange": 2.15,
+    "attackCooldownSeconds": 0.5
+  },
+  "enemy": {
+    "commonBaseHp": 32,
+    "commonBaseAttack": 5,
+    "tiers": {
+      "crystal": {
+        "label": "Crystal",
+        "statMultiplier": 0.35,
+        "statReward": 0.5,
+        "respawnMultiplier": 1,
+        "color": "#8dd9ff",
+        "hostile": false
+      },
+      "common": {
+        "label": "Common",
+        "statMultiplier": 1,
+        "statReward": 1,
+        "respawnMultiplier": 1,
+        "color": "#b8bec8",
+        "hostile": true
+      },
+      "uncommon": {
+        "label": "Uncommon",
+        "statMultiplier": 2.25,
+        "statReward": 1.25,
+        "respawnMultiplier": 3,
+        "color": "#64dc8c",
+        "hostile": true
+      },
+      "rare": {
+        "label": "Rare",
+        "statMultiplier": 4.5,
+        "statReward": 1.5,
+        "respawnMultiplier": 6,
+        "color": "#5d98ff",
+        "hostile": true
+      },
+      "epic": {
+        "label": "Epic",
+        "statMultiplier": 8,
+        "statReward": 1.75,
+        "respawnMultiplier": 9,
+        "color": "#bf75ff",
+        "hostile": true
+      },
+      "legendary": {
+        "label": "Legendary",
+        "statMultiplier": 14,
+        "statReward": 2,
+        "respawnMultiplier": 15,
+        "color": "#ffb33d",
+        "hostile": true
+      }
+    }
+  },
+  "loot": {
+    "hpWeight": 0.5,
+    "bluntWeight": 0.5
+  },
+  "respawn": {
+    "baseSeconds": 180
+  },
+  "areaScaling": {
+    "plannedAreaCount": 15,
+    "hpGrowthPerArea": 4.65,
+    "attackMultiplierPerArea": 1,
+    "formulaNotes": {
+      "hp": "commonBaseHp * hpGrowthPerArea^(area - 1)",
+      "attack": "commonBaseAttack * area * attackMultiplierPerArea"
+    }
+  }
+}

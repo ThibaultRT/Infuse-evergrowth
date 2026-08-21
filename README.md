@@ -2,36 +2,69 @@
 
 An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
-## v0.31 vertical slice
+## v0.32 vertical slice
 
-- Compact 3D map with 30 fixed targets across Crystal → Legendary tiers
-- Low-poly human placeholders for combat enemies
-- Human hero in starter underwear
+- Two authored areas with 30 fixed targets each across Crystal → Legendary tiers
+- Area 1's Legendary target is the current boss
+- Area 1 contains a boss-gated portal tagged `portal - area 2`
+- Defeating the boss opens the portal, briefly focuses the camera on it, and unlocks Area 2
+- Walking into the open portal moves the hero to Area 2
+- Low-poly human placeholders for combat enemies and a human hero in starter underwear
 - Hero starts at **20 Max HP**, **5 Blunt Attack**, and **0.10 HP/s** passive regeneration
 - Central touch joystick for iPhone plus WASD / arrow keys on desktop
 - Automatic combat: the hero attacks the nearest living target inside the current weapon range
-- Bare hands use **Blunt** damage with a base value of **5**, shown with a hammer icon
+- Bare hands use **Blunt** damage, shown with a hammer icon
 - Targets advertise their current stat loot above the HP bar using only a value + icon
-- Loot is rolled once per target life: Max HP uses a heart icon, Blunt Attack uses a hammer icon
-- Stat gains from kills appear on the right as number + icon only; new gains spawn at a fixed origin and push older gains upward
-- Hero attacks show a small floating damage value + hammer icon over the target
-- Enemy hits show a red negative damage value + hammer icon over the hero; all enemies currently deal Blunt damage
+- Stat gains from kills appear on the right as number + icon only and cascade upward
 - Fully defeated Common/Uncommon packs show a circular countdown until the first member respawns
-- Direct permanent-stat rewards: targets grant Max HP or Blunt Attack, not Essence
-- Source-aware stats using `(base + additive sources) × multiplicative sources`
-- Decimal-precision stats tracking page with whole-number combat HUD
-- Four equipment slots are shown side by side in a bottom dock, with a dedicated Inventory window ready for future equipment
+- Four equipment slots are shown side by side in a bottom dock, with an Inventory window ready for future equipment
 - Per-spawn escalating respawn timers with a local-midnight reset
-- Local save for permanent stats, inventory state, loot rolls, and daily spawn state; during early development save migrations are intentionally not maintained
+- Local save for permanent stats, area unlocks, boss progression, inventory, loot rolls, and daily spawn state
 - Installable PWA shell deployed through GitHub Pages
+
+## Version source
+
+`package.json` is the single source of truth for the app version. The tiny in-game version label reads that package version at runtime, so a release bump does not require editing the UI separately.
+
+## Balance data
+
+All tunable gameplay numbers live in [`src/data/balance.json`](src/data/balance.json), including:
+
+- hero base HP / attack / regeneration;
+- movement and bare-hand combat values;
+- Common enemy base HP / attack;
+- tier multipliers, loot rewards, respawn multipliers and colors;
+- respawn base time;
+- loot roll weights;
+- cross-area HP and attack scaling.
+
+Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, and portal definitions/tags.
+
+## Area scaling
+
+Common enemy stats define the baseline for each area:
+
+```text
+Common HP(area) = commonBaseHp × hpGrowthPerArea^(area - 1)
+Common Attack(area) = commonBaseAttack × area
+```
+
+Current HP growth is **4.65× per area**. Tier multipliers are applied after the area scaling.
+
+With the current values:
+
+- Area 1 Common: 32 HP
+- Area 2 Common: ~149 HP
+- Area 15 Common: ~70.7B HP
+- Area 15 Legendary: ~990B HP
+
+This is intentionally aimed at a ~15-area progression ending around billions to roughly one trillion HP for the top tier.
 
 ## Current damage types
 
 | Type | Current source | Base attack |
 | --- | --- | ---: |
 | Blunt | Bare hands | 5 |
-
-The damage-type model is designed to accept additional weapon/damage types later without collapsing them into one generic Attack stat.
 
 ## Run locally
 
@@ -46,10 +79,8 @@ npm run dev
 npm run build
 ```
 
-The Vite base path is currently configured for GitHub Pages at `/Infuse-evergrowth/`.
+The Vite base path is configured for GitHub Pages at `/Infuse-evergrowth/`.
 
 ## GitHub Pages
 
 A workflow in `.github/workflows/deploy-pages.yml` builds and deploys `dist/` on pushes to `main`.
-
-If Pages is not enabled yet, select **GitHub Actions** as the Pages source in the repository settings.

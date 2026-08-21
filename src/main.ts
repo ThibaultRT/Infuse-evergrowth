@@ -1,37 +1,92 @@
 import * as THREE from 'three';
 import './style.css';
-import { BARE_HANDS_DAMAGE_TYPE, BASE_RESPAWN_MS, HERO_ATTACK_COOLDOWN, HERO_ATTACK_RANGE, HERO_SPEED, SPAWNS, TIER_CONFIG } from './config';
+import {
+  AREAS,
+  BARE_HANDS_DAMAGE_TYPE,
+  BASE_RESPAWN_MS,
+  HERO_ATTACK_COOLDOWN,
+  HERO_ATTACK_RANGE,
+  HERO_SPEED,
+  PORTALS,
+  SPAWNS,
+  TIER_CONFIG,
+  areaById,
+  enemyAttack,
+  enemyMaxHp
+} from './config';
 import { bluntHammerIcon, heartIcon } from './icons';
 import { emptySpawnState, heroDamage, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from './save';
-import type { DamageType, LootType, SpawnDefinition, TierConfig } from './types';
+import type { DamageType, LootType, PortalDefinition, SpawnDefinition, TierConfig } from './types';
 import { renderInventory, renderStats, showToast, ui } from './ui';
-import { addRock, makeCrystal, makeHumanoid, makeTierRing } from './visuals';
+import { applyVersionTag } from './version';
+import { addRock, makeCrystal, makeHumanoid, makePortal, makeTierRing } from './visuals';
+
+applyVersionTag();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x93b8cf);
 scene.fog = new THREE.Fog(0x93b8cf, 42, 82);
-const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 160);
-camera.position.set(0, 20, 17);
+const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 180);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 ui.canvasHost.append(renderer.domElement);
 
 scene.add(new THREE.HemisphereLight(0xdaf2ff, 0x51613f, 2.2));
-const sun = new THREE.DirectionalLight(0xfff0d2, 2.8); sun.position.set(-12, 22, 8); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
-sun.shadow.camera.left = -30; sun.shadow.camera.right = 30; sun.shadow.camera.top = 30; sun.shadow.camera.bottom = -30; scene.add(sun);
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(38, 56), new THREE.MeshStandardMaterial({ color: 0x668d52, roughness: 0.95 }));
-ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-const path = new THREE.Mesh(new THREE.PlaneGeometry(6, 50), new THREE.MeshStandardMaterial({ color: 0x9c906c, roughness: 1 }));
-path.rotation.x = -Math.PI / 2; path.position.y = 0.012; path.receiveShadow = true; scene.add(path);
-[
+const sun = new THREE.DirectionalLight(0xfff0d2, 2.8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.left = -30;
+sun.shadow.camera.right = 30;
+sun.shadow.camera.top = 30;
+sun.shadow.camera.bottom = -30;
+scene.add(sun, sun.target);
+
+const ROCK_LAYOUT = [
   [-16, 5, 1.2], [-15, -3, .8], [16, 7, 1], [15, -4, 1.3], [-13, 10, .65], [13, 10, .7],
   [-16, -17, .85], [16, -16, .9], [-10, 23, .8], [10, 24, 1], [-5, -24, .8], [5, -25, 1.1]
-].forEach(([x, z, s]) => addRock(scene, x, z, s));
+] as const;
 
-const hero = makeHumanoid(0x2f3540, true); hero.position.set(0, 0, 0); scene.add(hero);
-let heroHp = maxHeroHp(), heroDead = false, heroAttackCooldown = 0;
+for (const area of AREAS) {
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(38, 56), new THREE.MeshStandardMaterial({ color: area.id === 1 ? 0x668d52 : 0x5d8556, roughness: 0.95 }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.set(area.originX, 0, area.originZ);
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  const path = new THREE.Mesh(new THREE.PlaneGeometry(6, 50), new THREE.MeshStandardMaterial({ color: area.id === 1 ? 0x9c906c : 0x879574, roughness: 1 }));
+  path.rotation.x = -Math.PI / 2;
+  path.position.set(area.originX, 0.012, area.originZ);
+  path.receiveShadow = true;
+  scene.add(path);
+
+  for (const [x, z, scale] of ROCK_LAYOUT) addRock(scene, area.originX + x, area.originZ + z, scale);
+}
+
+let currentAreaId = save.currentAreaId;
+const initialArea = areaById(currentAreaId);
+const hero = makeHumanoid(0x2f3540, true);
+hero.position.set(initialArea.originX, 0, initialArea.originZ);
+scene.add(hero);
+let heroHp = maxHeroHp();
+let heroDead = false;
+let heroAttackCooldown = 0;
+let portalTransitionCooldown = 0;
 const ENEMY_DAMAGE_TYPE: DamageType = 'blunt';
+
+type CameraFocus = { point: THREE.Vector3; expiresAt: number };
+let cameraFocus: CameraFocus | null = null;
+
+function syncLighting(): void {
+  const area = areaById(currentAreaId);
+  sun.position.set(area.originX - 12, 22, area.originZ + 8);
+  sun.target.position.set(area.originX, 0, area.originZ);
+}
+syncLighting();
+camera.position.set(initialArea.originX, 19, initialArea.originZ + 16.5);
 
 function formatRewardAmount(amount: number): string {
   return amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
@@ -52,8 +107,7 @@ const combatTexts: FloatingCombatText[] = [];
 function showCombatText(position: THREE.Vector3, amount: number, type: DamageType, incoming = false): void {
   const element = document.createElement('div');
   element.className = `combat-text${incoming ? ' incoming' : ''}`;
-  const sign = incoming ? '-' : '';
-  element.innerHTML = `<span>${sign}${Math.round(amount)}</span>${type === 'blunt' ? bluntHammerIcon(10) : ''}`;
+  element.innerHTML = `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${type === 'blunt' ? bluntHammerIcon(10) : ''}`;
   ui.world.append(element);
   combatTexts.push({ element, position: position.clone(), age: 0, duration: .9 });
 }
@@ -75,22 +129,32 @@ class SpawnEntity {
 
   constructor(readonly def: SpawnDefinition) {
     this.config = TIER_CONFIG[def.tier];
-    this.maxHp = Math.max(1, Math.round(32 * this.config.statMultiplier)); this.hp = this.maxHp;
-    this.damage = Math.max(1, Math.round(5 * this.config.statMultiplier)); this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
+    this.maxHp = enemyMaxHp(def.areaId, def.tier);
+    this.hp = this.maxHp;
+    this.damage = enemyAttack(def.areaId, def.tier);
+    this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
-    this.root.add(def.tier === 'crystal' ? makeCrystal(this.config.color) : makeHumanoid(this.config.color), makeTierRing(this.config.color)); scene.add(this.root);
+    this.root.add(def.tier === 'crystal' ? makeCrystal(this.config.color) : makeHumanoid(this.config.color), makeTierRing(this.config.color));
+    scene.add(this.root);
 
     this.targetUi.className = 'world-target-ui';
     this.lootLabel.className = 'world-loot';
     this.healthBar.className = 'world-hp-bar';
     this.healthFill.style.backgroundColor = `#${this.config.color.toString(16).padStart(6, '0')}`;
-    this.healthBar.append(this.healthFill); this.targetUi.append(this.lootLabel, this.healthBar); ui.world.append(this.targetUi);
+    this.healthBar.append(this.healthFill);
+    this.targetUi.append(this.lootLabel, this.healthBar);
+    ui.world.append(this.targetUi);
 
     const state = save.spawns[def.id];
     if (state?.respawnAt && state.respawnAt > Date.now()) this.setAlive(false);
     else if (state?.respawnAt) {
-      state.respawnAt = null; state.defeatedAt = null; state.loot = rollLoot(); this.setAlive(true); persist();
+      state.respawnAt = null;
+      state.defeatedAt = null;
+      state.loot = rollLoot();
+      this.setAlive(true);
+      persist();
     } else this.renderLoot();
+    this.syncAreaVisibility();
   }
 
   renderLoot(): void {
@@ -99,64 +163,161 @@ class SpawnEntity {
     this.lootLabel.innerHTML = `<span>${formatRewardAmount(this.config.statReward)}</span>${lootIcon(loot)}`;
   }
 
-  setAlive(value: boolean): void {
-    this.alive = value; this.root.visible = value; this.targetUi.classList.toggle('hidden', !value);
-    if (value) {
-      this.hp = this.maxHp; this.healthFill.style.width = '100%'; this.provoked = false; this.attackCooldown = 0; this.root.position.copy(this.spawnPosition); this.renderLoot();
-    }
+  syncAreaVisibility(): void {
+    const visible = this.alive && this.def.areaId === currentAreaId;
+    this.root.visible = visible;
+    this.targetUi.classList.toggle('hidden', !visible);
   }
+
+  setAlive(value: boolean): void {
+    this.alive = value;
+    if (value) {
+      this.hp = this.maxHp;
+      this.healthFill.style.width = '100%';
+      this.provoked = false;
+      this.attackCooldown = 0;
+      this.root.position.copy(this.spawnPosition);
+      this.renderLoot();
+    }
+    this.syncAreaVisibility();
+  }
+
   forceRespawn(): void { this.setAlive(true); }
   distanceToHero(): number { return this.root.position.distanceTo(hero.position); }
+
   receiveDamage(amount: number, type: DamageType): void {
-    if (!this.alive) return;
+    if (!this.alive || this.def.areaId !== currentAreaId) return;
     showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), amount, type);
-    this.hp = Math.max(0, this.hp - amount); this.healthFill.style.width = `${(this.hp / this.maxHp) * 100}%`;
+    this.hp = Math.max(0, this.hp - amount);
+    this.healthFill.style.width = `${(this.hp / this.maxHp) * 100}%`;
     if (this.config.hostile) this.provoked = true;
     if (this.hp === 0) this.defeat();
   }
+
   defeat(): void {
     const state = save.spawns[this.def.id];
     const now = Date.now();
-    state.killsToday += 1; state.defeatedAt = now;
+    state.killsToday += 1;
+    state.defeatedAt = now;
     const timer = BASE_RESPAWN_MS * this.config.respawnMultiplier * 2 ** (state.killsToday - 1);
     state.respawnAt = Math.min(now + timer, nextLocalMidnightMs());
-    const stat = state.loot, amount = this.config.statReward;
+
+    const stat = state.loot;
+    const amount = this.config.statReward;
     if (stat === 'hp') {
-      const oldMax = maxHeroHp(); save.stats.maxHp.additive.kills = (save.stats.maxHp.additive.kills ?? 0) + amount;
+      const oldMax = maxHeroHp();
+      save.stats.maxHp.additive.kills = (save.stats.maxHp.additive.kills ?? 0) + amount;
       heroHp = Math.min(maxHeroHp(), heroHp + maxHeroHp() - oldMax);
     } else {
       const blunt = save.stats.attack[stat];
       blunt.additive.kills = (blunt.additive.kills ?? 0) + amount;
     }
-    persist(); this.setAlive(false); renderStats(save.stats);
+
+    this.setAlive(false);
+    handleBossDefeat(this.def.areaId, this.def.id);
+    persist();
+    renderStats(save.stats);
     showToast(`+${formatRewardAmount(amount)} ${stat === 'hp' ? 'HP' : 'BLUNT'} · ${this.config.label}`);
   }
+
   update(dt: number): void {
     if (!this.alive) {
       const state = save.spawns[this.def.id];
       if (state?.respawnAt && Date.now() >= state.respawnAt) {
-        state.respawnAt = null; state.defeatedAt = null; state.loot = rollLoot(); this.setAlive(true); persist();
+        state.respawnAt = null;
+        state.defeatedAt = null;
+        state.loot = rollLoot();
+        this.setAlive(true);
+        persist();
       }
       return;
     }
-    if (!this.config.hostile || !this.provoked || heroDead) return;
-    const toHero = hero.position.clone().sub(this.root.position), distance = toHero.length();
-    const fromSpawn = this.root.position.distanceTo(this.spawnPosition), maxLeash = 7;
+    if (this.def.areaId !== currentAreaId || !this.config.hostile || !this.provoked || heroDead) return;
+
+    const toHero = hero.position.clone().sub(this.root.position);
+    const distance = toHero.length();
+    const fromSpawn = this.root.position.distanceTo(this.spawnPosition);
+    const maxLeash = 7;
     if (distance > 1.35 && fromSpawn < maxLeash) {
-      toHero.normalize(); this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
+      toHero.normalize();
+      this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
       this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
     }
     this.attackCooldown = Math.max(0, this.attackCooldown - dt);
-    if (distance <= 1.45 && this.attackCooldown === 0) { damageHero(this.damage, ENEMY_DAMAGE_TYPE); this.attackCooldown = 1.15; }
+    if (distance <= 1.45 && this.attackCooldown === 0) {
+      damageHero(this.damage, ENEMY_DAMAGE_TYPE);
+      this.attackCooldown = 1.15;
+    }
     if (fromSpawn >= maxLeash && distance > 3.5) this.provoked = false;
     if (!this.provoked) {
       const back = this.spawnPosition.clone().sub(this.root.position);
-      if (back.length() > .08) this.root.position.addScaledVector(back.normalize(), 3 * dt); else this.root.position.copy(this.spawnPosition);
+      if (back.length() > .08) this.root.position.addScaledVector(back.normalize(), 3 * dt);
+      else this.root.position.copy(this.spawnPosition);
     }
   }
 }
 
 const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
+
+class PortalEntity {
+  readonly root: THREE.Group;
+  readonly barrier: THREE.Mesh;
+  readonly glow: THREE.MeshStandardMaterial;
+  open = false;
+
+  constructor(readonly def: PortalDefinition) {
+    const visual = makePortal();
+    this.root = visual.root;
+    this.barrier = visual.barrier;
+    this.glow = visual.glow;
+    this.root.position.set(def.x, 0, def.z);
+    this.root.userData.portalId = def.id;
+    this.root.userData.tag = def.tag;
+    this.root.userData.targetAreaId = def.targetAreaId;
+    scene.add(this.root);
+    this.setOpen(save.unlockedAreas.includes(def.targetAreaId) || !def.requiresBossDefeated);
+    this.syncAreaVisibility();
+  }
+
+  setOpen(value: boolean): void {
+    this.open = value;
+    this.barrier.visible = !value;
+    this.glow.emissiveIntensity = value ? 1.25 : 0.12;
+    this.glow.color.setHex(value ? 0x6ad8ff : 0x59636f);
+  }
+
+  syncAreaVisibility(): void { this.root.visible = this.def.sourceAreaId === currentAreaId; }
+  distanceToHero(): number { return this.root.position.distanceTo(hero.position); }
+}
+
+const portalEntities = PORTALS.map((portal) => new PortalEntity(portal));
+
+function syncAreaVisibility(): void {
+  entities.forEach((entity) => entity.syncAreaVisibility());
+  portalEntities.forEach((portal) => portal.syncAreaVisibility());
+  syncLighting();
+}
+
+function startPortalCinematic(portal: PortalEntity): void {
+  resetJoystick();
+  cameraFocus = { point: portal.root.position.clone(), expiresAt: performance.now() + 2600 };
+}
+
+function handleBossDefeat(areaId: number, spawnId: string): void {
+  const area = areaById(areaId);
+  if (spawnId !== area.bossSpawnId || save.defeatedBosses.includes(spawnId)) return;
+  save.defeatedBosses.push(spawnId);
+
+  const openedPortals = portalEntities.filter((portal) => portal.def.sourceAreaId === areaId && portal.def.requiresBossDefeated);
+  for (const portal of openedPortals) {
+    if (!save.unlockedAreas.includes(portal.def.targetAreaId)) save.unlockedAreas.push(portal.def.targetAreaId);
+    portal.setOpen(true);
+  }
+  if (openedPortals[0]) {
+    startPortalCinematic(openedPortals[0]);
+    showToast(`${areaById(openedPortals[0].def.targetAreaId).name} unlocked`);
+  }
+}
 
 type GroupRespawnIndicator = {
   members: SpawnEntity[];
@@ -170,88 +331,190 @@ const groupMembers = new Map<string, SpawnEntity[]>();
 for (const entity of entities) {
   if (!entity.def.group) continue;
   const members = groupMembers.get(entity.def.group) ?? [];
-  members.push(entity); groupMembers.set(entity.def.group, members);
+  members.push(entity);
+  groupMembers.set(entity.def.group, members);
 }
 const groupIndicators: GroupRespawnIndicator[] = Array.from(groupMembers.values()).map((members) => {
   const center = members.reduce((sum, entity) => sum.add(entity.spawnPosition), new THREE.Vector3()).multiplyScalar(1 / members.length);
-  const element = document.createElement('div'); element.className = 'group-respawn hidden';
+  const element = document.createElement('div');
+  element.className = 'group-respawn hidden';
   element.innerHTML = `<svg viewBox="0 0 36 36" aria-hidden="true"><circle class="respawn-track" cx="18" cy="18" r="14"/><circle class="respawn-progress" cx="18" cy="18" r="14"/></svg><span></span>`;
   const progress = element.querySelector<SVGCircleElement>('.respawn-progress')!;
-  progress.style.strokeDasharray = `${GROUP_CIRCUMFERENCE}`; progress.style.strokeDashoffset = '0';
+  progress.style.strokeDasharray = `${GROUP_CIRCUMFERENCE}`;
+  progress.style.strokeDashoffset = '0';
   const timer = element.querySelector<HTMLSpanElement>('span')!;
   ui.world.append(element);
   return { members, center, element, progress, timer };
 });
 
 function resetAtMidnightIfNeeded(): void {
-  const key = localDailyKey(); if (save.dailyKey === key) return;
-  save.dailyKey = key; save.spawns = emptySpawnState(); entities.forEach((e) => e.forceRespawn()); persist(); showToast('Daily reset · all spawns restored');
+  const key = localDailyKey();
+  if (save.dailyKey === key) return;
+  save.dailyKey = key;
+  save.spawns = emptySpawnState();
+  entities.forEach((entity) => entity.forceRespawn());
+  persist();
+  showToast('Daily reset · all spawns restored');
 }
+
 function damageHero(amount: number, type: DamageType): void {
   if (heroDead) return;
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, type, true);
-  heroHp = Math.max(0, heroHp - amount); updateHud();
+  heroHp = Math.max(0, heroHp - amount);
+  updateHud();
   if (heroHp !== 0) return;
-  heroDead = true; showToast('Defeated · returning to the start');
-  setTimeout(() => { hero.position.set(0, 0, 0); heroHp = maxHeroHp(); heroDead = false; entities.forEach((e) => { e.provoked = false; }); updateHud(); }, 1200);
+  heroDead = true;
+  showToast('Defeated · returning to the start');
+  setTimeout(() => {
+    const area = areaById(currentAreaId);
+    hero.position.set(area.originX, 0, area.originZ);
+    heroHp = maxHeroHp();
+    heroDead = false;
+    entities.forEach((entity) => { entity.provoked = false; });
+    updateHud();
+  }, 1200);
 }
+
 function nearestTarget(maxDistance = HERO_ATTACK_RANGE): SpawnEntity | null {
-  let best: SpawnEntity | null = null, distance = maxDistance;
-  for (const entity of entities) if (entity.alive) { const d = entity.distanceToHero(); if (d < distance) { best = entity; distance = d; } }
+  let best: SpawnEntity | null = null;
+  let distance = maxDistance;
+  for (const entity of entities) {
+    if (!entity.alive || entity.def.areaId !== currentAreaId) continue;
+    const candidate = entity.distanceToHero();
+    if (candidate < distance) { best = entity; distance = candidate; }
+  }
   return best;
 }
+
 function autoAttack(): void {
-  if (heroDead || heroAttackCooldown > 0) return;
-  const target = nearestTarget(); if (!target) return;
-  heroAttackCooldown = HERO_ATTACK_COOLDOWN; target.receiveDamage(heroDamage(BARE_HANDS_DAMAGE_TYPE), BARE_HANDS_DAMAGE_TYPE);
-  const direction = target.root.position.clone().sub(hero.position); if (direction.lengthSq() > 0) hero.rotation.y = Math.atan2(direction.x, direction.z);
+  if (heroDead || heroAttackCooldown > 0 || cameraFocus) return;
+  const target = nearestTarget();
+  if (!target) return;
+  heroAttackCooldown = HERO_ATTACK_COOLDOWN;
+  target.receiveDamage(heroDamage(BARE_HANDS_DAMAGE_TYPE), BARE_HANDS_DAMAGE_TYPE);
+  const direction = target.root.position.clone().sub(hero.position);
+  if (direction.lengthSq() > 0) hero.rotation.y = Math.atan2(direction.x, direction.z);
 }
 
-const keys = new Set<string>(); addEventListener('keydown', (e) => keys.add(e.code)); addEventListener('keyup', (e) => keys.delete(e.code));
-const joystickVector = new THREE.Vector2(); let joystickPointer: number | null = null;
-function resetJoystick(): void { joystickPointer = null; joystickVector.set(0, 0); ui.joystickKnob.style.transform = 'translate(-50%, -50%)'; }
-ui.joystick.addEventListener('pointerdown', (e) => { joystickPointer = e.pointerId; ui.joystick.setPointerCapture(e.pointerId); });
-ui.joystick.addEventListener('pointermove', (e) => {
-  if (e.pointerId !== joystickPointer) return;
-  const r = ui.joystick.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-  const radius = r.width * .34, length = Math.hypot(dx, dy) || 1, clamp = Math.min(length, radius), nx = dx / length * clamp, ny = dy / length * clamp;
-  joystickVector.set(nx / radius, ny / radius); ui.joystickKnob.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+const keys = new Set<string>();
+addEventListener('keydown', (event) => keys.add(event.code));
+addEventListener('keyup', (event) => keys.delete(event.code));
+const joystickVector = new THREE.Vector2();
+let joystickPointer: number | null = null;
+function resetJoystick(): void {
+  joystickPointer = null;
+  joystickVector.set(0, 0);
+  ui.joystickKnob.style.transform = 'translate(-50%, -50%)';
+}
+ui.joystick.addEventListener('pointerdown', (event) => {
+  joystickPointer = event.pointerId;
+  ui.joystick.setPointerCapture(event.pointerId);
 });
-ui.joystick.addEventListener('pointerup', resetJoystick); ui.joystick.addEventListener('pointercancel', resetJoystick);
+ui.joystick.addEventListener('pointermove', (event) => {
+  if (event.pointerId !== joystickPointer) return;
+  const rect = ui.joystick.getBoundingClientRect();
+  const dx = event.clientX - (rect.left + rect.width / 2);
+  const dy = event.clientY - (rect.top + rect.height / 2);
+  const radius = rect.width * .34;
+  const length = Math.hypot(dx, dy) || 1;
+  const clamped = Math.min(length, radius);
+  const nx = dx / length * clamped;
+  const ny = dy / length * clamped;
+  joystickVector.set(nx / radius, ny / radius);
+  ui.joystickKnob.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+});
+ui.joystick.addEventListener('pointerup', resetJoystick);
+ui.joystick.addEventListener('pointercancel', resetJoystick);
 
 function setStatsPanel(open: boolean): void {
-  if (open) { ui.inventoryPanel.classList.remove('visible'); ui.inventoryPanel.setAttribute('aria-hidden', 'true'); }
-  ui.statsPanel.classList.toggle('visible', open); ui.statsPanel.setAttribute('aria-hidden', String(!open)); if (open) renderStats(save.stats);
+  if (open) {
+    ui.inventoryPanel.classList.remove('visible');
+    ui.inventoryPanel.setAttribute('aria-hidden', 'true');
+  }
+  ui.statsPanel.classList.toggle('visible', open);
+  ui.statsPanel.setAttribute('aria-hidden', String(!open));
+  if (open) renderStats(save.stats);
 }
 function setInventoryPanel(open: boolean): void {
-  if (open) { ui.statsPanel.classList.remove('visible'); ui.statsPanel.setAttribute('aria-hidden', 'true'); }
-  ui.inventoryPanel.classList.toggle('visible', open); ui.inventoryPanel.setAttribute('aria-hidden', String(!open)); if (open) renderInventory(save.inventory);
+  if (open) {
+    ui.statsPanel.classList.remove('visible');
+    ui.statsPanel.setAttribute('aria-hidden', 'true');
+  }
+  ui.inventoryPanel.classList.toggle('visible', open);
+  ui.inventoryPanel.setAttribute('aria-hidden', String(!open));
+  if (open) renderInventory(save.inventory);
 }
-ui.statsButton.addEventListener('click', () => setStatsPanel(true)); ui.statsClose.addEventListener('click', () => setStatsPanel(false));
-ui.statsPanel.addEventListener('pointerdown', (e) => { if (e.target === ui.statsPanel) setStatsPanel(false); });
-ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true)); ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
-ui.inventoryPanel.addEventListener('pointerdown', (e) => { if (e.target === ui.inventoryPanel) setInventoryPanel(false); });
+ui.statsButton.addEventListener('click', () => setStatsPanel(true));
+ui.statsClose.addEventListener('click', () => setStatsPanel(false));
+ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.statsPanel) setStatsPanel(false); });
+ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
+ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
+ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
 
 function movementVector(): THREE.Vector2 {
-  let x = joystickVector.x, y = -joystickVector.y;
-  if (keys.has('KeyA') || keys.has('ArrowLeft')) x--; if (keys.has('KeyD') || keys.has('ArrowRight')) x++;
-  if (keys.has('KeyW') || keys.has('ArrowUp')) y++; if (keys.has('KeyS') || keys.has('ArrowDown')) y--;
-  const v = new THREE.Vector2(x, y); if (v.lengthSq() > 1) v.normalize(); return v;
+  let x = joystickVector.x;
+  let y = -joystickVector.y;
+  if (keys.has('KeyA') || keys.has('ArrowLeft')) x--;
+  if (keys.has('KeyD') || keys.has('ArrowRight')) x++;
+  if (keys.has('KeyW') || keys.has('ArrowUp')) y++;
+  if (keys.has('KeyS') || keys.has('ArrowDown')) y--;
+  const vector = new THREE.Vector2(x, y);
+  if (vector.lengthSq() > 1) vector.normalize();
+  return vector;
 }
+
 function updateHero(dt: number): void {
-  if (heroDead) return; const move = movementVector(); if (move.lengthSq() === 0) return;
-  hero.position.x += move.x * HERO_SPEED * dt; hero.position.z -= move.y * HERO_SPEED * dt;
-  hero.position.x = THREE.MathUtils.clamp(hero.position.x, -17.2, 17.2); hero.position.z = THREE.MathUtils.clamp(hero.position.z, -26.2, 26.2);
+  if (heroDead || cameraFocus) return;
+  const move = movementVector();
+  if (move.lengthSq() === 0) return;
+  hero.position.x += move.x * HERO_SPEED * dt;
+  hero.position.z -= move.y * HERO_SPEED * dt;
+  const area = areaById(currentAreaId);
+  hero.position.x = THREE.MathUtils.clamp(hero.position.x, area.originX - 17.2, area.originX + 17.2);
+  hero.position.z = THREE.MathUtils.clamp(hero.position.z, area.originZ - 26.2, area.originZ + 26.2);
   hero.rotation.y = Math.atan2(move.x, -move.y);
 }
-function updateCamera(dt: number): void {
+
+function enterArea(targetAreaId: number): void {
+  if (!save.unlockedAreas.includes(targetAreaId)) return;
+  currentAreaId = targetAreaId;
+  save.currentAreaId = targetAreaId;
+  const area = areaById(targetAreaId);
+  hero.position.set(area.originX, 0, area.originZ);
+  entities.forEach((entity) => { entity.provoked = false; });
+  cameraFocus = null;
+  portalTransitionCooldown = 1;
+  resetJoystick();
+  syncAreaVisibility();
+  camera.position.set(area.originX, 19, area.originZ + 16.5);
+  persist();
+  showToast(area.name);
+}
+
+function updatePortals(dt: number): void {
+  portalTransitionCooldown = Math.max(0, portalTransitionCooldown - dt);
+  if (portalTransitionCooldown > 0 || cameraFocus || heroDead) return;
+  const portal = portalEntities.find((candidate) => candidate.def.sourceAreaId === currentAreaId && candidate.open && candidate.distanceToHero() <= 1.45);
+  if (portal) enterArea(portal.def.targetAreaId);
+}
+
+function updateCamera(dt: number, now: number): void {
+  if (cameraFocus && now < cameraFocus.expiresAt) {
+    const desired = new THREE.Vector3(cameraFocus.point.x, 16, cameraFocus.point.z + 12);
+    camera.position.lerp(desired, 1 - Math.exp(-3.2 * dt));
+    camera.lookAt(cameraFocus.point.x, 1.25, cameraFocus.point.z);
+    return;
+  }
+  if (cameraFocus) cameraFocus = null;
   camera.position.lerp(new THREE.Vector3(hero.position.x, 19, hero.position.z + 16.5), 1 - Math.exp(-5 * dt));
   camera.lookAt(hero.position.x, .9, hero.position.z - 2.5);
 }
 
 const projected = new THREE.Vector3();
 function projectWorldElement(position: THREE.Vector3, element: HTMLElement, yOffset = 0): boolean {
-  projected.copy(position); projected.y += yOffset; projected.project(camera);
+  projected.copy(position);
+  projected.y += yOffset;
+  projected.project(camera);
   const shown = projected.z >= -1 && projected.z <= 1 && projected.x >= -1.08 && projected.x <= 1.08 && projected.y >= -1.08 && projected.y <= 1.08;
   element.style.visibility = shown ? 'visible' : 'hidden';
   if (!shown) return false;
@@ -262,26 +525,34 @@ function projectWorldElement(position: THREE.Vector3, element: HTMLElement, yOff
 
 function updateTargetUi(): void {
   for (const entity of entities) {
-    if (!entity.alive) continue;
+    if (!entity.alive || entity.def.areaId !== currentAreaId) {
+      entity.targetUi.style.visibility = 'hidden';
+      continue;
+    }
     projectWorldElement(entity.root.position, entity.targetUi, entity.def.tier === 'crystal' ? 2.05 : 3.05);
   }
 }
 
 function formatCountdown(ms: number): string {
   const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
-  const minutes = Math.floor(totalSeconds / 60), seconds = totalSeconds % 60;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
 function updateGroupRespawns(): void {
   const now = Date.now();
   for (const indicator of groupIndicators) {
-    if (!indicator.members.every((member) => !member.alive)) { indicator.element.classList.add('hidden'); continue; }
+    if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.every((member) => !member.alive)) {
+      indicator.element.classList.add('hidden');
+      continue;
+    }
     const states = indicator.members.map((member) => save.spawns[member.def.id]);
     const ends = states.map((state) => state.respawnAt).filter((value): value is number => value !== null);
     const starts = states.map((state) => state.defeatedAt).filter((value): value is number => value !== null);
     if (!ends.length || !starts.length) { indicator.element.classList.add('hidden'); continue; }
-    const end = Math.min(...ends), start = Math.max(...starts);
+    const end = Math.min(...ends);
+    const start = Math.max(...starts);
     if (end <= now || end <= start) { indicator.element.classList.add('hidden'); continue; }
     indicator.element.classList.remove('hidden');
     const progress = THREE.MathUtils.clamp((end - now) / (end - start), 0, 1);
@@ -292,33 +563,71 @@ function updateGroupRespawns(): void {
 }
 
 function updateCombatTexts(dt: number): void {
-  for (let i = combatTexts.length - 1; i >= 0; i--) {
-    const item = combatTexts[i]; item.age += dt;
-    if (item.age >= item.duration) { item.element.remove(); combatTexts.splice(i, 1); continue; }
+  for (let index = combatTexts.length - 1; index >= 0; index--) {
+    const item = combatTexts[index];
+    item.age += dt;
+    if (item.age >= item.duration) {
+      item.element.remove();
+      combatTexts.splice(index, 1);
+      continue;
+    }
     if (projectWorldElement(item.position, item.element)) {
-      const t = item.age / item.duration;
-      item.element.style.transform = `translate(-50%, calc(-50% - ${t * 24}px))`;
-      item.element.style.opacity = String(1 - t);
+      const progress = item.age / item.duration;
+      item.element.style.transform = `translate(-50%, calc(-50% - ${progress * 24}px))`;
+      item.element.style.opacity = String(1 - progress);
     }
   }
 }
 
 function updateHud(): void {
-  const maxHp = maxHeroHp(); ui.hpText.textContent = `${Math.round(heroHp)} / ${Math.round(maxHp)}`;
-  ui.hpBar.style.width = `${heroHp / maxHp * 100}%`; ui.attackText.textContent = String(Math.round(heroDamage(BARE_HANDS_DAMAGE_TYPE)));
-  updateTargetUi(); updateGroupRespawns();
+  const maxHp = maxHeroHp();
+  ui.hpText.textContent = `${Math.round(heroHp)} / ${Math.round(maxHp)}`;
+  ui.hpBar.style.width = `${heroHp / maxHp * 100}%`;
+  ui.attackText.textContent = String(Math.round(heroDamage(BARE_HANDS_DAMAGE_TYPE)));
+  updateTargetUi();
+  updateGroupRespawns();
 }
 
-addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); });
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { resetAtMidnightIfNeeded(); entities.forEach((e) => e.update(0)); } });
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    resetAtMidnightIfNeeded();
+    entities.forEach((entity) => entity.update(0));
+  }
+});
 
-let previous = performance.now(), midnightAccumulator = 0;
+syncAreaVisibility();
+let previous = performance.now();
+let midnightAccumulator = 0;
 function frame(now: number): void {
-  const dt = Math.min((now - previous) / 1000, .05); previous = now; heroAttackCooldown = Math.max(0, heroAttackCooldown - dt); midnightAccumulator += dt;
-  if (midnightAccumulator >= 1) { midnightAccumulator = 0; resetAtMidnightIfNeeded(); }
-  updateHero(dt); autoAttack(); entities.forEach((e) => e.update(dt));
+  const dt = Math.min((now - previous) / 1000, .05);
+  previous = now;
+  heroAttackCooldown = Math.max(0, heroAttackCooldown - dt);
+  midnightAccumulator += dt;
+  if (midnightAccumulator >= 1) {
+    midnightAccumulator = 0;
+    resetAtMidnightIfNeeded();
+  }
+
+  updateHero(dt);
+  updatePortals(dt);
+  autoAttack();
+  if (!cameraFocus) entities.forEach((entity) => entity.update(dt));
   if (!heroDead) heroHp = Math.min(maxHeroHp(), heroHp + heroRegen() * dt);
-  updateCamera(dt); updateHud(); updateCombatTexts(dt); renderer.render(scene, camera); requestAnimationFrame(frame);
+  updateCamera(dt, now);
+  updateHud();
+  updateCombatTexts(dt);
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
 }
 
-renderStats(save.stats); renderInventory(save.inventory); updateHud(); persist(); requestAnimationFrame(frame);
+renderStats(save.stats);
+renderInventory(save.inventory);
+updateHud();
+persist();
+requestAnimationFrame(frame);
