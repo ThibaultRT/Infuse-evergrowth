@@ -2,11 +2,45 @@
 
 ## Product direction
 
-Infuse: Evergrowth is an **active incremental RPG**. The player explores manually, fights or infuses fixed world targets, and grows through repeated victories. It is not designed around artificial paywalls or excessive idle waiting.
+Infuse: Evergrowth is an **active incremental RPG**. The player explores manually, defeats fixed world targets, and grows through permanent stat gains.
 
-## v0.1 map population
+## Configuration sources
 
-The first map contains exactly **30 fixed spawn points**:
+Gameplay tuning is intentionally separated from authored world content.
+
+### `src/data/balance.json`
+
+Single source of truth for tunable numeric values:
+
+- hero base HP, damage, regeneration, movement speed, attack range/cooldown;
+- Common enemy base HP and attack;
+- tier stat multipliers;
+- tier permanent-stat rewards;
+- tier respawn multipliers;
+- loot roll weights;
+- respawn base duration;
+- cross-area growth formulas.
+
+### `src/data/areas.json`
+
+Authored world data:
+
+- area IDs and names;
+- world origins;
+- 30 fixed spawn positions per area;
+- group IDs;
+- boss spawn IDs;
+- portal IDs, tags, destinations and unlock rules.
+
+## Versioning
+
+`package.json` is the app-version source of truth. The top-right UI version is populated from the package version at runtime rather than maintaining a second literal value.
+
+Current package version: `0.32.0` → displayed as `0.32`.
+
+## Enemy population
+
+Each current area contains exactly **30 fixed spawn points**:
 
 | Tier | Count | Grouping |
 | --- | ---: | --- |
@@ -15,30 +49,44 @@ The first map contains exactly **30 fixed spawn points**:
 | Uncommon | 4 | Two packs: 2 + 2 |
 | Rare | 3 | Singles |
 | Epic | 2 | Singles |
-| Legendary | 1 | Single |
-
-Spawn positions and tiers are authored data and do not randomize.
-
-## Enemy tiers
+| Legendary | 1 | Single / area boss |
 
 Tier order:
 
 `Crystal < Common < Uncommon < Rare < Epic < Legendary`
 
-Higher tiers increase combat stats and the permanent-stat reward.
+Crystals never retaliate. All combat enemies are human placeholders for now.
 
-Crystals are a special tier:
+## Area scaling
 
-- fixed objects rather than humans;
-- never move;
-- never retaliate;
-- smallest reward tier.
+Common enemies define the per-area baseline. Tier multipliers apply after area scaling.
 
-All combat enemies are human placeholders for now. Skins/species can be replaced later without changing spawn/tier logic.
+```text
+Common HP(area) = commonBaseHp × hpGrowthPerArea^(area - 1)
+Common Attack(area) = commonBaseAttack × area × attackMultiplierPerArea
+Enemy HP = Common HP(area) × tier stat multiplier
+Enemy Attack = Common Attack(area) × tier stat multiplier
+```
 
-### Permanent stat rewards
+Current balance values:
 
-Enemies do **not** drop Essence or another intermediary currency. Defeating a target directly increases one permanent hero stat: **Max HP** or **Blunt Attack**.
+- Common base HP: `32`;
+- Common base Attack: `5`;
+- HP area growth: `4.65×`;
+- Attack area growth: linear (`base × area`).
+
+Approximate checkpoints:
+
+- Area 1 Common: `32 HP`;
+- Area 2 Common: `149 HP`;
+- Area 15 Common: `70.7B HP`;
+- Area 15 Legendary: `~990B HP`.
+
+This curve is chosen to support roughly 15 areas and finish in the billions / near-one-trillion range rather than using `pow(default, area)`, which would grow far too quickly with a default HP of 32.
+
+## Permanent stat rewards
+
+Enemies do not drop an intermediary Essence currency. Defeating a target directly increases one permanent hero stat: **Max HP** or **Blunt Attack**.
 
 | Tier | Stat multiplier | Permanent stat reward | Respawn multiplier |
 | --- | ---: | ---: | ---: |
@@ -49,177 +97,134 @@ Enemies do **not** drop Essence or another intermediary currency. Defeating a ta
 | Epic | 8x | +1.75 HP or Blunt | 9x |
 | Legendary | 14x | +2.00 HP or Blunt | 15x |
 
-Commons grant exactly **+1 HP or +1 Blunt Attack**, while higher tiers scale only gradually.
+Each target rolls HP vs Blunt once per life. The rolled reward is displayed above the target HP bar as value + icon and is rerolled on respawn.
 
-In v0.31, each target rolls its reward once when it spawns. The rolled reward is saved for that life and displayed above the target HP bar as only a value plus icon:
+Stats keep decimal precision internally and in the Stats panel. Combat HUD values are rounded to integers.
 
-- heart icon = Max HP;
-- hammer icon = Blunt Attack.
+## Stat source model
 
-After the target respawns, its next reward is rolled again.
+Each player stat stores:
 
-The stats tracking page keeps and displays decimal precision to two places. Active combat values are displayed as rounded whole numbers.
-
-### Stat source model
-
-Player stats are stored as source-aware values rather than a single flattened number. Each tracked stat contains:
-
-- a `base` value;
-- additive sources such as `kills`, `equipment`, and `other`;
-- multiplicative sources such as `equipment` and `other`.
+- `base`;
+- additive sources (`kills`, `equipment`, `other`);
+- multiplicative sources (`equipment`, `other`).
 
 Calculation order:
 
 `total = (base + sum(additive sources)) × product(multiplicative sources)`
 
-Current base stats:
+Current hero base stats:
 
-- Max HP: `120.00`;
+- Max HP: `20.00`;
 - Blunt Attack: `5.00`;
 - Health regeneration: `0.10 HP/s`.
 
-Kills add only to the `kills` additive source for Max HP or Blunt Attack.
+## Damage types
 
-Health regeneration restores current hero HP continuously up to Max HP and uses the same source model.
+Attack values are stored by damage type.
 
-### Damage types
+Current damage type:
 
-Attack stats are stored by damage type rather than as one generic Attack number.
+- **Blunt** — bare hands and all current enemy attacks; represented by a hammer icon.
 
-Current damage types:
-
-- **Blunt** — used by bare hands and all current enemy attacks, represented by a hammer icon.
-
-Bare hands currently deal only Blunt damage. Future weapons can introduce additional damage types and their own attack ranges.
-
-v0.31 combat feedback:
-
-- hero hits: floating whole-number damage + damage-type icon over the target;
-- enemy hits: floating red negative whole-number damage + damage-type icon over the hero.
+Future weapons can introduce additional damage types and their own attack ranges.
 
 ## Respawn rules
 
 Base first-kill respawn is **3 minutes**.
 
-For a given fixed spawn point, each additional defeat on the same local calendar day doubles its own timer:
+Per individual fixed spawn:
 
 `respawn = 3 min × tier multiplier × 2^(killsToday - 1)`
 
-Examples for a Common spawn:
+At device-local midnight:
 
-- first defeat: 3 min
-- second defeat: 6 min
-- third defeat: 12 min
-- fourth defeat: 24 min
+1. daily kill counters reset;
+2. all dead targets respawn;
+3. outstanding respawn timers are discarded;
+4. new loot is rolled;
+5. permanent player stats and area unlocks remain.
 
-Examples for an Uncommon spawn:
-
-- first defeat: 9 min
-- second defeat: 18 min
-- third defeat: 36 min
+Each calculated respawn deadline is capped at the next local midnight.
 
 ### Group respawn indicator
 
-Common and Uncommon packs have explicit group IDs.
+When every member of a Common/Uncommon group is dead, a circular indicator appears at the group center. It drains from full to empty until the earliest member respawns, then disappears as soon as that member returns.
 
-When **every member of one group is dead**, v0.31 shows a circular countdown at the group center:
+## Areas and portals
 
-- the circle is full when the last group member dies;
-- it drains continuously;
-- the countdown targets the **earliest scheduled respawn** among the dead members;
-- as soon as one member respawns, the group is no longer fully dead and the indicator disappears.
+### Area 1
 
-`defeatedAt` is persisted per spawn so the circular progress remains correct after reopening the PWA.
+- 30 targets;
+- Legendary spawn `area1-legendary-01` is the boss;
+- contains portal `area1-to-area2`;
+- portal tag: `portal - area 2`;
+- portal target: Area 2;
+- portal is closed until Area 1's boss is defeated.
 
-### Midnight reset
+### Boss unlock flow
 
-Midnight is based on the device's **local calendar time**.
+When the area boss is defeated:
 
-At local midnight:
+1. its boss ID is persisted in `defeatedBosses`;
+2. all boss-gated portals originating from that area open;
+3. their target areas are added to `unlockedAreas`;
+4. the camera temporarily focuses on the first newly opened portal;
+5. control resumes;
+6. walking into an open portal changes `currentAreaId` and places the hero in the destination area.
 
-1. all `killsToday` counters reset to zero;
-2. all dead enemies/crystals respawn immediately;
-3. all outstanding respawn timers are discarded;
-4. new loot is rolled for each spawn;
-5. permanent hero stats are **not** reset.
+Portal definitions are destination-based, so several portals from several source areas may point to the same target area without special-case code.
 
-Therefore a target may be killed at `23:59:50` and be alive again at `00:00:00`, allowing another kill at `00:00:01`.
+### Area 2
 
-Implementation rule: every calculated `respawnAt` is capped to the next local midnight.
+- another 30-target map with the same tier/group structure;
+- world layout is similar to Area 1;
+- enemy HP and attack are calculated from Area 2 scaling rather than duplicated values;
+- Area 2 has its own Legendary boss ID ready for later progression logic.
 
-Respawn escalation remains **per individual fixed spawn point**, not per pack.
+## Hero and controls
 
-## Hero
+Hero:
 
-The hero is human with an original stylized anime-fantasy look. Current visuals use primitive low-poly geometry.
-
-Starting state:
-
-- 120.00 Max HP;
-- 5.00 Blunt Attack from bare hands;
-- 0.10 HP/s passive health regeneration;
-- starter underwear only;
+- human low-poly placeholder;
+- starter underwear;
 - two unlocked hand weapon slots;
-- two additional locked orbit weapon slots.
+- two locked orbit weapon slots.
 
-Future orbit weapons are intended to float/follow the hero while the first two weapons remain hand-held.
+Controls:
 
-## Equipment and inventory
-
-v0.31 moves the four equipment squares out of the top HUD and into a compact bottom dock:
-
-- Hand 1;
-- Hand 2;
-- Orbit 1 (locked);
-- Orbit 2 (locked).
-
-An **Inventory** button opens a dedicated equipment window with:
-
-- the four equipped slots;
-- an inventory/bag area;
-- persistent inventory/equipped state in the save model.
-
-There are no actual equipment items yet; the UI/data structure is ready for later item drops and equip interactions.
-
-## Controls
-
-Mobile-first:
-
-- centered virtual joystick: movement;
+- centered virtual joystick on mobile;
+- WASD / arrow keys on desktop;
 - no attack button;
-- the hero automatically attacks the nearest living target within the current weapon range;
-- bare-hand range: `2.15` world units;
-- future weapons may provide different ranges, including long-range bows;
-- Stats button: open permanent-stat tracking;
-- Inventory button: open equipment/inventory.
+- hero automatically attacks the nearest living target within the active weapon range.
 
-Desktop development controls:
+Current bare-hand range: `2.15` world units.
 
-- WASD / arrow keys: movement;
-- attacks are automatic under the same range/cooldown rules.
+## Equipment / inventory groundwork
+
+Bottom dock contains four equipment slots side-by-side and an **Inventory** button. The Inventory window already represents equipped slots and a bag collection but no actual equipment items exist yet.
+
+## Presentation / combat feedback
+
+- zoomed-out camera;
+- compact target HP bars without names/numeric HP;
+- target loot value + icon above HP bar;
+- player hit text: whole-number damage + damage-type icon;
+- incoming hit text: red negative damage + damage-type icon;
+- stat gains: number + icon only on the right-side cascading stack;
+- portal opening triggers a short camera focus.
 
 ## Persistence
 
-v0.31 uses save schema/version `5` and stores locally:
+v0.32 uses save schema `7` and intentionally does not migrate earlier development saves.
 
-- source-aware Max HP, damage-type Attack stats, and Health Regeneration;
-- additive and multiplicative stat sources;
-- inventory items and equipped-slot references;
-- daily key;
-- per-spawn kills today;
-- per-spawn respawn deadline;
-- per-spawn defeat timestamp;
-- current per-life loot roll.
+Stored locally:
 
-During early development, save migrations are intentionally not maintained. A schema/save-key change may start the player from a fresh save.
-
-Storage is local to the browser. Cloud saves/accounts are intentionally out of scope for this slice.
-
-## Presentation
-
-- Camera is pulled back to show more surrounding map.
-- Each living target has a compact floating HP bar with no name or numeric HP.
-- Loot value + icon appears directly above the target HP bar.
-- Fully defeated packs show the circular group respawn countdown.
-- Combat damage text floats briefly at the hit location.
-- v0.31 displays a tiny `0.31` version marker in the top-right corner.
+- source-aware player stats;
+- inventory/equipped state;
+- current area;
+- unlocked areas;
+- defeated boss IDs;
+- daily spawn state;
+- respawn/defeat timestamps;
+- per-life loot rolls.
