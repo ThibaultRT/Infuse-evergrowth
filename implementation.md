@@ -38,20 +38,20 @@ All combat enemies are human placeholders in v0.1. Skins/species can be replaced
 
 ### Permanent stat rewards
 
-Enemies do **not** drop Essence or another intermediary currency. Defeating a target directly increases one permanent hero stat: **Max HP** or **Attack**, chosen 50/50 for now.
+Enemies do **not** drop Essence or another intermediary currency. Defeating a target directly increases one permanent hero stat: **Max HP** or **Blunt Attack**, chosen 50/50 for now.
 
 | Tier | Stat multiplier | Permanent stat reward | Respawn multiplier |
 | --- | ---: | ---: | ---: |
-| Crystal | 0.35x | +0.50 HP or ATK | 1x |
-| Common | 1x | +1.00 HP or ATK | 1x |
-| Uncommon | 2.25x | +1.25 HP or ATK | 3x |
-| Rare | 4.5x | +1.50 HP or ATK | 6x |
-| Epic | 8x | +1.75 HP or ATK | 9x |
-| Legendary | 14x | +2.00 HP or ATK | 15x |
+| Crystal | 0.35x | +0.50 HP or Blunt | 1x |
+| Common | 1x | +1.00 HP or Blunt | 1x |
+| Uncommon | 2.25x | +1.25 HP or Blunt | 3x |
+| Rare | 4.5x | +1.50 HP or Blunt | 6x |
+| Epic | 8x | +1.75 HP or Blunt | 9x |
+| Legendary | 14x | +2.00 HP or Blunt | 15x |
 
-These reward values are initial balancing placeholders. The important rule is that Commons grant exactly **+1 HP or +1 Attack**, while higher tiers scale only gradually.
+These reward values are initial balancing placeholders. Commons grant exactly **+1 HP or +1 Blunt Attack**, while higher tiers scale only gradually.
 
-The stats tracking page keeps and displays decimal precision to two decimal places. In the active game/combat HUD, HP and Attack are displayed as rounded whole numbers. Enemy health bars are small world-space overlays with no names or numeric values.
+The stats tracking page keeps and displays decimal precision to two decimal places. In the active game/combat HUD, HP and damage values are displayed as rounded whole numbers. Enemy health bars are small world-space overlays with no names or numeric values.
 
 ### Stat source model
 
@@ -70,12 +70,22 @@ The source maps are intentionally extensible so future systems can add named sou
 Current base stats:
 
 - Max HP: `120.00`;
-- Attack: `20.00`;
+- Blunt Attack: `5.00`;
 - Health regeneration: `0.10 HP/s`.
 
-Kills add only to the `kills` additive source for Max HP or Attack. Existing v0.1 saves are migrated so previous kill gains remain preserved under that source.
+Kills add only to the `kills` additive source for Max HP or Blunt Attack.
 
 Health regeneration restores the current hero HP continuously up to Max HP. It uses the same base/additive/multiplicative source model and is persisted like the other stats.
+
+### Damage types
+
+Attack stats are stored by damage type rather than as one generic Attack number.
+
+Current damage types:
+
+- **Blunt** — used by bare hands in v0.3 and represented by a hammer icon in the HUD/stats page.
+
+Bare hands currently deal only Blunt damage. Future weapons can introduce additional damage types and can use their own attack ranges.
 
 ## Respawn rules
 
@@ -124,7 +134,7 @@ The hero is human with an original stylized anime-fantasy look. v0.1 uses primit
 Starting state:
 
 - 120.00 Max HP;
-- 20.00 Attack;
+- 5.00 Blunt Attack from bare hands;
 - 0.10 HP/s passive health regeneration;
 - starter underwear only;
 - two unlocked hand weapon slots;
@@ -140,7 +150,7 @@ Mobile-first:
 - centered virtual joystick: movement;
 - no attack button;
 - the hero automatically attacks the nearest living target within the current weapon range;
-- bare-hand range in v0.2: `2.15` world units;
+- bare-hand range: `2.15` world units;
 - future weapons may provide different ranges, including long-range bows;
 - Stats button: open the permanent-stat tracking page.
 
@@ -151,19 +161,22 @@ Desktop development controls:
 
 ## Persistence
 
-v0.2 stores locally:
+v0.3 stores locally:
 
-- source-aware Max HP, Attack, and Health Regeneration, including decimal precision;
+- source-aware Max HP, damage-type Attack stats, and Health Regeneration, including decimal precision;
 - additive gains by named source (currently kills/equipment/other);
 - multiplicative modifiers by named source (currently equipment/other);
 - daily key;
 - per-spawn kills today;
 - per-spawn respawn deadline.
 
+During early development, save migrations are intentionally not maintained. A schema/save-key change may start the player from a fresh save.
+
 Storage is local to the browser. Cloud saves/accounts are intentionally out of scope for this slice.
 
-## v0.2 presentation changes
+## Presentation changes
 
 - Camera is pulled farther back to show significantly more of the surrounding map.
 - Enemy/target health is represented by a compact bar projected above the target in the world.
 - Target health bars intentionally show no target name and no numeric HP value.
+- v0.3 displays a tiny `0.3` version marker in the top-right corner.
