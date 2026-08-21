@@ -1,5 +1,5 @@
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-export type DamageType = 'blunt';
+export type DamageType = 'blunt' | 'slash' | 'piercing';
 export type CombatAffinity = 'blunt' | 'slash' | 'pierce';
 export type LootType = 'hp' | DamageType;
 export type EquipmentSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
@@ -52,18 +52,19 @@ export type PlayerStats = {
   regen: StatSources;
 };
 
-export type InventoryItem = {
-  id: string;
-  name: string;
-};
+export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type WeaponClass = 'sword' | 'hammer' | 'spear';
+export type HandSlotId = 'hand1' | 'hand2';
+export type EquipmentDefinition = { id: string; weaponClass: WeaponClass; rarity: EquipmentRarity; damageType: DamageType; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
+export type OwnedEquipment = { itemId: string; level: number; ascend: number };
 
 export type InventoryState = {
-  items: InventoryItem[];
+  items: Record<string, OwnedEquipment>;
   equipped: Record<EquipmentSlotId, string | null>;
 };
 
 export type SaveData = {
-  version: 7;
+  version: 8;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
