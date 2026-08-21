@@ -71,7 +71,7 @@ Enemy Attack = Common Attack(area) × tier stat multiplier
 Current balance values:
 
 - Common base HP: `32`;
-- Common base Attack: `5`;
+- Common base Attack: `2`;
 - HP area growth: `4.65×`;
 - Attack area growth: linear (`base × area`).
 
@@ -125,7 +125,11 @@ Attack values are stored by damage type.
 
 Current damage type:
 
-- **Blunt** — bare hands and all current enemy attacks; represented by a hammer icon.
+- **Blunt** — bare hands and Area 1 enemy attacks; represented by a hammer icon.
+- **Slash** — Area 2 enemy attacks; represented by a sword icon.
+- **Pierce** — the displayed weakness for Area 2 enemies; represented by a spear icon.
+
+Area 1 enemies are weak to Slash. Area 2 enemies are weak to Pierce. Weaknesses are surfaced in the HUD for loadout planning; damage modifiers will be applied when those hero damage types become available.
 
 Future weapons can introduce additional damage types and their own attack ranges.
 

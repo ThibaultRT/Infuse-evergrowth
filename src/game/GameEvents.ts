@@ -1,11 +1,11 @@
-import type { DamageType, LootType } from '../types';
+import type { CombatAffinity, DamageType, LootType } from '../types';
 
 export type GameEventMap = {
   enemyDamaged: { enemyId: string; amount: number; damageType: DamageType };
   enemyDefeated: { enemyId: string };
   enemyRespawned: { enemyId: string };
   bossDefeated: { bossId: string; areaId: number };
-  heroDamaged: { amount: number; damageType: DamageType };
+  heroDamaged: { amount: number; damageType: CombatAffinity };
   heroDefeated: undefined;
   statGained: { sourceId: string; stat: LootType; amount: number };
   portalUnlocked: { portalId: string };

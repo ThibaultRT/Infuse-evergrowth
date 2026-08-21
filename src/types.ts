@@ -1,5 +1,6 @@
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type DamageType = 'blunt';
+export type CombatAffinity = 'blunt' | 'slash' | 'pierce';
 export type LootType = 'hp' | DamageType;
 export type EquipmentSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
 
@@ -18,6 +19,8 @@ export type AreaDefinition = {
   originX: number;
   originZ: number;
   bossSpawnId: string;
+  enemyWeapon: CombatAffinity;
+  enemyWeakness: CombatAffinity;
 };
 
 export type PortalDefinition = {

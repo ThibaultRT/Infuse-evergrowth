@@ -1,6 +1,6 @@
 import balance from './data/balance.json';
 import areaData from './data/areas.json';
-import type { AreaDefinition, DamageType, PortalDefinition, SpawnDefinition, Tier, TierConfig } from './types';
+import type { AreaDefinition, CombatAffinity, DamageType, PortalDefinition, SpawnDefinition, Tier, TierConfig } from './types';
 
 const tierBalance = balance.enemy.tiers;
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
@@ -30,7 +30,9 @@ export const AREAS: AreaDefinition[] = areaData.areas.map((area) => ({
   name: area.name,
   originX: area.worldOrigin.x,
   originZ: area.worldOrigin.z,
-  bossSpawnId: area.bossSpawnId
+  bossSpawnId: area.bossSpawnId,
+  enemyWeapon: area.enemyWeapon as CombatAffinity,
+  enemyWeakness: area.enemyWeakness as CombatAffinity
 }));
 
 export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>

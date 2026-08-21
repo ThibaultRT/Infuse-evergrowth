@@ -17,10 +17,10 @@ import {
   enemyAttack,
   enemyMaxHp
 } from '../config';
-import { bluntHammerIcon, heartIcon } from '../icons';
+import { bluntHammerIcon, combatAffinityIcon, heartIcon } from '../icons';
 import { emptySpawnState, heroDamage, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
-import type { DamageType, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
-import { renderInventory, renderStats, showToast, ui } from '../ui';
+import type { CombatAffinity, DamageType, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
+import { renderEnemyAffinities, renderInventory, renderStats, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeHumanoid, makePortal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
@@ -86,8 +86,6 @@ let heroHp = maxHeroHp();
 let heroDead = false;
 let heroAttackCooldown = 0;
 let portalTransitionCooldown = 0;
-const ENEMY_DAMAGE_TYPE: DamageType = 'blunt';
-
 const cameraController = new CameraController(camera, hero.position);
 
 function syncLighting(): void {
@@ -114,10 +112,10 @@ type FloatingCombatText = {
 };
 const combatTexts: FloatingCombatText[] = [];
 
-function showCombatText(position: THREE.Vector3, amount: number, type: DamageType, incoming = false): void {
+function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity, incoming = false): void {
   const element = document.createElement('div');
   element.className = `combat-text${incoming ? ' incoming' : ''}`;
-  element.innerHTML = `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${type === 'blunt' ? bluntHammerIcon(10) : ''}`;
+  element.innerHTML = `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${combatAffinityIcon(type, 10)}`;
   ui.world.append(element);
   combatTexts.push({ element, position: position.clone(), age: 0, duration: .9 });
 }
@@ -128,6 +126,7 @@ class SpawnEntity {
   readonly spawnPosition: THREE.Vector3;
   readonly maxHp: number;
   readonly damage: number;
+  readonly damageType: CombatAffinity;
   readonly targetUi = document.createElement('div');
   readonly lootLabel = document.createElement('div');
   readonly healthBar = document.createElement('div');
@@ -142,6 +141,7 @@ class SpawnEntity {
     this.maxHp = enemyMaxHp(def.areaId, def.tier);
     this.hp = this.maxHp;
     this.damage = enemyAttack(def.areaId, def.tier);
+    this.damageType = areaById(def.areaId).enemyWeapon;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
     this.root.add(def.tier === 'crystal' ? makeCrystal(this.config.color) : makeHumanoid(this.config.color), makeTierRing(this.config.color));
@@ -265,7 +265,7 @@ class SpawnEntity {
       }
       this.attackCooldown = Math.max(0, this.attackCooldown - dt);
       if (distance <= ENEMY_ATTACK_RANGE_METERS && this.attackCooldown === 0) {
-        damageHero(this.damage, ENEMY_DAMAGE_TYPE);
+        damageHero(this.damage, this.damageType);
         this.attackCooldown = ENEMY_ATTACK_COOLDOWN;
       }
       return;
@@ -383,7 +383,23 @@ function resetAtMidnightIfNeeded(): void {
   showToast('Daily reset · all spawns restored');
 }
 
-function damageHero(amount: number, type: DamageType): void {
+function resetSpawnCooldowns(): void {
+  let resetCount = 0;
+  entities.forEach((entity) => {
+    const state = save.spawns[entity.def.id];
+    if (!state.respawnAt) return;
+    state.respawnAt = null;
+    state.defeatedAt = null;
+    state.loot = rollLoot();
+    entity.forceRespawn();
+    events.emit('enemyRespawned', { enemyId: entity.def.id });
+    resetCount += 1;
+  });
+  persist();
+  showToast(resetCount === 0 ? 'No spawn cooldowns active' : `Spawned ${resetCount} target${resetCount === 1 ? '' : 's'}`);
+}
+
+function damageHero(amount: number, type: CombatAffinity): void {
   if (heroDead) return;
   events.emit('heroDamaged', { amount, damageType: type });
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, type, true);
@@ -443,6 +459,7 @@ function setInventoryPanel(open: boolean): void {
   if (open) renderInventory(save.inventory);
 }
 ui.statsButton.addEventListener('click', () => setStatsPanel(true));
+ui.spawnButton.addEventListener('click', resetSpawnCooldowns);
 ui.statsClose.addEventListener('click', () => setStatsPanel(false));
 ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.statsPanel) setStatsPanel(false); });
 ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
@@ -467,6 +484,7 @@ function enterArea(targetAreaId: number): void {
   events.emit('areaEntered', { areaId: targetAreaId });
   save.currentAreaId = targetAreaId;
   const area = areaById(targetAreaId);
+  renderEnemyAffinities(area);
   hero.position.set(area.originX, 0, area.originZ);
   entities.forEach((entity) => { entity.provoked = false; });
   cameraController.returnToHero();
@@ -613,6 +631,7 @@ function frame(now: number): void {
 
 renderStats(save.stats);
 renderInventory(save.inventory);
+renderEnemyAffinities(areaById(currentAreaId));
 updateHud();
 persist();
 requestAnimationFrame(frame);
