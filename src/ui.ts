@@ -1,7 +1,8 @@
 import './reward-popups.css';
-import { bluntHammerIcon, combatAffinityIcon, heartIcon } from './icons';
+import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from './icons';
 import { statAdditiveTotal, statTotal } from './save';
-import type { AreaDefinition, EquipmentSlotId, InventoryState, PlayerStats, StatSources } from './types';
+import { EQUIPMENT_BY_ID, equipmentDamage } from './systems/EquipmentSystem';
+import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, PlayerStats, StatSources } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app');
@@ -19,7 +20,7 @@ app.innerHTML = `
             <div class="hp-label"><span>HP</span><span id="hp-text">20 / 20</span></div>
             <div class="bar"><span id="hp-bar"></span></div>
           </div>
-          <div class="damage-hud" title="Blunt damage">${bluntHammerIcon(13)}<span id="attack-stat">5</span></div>
+          <div class="hand-hud"><span id="hand1-stat"></span><span id="hand2-stat"></span></div>
         </div>
         <div id="enemy-affinities" class="enemy-affinities"></div>
       </div>
@@ -40,6 +41,7 @@ app.innerHTML = `
       <button id="inventory-button" class="dock-button" type="button">INVENTORY</button>
     </div>
     <div id="gain-stack" class="gain-stack" aria-live="polite"></div>
+    <div id="equipment-drop-layer" class="equipment-drop-layer" aria-live="polite"></div>
     <div id="toast" class="toast"></div>
     <div id="stats-panel" class="modal-panel" aria-hidden="true">
       <div class="card modal-sheet stats-sheet">
@@ -61,6 +63,7 @@ app.innerHTML = `
         <div id="inventory-equipped" class="inventory-equipped"></div>
         <div class="inventory-section-title">Bag</div>
         <div id="inventory-bag" class="inventory-bag"></div>
+        <div id="weapon-detail" class="weapon-detail"></div>
       </div>
     </div>
   </div>
@@ -68,7 +71,7 @@ app.innerHTML = `
 
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
-  hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), attackText: q<HTMLSpanElement>('#attack-stat'),
+  hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), hand2Stat: q<HTMLSpanElement>('#hand2-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
@@ -77,7 +80,7 @@ export const ui = {
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
-  inventoryBag: q<HTMLDivElement>('#inventory-bag'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
+  inventoryBag: q<HTMLDivElement>('#inventory-bag'), weaponDetail: q<HTMLDivElement>('#weapon-detail'), equipmentDropLayer: q<HTMLDivElement>('#equipment-drop-layer'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
 };
 
 export function renderEnemyAffinities(area: AreaDefinition): void {
@@ -158,7 +161,7 @@ const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Hand 1', hand2: '
 const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2'];
 
 export function renderInventory(inventory: InventoryState): void {
-  const itemNames = new Map(inventory.items.map((item) => [item.id, item.name]));
+  const itemNames = new Map(Object.keys(inventory.items).map((id) => [id, id]));
   ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
     const locked = slot.startsWith('orbit');
     const itemId = inventory.equipped[slot];
@@ -173,7 +176,35 @@ export function renderInventory(inventory: InventoryState): void {
     slotEl.innerHTML = itemId ? `<span>${label}</span><strong>${itemNames.get(itemId) ?? 'ITEM'}</strong>` : `<span>${label}</span>`;
   });
 
-  ui.inventoryBag.innerHTML = inventory.items.length
-    ? inventory.items.map((item) => `<button class="inventory-item" type="button" data-item-id="${item.id}">${item.name}</button>`).join('')
+  const items = Object.values(inventory.items);
+  ui.inventoryBag.innerHTML = items.length
+    ? items.map((item) => `<button class="inventory-item rarity-${EQUIPMENT_BY_ID.get(item.itemId)?.rarity ?? 'common'}" type="button" data-item-id="${item.itemId}"><strong>${item.itemId}</strong><span>Lv ${item.level} · A${item.ascend}</span></button>`).join('')
     : '<div class="inventory-empty">No equipment found yet.</div>';
+}
+
+export function renderWeaponDetail(owned: OwnedEquipment | null): void {
+  const item = owned ? EQUIPMENT_BY_ID.get(owned.itemId) : undefined;
+  if (!owned || !item) { ui.weaponDetail.innerHTML = ''; return; }
+  const equipped = (['hand1', 'hand2'] as const).find((hand) => (document.querySelector(`[data-slot="${hand}"] strong`)?.textContent === item.id));
+  ui.weaponDetail.innerHTML = `<div class="weapon-art rarity-${item.rarity}">${damageTypeIcon(item.damageType, 52)}</div>
+    <h3>${item.id}</h3><div class="weapon-meta">${item.rarity} · ${item.weaponClass}</div>
+    <div class="weapon-values"><span>Level <strong>${owned.level}</strong></span><span>Ascend <strong>${owned.ascend}</strong></span><span>Damage <strong>${Math.round(equipmentDamage(item, owned))} ${damageTypeIcon(item.damageType, 12)}</strong></span><span>Per level <strong>+${item.baseDamagePerLevel * 2 ** owned.ascend}</strong></span></div>
+    <div class="weapon-actions"><button data-equip="hand1" data-item-id="${item.id}">Equip H1</button><button data-equip="hand2" data-item-id="${item.id}">Equip H2</button><button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div>
+    <p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p>${equipped ? `<small>Equipped ${equipped.toUpperCase()}</small>` : ''}`;
+}
+
+const dropQueue: Array<{ itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number }> = [];
+let showingDrop = false;
+export function showEquipmentDrop(drop: typeof dropQueue[number]): void {
+  dropQueue.push(drop);
+  if (showingDrop) return;
+  const showNext = (): void => {
+    const next = dropQueue.shift();
+    if (!next) { showingDrop = false; return; }
+    showingDrop = true;
+    const item = EQUIPMENT_BY_ID.get(next.itemId)!;
+    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}">${damageTypeIcon(item.damageType, 58)}<b>${item.id}</b><span>${item.rarity} ${item.weaponClass} · x${next.quantity}</span><strong>${next.previousLevel === null ? 'NEW · ' : `Level ${next.previousLevel} → `}Level ${next.newLevel} · Ascend ${next.ascend}</strong></div>`;
+    window.setTimeout(() => { ui.equipmentDropLayer.innerHTML = ''; showingDrop = false; showNext(); }, 1800);
+  };
+  showNext();
 }

@@ -1,7 +1,8 @@
 import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, LOOT_HP_WEIGHT, SPAWNS } from './config';
 import type { DamageType, InventoryState, LootType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v7';
+const SAVE_KEY = 'infuse-evergrowth-save-v8';
+const PREVIOUS_SAVE_KEY = 'infuse-evergrowth-save-v7';
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -29,13 +30,35 @@ function freshStat(base: number): StatSources {
 function freshStats(): PlayerStats {
   return {
     maxHp: freshStat(BASE_HERO_MAX_HP),
-    attack: { blunt: freshStat(BASE_HERO_BLUNT_ATTACK) },
+    attack: { blunt: freshStat(BASE_HERO_BLUNT_ATTACK), slash: freshStat(0), piercing: freshStat(0) },
     regen: freshStat(BASE_HERO_REGEN)
   };
 }
 
 function freshInventory(): InventoryState {
-  return { items: [], equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null } };
+  return { items: {}, equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null } };
+}
+
+function migrateInventory(value: unknown): InventoryState {
+  const fresh = freshInventory();
+  if (!value || typeof value !== 'object') return fresh;
+  const source = value as { items?: unknown; equipped?: Partial<InventoryState['equipped']> };
+  if (Array.isArray(source.items)) {
+    for (const raw of source.items) {
+      if (!raw || typeof raw !== 'object') continue;
+      const itemId = String((raw as { id?: unknown }).id ?? '');
+      if (itemId) fresh.items[itemId] = { itemId, level: 1, ascend: 0 };
+    }
+  }
+  if (source.items && !Array.isArray(source.items) && typeof source.items === 'object') {
+    for (const [itemId, raw] of Object.entries(source.items as Record<string, unknown>)) {
+      if (!raw || typeof raw !== 'object') continue;
+      const item = raw as { level?: unknown; ascend?: unknown };
+      fresh.items[itemId] = { itemId, level: Math.max(1, Number(item.level) || 1), ascend: Math.max(0, Number(item.ascend) || 0) };
+    }
+  }
+  fresh.equipped = { ...fresh.equipped, ...(source.equipped ?? {}) };
+  return fresh;
 }
 
 function normalizeStat(stat: Partial<StatSources> | undefined, base: number): StatSources {
@@ -49,7 +72,7 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 
 function loadSave(): SaveData {
   const fresh: SaveData = {
-    version: 7,
+    version: 8,
     dailyKey: localDailyKey(),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -59,24 +82,24 @@ function loadSave(): SaveData {
     spawns: emptySpawnState()
   };
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(SAVE_KEY) ?? localStorage.getItem(PREVIOUS_SAVE_KEY);
     if (!raw) return fresh;
-    const parsed = JSON.parse(raw) as Partial<SaveData>;
-    if (parsed.version !== 7 || !parsed.stats) return fresh;
+    const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version'> & { version?: number };
+    if ((parsed.version !== 7 && parsed.version !== 8) || !parsed.stats) return fresh;
     const unlockedAreas = Array.from(new Set([1, ...(parsed.unlockedAreas ?? [])]));
     const requestedArea = parsed.currentAreaId ?? 1;
     return {
-      version: 7,
+      version: 8,
       dailyKey: localDailyKey(),
       currentAreaId: unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
       defeatedBosses: parsed.defeatedBosses ?? [],
       stats: {
         maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
-        attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK) },
+        attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK), slash: normalizeStat(parsed.stats.attack?.slash, 0), piercing: normalizeStat(parsed.stats.attack?.piercing, 0) },
         regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN)
       },
-      inventory: parsed.inventory ?? freshInventory(),
+      inventory: migrateInventory(parsed.inventory),
       spawns: parsed.dailyKey === localDailyKey() ? { ...emptySpawnState(), ...(parsed.spawns ?? {}) } : emptySpawnState()
     };
   } catch {

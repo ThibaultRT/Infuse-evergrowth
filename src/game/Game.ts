@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import {
   AREAS,
-  BARE_HANDS_DAMAGE_TYPE,
   BASE_RESPAWN_MS,
   ENEMY_AGGRO_RADIUS_METERS,
   ENEMY_ATTACK_COOLDOWN,
   ENEMY_ATTACK_RANGE_METERS,
   ENEMY_LEASH_RADIUS_METERS,
-  HERO_ATTACK_COOLDOWN,
   HERO_ATTACK_RANGE_METERS,
   HERO_SPEED,
   PORTALS,
@@ -17,14 +15,16 @@ import {
   enemyAttack,
   enemyMaxHp
 } from '../config';
-import { bluntHammerIcon, combatAffinityIcon, heartIcon } from '../icons';
-import { emptySpawnState, heroDamage, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
-import type { CombatAffinity, DamageType, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
-import { renderEnemyAffinities, renderInventory, renderStats, showToast, ui } from '../ui';
+import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
+import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
+import type { CombatAffinity, DamageType, HandSlotId, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
+import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showEquipmentDrop, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeHumanoid, makePortal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
+import { applyEquipmentCopies, ascend, attackProfile, equip } from '../systems/EquipmentSystem';
+import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 
 export class Game {
   private started = false;
@@ -84,7 +84,7 @@ hero.position.set(initialArea.originX, 0, initialArea.originZ);
 scene.add(hero);
 let heroHp = maxHeroHp();
 let heroDead = false;
-let heroAttackCooldown = 0;
+const handCooldowns: Record<HandSlotId, number> = { hand1: 0, hand2: 0 };
 let portalTransitionCooldown = 0;
 const cameraController = new CameraController(camera, hero.position);
 
@@ -112,10 +112,10 @@ type FloatingCombatText = {
 };
 const combatTexts: FloatingCombatText[] = [];
 
-function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity, incoming = false): void {
+function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false): void {
   const element = document.createElement('div');
   element.className = `combat-text${incoming ? ' incoming' : ''}`;
-  element.innerHTML = `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${combatAffinityIcon(type, 10)}`;
+  element.innerHTML = `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${incoming ? combatAffinityIcon(type as CombatAffinity, 10) : damageTypeIcon(type as DamageType, 10)}`;
   ui.world.append(element);
   combatTexts.push({ element, position: position.clone(), age: 0, duration: .9 });
 }
@@ -228,6 +228,14 @@ class SpawnEntity {
     this.setAlive(false);
     events.emit('statGained', { sourceId: this.def.id, stat, amount });
     handleBossDefeat(this.def.areaId, this.def.id);
+    const itemId = rollEquipmentDrop(this.def.areaId, this.def.tier);
+    if (itemId) {
+      const result = applyEquipmentCopies(itemId, 1);
+      const drop = { sourceId: this.def.id, areaId: this.def.areaId, itemId, quantity: 1, previousLevel: result.previousLevel, newLevel: result.owned.level, ascend: result.owned.ascend };
+      events.emit('equipmentDropped', drop);
+      showEquipmentDrop(drop);
+      renderInventory(save.inventory);
+    }
     persist();
     renderStats(save.stats);
     showToast(`+${formatRewardAmount(amount)} ${stat === 'hp' ? 'HP' : 'BLUNT'} · ${this.config.label}`);
@@ -431,13 +439,17 @@ function nearestTarget(maxDistance = HERO_ATTACK_RANGE_METERS): SpawnEntity | nu
 }
 
 function autoAttack(): void {
-  if (heroDead || heroAttackCooldown > 0 || cameraController.isScripted) return;
-  const target = nearestTarget();
-  if (!target) return;
-  heroAttackCooldown = HERO_ATTACK_COOLDOWN;
-  target.receiveDamage(heroDamage(BARE_HANDS_DAMAGE_TYPE), BARE_HANDS_DAMAGE_TYPE);
-  const direction = target.root.position.clone().sub(hero.position);
-  if (direction.lengthSq() > 0) hero.rotation.y = Math.atan2(direction.x, direction.z);
+  if (heroDead || cameraController.isScripted) return;
+  for (const hand of ['hand1', 'hand2'] as const) {
+    if (handCooldowns[hand] > 0) continue;
+    const target = nearestTarget();
+    if (!target) continue;
+    const profile = attackProfile(hand);
+    handCooldowns[hand] = profile.cooldownSeconds;
+    target.receiveDamage(profile.damage, profile.damageType);
+    const direction = target.root.position.clone().sub(hero.position);
+    if (direction.lengthSq() > 0) hero.rotation.y = Math.atan2(direction.x, direction.z);
+  }
 }
 
 function setStatsPanel(open: boolean): void {
@@ -465,6 +477,18 @@ ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === 
 ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
 ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
 ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
+ui.inventoryBag.addEventListener('click', (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
+  if (button?.dataset.itemId) renderWeaponDetail(save.inventory.items[button.dataset.itemId] ?? null);
+});
+ui.weaponDetail.addEventListener('click', (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
+  const itemId = button?.dataset.itemId;
+  if (!button || !itemId) return;
+  if (button.dataset.equip) { const hand = button.dataset.equip as HandSlotId; equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand }); }
+  if (button.hasAttribute('data-ascend')) { const previousAscend = save.inventory.items[itemId].ascend; if (ascend(itemId)) events.emit('weaponAscended', { itemId, previousAscend, newAscend: previousAscend + 1 }); }
+  persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
+});
 
 function updateHero(dt: number): void {
   if (heroDead || cameraController.isScripted) return;
@@ -579,7 +603,10 @@ function updateHud(): void {
   const maxHp = maxHeroHp();
   ui.hpText.textContent = `${Math.round(heroHp)} / ${Math.round(maxHp)}`;
   ui.hpBar.style.width = `${heroHp / maxHp * 100}%`;
-  ui.attackText.textContent = String(Math.round(heroDamage(BARE_HANDS_DAMAGE_TYPE)));
+  for (const hand of ['hand1', 'hand2'] as const) {
+    const profile = attackProfile(hand);
+    ui[hand === 'hand1' ? 'hand1Stat' : 'hand2Stat'].innerHTML = `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`;
+  }
   updateTargetUi();
   updateRespawnIndicators();
 }
@@ -610,7 +637,8 @@ let midnightAccumulator = 0;
 function frame(now: number): void {
   const dt = Math.min((now - previous) / 1000, .05);
   previous = now;
-  heroAttackCooldown = Math.max(0, heroAttackCooldown - dt);
+  handCooldowns.hand1 = Math.max(0, handCooldowns.hand1 - dt);
+  handCooldowns.hand2 = Math.max(0, handCooldowns.hand2 - dt);
   midnightAccumulator += dt;
   if (midnightAccumulator >= 1) {
     midnightAccumulator = 0;

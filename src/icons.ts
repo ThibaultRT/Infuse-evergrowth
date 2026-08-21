@@ -1,4 +1,4 @@
-import type { CombatAffinity } from './types';
+import type { CombatAffinity, DamageType } from './types';
 
 export function bluntHammerIcon(size = 12): string {
   return `<svg class="damage-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -21,6 +21,12 @@ export function pierceSpearIcon(size = 12): string {
 export function combatAffinityIcon(type: CombatAffinity, size = 12): string {
   if (type === 'slash') return slashSwordIcon(size);
   if (type === 'pierce') return pierceSpearIcon(size);
+  return bluntHammerIcon(size);
+}
+
+export function damageTypeIcon(type: DamageType, size = 12): string {
+  if (type === 'slash') return slashSwordIcon(size);
+  if (type === 'piercing') return pierceSpearIcon(size);
   return bluntHammerIcon(size);
 }
 

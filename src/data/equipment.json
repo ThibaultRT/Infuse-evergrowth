@@ -1,0 +1,17 @@
+[
+  {"id":"sword-common","weaponClass":"sword","rarity":"common","damageType":"slash","baseDamage":3,"baseDamagePerLevel":3,"attackCooldownSeconds":1},
+  {"id":"sword-uncommon","weaponClass":"sword","rarity":"uncommon","damageType":"slash","baseDamage":5,"baseDamagePerLevel":4,"attackCooldownSeconds":1},
+  {"id":"sword-rare","weaponClass":"sword","rarity":"rare","damageType":"slash","baseDamage":8,"baseDamagePerLevel":6,"attackCooldownSeconds":1},
+  {"id":"sword-epic","weaponClass":"sword","rarity":"epic","damageType":"slash","baseDamage":13,"baseDamagePerLevel":9,"attackCooldownSeconds":1},
+  {"id":"sword-legendary","weaponClass":"sword","rarity":"legendary","damageType":"slash","baseDamage":21,"baseDamagePerLevel":13,"attackCooldownSeconds":1},
+  {"id":"hammer-common","weaponClass":"hammer","rarity":"common","damageType":"blunt","baseDamage":3,"baseDamagePerLevel":3,"attackCooldownSeconds":1.5},
+  {"id":"hammer-uncommon","weaponClass":"hammer","rarity":"uncommon","damageType":"blunt","baseDamage":5,"baseDamagePerLevel":4,"attackCooldownSeconds":1.5},
+  {"id":"hammer-rare","weaponClass":"hammer","rarity":"rare","damageType":"blunt","baseDamage":8,"baseDamagePerLevel":6,"attackCooldownSeconds":1.5},
+  {"id":"hammer-epic","weaponClass":"hammer","rarity":"epic","damageType":"blunt","baseDamage":13,"baseDamagePerLevel":9,"attackCooldownSeconds":1.5},
+  {"id":"hammer-legendary","weaponClass":"hammer","rarity":"legendary","damageType":"blunt","baseDamage":21,"baseDamagePerLevel":13,"attackCooldownSeconds":1.5},
+  {"id":"spear-common","weaponClass":"spear","rarity":"common","damageType":"piercing","baseDamage":3,"baseDamagePerLevel":3,"attackCooldownSeconds":1.25},
+  {"id":"spear-uncommon","weaponClass":"spear","rarity":"uncommon","damageType":"piercing","baseDamage":5,"baseDamagePerLevel":4,"attackCooldownSeconds":1.25},
+  {"id":"spear-rare","weaponClass":"spear","rarity":"rare","damageType":"piercing","baseDamage":8,"baseDamagePerLevel":6,"attackCooldownSeconds":1.25},
+  {"id":"spear-epic","weaponClass":"spear","rarity":"epic","damageType":"piercing","baseDamage":13,"baseDamagePerLevel":9,"attackCooldownSeconds":1.25},
+  {"id":"spear-legendary","weaponClass":"spear","rarity":"legendary","damageType":"piercing","baseDamage":21,"baseDamagePerLevel":13,"attackCooldownSeconds":1.25}
+]
