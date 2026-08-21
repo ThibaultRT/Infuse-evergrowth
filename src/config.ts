@@ -43,7 +43,7 @@ export const SPAWNS: SpawnDefinition[] = [
 ];
 
 export const BASE_RESPAWN_MS = 3 * 60 * 1000;
-export const BASE_HERO_MAX_HP = 120;
+export const BASE_HERO_MAX_HP = 20;
 export const BASE_HERO_BLUNT_ATTACK = 5;
 export const BASE_HERO_REGEN = 0.1;
 export const BARE_HANDS_DAMAGE_TYPE: DamageType = 'blunt';

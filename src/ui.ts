@@ -1,4 +1,5 @@
-import { bluntHammerIcon } from './icons';
+import './reward-popups.css';
+import { bluntHammerIcon, heartIcon } from './icons';
 import { statAdditiveTotal, statTotal } from './save';
 import type { EquipmentSlotId, InventoryState, PlayerStats, StatSources } from './types';
 
@@ -15,7 +16,7 @@ app.innerHTML = `
         <div class="brand">Infuse: Evergrowth</div>
         <div class="stats">
           <div style="flex:1">
-            <div class="hp-label"><span>HP</span><span id="hp-text">120 / 120</span></div>
+            <div class="hp-label"><span>HP</span><span id="hp-text">20 / 20</span></div>
             <div class="bar"><span id="hp-bar"></span></div>
           </div>
           <div class="damage-hud" title="Blunt damage">${bluntHammerIcon(13)}<span id="attack-stat">5</span></div>
@@ -35,6 +36,7 @@ app.innerHTML = `
       </div>
       <button id="inventory-button" class="dock-button" type="button">INVENTORY</button>
     </div>
+    <div id="gain-stack" class="gain-stack" aria-live="polite"></div>
     <div id="toast" class="toast"></div>
     <div id="stats-panel" class="modal-panel" aria-hidden="true">
       <div class="card modal-sheet stats-sheet">
@@ -64,8 +66,8 @@ app.innerHTML = `
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
   hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), attackText: q<HTMLSpanElement>('#attack-stat'),
-  world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), joystick: q<HTMLDivElement>('#joystick'),
-  joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
+  world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
+  joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
@@ -73,8 +75,45 @@ export const ui = {
   inventoryBag: q<HTMLDivElement>('#inventory-bag'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
 };
 
+const gainItems: HTMLDivElement[] = [];
+
+function layoutGainItems(): void {
+  gainItems.forEach((element, index) => {
+    element.style.transform = `translateY(${-index * 27}px)`;
+  });
+}
+
+function showGain(amount: string, stat: 'HP' | 'BLUNT'): void {
+  const element = document.createElement('div');
+  element.className = `gain-pop ${stat === 'HP' ? 'hp' : 'blunt'}`;
+  element.innerHTML = `<span>${amount}</span>${stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13)}`;
+  element.style.opacity = '0';
+  element.style.transform = 'translateY(8px)';
+  ui.gainStack.append(element);
+  gainItems.unshift(element);
+
+  requestAnimationFrame(() => {
+    layoutGainItems();
+    element.style.opacity = '1';
+  });
+
+  window.setTimeout(() => {
+    const index = gainItems.indexOf(element);
+    if (index >= 0) gainItems.splice(index, 1);
+    element.classList.add('leaving');
+    layoutGainItems();
+    window.setTimeout(() => element.remove(), 180);
+  }, 1600);
+}
+
 let toastTimer: number | null = null;
 export function showToast(message: string): void {
+  const gain = message.match(/^\+([0-9]+(?:\.[0-9]+)?) (HP|BLUNT)\b/);
+  if (gain) {
+    showGain(gain[1], gain[2] as 'HP' | 'BLUNT');
+    return;
+  }
+
   ui.toast.textContent = message;
   ui.toast.classList.add('visible');
   if (toastTimer !== null) clearTimeout(toastTimer);

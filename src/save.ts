@@ -1,7 +1,7 @@
 import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
 import type { DamageType, InventoryState, LootType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v5';
+const SAVE_KEY = 'infuse-evergrowth-save-v6';
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -51,14 +51,14 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 }
 
 function loadSave(): SaveData {
-  const fresh: SaveData = { version: 5, dailyKey: localDailyKey(), stats: freshStats(), inventory: freshInventory(), spawns: emptySpawnState() };
+  const fresh: SaveData = { version: 6, dailyKey: localDailyKey(), stats: freshStats(), inventory: freshInventory(), spawns: emptySpawnState() };
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Partial<SaveData>;
-    if (parsed.version !== 5 || !parsed.stats) return fresh;
+    if (parsed.version !== 6 || !parsed.stats) return fresh;
     return {
-      version: 5,
+      version: 6,
       dailyKey: localDailyKey(),
       stats: {
         maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
