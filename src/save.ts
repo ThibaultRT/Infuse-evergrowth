@@ -1,9 +1,7 @@
-import { BASE_HERO_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
-import type { PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
+import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
+import type { DamageType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-type LegacyStats = { maxHp?: number; attack?: number; hpGained?: number; attackGained?: number };
-const SAVE_KEY = 'infuse-evergrowth-save-v3';
-const LEGACY_SAVE_KEY = 'infuse-evergrowth-save-v2';
+const SAVE_KEY = 'infuse-evergrowth-save-v4';
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -25,7 +23,11 @@ function freshStat(base: number): StatSources {
 }
 
 function freshStats(): PlayerStats {
-  return { maxHp: freshStat(BASE_HERO_MAX_HP), attack: freshStat(BASE_HERO_ATTACK), regen: freshStat(BASE_HERO_REGEN) };
+  return {
+    maxHp: freshStat(BASE_HERO_MAX_HP),
+    attack: { blunt: freshStat(BASE_HERO_BLUNT_ATTACK) },
+    regen: freshStat(BASE_HERO_REGEN)
+  };
 }
 
 function normalizeStat(stat: Partial<StatSources> | undefined, base: number): StatSources {
@@ -37,45 +39,26 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
   };
 }
 
-function normalizeStats(stats: Partial<PlayerStats> | undefined): PlayerStats {
-  return {
-    maxHp: normalizeStat(stats?.maxHp, BASE_HERO_MAX_HP),
-    attack: normalizeStat(stats?.attack, BASE_HERO_ATTACK),
-    regen: normalizeStat(stats?.regen, BASE_HERO_REGEN)
-  };
-}
-
-function migrateLegacyStats(stats: LegacyStats): PlayerStats {
-  const migrated = freshStats();
-  migrated.maxHp.additive.kills = stats.hpGained ?? Math.max(0, (stats.maxHp ?? BASE_HERO_MAX_HP) - BASE_HERO_MAX_HP);
-  migrated.attack.additive.kills = stats.attackGained ?? Math.max(0, (stats.attack ?? BASE_HERO_ATTACK) - BASE_HERO_ATTACK);
-  return migrated;
-}
-
 function loadSave(): SaveData {
-  const fresh: SaveData = { version: 3, dailyKey: localDailyKey(), stats: freshStats(), spawns: emptySpawnState() };
+  const fresh: SaveData = { version: 4, dailyKey: localDailyKey(), stats: freshStats(), spawns: emptySpawnState() };
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<SaveData>;
-      if (parsed.version === 3 && parsed.stats) return {
-        version: 3,
-        dailyKey: localDailyKey(),
-        stats: normalizeStats(parsed.stats),
-        spawns: parsed.dailyKey === localDailyKey() ? { ...emptySpawnState(), ...(parsed.spawns ?? {}) } : emptySpawnState()
-      };
-    }
-    const legacyRaw = localStorage.getItem(LEGACY_SAVE_KEY);
-    if (!legacyRaw) return fresh;
-    const legacy = JSON.parse(legacyRaw) as { version?: number; dailyKey?: string; stats?: LegacyStats; spawns?: Record<string, SavedSpawnState> };
-    if (legacy.version !== 2 || !legacy.stats) return fresh;
+    if (!raw) return fresh;
+    const parsed = JSON.parse(raw) as Partial<SaveData>;
+    if (parsed.version !== 4 || !parsed.stats) return fresh;
     return {
-      version: 3,
+      version: 4,
       dailyKey: localDailyKey(),
-      stats: migrateLegacyStats(legacy.stats),
-      spawns: legacy.dailyKey === localDailyKey() ? { ...emptySpawnState(), ...(legacy.spawns ?? {}) } : emptySpawnState()
+      stats: {
+        maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
+        attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK) },
+        regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN)
+      },
+      spawns: parsed.dailyKey === localDailyKey() ? { ...emptySpawnState(), ...(parsed.spawns ?? {}) } : emptySpawnState()
     };
-  } catch { return fresh; }
+  } catch {
+    return fresh;
+  }
 }
 
 export const save = loadSave();
@@ -84,5 +67,5 @@ export function statAdditiveTotal(stat: StatSources): number { return stat.base 
 export function statMultiplierTotal(stat: StatSources): number { return Object.values(stat.multiplicative).reduce((a, b) => a * b, 1); }
 export function statTotal(stat: StatSources): number { return statAdditiveTotal(stat) * statMultiplierTotal(stat); }
 export function maxHeroHp(): number { return statTotal(save.stats.maxHp); }
-export function heroAttack(): number { return statTotal(save.stats.attack); }
+export function heroDamage(type: DamageType): number { return statTotal(save.stats.attack[type]); }
 export function heroRegen(): number { return statTotal(save.stats.regen); }
