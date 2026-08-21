@@ -1,30 +1,16 @@
-import balance from '../data/balance.json';
-import equipmentData from '../data/equipment.json';
 import { heroDamage, save } from '../save';
-import type { DamageType, EquipmentDefinition, HandSlotId, OwnedEquipment } from '../types';
+import type { DamageType, HandSlotId, OwnedEquipment } from '../types';
+import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
+import { ascendOwnedEquipment, canAscend, equipmentDamage } from '../domain/items/EquipmentProgression';
 
-export const EQUIPMENT = equipmentData as EquipmentDefinition[];
-export const EQUIPMENT_BY_ID = new Map(EQUIPMENT.map((item) => [item.id, item]));
-if (EQUIPMENT_BY_ID.size !== EQUIPMENT.length) throw new Error('Duplicate equipment ID');
+export { EQUIPMENT, EQUIPMENT_BY_ID, equipmentDamage };
 
 export type AttackProfile = { damage: number; damageType: DamageType; cooldownSeconds: number };
 
-function growthAtAscend(item: EquipmentDefinition, ascend: number): number {
-  return item.baseDamagePerLevel * balance.equipmentProgression.perLevelMultiplierPerAscend ** ascend;
-}
-
-function baseAtAscend(item: EquipmentDefinition, ascend: number): number {
-  let base = item.baseDamage;
-  for (let current = 0; current < ascend; current += 1) {
-    base = balance.equipmentProgression.ascendBaseMultiplier * (base + (balance.equipmentProgression.ascendLevel - 1) * growthAtAscend(item, current));
-  }
-  return base;
-}
-
-export function equipmentDamage(item: EquipmentDefinition, owned: OwnedEquipment): number {
-  return baseAtAscend(item, owned.ascend) + (owned.level - 1) * growthAtAscend(item, owned.ascend);
-}
-
+/**
+ * Runtime equipment orchestration. Static definitions and progression math live
+ * in the item domain; this system only connects them to persistent player state.
+ */
 export function attackProfile(hand: HandSlotId): AttackProfile {
   const itemId = save.inventory.equipped[hand];
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
@@ -58,8 +44,7 @@ export function unequip(hand: HandSlotId): string | null {
 
 export function ascend(itemId: string): boolean {
   const owned = save.inventory.items[itemId];
-  if (!owned || owned.level < balance.equipmentProgression.ascendLevel) return false;
-  owned.level = Math.max(1, owned.level - balance.equipmentProgression.ascendLevel);
-  owned.ascend += 1;
+  if (!owned || !canAscend(owned)) return false;
+  save.inventory.items[itemId] = ascendOwnedEquipment(owned);
   return true;
 }
