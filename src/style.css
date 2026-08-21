@@ -45,6 +45,17 @@ canvas {
   z-index: 2;
 }
 
+.version-tag {
+  position: absolute;
+  top: max(2px, env(safe-area-inset-top));
+  right: 5px;
+  z-index: 4;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  opacity: .5;
+}
+
 .topbar {
   position: absolute;
   top: max(12px, env(safe-area-inset-top));
@@ -206,6 +217,23 @@ canvas {
   margin-top: 6px;
   font-weight: 700;
   font-size: 14px;
+}
+
+.damage-hud,
+.stat-title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.damage-hud {
+  font-variant-numeric: tabular-nums;
+}
+
+.damage-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: -0.12em;
 }
 
 .hp-wrap {
