@@ -51,7 +51,31 @@ Enemies do **not** drop Essence or another intermediary currency. Defeating a ta
 
 These reward values are initial balancing placeholders. The important rule is that Commons grant exactly **+1 HP or +1 Attack**, while higher tiers scale only gradually.
 
-The stats tracking page keeps and displays decimal precision to two decimal places. In the active game/combat HUD, HP, Attack, damage-related values, and target health are displayed as rounded whole numbers.
+The stats tracking page keeps and displays decimal precision to two decimal places. In the active game/combat HUD, HP and Attack are displayed as rounded whole numbers. Enemy health bars are small world-space overlays with no names or numeric values.
+
+### Stat source model
+
+Player stats are stored as source-aware values rather than a single flattened number. Each tracked stat contains:
+
+- a `base` value;
+- additive sources such as `kills`, `equipment`, and `other`;
+- multiplicative sources such as `equipment` and `other`.
+
+Calculation order:
+
+`total = (base + sum(additive sources)) × product(multiplicative sources)`
+
+The source maps are intentionally extensible so future systems can add named sources without changing the calculation model.
+
+Current base stats:
+
+- Max HP: `120.00`;
+- Attack: `20.00`;
+- Health regeneration: `0.10 HP/s`.
+
+Kills add only to the `kills` additive source for Max HP or Attack. Existing v0.1 saves are migrated so previous kill gains remain preserved under that source.
+
+Health regeneration restores the current hero HP continuously up to Max HP. It uses the same base/additive/multiplicative source model and is persisted like the other stats.
 
 ## Respawn rules
 
@@ -101,6 +125,7 @@ Starting state:
 
 - 120.00 Max HP;
 - 20.00 Attack;
+- 0.10 HP/s passive health regeneration;
 - starter underwear only;
 - two unlocked hand weapon slots;
 - two additional locked weapon slots;
@@ -112,23 +137,33 @@ v0.1 has no actual equipment items yet. The four slots are exposed in the HUD so
 
 Mobile-first:
 
-- left virtual joystick: movement;
-- right Attack button: attack nearest living target in range;
+- centered virtual joystick: movement;
+- no attack button;
+- the hero automatically attacks the nearest living target within the current weapon range;
+- bare-hand range in v0.2: `2.15` world units;
+- future weapons may provide different ranges, including long-range bows;
 - Stats button: open the permanent-stat tracking page.
 
 Desktop development controls:
 
 - WASD / arrow keys: movement;
-- Space: attack.
+- attacks are automatic under the same range/cooldown rules.
 
 ## Persistence
 
-v0.1 stores locally:
+v0.2 stores locally:
 
-- permanent Max HP and Attack, including decimal precision;
-- lifetime HP and Attack gained;
+- source-aware Max HP, Attack, and Health Regeneration, including decimal precision;
+- additive gains by named source (currently kills/equipment/other);
+- multiplicative modifiers by named source (currently equipment/other);
 - daily key;
 - per-spawn kills today;
 - per-spawn respawn deadline.
 
 Storage is local to the browser. Cloud saves/accounts are intentionally out of scope for this slice.
+
+## v0.2 presentation changes
+
+- Camera is pulled farther back to show significantly more of the surrounding map.
+- Enemy/target health is represented by a compact bar projected above the target in the world.
+- Target health bars intentionally show no target name and no numeric HP value.
