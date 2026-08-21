@@ -24,7 +24,7 @@ import { addRock, makeCrystal, makeHumanoid, makePortal, makeTierRing } from '..
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
-import { applyEquipmentCopies, ascend, attackProfile, equip } from '../systems/EquipmentSystem';
+import { applyEquipmentCopies, ascend, attackProfile, equip, unequip } from '../systems/EquipmentSystem';
 import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 
 export class Game {
@@ -486,7 +486,9 @@ ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === 
 ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
 ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
 ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
+let suppressInventoryClick = false;
 ui.inventoryBag.addEventListener('click', (event) => {
+  if (suppressInventoryClick) { suppressInventoryClick = false; return; }
   const button = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
   if (button?.dataset.itemId) renderWeaponDetail(save.inventory.items[button.dataset.itemId] ?? null);
 });
@@ -495,9 +497,71 @@ ui.weaponDetail.addEventListener('click', (event) => {
   const itemId = button?.dataset.itemId;
   if (!button || !itemId) return;
   if (button.dataset.equip) { const hand = button.dataset.equip as HandSlotId; equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand }); }
+  if (button.dataset.unequip) { const hand = button.dataset.unequip as HandSlotId; if (unequip(hand)) events.emit('equipmentUnequipped', { itemId, hand }); }
   if (button.hasAttribute('data-ascend')) { const previousAscend = save.inventory.items[itemId].ascend; if (ascend(itemId)) events.emit('weaponAscended', { itemId, previousAscend, newAscend: previousAscend + 1 }); }
   persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
 });
+
+type EquipmentDrag = { itemId: string; sourceHand: HandSlotId | null };
+function dragFrom(element: HTMLElement): EquipmentDrag | null {
+  const itemId = element.dataset.itemId;
+  if (!itemId) return null;
+  const slot = element.closest<HTMLElement>('[data-slot]')?.dataset.slot;
+  return { itemId, sourceHand: slot === 'hand1' || slot === 'hand2' ? slot : null };
+}
+function completeEquipmentDrag(drag: EquipmentDrag, target: Element | null): void {
+  const slot = target?.closest<HTMLElement>('.inventory-equip-slot:not(.locked)')?.dataset.slot;
+  if (slot === 'hand1' || slot === 'hand2') {
+    equip(drag.itemId, slot);
+    events.emit('equipmentEquipped', { itemId: drag.itemId, hand: slot });
+  } else if (target?.closest('#inventory-bag') && drag.sourceHand) {
+    unequip(drag.sourceHand);
+    events.emit('equipmentUnequipped', { itemId: drag.itemId, hand: drag.sourceHand });
+  } else return;
+  persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[drag.itemId]); updateHud();
+}
+
+ui.inventoryPanel.addEventListener('dragstart', (event) => {
+  const source = (event.target as HTMLElement).closest<HTMLElement>('[draggable="true"]');
+  const drag = source ? dragFrom(source) : null;
+  if (!source || !drag || !event.dataTransfer) { event.preventDefault(); return; }
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('application/x-inventory-equipment', JSON.stringify(drag));
+  source.classList.add('dragging');
+});
+ui.inventoryPanel.addEventListener('dragend', (event) => (event.target as HTMLElement).classList.remove('dragging'));
+ui.inventoryPanel.addEventListener('dragover', (event) => {
+  if ((event.target as Element).closest('.inventory-equip-slot:not(.locked), #inventory-bag')) event.preventDefault();
+});
+ui.inventoryPanel.addEventListener('drop', (event) => {
+  event.preventDefault();
+  const raw = event.dataTransfer?.getData('application/x-inventory-equipment');
+  if (raw) completeEquipmentDrag(JSON.parse(raw) as EquipmentDrag, event.target as Element);
+});
+
+let pointerDrag: (EquipmentDrag & { startX: number; startY: number; active: boolean; source: HTMLElement }) | null = null;
+ui.inventoryPanel.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'mouse') return;
+  const source = (event.target as HTMLElement).closest<HTMLElement>('[draggable="true"]');
+  const drag = source ? dragFrom(source) : null;
+  if (source && drag) pointerDrag = { ...drag, startX: event.clientX, startY: event.clientY, active: false, source };
+});
+ui.inventoryPanel.addEventListener('pointermove', (event) => {
+  if (!pointerDrag || pointerDrag.active) return;
+  if (Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY) < 8) return;
+  pointerDrag.active = true;
+  pointerDrag.source.classList.add('dragging');
+});
+ui.inventoryPanel.addEventListener('pointerup', (event) => {
+  if (!pointerDrag) return;
+  const drag = pointerDrag;
+  pointerDrag = null;
+  drag.source.classList.remove('dragging');
+  if (!drag.active) return;
+  suppressInventoryClick = true;
+  completeEquipmentDrag(drag, document.elementFromPoint(event.clientX, event.clientY));
+});
+ui.inventoryPanel.addEventListener('pointercancel', () => { pointerDrag?.source.classList.remove('dragging'); pointerDrag = null; });
 
 function updateHero(dt: number): void {
   if (heroDead || cameraController.isScripted) return;

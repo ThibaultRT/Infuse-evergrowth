@@ -96,6 +96,8 @@ canvas { display: block; width: 100%; height: 100%; }
 .inventory-empty { grid-column: 1/-1; align-self: center; justify-self: center; font-size: 12px; opacity: .48; }
 .inventory-item { min-height: 62px; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; background: rgba(255,255,255,.055); color: inherit; font: inherit; font-size: 9px; display: grid; gap: 4px; padding: 5px; overflow-wrap: anywhere; }
 .inventory-item span { opacity: .65; }
+.inventory-item.dragging, .inventory-equip-slot.dragging { opacity: .35; transform: scale(.96); }
+.inventory-equip-slot:not(.locked), .inventory-bag { touch-action: none; }
 .weapon-detail { margin-top: 14px; text-align: center; }
 .weapon-detail:empty { display: none; }
 .weapon-art { display: grid; place-items: center; width: 92px; height: 92px; margin: 0 auto; border-radius: 22px; background: rgba(255,255,255,.06); }
