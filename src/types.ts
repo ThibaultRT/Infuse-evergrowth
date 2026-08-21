@@ -41,7 +41,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 5;
+  version: 6;
   dailyKey: string;
   stats: PlayerStats;
   inventory: InventoryState;
