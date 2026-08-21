@@ -1,11 +1,12 @@
 {
   "hero": {
     "baseMaxHp": 20,
-    "baseBluntAttack": 5,
+    "baseBluntAttack": 3,
     "baseRegenHpPerSecond": 0.1,
     "moveSpeed": 7.6,
     "bareHandsRangeMeters": 2.15,
-    "attackCooldownSeconds": 0.5
+    "attackCooldownSeconds": 1,
+    "respawnDelaySeconds": 5
   },
   "enemy": {
     "commonBaseHp": 32,
@@ -69,6 +70,18 @@
     "hpWeight": 0.5,
     "bluntWeight": 0.5
   },
+  "equipmentDrops": {
+    "areaChanceGrowth": 0.15,
+    "areaChanceMultiplierCap": 3,
+    "baseChanceByEnemyTier": { "uncommon": 0.01, "rare": 0.02, "epic": 0.04, "legendary": 0.08 },
+    "rarityWeightsByEnemyTier": {
+      "uncommon": { "common": 0.7, "uncommon": 0.3 },
+      "rare": { "common": 0.4, "uncommon": 0.4, "rare": 0.2 },
+      "epic": { "common": 0.2, "uncommon": 0.3, "rare": 0.3, "epic": 0.2 },
+      "legendary": { "common": 0.1, "uncommon": 0.15, "rare": 0.2, "epic": 0.25, "legendary": 0.3 }
+    }
+  },
+  "equipmentProgression": { "ascendLevel": 50, "ascendBaseMultiplier": 2, "perLevelMultiplierPerAscend": 2 },
   "respawn": {
     "baseSeconds": 180
   },

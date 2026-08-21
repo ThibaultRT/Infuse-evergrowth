@@ -1,4 +1,4 @@
-import type { CombatAffinity, DamageType, LootType } from '../types';
+import type { CombatAffinity, DamageType, HandSlotId, LootType } from '../types';
 
 export type GameEventMap = {
   enemyDamaged: { enemyId: string; amount: number; damageType: DamageType };
@@ -11,6 +11,9 @@ export type GameEventMap = {
   portalUnlocked: { portalId: string };
   portalEntered: { portalId: string; destinationAreaId: number };
   areaEntered: { areaId: number };
+  equipmentDropped: { sourceId: string; areaId: number; itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number };
+  equipmentEquipped: { itemId: string; hand: HandSlotId };
+  weaponAscended: { itemId: string; previousAscend: number; newAscend: number };
 };
 
 type Listener<T> = (event: T) => void;

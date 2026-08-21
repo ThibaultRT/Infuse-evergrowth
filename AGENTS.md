@@ -40,6 +40,7 @@ The Vite production base is `/Infuse-evergrowth/` for GitHub Pages. Deployment i
 - Spawns have stable authored IDs. Respawn state is stored per spawn with `killsToday`, `defeatedAt`, `respawnAt`, and the rolled loot type.
 - Daily spawn state resets at local midnight. Permanent player stats, boss progression, inventory, and unlocked areas persist.
 - When changing the save shape, update the types, normalization/loading logic, save version, and storage key together. Existing malformed/old saves should fall back safely.
+- All player progression must be persisted. Whenever a save-shape change is necessary, add an explicit migration helper so existing progression is preserved.
 - UI is rendered as a template in `src/ui.ts`; add every interactively queried element to the exported `ui` object. HUD controls need `pointer-events: auto` because the HUD container itself ignores pointer events.
 - World-attached labels are DOM elements projected from Three.js positions. Keep their visibility synchronized with entity life and the active area.
 
@@ -51,3 +52,4 @@ The Vite production base is `/Infuse-evergrowth/` for GitHub Pages. Deployment i
 - Do not edit generated `dist/` output or dependency contents.
 - Run `npm run build` after code changes. For visible web-app changes, also inspect the running app at a mobile-sized viewport and capture a screenshot when tooling permits.
 - Before committing, review `git diff` and `git status`. Commit changes on the current branch.
+- Systematically increment the package version before creating a pull request. Use `package.json` as the single source of truth and apply semantic versioning appropriate to the change.
