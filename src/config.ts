@@ -1,4 +1,4 @@
-import type { SpawnDefinition, Tier, TierConfig } from './types';
+import type { DamageType, SpawnDefinition, Tier, TierConfig } from './types';
 
 export const TIER_CONFIG: Record<Tier, TierConfig> = {
   crystal: { label: 'Crystal', statMultiplier: 0.35, statReward: 0.5, respawnMultiplier: 1, color: 0x8dd9ff, hostile: false },
@@ -44,8 +44,9 @@ export const SPAWNS: SpawnDefinition[] = [
 
 export const BASE_RESPAWN_MS = 3 * 60 * 1000;
 export const BASE_HERO_MAX_HP = 120;
-export const BASE_HERO_ATTACK = 20;
+export const BASE_HERO_BLUNT_ATTACK = 5;
 export const BASE_HERO_REGEN = 0.1;
+export const BARE_HANDS_DAMAGE_TYPE: DamageType = 'blunt';
 export const HERO_SPEED = 7.6;
 export const HERO_ATTACK_RANGE = 2.15;
 export const HERO_ATTACK_COOLDOWN = 0.5;
