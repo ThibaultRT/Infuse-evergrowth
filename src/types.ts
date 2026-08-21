@@ -1,4 +1,5 @@
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type DamageType = 'blunt';
 
 export type SpawnDefinition = {
   id: string;
@@ -21,12 +22,12 @@ export type StatSources = {
 
 export type PlayerStats = {
   maxHp: StatSources;
-  attack: StatSources;
+  attack: Record<DamageType, StatSources>;
   regen: StatSources;
 };
 
 export type SaveData = {
-  version: 3;
+  version: 4;
   dailyKey: string;
   stats: PlayerStats;
   spawns: Record<string, SavedSpawnState>;

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import './style.css';
-import { BASE_RESPAWN_MS, HERO_ATTACK_COOLDOWN, HERO_ATTACK_RANGE, HERO_SPEED, SPAWNS, TIER_CONFIG } from './config';
-import { emptySpawnState, heroAttack, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from './save';
+import { BARE_HANDS_DAMAGE_TYPE, BASE_RESPAWN_MS, HERO_ATTACK_COOLDOWN, HERO_ATTACK_RANGE, HERO_SPEED, SPAWNS, TIER_CONFIG } from './config';
+import { emptySpawnState, heroDamage, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from './save';
 import type { SpawnDefinition, TierConfig } from './types';
 import { renderStats, showToast, ui } from './ui';
 import { addRock, makeCrystal, makeHumanoid, makeTierRing } from './visuals';
@@ -77,9 +77,12 @@ class SpawnEntity {
     if (stat === 'hp') {
       const oldMax = maxHeroHp(); save.stats.maxHp.additive.kills = (save.stats.maxHp.additive.kills ?? 0) + amount;
       heroHp = Math.min(maxHeroHp(), heroHp + maxHeroHp() - oldMax);
-    } else save.stats.attack.additive.kills = (save.stats.attack.additive.kills ?? 0) + amount;
+    } else {
+      const blunt = save.stats.attack[BARE_HANDS_DAMAGE_TYPE];
+      blunt.additive.kills = (blunt.additive.kills ?? 0) + amount;
+    }
     persist(); this.setAlive(false); renderStats(save.stats);
-    showToast(`+${amount.toFixed(amount % 1 === 0 ? 0 : 2)} ${stat === 'hp' ? 'HP' : 'ATK'} · ${this.config.label}`);
+    showToast(`+${amount.toFixed(amount % 1 === 0 ? 0 : 2)} ${stat === 'hp' ? 'HP' : 'BLUNT'} · ${this.config.label}`);
   }
   update(dt: number): void {
     if (!this.alive) {
@@ -124,7 +127,7 @@ function nearestTarget(maxDistance = HERO_ATTACK_RANGE): SpawnEntity | null {
 function autoAttack(): void {
   if (heroDead || heroAttackCooldown > 0) return;
   const target = nearestTarget(); if (!target) return;
-  heroAttackCooldown = HERO_ATTACK_COOLDOWN; target.receiveDamage(heroAttack());
+  heroAttackCooldown = HERO_ATTACK_COOLDOWN; target.receiveDamage(heroDamage(BARE_HANDS_DAMAGE_TYPE));
   const direction = target.root.position.clone().sub(hero.position); if (direction.lengthSq() > 0) hero.rotation.y = Math.atan2(direction.x, direction.z);
 }
 
@@ -172,7 +175,7 @@ function updateWorldBars(): void {
 }
 function updateHud(): void {
   const maxHp = maxHeroHp(); ui.hpText.textContent = `${Math.round(heroHp)} / ${Math.round(maxHp)}`;
-  ui.hpBar.style.width = `${heroHp / maxHp * 100}%`; ui.attackText.textContent = String(Math.round(heroAttack())); updateWorldBars();
+  ui.hpBar.style.width = `${heroHp / maxHp * 100}%`; ui.attackText.textContent = String(Math.round(heroDamage(BARE_HANDS_DAMAGE_TYPE))); updateWorldBars();
 }
 
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); });
