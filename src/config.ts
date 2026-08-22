@@ -1,6 +1,6 @@
 import balance from './data/balance.json';
 import areaData from './data/areas.json';
-import type { AreaDefinition, CombatAffinity, DamageType, PortalDefinition, SpawnDefinition, Tier, TierConfig } from './types';
+import type { AreaDefinition, CombatAffinity, DamageType, GateDefinition, SpawnDefinition, Tier, TierConfig } from './types';
 
 const tierBalance = balance.enemy.tiers;
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
@@ -47,15 +47,15 @@ export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>
   }))
 );
 
-export const PORTALS: PortalDefinition[] = areaData.areas.flatMap((area) =>
-  area.portals.map((portal) => ({
-    id: portal.id,
-    tag: portal.tag,
+export const GATES: GateDefinition[] = areaData.areas.flatMap((area) =>
+  area.gates.map((gate) => ({
+    id: gate.id,
+    tag: gate.tag,
     sourceAreaId: area.id,
-    targetAreaId: portal.targetAreaId,
-    x: area.worldOrigin.x + portal.x,
-    z: area.worldOrigin.z + portal.z,
-    requiresBossDefeated: portal.requiresBossDefeated
+    targetAreaId: gate.targetAreaId,
+    x: area.worldOrigin.x + gate.x,
+    z: area.worldOrigin.z + gate.z,
+    requiresBossDefeated: gate.requiresBossDefeated
   }))
 );
 

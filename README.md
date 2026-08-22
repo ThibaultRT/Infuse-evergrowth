@@ -6,11 +6,11 @@ An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
 - Two authored areas with 30 fixed targets each across Crystal → Legendary tiers
 - Area 1's Legendary target is the current boss
-- Area 1 contains a boss-gated portal tagged `portal - area 2`
-- Defeating the boss opens the portal, briefly focuses the camera on it, and unlocks Area 2
-- Walking into the open portal moves the hero to Area 2, whose always-open return portal leads back to Area 1
+- Area 1 and the darker ashwood Area 2 meet at a shared, boss-gated physical passage
+- Defeating the boss opens the gate, briefly focuses the camera on it, and unlocks Area 2
+- Walking through the open gate crosses the shared boundary; Area 2's side remains open for the return journey
 - Area 2 enemies grant twice the permanent-stat rewards of their Area 1 counterparts
-- Low-poly human placeholders for combat enemies and a human hero in starter underwear
+- Animated Quaternius humanoids, an equipment-driven Ranger hero, dual hand weapons, and trial orbit slots
 - Hero starts at **20 Max HP**, **5 Blunt Attack**, and **0.10 HP/s** passive regeneration
 - Central touch joystick for iPhone plus WASD / arrow keys on desktop
 - Automatic combat: the hero attacks the nearest living target inside the current weapon range
@@ -39,7 +39,7 @@ All tunable gameplay numbers live in [`src/data/balance.json`](src/data/balance.
 - loot roll weights;
 - cross-area HP and attack scaling.
 
-Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, and portal definitions/tags.
+Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, and gate definitions/tags.
 
 ## Area scaling
 

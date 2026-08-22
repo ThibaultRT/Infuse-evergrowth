@@ -1,5 +1,5 @@
 import { heroDamage, save } from '../save';
-import type { DamageType, HandSlotId, OwnedEquipment } from '../types';
+import type { DamageType, EquipmentSlotId, OwnedEquipment } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { ascendOwnedEquipment, canAscend, equipmentDamage } from '../domain/items/EquipmentProgression';
 
@@ -11,7 +11,7 @@ export type AttackProfile = { damage: number; damageType: DamageType; cooldownSe
  * Runtime equipment orchestration. Static definitions and progression math live
  * in the item domain; this system only connects them to persistent player state.
  */
-export function attackProfile(hand: HandSlotId): AttackProfile {
+export function attackProfile(hand: EquipmentSlotId): AttackProfile {
   const itemId = save.inventory.equipped[hand];
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
   const owned = itemId ? save.inventory.items[itemId] : undefined;
@@ -29,14 +29,13 @@ export function applyEquipmentCopies(itemId: string, quantity: number): { previo
   return { previousLevel, owned };
 }
 
-export function equip(itemId: string, hand: HandSlotId): void {
+export function equip(itemId: string, hand: EquipmentSlotId): void {
   if (!save.inventory.items[itemId]) return;
-  const other: HandSlotId = hand === 'hand1' ? 'hand2' : 'hand1';
-  if (save.inventory.equipped[other] === itemId) save.inventory.equipped[other] = null;
+  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) if (slot !== hand && save.inventory.equipped[slot] === itemId) save.inventory.equipped[slot] = null;
   save.inventory.equipped[hand] = itemId;
 }
 
-export function unequip(hand: HandSlotId): string | null {
+export function unequip(hand: EquipmentSlotId): string | null {
   const itemId = save.inventory.equipped[hand];
   save.inventory.equipped[hand] = null;
   return itemId;

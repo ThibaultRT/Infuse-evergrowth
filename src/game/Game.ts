@@ -9,7 +9,7 @@ import {
   HERO_ATTACK_RANGE_METERS,
   HERO_RESPAWN_DELAY_MS,
   HERO_SPEED,
-  PORTALS,
+  GATES,
   SPAWNS,
   TIER_CONFIG,
   areaById,
@@ -19,7 +19,7 @@ import {
 } from '../config';
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, rollLoot, save } from '../save';
-import type { CombatAffinity, DamageType, HandSlotId, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showEquipmentDrop, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
@@ -32,6 +32,7 @@ import { EnvironmentView } from '../rendering/EnvironmentView';
 import { GateView } from '../rendering/GateView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
+import { EffectManager } from '../rendering/EffectManager';
 
 export class Game {
   private started = false;
@@ -47,6 +48,7 @@ scene.background = new THREE.Color(0x93b8cf);
 scene.fog = new THREE.Fog(0x93b8cf, 42, 82);
 const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 180);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+const effects = new EffectManager(scene);
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 renderer.shadowMap.enabled = true;
@@ -80,13 +82,16 @@ const environmentViews = AREAS.map((area) => {
 let currentAreaId = save.currentAreaId;
 const initialArea = areaById(currentAreaId);
 const heroView = new HeroView();
+heroView.syncEquipment(save.inventory);
+events.on('equipmentEquipped', () => heroView.syncEquipment(save.inventory));
+events.on('equipmentUnequipped', () => heroView.syncEquipment(save.inventory));
 const hero = heroView.root;
 hero.position.set(initialArea.originX, 0, initialArea.originZ);
 scene.add(hero);
 let heroHp = maxHeroHp();
 let heroDead = false;
-const handCooldowns: Record<HandSlotId, number> = { hand1: 0, hand2: 0 };
-let portalTransitionCooldown = 0;
+const attackCooldowns: Record<EquipmentSlotId, number> = { hand1: 0, hand2: 0, orbit1: 0, orbit2: 0 };
+let gateTransitionCooldown = 0;
 const cameraController = new CameraController(camera, hero.position);
 
 function syncLighting(): void {
@@ -222,6 +227,7 @@ class SpawnEntity {
   receiveDamage(amount: number, type: DamageType): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
     events.emit('enemyDamaged', { enemyId: this.def.id, amount, damageType: type });
+    effects.impact(this.root.position, type);
     this.enemyView?.playHit();
     showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), amount, type);
     this.hp = Math.max(0, this.hp - amount);
@@ -322,14 +328,14 @@ class SpawnEntity {
 
 const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
 
-class PortalEntity {
+class GateEntity {
   readonly view = new GateView();
   readonly root = this.view.root;
   open = false;
 
-  constructor(readonly def: PortalDefinition) {
+  constructor(readonly def: GateDefinition) {
     this.root.position.set(def.x, 0, def.z);
-    this.root.userData.portalId = def.id;
+    this.root.userData.gateId = def.id;
     this.root.userData.tag = def.tag;
     this.root.userData.targetAreaId = def.targetAreaId;
     scene.add(this.root);
@@ -347,18 +353,18 @@ class PortalEntity {
   distanceToHero(): number { return this.root.position.distanceTo(hero.position); }
 }
 
-const portalEntities = PORTALS.map((portal) => new PortalEntity(portal));
+const gateEntities = GATES.map((gate) => new GateEntity(gate));
 
 function syncAreaVisibility(): void {
   entities.forEach((entity) => entity.syncAreaVisibility());
-  portalEntities.forEach((portal) => portal.syncAreaVisibility());
+  gateEntities.forEach((gate) => gate.syncAreaVisibility());
   environmentViews.forEach((view) => { view.root.visible = view.area.id === currentAreaId; });
   syncLighting();
 }
 
-function startPortalCinematic(portal: PortalEntity): void {
+function startGateCinematic(gate: GateEntity): void {
   input.reset();
-  cameraController.focus(portal.root.position, 2600);
+  cameraController.focus(gate.root.position, 2600);
 }
 
 function handleBossDefeat(areaId: number, spawnId: string): void {
@@ -367,15 +373,15 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   save.defeatedBosses.push(spawnId);
   events.emit('bossDefeated', { bossId: spawnId, areaId });
 
-  const openedPortals = portalEntities.filter((portal) => portal.def.sourceAreaId === areaId && portal.def.requiresBossDefeated);
-  for (const portal of openedPortals) {
-    if (!save.unlockedAreas.includes(portal.def.targetAreaId)) save.unlockedAreas.push(portal.def.targetAreaId);
-    portal.setOpen(true);
-    events.emit('portalUnlocked', { portalId: portal.def.id });
+  const openedGates = gateEntities.filter((gate) => gate.def.sourceAreaId === areaId && gate.def.requiresBossDefeated);
+  for (const gate of openedGates) {
+    if (!save.unlockedAreas.includes(gate.def.targetAreaId)) save.unlockedAreas.push(gate.def.targetAreaId);
+    gate.setOpen(true);
+    events.emit('gateUnlocked', { gateId: gate.def.id });
   }
-  if (openedPortals[0]) {
-    startPortalCinematic(openedPortals[0]);
-    showToast(`${areaById(openedPortals[0].def.targetAreaId).name} unlocked`);
+  if (openedGates[0]) {
+    startGateCinematic(openedGates[0]);
+    showToast(`${areaById(openedGates[0].def.targetAreaId).name} unlocked`);
   }
 }
 
@@ -456,6 +462,8 @@ function damageHero(amount: number, type: CombatAffinity): void {
     hero.position.set(area.originX, 0, area.originZ);
     heroHp = maxHeroHp();
     heroDead = false;
+    effects.resurrection(hero.position);
+    events.emit('heroResurrected', { areaId: currentAreaId });
     updateHud();
   }, HERO_RESPAWN_DELAY_MS);
 }
@@ -473,12 +481,14 @@ function nearestTarget(maxDistance = HERO_ATTACK_RANGE_METERS): SpawnEntity | nu
 
 function autoAttack(): void {
   if (heroDead || cameraController.isScripted) return;
-  for (const hand of ['hand1', 'hand2'] as const) {
-    if (handCooldowns[hand] > 0) continue;
+  for (const hand of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
+    if (attackCooldowns[hand] > 0 || ((hand === 'orbit1' || hand === 'orbit2') && !save.inventory.equipped[hand])) continue;
     const target = nearestTarget();
     if (!target) continue;
     const profile = attackProfile(hand);
-    handCooldowns[hand] = profile.cooldownSeconds;
+    attackCooldowns[hand] = profile.cooldownSeconds;
+    heroView.playWeaponAttack(hand, profile.damageType, target.root.position);
+    events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
     target.receiveDamage(profile.damage, profile.damageType);
     const direction = target.root.position.clone().sub(hero.position);
     if (direction.lengthSq() > 0) heroView.setFacing(Math.atan2(direction.x, direction.z));
@@ -574,21 +584,21 @@ ui.weaponDetail.addEventListener('click', (event) => {
     if (!hand) { showToast('no free slots!'); return; }
     equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand });
   }
-  if (button.dataset.unequip) { const hand = button.dataset.unequip as HandSlotId; if (unequip(hand)) events.emit('equipmentUnequipped', { itemId, hand }); }
+  if (button.dataset.unequip) { const hand = button.dataset.unequip as EquipmentSlotId; if (unequip(hand)) events.emit('equipmentUnequipped', { itemId, hand }); }
   if (button.hasAttribute('data-ascend')) { const previousAscend = save.inventory.items[itemId].ascend; if (ascend(itemId)) events.emit('weaponAscended', { itemId, previousAscend, newAscend: previousAscend + 1 }); }
   persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
 });
 
-type EquipmentDrag = { itemId: string; sourceHand: HandSlotId | null };
+type EquipmentDrag = { itemId: string; sourceHand: EquipmentSlotId | null };
 function dragFrom(element: HTMLElement): EquipmentDrag | null {
   const itemId = element.dataset.itemId;
   if (!itemId) return null;
   const slot = element.closest<HTMLElement>('[data-slot]')?.dataset.slot;
-  return { itemId, sourceHand: slot === 'hand1' || slot === 'hand2' ? slot : null };
+  return { itemId, sourceHand: slot === 'hand1' || slot === 'hand2' || slot === 'orbit1' || slot === 'orbit2' ? slot : null };
 }
 function completeEquipmentDrag(drag: EquipmentDrag, target: Element | null): void {
   const slot = target?.closest<HTMLElement>('.inventory-equip-slot:not(.locked)')?.dataset.slot;
-  if (slot === 'hand1' || slot === 'hand2') {
+  if (slot === 'hand1' || slot === 'hand2' || slot === 'orbit1' || slot === 'orbit2') {
     equip(drag.itemId, slot);
     events.emit('equipmentEquipped', { itemId: drag.itemId, hand: slot });
   } else if (target?.closest('#inventory-bag') && drag.sourceHand) {
@@ -649,7 +659,7 @@ function updateHero(dt: number): void {
     hero.position.z -= move.y * HERO_SPEED * dt;
     const area = areaById(currentAreaId);
     hero.position.x = THREE.MathUtils.clamp(hero.position.x, area.originX - 17.2, area.originX + 17.2);
-    hero.position.z = THREE.MathUtils.clamp(hero.position.z, area.originZ - 26.2, area.originZ + 26.2);
+    hero.position.z = THREE.MathUtils.clamp(hero.position.z, area.originZ - 27.2, area.originZ + 27.2);
     heroView.setFacing(Math.atan2(move.x, -move.y));
   }
   heroView.update(dt, moving);
@@ -657,15 +667,18 @@ function updateHero(dt: number): void {
 
 function enterArea(targetAreaId: number): void {
   if (!save.unlockedAreas.includes(targetAreaId)) return;
+  const previous = areaById(currentAreaId);
   currentAreaId = targetAreaId;
   events.emit('areaEntered', { areaId: targetAreaId });
   save.currentAreaId = targetAreaId;
   const area = areaById(targetAreaId);
   renderEnemyAffinities(area);
-  hero.position.set(area.originX, 0, area.originZ);
+  const crossedAdjacentBoundary = previous.id !== area.id && Math.abs(previous.originZ - area.originZ) <= 60 && previous.originX === area.originX;
+  if (crossedAdjacentBoundary) hero.position.z += area.originZ < previous.originZ ? -2.8 : 2.8;
+  else hero.position.set(area.originX, 0, area.originZ);
   entities.forEach((entity) => { entity.provoked = false; });
   cameraController.returnToHero();
-  portalTransitionCooldown = 1;
+  gateTransitionCooldown = 1;
   input.reset();
   syncAreaVisibility();
   camera.position.set(area.originX, 19, area.originZ + 16.5);
@@ -673,14 +686,14 @@ function enterArea(targetAreaId: number): void {
   showToast(area.name);
 }
 
-function updatePortals(dt: number): void {
-  portalEntities.forEach((portal) => portal.update(dt));
-  portalTransitionCooldown = Math.max(0, portalTransitionCooldown - dt);
-  if (portalTransitionCooldown > 0 || cameraController.isScripted || heroDead) return;
-  const portal = portalEntities.find((candidate) => candidate.def.sourceAreaId === currentAreaId && candidate.open && candidate.distanceToHero() <= 1.45);
-  if (portal) {
-    events.emit('portalEntered', { portalId: portal.def.id, destinationAreaId: portal.def.targetAreaId });
-    enterArea(portal.def.targetAreaId);
+function updateGates(dt: number): void {
+  gateEntities.forEach((gate) => gate.update(dt));
+  gateTransitionCooldown = Math.max(0, gateTransitionCooldown - dt);
+  if (gateTransitionCooldown > 0 || cameraController.isScripted || heroDead) return;
+  const gate = gateEntities.find((candidate) => candidate.def.sourceAreaId === currentAreaId && candidate.open && candidate.distanceToHero() <= 1.45);
+  if (gate) {
+    events.emit('gateCrossed', { gateId: gate.def.id, destinationAreaId: gate.def.targetAreaId });
+    enterArea(gate.def.targetAreaId);
   }
 }
 
@@ -798,8 +811,7 @@ function frame(now: number): void {
   lastRenderedAt = now;
   const dt = Math.min((now - previous) / 1000, .05);
   previous = now;
-  handCooldowns.hand1 = Math.max(0, handCooldowns.hand1 - dt);
-  handCooldowns.hand2 = Math.max(0, handCooldowns.hand2 - dt);
+  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) attackCooldowns[slot] = Math.max(0, attackCooldowns[slot] - dt);
   midnightAccumulator += dt;
   if (midnightAccumulator >= 1) {
     midnightAccumulator = 0;
@@ -807,7 +819,7 @@ function frame(now: number): void {
   }
 
   updateHero(dt);
-  updatePortals(dt);
+  updateGates(dt);
   autoAttack();
   if (!cameraController.isScripted) entities.forEach((entity) => entity.update(dt));
   entities.forEach((entity) => entity.updateView(dt));
@@ -815,6 +827,7 @@ function frame(now: number): void {
   cameraController.update(dt, now);
   updateHud();
   updateCombatTexts(dt);
+  effects.update(dt);
   renderer.render(scene, camera);
   if (import.meta.env.DEV && renderingQuality.showStats) {
     statsFrames += 1;

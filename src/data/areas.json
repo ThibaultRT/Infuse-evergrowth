@@ -8,13 +8,13 @@
       "enemyWeakness": "slash",
       "worldOrigin": { "x": 0, "z": 0 },
       "bossSpawnId": "area1-legendary-01",
-      "portals": [
+      "gates": [
         {
           "id": "area1-to-area2",
-          "tag": "portal - area 2",
+          "tag": "meadow gate - ashwood",
           "targetAreaId": 2,
           "x": 0,
-          "z": -24,
+          "z": -28,
           "requiresBossDefeated": true
         }
       ],
@@ -54,18 +54,18 @@
     {
       "id": 2,
       "name": "Area 2",
-      "environmentTheme": "legacy",
+      "environmentTheme": "ashwood",
       "enemyWeapon": "slash",
       "enemyWeakness": "pierce",
-      "worldOrigin": { "x": 60, "z": 0 },
+      "worldOrigin": { "x": 0, "z": -56 },
       "bossSpawnId": "area2-legendary-01",
-      "portals": [
+      "gates": [
         {
           "id": "area2-to-area1",
-          "tag": "portal - area 1",
+          "tag": "ashwood gate - meadow",
           "targetAreaId": 1,
           "x": 0,
-          "z": -24,
+          "z": 28,
           "requiresBossDefeated": false
         }
       ],
