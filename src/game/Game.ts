@@ -21,7 +21,7 @@ import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
 import type { CombatAffinity, DamageType, HandSlotId, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showEquipmentDrop, showToast, ui } from '../ui';
-import { addRock, makeCrystal, makeHumanoid, makePortal, makeTierRing } from '../visuals';
+import { addRock, makeCrystal, makeHumanoid, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
@@ -29,6 +29,7 @@ import { applyEquipmentCopies, ascend, attackProfile, equip, unequip } from '../
 import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView } from '../rendering/EnvironmentView';
+import { GateView } from '../rendering/GateView';
 
 export class Game {
   private started = false;
@@ -301,16 +302,11 @@ class SpawnEntity {
 const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
 
 class PortalEntity {
-  readonly root: THREE.Group;
-  readonly barrier: THREE.Mesh;
-  readonly glow: THREE.MeshStandardMaterial;
+  readonly view = new GateView();
+  readonly root = this.view.root;
   open = false;
 
   constructor(readonly def: PortalDefinition) {
-    const visual = makePortal();
-    this.root = visual.root;
-    this.barrier = visual.barrier;
-    this.glow = visual.glow;
     this.root.position.set(def.x, 0, def.z);
     this.root.userData.portalId = def.id;
     this.root.userData.tag = def.tag;
@@ -322,11 +318,10 @@ class PortalEntity {
 
   setOpen(value: boolean): void {
     this.open = value;
-    this.barrier.visible = !value;
-    this.glow.emissiveIntensity = value ? 1.25 : 0.12;
-    this.glow.color.setHex(value ? 0x6ad8ff : 0x59636f);
+    this.view.setOpen(value);
   }
 
+  update(dt: number): void { this.view.update(dt); }
   syncAreaVisibility(): void { this.root.visible = this.def.sourceAreaId === currentAreaId; }
   distanceToHero(): number { return this.root.position.distanceTo(hero.position); }
 }
@@ -644,6 +639,7 @@ function enterArea(targetAreaId: number): void {
 }
 
 function updatePortals(dt: number): void {
+  portalEntities.forEach((portal) => portal.update(dt));
   portalTransitionCooldown = Math.max(0, portalTransitionCooldown - dt);
   if (portalTransitionCooldown > 0 || cameraController.isScripted || heroDead) return;
   const portal = portalEntities.find((candidate) => candidate.def.sourceAreaId === currentAreaId && candidate.open && candidate.distanceToHero() <= 1.45);
