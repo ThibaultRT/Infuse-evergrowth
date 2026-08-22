@@ -116,46 +116,21 @@ export function renderEnemyAffinities(area: AreaDefinition): void {
 }
 
 const gainItems: HTMLDivElement[] = [];
-
-function layoutGainItems(): void {
-  gainItems.forEach((element, index) => {
-    element.style.transform = `translateY(${-index * 27}px)`;
-  });
-}
-
+function layoutGainItems(): void { gainItems.forEach((element, index) => { element.style.transform = `translateY(${-index * 27}px)`; }); }
 function showGain(amount: string, stat: 'HP' | 'BLUNT'): void {
   const element = document.createElement('div');
   element.className = `gain-pop ${stat === 'HP' ? 'hp' : 'blunt'}`;
   element.innerHTML = `<span>${amount}</span>${stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13)}`;
-  element.style.opacity = '0';
-  element.style.transform = 'translateY(8px)';
-  ui.gainStack.append(element);
-  gainItems.unshift(element);
-
-  requestAnimationFrame(() => {
-    layoutGainItems();
-    element.style.opacity = '1';
-  });
-
-  window.setTimeout(() => {
-    const index = gainItems.indexOf(element);
-    if (index >= 0) gainItems.splice(index, 1);
-    element.classList.add('leaving');
-    layoutGainItems();
-    window.setTimeout(() => element.remove(), 180);
-  }, 1600);
+  element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
+  requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
+  window.setTimeout(() => { const index = gainItems.indexOf(element); if (index >= 0) gainItems.splice(index, 1); element.classList.add('leaving'); layoutGainItems(); window.setTimeout(() => element.remove(), 180); }, 1600);
 }
 
 let toastTimer: number | null = null;
 export function showToast(message: string): void {
   const gain = message.match(/^\+([0-9]+(?:\.[0-9]+)?) (HP|BLUNT)\b/);
-  if (gain) {
-    showGain(gain[1], gain[2] as 'HP' | 'BLUNT');
-    return;
-  }
-
-  ui.toast.textContent = message;
-  ui.toast.classList.add('visible');
+  if (gain) { showGain(gain[1], gain[2] as 'HP' | 'BLUNT'); return; }
+  ui.toast.textContent = message; ui.toast.classList.add('visible');
   if (toastTimer !== null) clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => ui.toast.classList.remove('visible'), 1500);
 }
@@ -165,57 +140,41 @@ function renderBreakdown(label: string, stat: StatSources, suffix = ''): string 
   const additiveTotal = statAdditiveTotal(stat), total = statTotal(stat);
   const adds = Object.entries(stat.additive).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${v.toFixed(2)}${suffix}</span></div>`).join('');
   const mults = Object.entries(stat.multiplicative).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${v.toFixed(2)}</span></div>`).join('');
-  return `<section class="stat-breakdown">
-    <div class="stat-row"><span>${label}</span><strong>${total.toFixed(2)}${suffix}</strong></div>
-    <div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${stat.base.toFixed(2)}${suffix}</span></div>
-    <div class="stat-group-title">Additive</div>${adds}<div class="stat-line stat-subtotal"><span>Total</span><span>${additiveTotal.toFixed(2)}${suffix}</span></div>
-    <div class="stat-group-title">Multiplicative</div>${mults}<div class="stat-line stat-total"><span>Total</span><strong>${total.toFixed(2)}${suffix}</strong></div>
-  </section>`;
+  return `<section class="stat-breakdown"><div class="stat-row"><span>${label}</span><strong>${total.toFixed(2)}${suffix}</strong></div><div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${stat.base.toFixed(2)}${suffix}</span></div><div class="stat-group-title">Additive</div>${adds}<div class="stat-line stat-subtotal"><span>Total</span><span>${additiveTotal.toFixed(2)}${suffix}</span></div><div class="stat-group-title">Multiplicative</div>${mults}<div class="stat-line stat-total"><span>Total</span><strong>${total.toFixed(2)}${suffix}</strong></div></section>`;
 }
 
 export function renderStats(stats: PlayerStats): void {
   const bluntLabel = `<span class="stat-title-with-icon">${bluntHammerIcon(14)} Blunt attack</span>`;
-  ui.statsContent.innerHTML = [
-    renderBreakdown('Max HP', stats.maxHp),
-    renderBreakdown(bluntLabel, stats.attack.blunt),
-    renderBreakdown('Health regeneration', stats.regen, ' HP/s')
-  ].join('');
+  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Health regeneration', stats.regen, ' HP/s')].join('');
 }
 
 const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Hand 1', hand2: 'Hand 2', orbit1: 'Orbit 1', orbit2: 'Orbit 2' };
 const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2'];
 
 export function renderInventory(inventory: InventoryState): void {
-  const itemNames = new Map(Object.keys(inventory.items).map((id) => [id, id]));
   ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
     const locked = slot.startsWith('orbit');
     const itemId = inventory.equipped[slot];
-    const value = locked ? 'LOCKED' : itemId ? itemNames.get(itemId) ?? 'ITEM' : 'EMPTY';
-    return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"${itemId && !locked ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span><strong>${value}</strong></div>`;
+    const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
+    const value = locked ? '<strong>LOCKED</strong>' : item ? damageTypeIcon(item.damageType, 25) : '<strong>EMPTY</strong>';
+    return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"${itemId && !locked ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span>${value}</div>`;
   }).join('');
-
   ui.quickSlots.forEach((slotEl) => {
     const slot = slotEl.dataset.slot as EquipmentSlotId;
     const itemId = inventory.equipped[slot];
     const label = slot === 'hand1' ? 'H1' : slot === 'hand2' ? 'H2' : slot === 'orbit1' ? 'O1' : 'O2';
-    slotEl.innerHTML = itemId ? `<span>${label}</span><strong>${itemNames.get(itemId) ?? 'ITEM'}</strong>` : `<span>${label}</span>`;
+    const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
+    slotEl.innerHTML = item ? `<span>${label}</span>${damageTypeIcon(item.damageType, 19)}` : `<span>${label}</span>`;
   });
-
   const items = Object.values(inventory.items);
-  ui.inventoryBag.innerHTML = items.length
-    ? items.map((item) => `<button class="inventory-item rarity-${EQUIPMENT_BY_ID.get(item.itemId)?.rarity ?? 'common'}" type="button" data-item-id="${item.itemId}" draggable="true"><strong>${item.itemId}</strong><span>Lv ${item.level} · A${item.ascend}</span></button>`).join('')
-    : '<div class="inventory-empty">No equipment found yet.</div>';
+  ui.inventoryBag.innerHTML = items.length ? items.map((owned) => { const item = EQUIPMENT_BY_ID.get(owned.itemId); return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}" type="button" data-item-id="${owned.itemId}" draggable="true" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}">${item ? damageTypeIcon(item.damageType, 27) : ''}<span>Lv ${owned.level} · A${owned.ascend}</span></button>`; }).join('') : '<div class="inventory-empty">No equipment found yet.</div>';
 }
 
 export function renderWeaponDetail(owned: OwnedEquipment | null): void {
   const item = owned ? EQUIPMENT_BY_ID.get(owned.itemId) : undefined;
   if (!owned || !item) { ui.weaponDetail.innerHTML = ''; return; }
   const equipped = (['hand1', 'hand2'] as const).find((hand) => save.inventory.equipped[hand] === item.id);
-  ui.weaponDetail.innerHTML = `<div class="weapon-art rarity-${item.rarity}">${damageTypeIcon(item.damageType, 52)}</div>
-    <h3>${item.id}</h3><div class="weapon-meta">${item.rarity} · ${item.weaponClass}</div>
-    <div class="weapon-values"><span>Level <strong>${owned.level}</strong></span><span>Ascend <strong>${owned.ascend}</strong></span><span>Damage <strong>${Math.round(equipmentDamage(item, owned))} ${damageTypeIcon(item.damageType, 12)}</strong></span><span>Per level <strong>+${item.baseDamagePerLevel * 2 ** owned.ascend}</strong></span></div>
-    <div class="weapon-actions"><button data-equip="hand1" data-item-id="${item.id}">Equip H1</button><button data-equip="hand2" data-item-id="${item.id}">Equip H2</button>${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : ''}<button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div>
-    <p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p>${equipped ? `<small>Equipped ${equipped.toUpperCase()}</small>` : ''}`;
+  ui.weaponDetail.innerHTML = `<div class="weapon-art rarity-${item.rarity}">${damageTypeIcon(item.damageType, 52)}</div><h3>${item.name}</h3><div class="weapon-meta">${item.rarity} · ${item.weaponClass}</div><div class="weapon-values"><span>Level <strong>${owned.level}</strong></span><span>Ascend <strong>${owned.ascend}</strong></span><span>Damage <strong>${Math.round(equipmentDamage(item, owned))} ${damageTypeIcon(item.damageType, 12)}</strong></span><span>Per level <strong>+${item.baseDamagePerLevel * 2 ** owned.ascend}</strong></span></div><div class="weapon-actions">${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : `<button data-equip data-item-id="${item.id}">Equip</button>`}<button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div><p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p>${equipped ? `<small>Equipped ${equipped.toUpperCase()}</small>` : ''}`;
 }
 
 const dropQueue: Array<{ itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number }> = [];
@@ -228,7 +187,7 @@ export function showEquipmentDrop(drop: typeof dropQueue[number]): void {
     if (!next) { showingDrop = false; return; }
     showingDrop = true;
     const item = EQUIPMENT_BY_ID.get(next.itemId)!;
-    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}">${damageTypeIcon(item.damageType, 58)}<b>${item.id}</b><span>${item.rarity} ${item.weaponClass} · x${next.quantity}</span><strong>${next.previousLevel === null ? 'NEW · ' : `Level ${next.previousLevel} → `}Level ${next.newLevel} · Ascend ${next.ascend}</strong></div>`;
+    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}">${damageTypeIcon(item.damageType, 58)}<b>${item.name}</b><span>${item.rarity} ${item.weaponClass} · x${next.quantity}</span><strong>${next.previousLevel === null ? 'NEW · ' : `Level ${next.previousLevel} → `}Level ${next.newLevel} · Ascend ${next.ascend}</strong></div>`;
     window.setTimeout(() => { ui.equipmentDropLayer.innerHTML = ''; showingDrop = false; showNext(); }, 1800);
   };
   showNext();
