@@ -21,6 +21,7 @@ export type AreaDefinition = {
   bossSpawnId: string;
   enemyWeapon: CombatAffinity;
   enemyWeakness: CombatAffinity;
+  environmentTheme: string;
 };
 
 export type PortalDefinition = {
@@ -55,7 +56,7 @@ export type PlayerStats = {
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type WeaponClass = 'sword' | 'hammer' | 'spear';
 export type HandSlotId = 'hand1' | 'hand2';
-export type EquipmentDefinition = { id: string; weaponClass: WeaponClass; rarity: EquipmentRarity; damageType: DamageType; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
+export type EquipmentDefinition = { id: string; name: string; weaponClass: WeaponClass; rarity: EquipmentRarity; damageType: DamageType; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
 export type OwnedEquipment = { itemId: string; level: number; ascend: number };
 
 export type InventoryState = {
