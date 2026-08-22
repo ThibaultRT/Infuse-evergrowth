@@ -1,7 +1,7 @@
 import balance from '../data/balance.json';
 import lootTables from '../data/equipment-loot-tables.json';
 import type { EquipmentRarity, Tier } from '../types';
-import { EQUIPMENT_BY_ID } from './EquipmentSystem';
+import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 
 type Table = { items?: string[]; inherits?: number; add?: string[] };
 const tables = lootTables.areas as Record<string, Table>;
