@@ -34,3 +34,9 @@ For each profile, capture Area 1 and Area 2 in full resolution / smooth mode, th
 - Full mode: device pixel ratio capped at 2.
 - Reduced mode: 70% of device pixel ratio, still capped at 2.
 - Battery-saver mode: 30 FPS target; smooth mode: up to 60 FPS.
+
+## Slice 3A desktop build measurement
+
+- The production `dist/` is 39 MiB on disk; Vite precaches 27,448.81 KiB and the JavaScript entry is 659.90 kB (170.80 kB gzip).
+- The authored Area 1 Quaternius placement plus gate contributes approximately 50 static draw calls and 80,648 indexed triangles before frustum culling. Renderer statistics remain the source of truth for the whole live scene.
+- Representative iPhone 12 portrait FPS, live-scene draw calls/triangles, and load timing could not be captured in this container because no browser executable is installed. These measurements remain required on representative hardware; desktop arithmetic is not presented as mobile performance.
