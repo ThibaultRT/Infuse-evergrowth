@@ -2,348 +2,348 @@
 
 ## Purpose
 
-This document defines the graphical direction and staged implementation plan for the current vertical slice and the areas that follow it. The goal is to improve area identity, character readability, equipment presentation, and combat feel without letting rendering become the source of truth for gameplay.
+This document defines the current graphical direction and staged implementation plan for Infuse: Evergrowth. The goal is to improve area identity, character readability, equipment presentation, and combat feel without letting rendering become the source of truth for gameplay.
 
-The first graphical work should establish a reusable visual language and rendering foundation rather than produce one-off final art. New areas, enemies, weapons, armor pieces, gates, and effects must be able to build on the same data-driven architecture.
+The project remains a Three.js browser game. The graphical pass must evolve the existing architecture incrementally rather than restart it or replace Three.js with another engine.
 
 ## Resolved visual and product direction
 
-The following decisions are now the baseline for graphical work.
-
 ### Art direction and world tone
 
-- Target **higher-detail stylized medieval fantasy**, rather than an intentionally minimal low-poly look.
-- The fantasy language should remain specialized around recognizable medieval forms so armor, weapons, enemies, architecture, and scenery naturally belong together.
-- Appropriate environment elements include old wooden bridges over rivers, stone walls, paved medieval roads, ruined city remains, farms, forests, and similar grounded medieval-fantasy landmarks.
-- **Devour Idle RPG** is a useful cosmetic quality reference. It is not an implementation or asset-copying reference.
-- Early areas should be bright and approachable. Later zones may become substantially darker or harsher when their biome calls for it.
-- Candidate biome themes include burned forest, lava crater, farmlands, medieval paved roads through old city remains, and other strongly authored environments.
-- Areas should have **strongly distinct biomes**, not merely palette variations of the same environment.
-- Readability on a phone remains important, but detail should not be removed merely to preserve a low-poly aesthetic.
+- Target **higher-detail stylized medieval fantasy**, not an intentionally minimal low-poly look.
+- Use recognizable medieval forms for armor, weapons, architecture, roads, ruins, fences, bridges, gates, and scenery.
+- **Devour Idle RPG** is a cosmetic quality reference only. Do not copy its assets or implementation.
+- Early areas should be bright and approachable; later areas may become substantially darker or harsher.
+- Areas must have **strongly distinct biomes**, not merely palette variations.
+- Candidate later biomes include burned forest, lava crater, farmlands, old paved roads through ruined city remains, and other strongly authored environments.
+- Detail should remain readable at normal phone scale, with iPhone 12 as the minimum phone target.
 
 ### Hero and equipment presentation
 
 - Player appearance is primarily **equipment-driven**.
-- Weapons are the only functional equipment implemented today, but the hero should not appear naked. Use a simple leather armor set as the visual placeholder until armor gameplay exists.
-- The character representation must be designed from the start for visible modular equipment:
-  - helmet;
+- The hero should never look naked even before armor gameplay exists; use the available Quaternius Ranger outfit as the first coherent placeholder presentation.
+- Design the visual character pipeline from the start for:
+  - helmet/head treatment;
   - torso armor;
   - leg armor;
   - left-hand weapon;
   - right-hand weapon.
-- Both hand weapons must be visible simultaneously.
-- Each hand is an independent attack source and therefore needs an independent animation timeline. A slow hammer in one hand and a fast axe in the other must be able to attack asynchronously without forcing the whole character into one shared attack cycle.
-- Hero facing and locomotion should remain smooth while individual weapon attacks animate independently.
-- Orbit weapon slots are currently locked in gameplay but should be unlocked for graphical/gameplay trials.
-- Orbit-slot weapons should visibly hover near and follow the hero. Their attack language should feel like a flying weapon: leave the orbit position, travel toward the target, strike, and return/follow as appropriate to the eventual gameplay rules.
-- Orbit visuals and animation must remain projections of gameplay state; they must not create a second combat timing model in rendering code.
+- Both equipped hand weapons must be visible simultaneously.
+- Both hands are independent gameplay attack sources and their visual attack timelines must remain independently schedulable.
+- Hero facing and locomotion should remain smooth while individual weapon attacks happen asynchronously.
+- Orbit weapon slots should later be unlocked for trials; orbit visuals must follow gameplay state rather than create a second combat timing model.
 
 ### Enemy visual language
 
-- Area 1 should begin with **variants of one humanoid enemy family** rather than many unrelated creature models.
-- The Common enemy can be a simple human with basic clothing/equipment.
-- Higher rarities should progressively add visible quality and threat through armor, weapons, silhouette changes, materials, adornments, and animation details.
-- Rarity color should be used as an **accent**, not as full-body recoloring. For example, a Rare enemy may use the rarity color on its helmet, weapon treatment, trim, glow, or another focused element rather than becoming entirely blue.
-- Rarity must remain recognizable without depending on color alone.
-- Enemies should initially differ between areas to strengthen biome identity, but the content architecture must allow an enemy definition originating in Area 1 to be spawned in Area 2 or any later area.
-- Enemy family, area membership, spawn placement, and rarity presentation should therefore remain separate concepts in authored data.
-- Bosses should receive stronger silhouette and equipment/environment treatment than normal rarity variants.
+- Area 1 begins with **one humanoid enemy family** rather than unrelated creature models.
+- Common enemies should have simple clothing/equipment; higher rarities should gain visible quality through equipment, silhouette, ornament, materials, and focused rarity accents.
+- Do not use full-body rarity recoloring. Rarity must remain recognizable without depending on color alone.
+- Enemy family, rarity presentation, spawn placement, and area membership remain independent authored concepts so enemies can be reused across areas.
+- Crystals remain non-hostile and visually distinct from attacking enemies.
+- Bosses should be visually unique through scale, silhouette, equipment, animation, and/or environment treatment rather than only tint.
 
 ### Camera, effects, pacing, and death
 
-- The game should feel **calm and readable**, not like a fast-paced action game. There is no intended dodge/parry reaction loop.
-- Avoid frequent screen flashes, strong camera shake, hit-stop spam, or other effects that make long incremental sessions tiring.
-- Camera zoom-in/zoom-out around meaningful points of interest or major events is acceptable when restrained.
-- The normal camera should smoothly follow the player rather than snapping aggressively.
-- Combat impact should primarily come from weapon motion, enemy reaction, contact effects, and clear animation rather than screen-wide effects.
-- On death there should be no travel sequence. The hero should play a resurrection/return animation at the area's origin location.
-- There is **no day/night cycle** in scope.
+- The game should feel calm and readable, not like a reaction-heavy action game.
+- Avoid frequent screen flashes, strong camera shake, hit-stop spam, or other tiring effects.
+- Combat impact should come primarily from weapon motion, enemy reaction, contact effects, and restrained particles.
+- The normal camera should follow smoothly.
+- On death, the hero resurrects visually at the current area's origin; there is no travel sequence.
+- There is no day/night cycle in scope.
+- There is no audio in scope.
 
 ### Areas and gates
 
-- The previous **portal** concept is replaced by **gates** everywhere in the product and graphical vocabulary.
+- The previous **portal** concept is superseded by **physical gates** in the product and graphical vocabulary.
 - Gates are not teleporters.
-- Areas should be understood as geographically adjacent parts of one world, connected side-by-side by a physical gate or passage at their boundary.
-- The forward gate remains closed until the area's boss is defeated. Boss progression/game state owns the lock state; rendering only communicates it.
-- When the boss is defeated, the gate should visibly open and allow the player to continue into the neighboring area.
-- Moving through a gate should feel like continuous world traversal, not portal travel or a magical teleport transition.
-- Gate art should match the local architecture and biome: stone archways, palisade gates, ruined city gates, bridges with barriers, fortified passages, or equivalent forms can all implement the same gameplay concept.
-- Backtracking should use the same physical area connection where allowed by progression rules.
-- The data model should identify the destination area explicitly so several areas can eventually connect through multiple gates without hard-coded area-specific logic.
+- Areas should eventually be geographically adjacent portions of one continuous world, connected through a physical blocked passage at their shared boundary.
+- Boss/game progression owns locked/open state. Rendering only communicates and animates it.
+- Defeating the boss should visibly open the physical route to the next area.
+- Gate art should match the local biome: stone arch, palisade, ruined gate, bridge barrier, fortified passage, or equivalent.
+- Destination area IDs remain data-driven so later areas can have several connections.
+- Historical `portal` names may remain temporarily in legacy code/data while the graphical slices are being migrated, but **new rendering APIs and new authored terminology should use `gate`**. Do not spread the legacy term further.
 
 ### Device, orientation, UI, and performance targets
 
 - Minimum phone target: **iPhone 12**.
-- Support screen sizes from iPhone 12 through current larger iPhones without assuming only high-performance devices.
-- **Portrait is the only first-class mobile orientation.** Landscape does not need equal design attention.
-- Tablet and desktop layouts can remain adaptations of the phone layout for now.
-- Add a visible settings-wheel entry point for graphics/performance testing.
-- At minimum, settings should allow testing:
-  - lower rendering resolution / render scale;
-  - lower frame-rate mode.
-- The intended normal experience can target smooth high-quality rendering, but graphical implementation must degrade cleanly on the lower settings.
-- Do not require a formal reduced-motion mode, effect-intensity setting, or color-blind palette system in this pass. Still avoid unnecessary effects and avoid using color as the only gameplay signal.
+- Portrait is the only first-class mobile orientation for now.
+- Tablet and desktop remain adaptations of the phone layout.
+- Existing settings must continue supporting:
+  - full/reduced render scale;
+  - smooth/30 FPS modes;
+  - development renderer statistics.
 - Initial load target: **20 seconds maximum** on the supported target class under reasonable network conditions.
-- Total downloadable game payload target: **500 MB maximum**. This is a hard upper boundary, not an invitation to approach it unnecessarily; assets should still be compressed and reused sensibly.
+- Total downloadable game payload hard maximum: **500 MB**, while keeping the practical runtime materially smaller.
+- Normal application UI remains HTML/CSS rather than Three.js canvas UI.
 
-### Asset sourcing and licensing
+## Asset family decision — Quaternius
 
-- Assets may be produced internally or sourced from open-source projects/assets.
-- Do not spend money on commissioned or purchased asset packs at this stage.
-- The game's own source code is intended to remain closed-source in the future.
-- Therefore, only adopt third-party code/assets whose licenses are compatible with proprietary distribution and do **not** force the game's own source code to be opened.
-- Track the source and license of every imported asset. Prefer permissive licenses or public-domain/CC0 content where practical.
-- Attribution requirements are acceptable only when they can be reliably satisfied in the shipped product/repository documentation.
-- Do not copy assets from Devour Idle RPG; it is a visual reference only.
+Quaternius is now the primary 3D asset family for the first graphical implementation. The selected Standard packs are CC0 1.0 and compatible with a future proprietary commercial release; attribution is not required. Keep provenance recorded anyway.
 
-### Audio
+The curated runtime assets are committed under:
 
-- **No audio at all** is in scope: no music, ambient audio, weapon sounds, UI sounds, or audio feedback.
-- Do not create architecture or asset work that depends on audio cues for readability.
+```text
+public/assets/quaternius/
+├── animations/
+├── characters/
+├── licenses/
+├── nature/
+├── village/
+├── weapons/
+├── manifest.json
+└── README.md
+```
 
-### Graphical priority
+Detailed inspection notes, measured triangle counts, source-pack limitations, exact filenames, and integration recommendations live in `WIP/quaternius-assets.md`. Project-level provenance is tracked in `ASSET-LICENSES.md`.
 
-The priority order for the first graphical work is:
+### Important findings from the actual Standard archives
 
-1. **Area graphics and biome identity.**
-2. **Hero appearance and equipment presentation.**
-3. **Combat and weapon animation.**
-4. Enemy/boss polish, rewards, and UI refinement around those foundations.
+- Do **not** import or ship the original ~833 MB of source ZIP archives.
+- The curated runtime subset is roughly **38 MiB unpacked** and uses textures resized to a maximum of 1024 px.
+- The free Standard **Modular Character Outfits - Fantasy** archive contains only the **Peasant and Ranger** outfit families, not the full catalogue shown in promotional material.
+- The free Standard **Fantasy Props MegaKit** contains a bronze sword, axe, and shield but **no hammer or spear**.
+- Do not fake hammer/spear visuals using unrelated weapon classes. Keep those visuals explicitly unresolved until a suitable asset source or bespoke model is selected.
+- The Universal Base Characters, Ranger/Peasant outfits, and Universal Animation Library use the same humanoid skeleton naming, including `hand_l` and `hand_r`.
+- Use the **non-root-motion** UAL1 library because gameplay already owns movement and attack timing.
+- Useful UAL1 clips include `Idle_Loop`, `Jog_Fwd_Loop`, `Walk_Loop`, `Death01`, `Hit_Chest`, `Hit_Head`, `Punch_Jab`, `Punch_Cross`, `Sword_Attack`, and `Sword_Idle`.
+- UAL2 is available but should not be shipped until a feature actually consumes its additional clips.
+- Quaternius recommends using only the base-character head under clothing. The Standard base archive provides full-body glTFs, so a later optimization pass should produce a head/eyes/skin-only derivative instead of rendering a hidden full body under every outfit.
 
-## Guiding principles
+### First approved Area 1 asset candidates
 
-1. **Readable detail.** Pursue higher-detail medieval fantasy while preserving clear silhouettes, targets, rewards, gates, and equipment at phone scale.
-2. **Strong biome identity.** Each area should be recognizable immediately through terrain, architecture, vegetation, props, lighting, palette, and atmosphere—not only through HUD text.
-3. **Grounded medieval-fantasy cohesion.** Weapons, armor, humanoids, gates, roads, ruins, bridges, walls, and natural scenery should look like parts of the same world even when biomes differ strongly.
-4. **Gameplay owns truth.** Visual effects may communicate attacks, damage, rarity, equipment, gate state, and progression, but must not determine gameplay timing or outcomes.
-5. **Mobile performance first.** iPhone 12 is the minimum phone target. Limit draw calls, shader cost, transparent overdraw, texture memory, and animation overhead; reuse geometry/materials where useful.
-6. **Progressive asset adoption.** Introduce optimized GLB assets, rigs, textures, and animation incrementally without requiring an engine rewrite.
-7. **Data-driven content.** Keep area visuals, enemy families, enemy placement, rarity presentation, and gate connections authored independently enough to allow later recombination.
-8. **Restrained effects.** Prefer animation and physical motion over flashes, screen shake, and visual noise.
+From Stylized Nature:
 
-## Proposed visual direction
+- `CommonTree_1`
+- `CommonTree_3`
+- `Rock_Medium_1`
+- `Rock_Medium_2`
+- `Bush_Common_Flowers`
+- `Flower_3_Group`
+- `Grass_Common_Short`
+- `RockPath_Round_Wide`
 
-### Shared visual language
+From Medieval Village:
 
-- Stylized but higher-detail medieval-fantasy proportions and materials.
-- Recognizable metal, leather, wood, cloth, stone, earth, vegetation, and fire/lava materials without chasing photorealism.
-- Strong silhouettes and deliberate value contrast so higher-detail models remain readable at mobile scale.
-- Directional lighting plus readable contact shadows, with lighting adapted per biome.
-- Saturated accents reserved for rarity, damage types, rewards, important interactables, and selected biome features.
-- Equipment quality conveyed through silhouette, material, ornament, and focused rarity accents rather than whole-model recolors.
-- Physical gates use destination/context cues through surrounding architecture and world layout rather than magical portal language.
+- `Prop_WoodenFence_Single`
+- `Prop_WoodenFence_Extension1`
+- `Prop_Brick1`
+- `Floor_UnevenBrick`
+- `DoorFrame_Round_Brick`
+- `Door_4_Round`
 
-### Area 1 — bright medieval-fantasy starting biome
+Character/weapon proof assets:
 
-The first area should establish the grounded fantasy baseline:
+- `Male_Ranger`
+- `Male_Peasant`
+- `Superhero_Male_FullBody` as a temporary base/head source
+- `UAL1_Standard.glb`
+- `Sword_Bronze`
 
-- bright daylight and approachable vegetation;
-- grass, dirt or paved paths, shrubs, trees, rocks, and flowers where useful;
-- old stone walls, low ruins, fences, wooden structures, or a wooden bridge over water as memorable landmarks;
-- readable authored paths between origin, enemy groups, boss, and the gate to Area 2;
-- a humanoid enemy family whose rarity progression is visible through equipment quality;
-- an architectural gate at the Area 1 / Area 2 boundary that is visibly closed until the Area 1 boss is defeated.
+`DoorFrame_Round_Brick` + `Door_4_Round` is the first approved physical gate prototype. The door should animate around a rendering-owned pivot while its locked/open state comes from gameplay progression.
 
-Area 1 should feel attractive and detailed enough to establish the game's quality bar without using the darkest themes too early.
+## Rendering architecture
 
-### Area 2 — distinct neighboring biome
+The graphical work should evolve toward these boundaries without blocking on a complete refactor:
 
-Area 2 should look clearly different from Area 1 while remaining physically adjacent. The exact final theme can evolve, but it should demonstrate the strong-biome system rather than merely changing the grass color.
+- `AssetLoader`: resolves Vite/GitHub Pages-safe URLs, loads/caches glTF/GLB/textures/animation clips, and provides safe fallbacks.
+- `EnvironmentView`: builds terrain, structures, landmarks, vegetation, and props for an area from authored visual data.
+- `HeroView`: owns the hero visual rig, facing/locomotion presentation, modular equipment visibility/attachments, both hand weapon visuals, and later orbit visuals.
+- `EnemyView`: renders enemy family + rarity/equipment presentation independently from area spawn configuration.
+- `GateView`: renders and animates a physical area's connection from gameplay-owned lock state.
+- `EffectManager`: later pools restrained hit, death, loot, resurrection, boss-defeat, and gate-opening effects.
 
-Useful directions include denser ruined stone, old paved roadway, altered vegetation, damaged structures, or a visibly harsher natural environment. Later areas can push farther into themes such as burned forest, lava crater, farmlands, and ruined medieval city remains.
+Rendering code consumes gameplay/domain state and events. It must not calculate combat damage, cooldowns, equipment ownership, progression, respawn, or save state.
 
-The shared boundary with Area 1 should make geographic sense from both sides. The gate and surrounding landmark should visually connect the two spaces even if the biome changes substantially beyond it.
+### Asset-loading rules
 
-## Technical foundation
-
-Before producing many assets, establish reusable rendering boundaries:
-
-- `EnvironmentView` builds terrain, water, structures, landmarks, vegetation, and props from area visual data.
-- `HeroView` owns the hero model, locomotion/facing visuals, modular armor attachment points, independent hand-weapon visuals, and orbit-slot attachment/follow presentation.
-- `EnemyView` renders an enemy definition plus rarity/equipment presentation independently from the area that spawned it.
-- `GateView` renders a physical area's connection and its locked/open state.
-- `EffectManager` pools restrained short-lived hit, death, loot, resurrection, boss-defeat, and gate-opening effects.
-- `AssetLoader` loads and caches GLB files, textures, and animation clips using URLs compatible with Vite's GitHub Pages base.
-- Area definitions reference an environment theme, landmarks/props, neighboring area connections, and physical gate placement.
-- Rendering code consumes game state and events; combat, equipment timing, progression, and persistence remain renderer-independent.
-
-Avoid blocking the graphical pass on a complete architecture refactor. These boundaries can be extracted incrementally from `src/visuals.ts` and `src/game/Game.ts` as each visual feature is implemented.
-
-## Implementation phases
+- Use `GLTFLoader` for the curated Quaternius assets.
+- Clone rigged humanoids with `SkeletonUtils.clone`, not ordinary `Object3D.clone`.
+- Load UAL1 once and share its `AnimationClip` catalogue across compatible humanoids; create one `AnimationMixer` per visible animated humanoid.
+- Cache promises/assets by URL so repeated environment props do not reload files.
+- Static repeated props should reuse geometry/materials and may use instancing when profiling shows value.
+- Use Vite base-aware URLs; never add root-relative asset URLs that break the `/Infuse-evergrowth/` GitHub Pages base.
+- Preserve existing procedural visuals as graceful fallbacks until the corresponding runtime asset is confirmed loaded.
+- Cosmetic asset-loading failure must not break gameplay, saves, or area progression.
+- Gameplay movement remains authoritative; root motion is not used.
 
 ## Implementation status
 
-- **Slice 1 — rendering quality controls and baseline tooling: implemented in v0.35.0.** The settings wheel exposes full/reduced (70%) render scale and smooth/30 FPS modes, persists those device preferences, and includes a development-build renderer statistics toggle.
-- Baseline capture is reproducible with the viewport and measurement matrix in `WIP/graphical-baseline.md`. Measurements requiring representative or physical hardware remain explicitly pending rather than being inferred from a development desktop.
-- Slices 2–13 remain planned. In accordance with the delivery guidance below, this change intentionally stops before the Area 1 environment pass so the rendering foundation can be built and validated independently.
+### Slice 1 — rendering quality controls and baseline tooling — **implemented in v0.35.0**
 
-### Phase 0 — Baseline, device targets, and quality controls
+Implemented and should **not be redone**:
 
-1. Capture reference screenshots from iPhone-12-sized portrait, larger iPhone portrait, tablet, and desktop viewports.
-2. Record frame time, renderer draw calls, triangles, texture memory where measurable, and JS/asset payload size in both existing areas.
-3. Establish iPhone 12 as the minimum phone performance reference.
-4. Define initial rendering modes exposed through a settings-wheel UI:
-   - normal/full quality;
-   - low-resolution/render-scale mode;
-   - low-frame-rate mode, targeting 30 FPS.
-5. Preserve a smooth higher-frame-rate target when the device can sustain it, without making 60 FPS on high-end hardware the only acceptable configuration.
-6. Add a development-only renderer statistics overlay or logging toggle.
-7. Track initial-load time against the 20-second maximum and downloadable payload against the 500 MB maximum.
+- settings wheel;
+- full/reduced (70%) render scale;
+- smooth/30 FPS modes;
+- persisted device graphical preferences;
+- development renderer-statistics toggle;
+- reproducible baseline process in `WIP/graphical-baseline.md`.
 
-**Exit criteria:** reproducible baseline measurements exist, iPhone 12 portrait is represented in validation, and the quality/FPS controls can be exercised deliberately during future graphical work.
+Representative/physical-device measurements that remain pending should be filled in later; they are not a reason to rewrite the foundation.
 
-### Phase 1 — Area identity, adjacent-world layout, and gates
+### Slice 2 — initial `EnvironmentView` and Area 1 scaffold — **implemented in v0.36.0**
 
-1. Introduce per-area environment themes for background, fog/atmosphere, ground, water where needed, key light, fill light, and accent colors.
-2. Replace the plain ground treatment with authored terrain layers and reusable medieval-fantasy prop/structure kits.
-3. Give Area 1 a detailed bright starting-biome treatment with recognizable landmarks.
-4. Give Area 2 a strongly different biome treatment while preserving a believable shared boundary with Area 1.
-5. Replace all portal visuals and terminology with a physical `GateView`.
-6. Position Area 1 and Area 2 conceptually/geographically side-by-side and place the gate at their shared boundary.
-7. Give the forward gate clearly readable locked and open states driven by boss progression.
-8. On boss defeat, animate the physical gate opening without a teleport or magical travel sequence.
-9. Allow traversal through the opened boundary into the adjacent area; keep destination area IDs data-driven for future multi-gate layouts.
-10. Validate every world label against the new backgrounds at the smallest supported portrait viewport.
+Implemented and should **not be discarded or restarted**:
 
-**Exit criteria:** screenshots without HUD text clearly identify each area; the shared gate reads as a physical blocked passage; defeating the boss visibly opens the route to the next area without teleportation.
+- `EnvironmentView` rendering boundary;
+- per-area `environmentTheme` wiring;
+- Area 1 `sunlit-meadow` treatment and area-specific lighting;
+- procedural meadow/path/ruin/fence/tree/bush placeholders;
+- Area 2 legacy visual fallback;
+- equipment-friendly inventory naming/UI improvements delivered in the same merged change.
 
-### Phase 2 — Hero model and modular equipment
+Slice 2 is a **scaffold/prototype**, not the final Area 1 art. The new Quaternius pass should replace its procedural placeholders incrementally while keeping the useful architecture.
 
-1. Replace the placeholder/naked-looking hero presentation with a coherent medieval-fantasy base character wearing simple leather placeholder armor.
-2. Build attachment/visibility support for modular helmet, torso armor, and leg armor from the first character implementation even if armor has no gameplay stats yet.
-3. Show equipped weapons in both hand slots simultaneously.
-4. Keep left- and right-hand attack animations independently schedulable so different weapon speeds can animate asynchronously.
-5. Add smooth facing interpolation and locomotion without coupling hero rotation to a single attack animation timeline.
-6. Unlock orbit slots for trials and implement their visual attachment/follow behavior.
-7. Give orbit weapons a flying attack presentation that can leave the orbit/follow position, travel toward a target, attack, and return according to gameplay events.
-8. Keep all attachment points and animation state in the view layer while equipment ownership, cooldowns, and attack timing remain in domain/system state.
+### Asset preparation — **completed**
 
-**Exit criteria:** the hero is visually coherent without functional armor, all planned modular slots have a technical attachment path, both hand weapons can visibly attack on different cadences, and orbit weapons can be trialed without rendering logic owning combat outcomes.
+The inspected/curated Quaternius runtime subset is now available on `main` under `public/assets/quaternius/`. The source ZIPs are not part of the runtime repository.
 
-### Phase 3 — Enemy family, rarity, and cross-area reuse
+## Next delivery slices
 
-1. Build Area 1 around one base humanoid enemy family.
-2. Establish a Common presentation with simple clothing/equipment and an intentionally modest silhouette.
-3. Add Uncommon and higher-rarity variants through progressively better armor, visible weapons, ornament, silhouette changes, and selective rarity-color accents.
-4. Avoid full-body rarity recoloring. Use accents such as helmet details, weapon treatments, trim, gems, cloth, or restrained effects.
-5. Preserve non-color rarity cues for readability.
-6. Keep enemy definition/family independent from area spawn configuration so an Area 1 enemy can later be authored into Area 2 without cloning rendering logic.
-7. Give Area 2 a different initial enemy family or visual treatment to strengthen biome identity while preserving the cross-area reuse capability.
-8. Give crystals a distinct non-hostile silhouette and idle motion.
-9. Make bosses visually unique through scale, silhouette, equipment, animation, and/or environment-linked details rather than only a rarity tint.
+Each slice must start from the latest `origin/main`, be independently reviewable, increment the package version according to `AGENTS.md`, run `npm run build`, and avoid bundling later slices prematurely.
 
-**Exit criteria:** enemy rarity is recognizable from model/equipment treatment at normal phone scale, and the authored content model can spawn the same enemy definition in multiple areas.
+### Slice 3A — Quaternius asset foundation + Area 1 + gate
 
-### Phase 4 — Combat and resurrection animation
+This is the **next implementation slice**.
 
-1. Add weapon-class attack motion for swords, hammers, spears, axes, and other implemented weapon classes as they become available.
-2. Ensure animation design works with independent left-hand, right-hand, and orbit attack sources.
-3. Create restrained impact languages:
-   - blunt: physical recoil, dust/contact ring, heavier weapon follow-through;
-   - slash: directional blade motion and brief cut trail;
-   - piercing: narrow thrust/travel line and focused impact;
-   - future weapon classes should extend the same event-driven system rather than add screen-wide effects.
-4. Avoid frequent screen flashes, large shake, or excessive hit stop.
-5. Use enemy reaction, weapon motion, contact effects, and limited particles as the primary feedback.
-6. Synchronize visible impact with existing gameplay damage events; animation must not delay or duplicate damage.
-7. Pool effect objects and cap simultaneous effects to avoid combat-driven allocation spikes.
-8. Add a death/resurrection presentation that restores the hero visually at the current area's origin location, with no travel sequence.
-9. Keep smooth camera follow during normal play; use restrained zoom only for meaningful points of interest or major progression beats where it improves presentation.
+1. Add a reusable rendering-only `AssetLoader` with Vite-base-safe URLs and cache loaded resources/promises.
+2. Consume the curated assets already committed under `public/assets/quaternius/`; do not add the original Quaternius archives.
+3. Evolve the existing `EnvironmentView`; do not replace it with a new unrelated world-rendering subsystem.
+4. Replace the Area 1 procedural trees, rocks, flowers/grass, fence pieces, path treatment, and selected ruin elements with the approved Quaternius candidates.
+5. Keep layout/spawn/combat coordinates authoritative in existing game data. Environment art must adapt to gameplay, not silently move gameplay entities.
+6. Preserve procedural fallbacks when an optional cosmetic asset fails to load.
+7. Add a rendering-only `GateView` and use `DoorFrame_Round_Brick` + `Door_4_Round` as the first physical gate assembly.
+8. Drive locked/open visual state from existing boss/progression state. The door may animate open in rendering but must not own the unlock condition.
+9. Do **not** implement the hero or enemy character replacement in this slice.
+10. Measure production payload, draw calls, triangle counts, and representative portrait performance after the asset replacement.
 
-**Exit criteria:** players can identify which independent weapon source attacked and whether it connected without relying on screen flashes or damage text; death clearly resolves into resurrection at the area origin.
+**Exit criteria:** Area 1 is visibly built from the curated Quaternius family rather than primitive placeholders; its existing gameplay remains unchanged; a physical gate component exists and clearly reads as locked/open from gameplay state; failure to load an optional asset leaves a playable fallback; `npm run build` succeeds.
 
-### Phase 5 — Rewards and progression presentation
+### Slice 3B — Quaternius hero proof
 
-1. Improve loot and permanent-stat gain effects while retaining numeric clarity.
-2. Give equipment rarities consistent focused accents across world drops and inventory presentation.
-3. Add a short boss-defeat presentation that emphasizes the physical gate unlocking/opening without taking control for too long.
-4. Avoid making higher rewards proportionally noisier on screen.
-5. Preserve world-label visibility synchronization across death, resurrection, enemy respawn, gate state, and area traversal.
+1. Add `HeroView` or extract/evolve the equivalent rendering boundary rather than embedding character loading directly in `Game.ts`.
+2. Use `Male_Ranger` as the first coherent hero outfit and the compatible base/head source as needed.
+3. Load/share non-root-motion `UAL1_Standard.glb` animation clips.
+4. Implement idle/jog locomotion presentation and smooth facing interpolation without letting animation move the gameplay entity.
+5. Expose/find `hand_l` and `hand_r` attachment points and prove that both can hold separate visible objects.
+6. Attach `Sword_Bronze` as the first weapon proof-of-concept to one hand with an authored orientation/offset.
+7. Keep both hand attachment/timeline paths independent even if only one proper weapon model is available in this slice.
+8. Do not fake hammer or spear assets.
+9. Preserve a procedural hero fallback if the character asset fails to load.
 
-**Exit criteria:** equipment rarity and permanent-stat gains are legible in combat, and boss progression has a clear visual payoff through the newly opened route.
+**Exit criteria:** the hero uses a coherent Quaternius humanoid presentation, locomotion/facing work without root motion, both hand bones are independently usable, and one real sword attachment works without changing combat timing.
 
-### Phase 6 — HUD and portrait-mobile polish
+### Slice 3C — Quaternius humanoid enemies
 
-1. Establish consistent spacing, typography, panel surfaces, and icon sizing around the portrait layout.
-2. Audit iPhone 12 safe-area insets, thumb reach, touch target sizes, and the largest current iPhone sizes.
-3. Add the settings-wheel control and simple graphics/performance settings needed for low-resolution and low-FPS testing.
-4. Improve inventory comparison and equipped-slot clarity without covering critical combat information.
-5. Ensure helmet/torso/legs and both hand slots have a future-proof UI representation even if armor functionality arrives later.
-6. Treat tablet and desktop as adaptations of the portrait-first phone UI rather than separate first-class designs.
-7. Keep normal application UI in HTML/CSS; do not move HUD panels into the Three.js canvas.
+1. Add/evolve an `EnemyView` boundary that is independent from spawn placement and gameplay state.
+2. Use `Male_Peasant` as the initial Common Area 1 humanoid enemy presentation.
+3. Reuse the shared UAL1 clip catalogue for idle, jog/walk, hit, and death presentation.
+4. Begin rarity differentiation using available Ranger/Peasant modular pieces, focused accents, weapon/equipment presence, and silhouette changes where the free Standard assets allow it.
+5. Do not claim that the free asset set provides a complete Common-through-Legendary armor progression; keep gaps explicit.
+6. Keep crystals visually separate and non-hostile.
+7. Preserve procedural enemy fallback when asset loading fails.
+8. Profile mixer/skin cost with representative Area 1 enemy counts before expanding animated character density.
 
-**Exit criteria:** the game is comfortable and readable from iPhone 12 upward in portrait, performance modes can be switched from the UI, and larger devices remain usable without requiring dedicated layouts.
+**Exit criteria:** Area 1 Common humanoid enemies use the shared Quaternius rig/animation pipeline, rarity architecture remains data-driven, crystals remain distinct/non-hostile, and the active-area animation cost is measured.
 
-### Phase 7 — Optimization, asset compliance, and release validation
+### Slice 4 — Area 2 biome + continuous adjacent-world connection
 
-1. Profile both areas during dense combat, gate opening/traversal, boss defeat, inventory use, death/resurrection, orbit attacks, and simultaneous dual-hand attacks.
-2. Merge compatible static geometry where it reduces draw calls without harming culling.
-3. Share materials and geometry; use instancing for repeated vegetation/props where beneficial.
-4. Compress meshes and textures, validate texture dimensions/color spaces, and avoid oversized source assets in the shipped bundle.
-5. Measure the iPhone 12 experience in both normal and fallback settings.
-6. Verify initial load remains within the 20-second target and total downloadable payload remains below 500 MB.
-7. Maintain an asset-source/license inventory and reject dependencies/assets that would force proprietary game source code to become open source.
-8. Test PWA installation, offline reload, GitHub Pages asset paths, Safari lifecycle restoration, and WebGL context recovery.
-9. Compare final screenshots and performance measurements with the Phase 0 baseline.
+1. Give Area 2 a strongly distinct biome while retaining the same rendering architecture and asset-loading rules.
+2. Make the Area 1/Area 2 boundary geographically believable from both sides.
+3. Complete the migration from teleport-style portal traversal to physical gate traversal through adjacent world space.
+4. Keep destination area IDs data-driven for future branching connections.
+5. Remove obsolete portal visuals/labels as they are superseded; do not add new portal terminology.
 
-**Exit criteria:** the graphical pass meets the device, load, payload, licensing, and gameplay constraints without regressions to saves, deployment, controls, or combat state.
+**Exit criteria:** Area 1 and Area 2 are clearly distinct without HUD text, share one physical boundary, and traversal occurs through the opened route rather than a magical teleport presentation.
 
-## Suggested delivery slices
+### Slice 5 — equipment visuals + asynchronous hand attacks
 
-Each slice should be independently reviewable and shippable:
+Start only after suitable hammer/spear models have been selected or created.
 
-1. Rendering quality controls and baseline measurements.
-2. Area 1 environment quality pass.
-3. Adjacent Area 2 environment and shared physical boundary.
-4. Portal-to-gate conversion and boss-driven gate-opening presentation.
-5. Hero base model with leather placeholder armor and modular armor attachment points.
-6. Simultaneous visible hand weapons with asynchronous attack animation support.
-7. Orbit-slot trial unlock plus hovering/flying weapon presentation.
-8. Humanoid enemy rarity variants with equipment-driven visual progression.
-9. Area 2 enemy treatment and cross-area enemy reuse validation.
-10. Weapon-class attacks, restrained hit effects, and resurrection animation.
-11. Rewards/equipment presentation and boss gate-opening sequence.
-12. Portrait HUD/performance settings polish.
-13. Optimization, licensing audit, and final validation.
+1. Map gameplay equipment definitions to stable visual asset IDs independently from damage/stat definitions.
+2. Show both equipped hand weapons simultaneously.
+3. Support independently timed left/right weapon attack presentation so different weapon speeds do not force one shared full-body attack cycle.
+4. Use appropriate animation layering, local weapon motion, or upper-body treatment so locomotion can continue cleanly.
+5. Preserve blunt/slash/piercing gameplay types; visuals must not invent a generic damage type.
 
-Do not combine all phases into one pull request. Each visible slice should include portrait-mobile screenshots, before/after comparisons where relevant, and a production build check when code is changed.
+**Exit criteria:** both hands visibly represent their equipped items and can attack on different cadences while gameplay remains authoritative.
+
+### Slice 6 — orbit weapon trial
+
+1. Unlock orbit slots for the planned graphical/gameplay trial.
+2. Render orbit weapons hovering/following the hero.
+3. Present a flying attack that leaves the orbit position, travels toward the gameplay-selected target, strikes, and returns/follows.
+4. Rendering follows attack state/events and never creates an independent damage timer.
+
+### Slice 7 — combat feedback + resurrection
+
+1. Establish restrained attack/impact language by damage type:
+   - blunt: recoil/dust/heavier follow-through;
+   - slash: directional blade motion/brief trail;
+   - piercing: narrow thrust/travel line/focused impact.
+2. Synchronize visible impact with gameplay damage events without delaying or duplicating damage.
+3. Pool and cap effects.
+4. Add death/resurrection presentation at the current area origin.
+
+### Slice 8 — rewards, boss progression, and rarity presentation
+
+1. Improve equipment drop/permanent-stat feedback while retaining numeric clarity.
+2. Keep rarity accents consistent across world and inventory presentation.
+3. Give boss defeat a restrained visual payoff linked to the physical gate opening.
+4. Avoid making higher rewards proportionally noisier.
+
+### Slice 9 — portrait HUD polish
+
+1. Audit iPhone 12 safe areas, touch targets, thumb reach, spacing, typography, and inventory readability.
+2. Keep existing graphics/performance settings accessible.
+3. Prepare future UI representation for helmet/torso/legs plus both hand slots without implementing nonexistent armor gameplay.
+4. Keep tablet/desktop as adaptations of portrait-first UI.
+
+### Slice 10 — optimization and release validation
+
+1. Profile dense combat, animated humanoids, gate opening/traversal, inventory, boss defeat, resurrection, dual-hand attacks, and orbit attacks.
+2. Share geometry/materials and use instancing where measurable.
+3. Create the head/eyes/skin-only base-character derivative if hidden full-body skinning remains wasteful.
+4. Compress/optimize meshes/textures only after measuring Safari decode/runtime tradeoffs.
+5. Measure iPhone 12 normal and fallback modes.
+6. Validate initial load against 20 seconds and total downloadable payload below 500 MB.
+7. Maintain asset-license provenance and reject incompatible third-party content.
+8. Test PWA installation/offline reload, GitHub Pages asset paths, Safari lifecycle restoration, and WebGL context recovery.
 
 ## Validation checklist
 
 - `npm run build` succeeds for implementation changes.
+- A new slice starts from latest `origin/main` and does not reintroduce prior merged slice diffs.
 - iPhone 12 portrait is included in graphical validation.
 - Larger iPhones remain usable; tablet and desktop adaptations do not regress.
-- Portrait is treated as the primary/required mobile orientation.
-- Area 1 and Area 2 are visually distinct strong biomes.
-- Area 1 and Area 2 are connected by a physical gate rather than a teleporting portal.
-- The gate remains closed until the relevant boss is defeated and visibly opens from gameplay progression state.
-- Area traversal does not use a portal/teleport animation.
-- Death returns/resurrects the hero at the area's origin with an appropriate animation.
-- Hero visuals support helmet, torso, legs, left hand, and right hand attachment points.
-- Both equipped hand weapons are visible and can animate asynchronously.
-- Orbit-slot weapons can hover/follow and perform a flying attack presentation during trials.
-- Enemy rarity uses equipment/silhouette/material differences plus focused color accents rather than full-body rarity recoloring.
+- Area 1 and Area 2 become visually distinct strong biomes.
+- New environment work uses the curated Quaternius runtime subset rather than the original source archives.
+- Asset URLs work under the `/Infuse-evergrowth/` production base.
+- Required assets are compatible with the PWA caching strategy.
+- Optional cosmetic loading failure preserves a playable procedural fallback.
+- Gameplay movement/combat/progression remains authoritative over animation and visual effects.
+- Gates are physical world connections, not teleporters, and boss progression owns lock state.
+- Hero visuals support helmet/head, torso, legs, left hand, and right hand attachment paths.
+- Both hand visuals can eventually animate independently.
+- Orbit visuals remain projections of gameplay state.
+- Enemy rarity uses equipment/silhouette/material differences plus focused accents rather than full-body recoloring.
 - Enemy definitions can be reused across areas independently from spawn placement.
 - Crystals remain visually non-hostile.
-- Camera follow is smooth and normal combat avoids excessive shake, flashes, and hit stop.
-- There is no dependency on a day/night system or audio feedback.
-- The settings wheel exposes low-resolution and low-FPS test modes.
-- No asset uses a root-relative URL that breaks the `/Infuse-evergrowth/` production base.
-- Required assets are compatible with the PWA caching strategy.
+- Normal combat avoids excessive shake, flashes, and hit stop.
+- There is no dependency on day/night or audio feedback.
 - Initial load is validated against the 20-second maximum.
-- Downloadable payload remains under 500 MB and is kept materially smaller where practical.
-- Every third-party asset/dependency used for the graphical pass has recorded licensing compatible with future proprietary source code.
+- Downloadable payload remains under 500 MB and materially smaller where practical.
+- Every third-party asset/dependency has recorded licensing compatible with proprietary distribution.
 - Performance is measured on real or representative constrained hardware, not inferred only from desktop results.
 
 ## Future decisions intentionally left open
 
-The major art-direction questions for the first pass are resolved. The following details can remain implementation choices until their corresponding slice is designed:
+- Exact final Area 2 biome, provided it is strongly distinct from Area 1 and geographically believable at the shared gate.
+- Final armor progression/catalog once armor becomes functional gameplay; the free Quaternius Standard outfits are not sufficient to assume a complete rarity ladder.
+- Visual source for hammer and spear models.
+- Exact hero head/body treatment after the initial Ranger proof and head-only optimization work.
+- Exact orbit weapon flight paths and timing, provided rendering follows combat state rather than owning it.
+- Exact later-area sequence among burned forest, lava crater, farmlands, ruined medieval city, and other candidate biomes.
+- Whether later content introduces non-humanoid enemy families in addition to humanoid variants.
 
-- the exact Area 2 biome, provided it is strongly distinct from Area 1 and geographically believable at the shared gate;
-- the exact visual design of the hero beneath modular equipment;
-- the final armor progression/catalog once armor becomes functional gameplay;
-- exact orbit weapon flight paths and timing, provided rendering follows combat state rather than owning it;
-- exact later-area sequence among burned forest, lava crater, farmlands, ruined medieval city, and other candidate biomes;
-- whether later content introduces non-humanoid enemy families in addition to humanoid variants.
-
-When one of these choices becomes necessary, prefer the option that strengthens biome identity and equipment readability while remaining compatible with iPhone 12 performance and the reusable data-driven rendering architecture.
+When one of these choices becomes necessary, prefer the option that strengthens biome identity and equipment readability while remaining compatible with iPhone 12 performance, the curated asset family, and the reusable data-driven rendering architecture.
