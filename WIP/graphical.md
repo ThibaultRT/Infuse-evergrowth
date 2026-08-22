@@ -246,7 +246,7 @@ This is the **next implementation slice**.
 
 **Exit criteria:** Area 1 Common humanoid enemies use the shared Quaternius rig/animation pipeline, rarity architecture remains data-driven, crystals remain distinct/non-hostile, and the active-area animation cost is measured.
 
-### Slice 4 — Area 2 biome + continuous adjacent-world connection
+### Slice 4 — Area 2 biome + continuous adjacent-world connection — **implemented in v0.40.0**
 
 1. Give Area 2 a strongly distinct biome while retaining the same rendering architecture and asset-loading rules.
 2. Make the Area 1/Area 2 boundary geographically believable from both sides.
@@ -256,7 +256,7 @@ This is the **next implementation slice**.
 
 **Exit criteria:** Area 1 and Area 2 are clearly distinct without HUD text, share one physical boundary, and traversal occurs through the opened route rather than a magical teleport presentation.
 
-### Slice 5 — equipment visuals + asynchronous hand attacks
+### Slice 5 — equipment visuals + asynchronous hand attacks — **implemented in v0.40.0**
 
 Start only after suitable hammer/spear models have been selected or created.
 
@@ -268,14 +268,14 @@ Start only after suitable hammer/spear models have been selected or created.
 
 **Exit criteria:** both hands visibly represent their equipped items and can attack on different cadences while gameplay remains authoritative.
 
-### Slice 6 — orbit weapon trial
+### Slice 6 — orbit weapon trial — **implemented in v0.40.0**
 
 1. Unlock orbit slots for the planned graphical/gameplay trial.
 2. Render orbit weapons hovering/following the hero.
 3. Present a flying attack that leaves the orbit position, travels toward the gameplay-selected target, strikes, and returns/follows.
 4. Rendering follows attack state/events and never creates an independent damage timer.
 
-### Slice 7 — combat feedback + resurrection
+### Slice 7 — combat feedback + resurrection — **implemented in v0.40.0**
 
 1. Establish restrained attack/impact language by damage type:
    - blunt: recoil/dust/heavier follow-through;

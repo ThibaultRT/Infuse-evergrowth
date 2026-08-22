@@ -25,7 +25,24 @@ export class EnvironmentView {
   constructor(readonly area: AreaDefinition, private readonly assets: AssetLoader = quaterniusAssets) {
     this.root.position.set(area.originX, 0, area.originZ);
     if (area.environmentTheme === 'sunlit-meadow') this.buildSunlitMeadow();
+    else if (area.environmentTheme === 'ashwood') this.buildAshwood();
     else this.buildLegacyGround();
+  }
+
+  private buildAshwood(): void {
+    const ground = mesh(new THREE.PlaneGeometry(38, 56, 8, 12), new THREE.MeshStandardMaterial({ color: 0x3d493c, roughness: 1 }), 0, 0, 0);
+    ground.rotation.x = -Math.PI / 2;
+    const road = mesh(new THREE.PlaneGeometry(5.5, 56), new THREE.MeshStandardMaterial({ color: 0x564d43, roughness: 1 }), 0, .012, 0);
+    road.rotation.x = -Math.PI / 2;
+    const bark = new THREE.MeshStandardMaterial({ color: 0x29241f, roughness: 1 });
+    const ember = new THREE.MeshStandardMaterial({ color: 0x803b22, emissive: 0x5a1908, emissiveIntensity: .22, roughness: .9 });
+    const details = new THREE.Group();
+    for (const [x, z, height] of [[-15,-20,4],[14,-15,3.5],[-13,-6,3],[15,3,4],[-14,15,3.6],[12,21,4.2]] as const) {
+      const trunk = mesh(new THREE.CylinderGeometry(.2, .38, height, 7), bark, x, height / 2, z);
+      trunk.rotation.z = (x + z) * .006; details.add(trunk);
+      const coal = mesh(new THREE.DodecahedronGeometry(.35), ember, x + .3, .24, z + .2); details.add(coal);
+    }
+    this.root.add(ground, road, details);
   }
 
   private buildLegacyGround(): void {

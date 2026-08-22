@@ -36,8 +36,8 @@ app.innerHTML = `
       <div class="quick-slots" aria-label="equipped weapon slots">
         <div class="quick-slot" data-slot="hand1"><span>H1</span></div>
         <div class="quick-slot" data-slot="hand2"><span>H2</span></div>
-        <div class="quick-slot locked" data-slot="orbit1"><span>O1</span></div>
-        <div class="quick-slot locked" data-slot="orbit2"><span>O2</span></div>
+        <div class="quick-slot" data-slot="orbit1"><span>O1</span></div>
+        <div class="quick-slot" data-slot="orbit2"><span>O2</span></div>
       </div>
       <button id="inventory-button" class="dock-button" type="button">INVENTORY</button>
     </div>
@@ -158,7 +158,7 @@ const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2'];
 
 export function renderInventory(inventory: InventoryState): void {
   ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
-    const locked = slot.startsWith('orbit');
+    const locked = false;
     const itemId = inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
     const value = locked ? '<strong>LOCKED</strong>' : item ? damageTypeIcon(item.damageType, 25) : '<strong>EMPTY</strong>';

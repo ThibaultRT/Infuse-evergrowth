@@ -1,19 +1,21 @@
-import type { CombatAffinity, DamageType, HandSlotId, LootType } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, LootType } from '../types';
 
 export type GameEventMap = {
   enemyDamaged: { enemyId: string; amount: number; damageType: DamageType };
+  weaponAttacked: { slot: import('../types').EquipmentSlotId; targetId: string; damageType: DamageType };
   enemyDefeated: { enemyId: string };
   enemyRespawned: { enemyId: string };
   bossDefeated: { bossId: string; areaId: number };
   heroDamaged: { amount: number; damageType: CombatAffinity };
   heroDefeated: undefined;
+  heroResurrected: { areaId: number };
+  gateUnlocked: { gateId: string };
+  gateCrossed: { gateId: string; destinationAreaId: number };
   statGained: { sourceId: string; stat: LootType; amount: number };
-  portalUnlocked: { portalId: string };
-  portalEntered: { portalId: string; destinationAreaId: number };
   areaEntered: { areaId: number };
   equipmentDropped: { sourceId: string; areaId: number; itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number };
-  equipmentEquipped: { itemId: string; hand: HandSlotId };
-  equipmentUnequipped: { itemId: string; hand: HandSlotId };
+  equipmentEquipped: { itemId: string; hand: EquipmentSlotId };
+  equipmentUnequipped: { itemId: string; hand: EquipmentSlotId };
   weaponAscended: { itemId: string; previousAscend: number; newAscend: number };
 };
 

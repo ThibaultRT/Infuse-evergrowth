@@ -24,7 +24,7 @@ export type AreaDefinition = {
   environmentTheme: string;
 };
 
-export type PortalDefinition = {
+export type GateDefinition = {
   id: string;
   tag: string;
   sourceAreaId: number;
