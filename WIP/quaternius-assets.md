@@ -1,194 +1,175 @@
-# Quaternius asset implementation audit
+# Quaternius asset inspection and runtime import plan
 
-## Decision
+## Scope
 
-Use **Quaternius as the primary 3D asset family** for environment, characters, equipment and animation. The official creator pages mark the relevant Standard packs as **CC0 1.0**, including commercial use, with no attribution requirement.
+This inspection is based on the actual Standard ZIP archives supplied for Infuse: Evergrowth:
 
-Do **not** commit the original full ZIP archives to the runtime application. Keep only the selected runtime models/textures required by the current areas and character variants, preferably converted to optimized `.glb` files.
+- Medieval Village MegaKit [Standard]
+- Stylized Nature MegaKit [Standard]
+- Fantasy Props MegaKit [Standard]
+- Universal Base Characters [Standard]
+- Modular Character Outfits - Fantasy [Standard]
+- Universal Animation Library [Standard]
+- Universal Animation Library 2 [Standard]
 
-## Official packs selected
+Every included archive contains a Quaternius license file declaring **CC0 1.0 Universal / Public Domain Dedication**. Attribution is not required. Keep the creator/pack/source records below for provenance even though the license does not require credits.
 
-| Purpose | Pack | Official page | Free Standard archive | Official formats |
-| --- | --- | --- | ---: | --- |
-| Area 1 village structures / ruins | Medieval Village MegaKit | https://quaternius.com/packs/medievalvillagemegakit.html | 153 MB | FBX, OBJ, glTF |
-| Trees / rocks / flowers / plants | Stylized Nature MegaKit | https://quaternius.com/packs/stylizednaturemegakit.html | 99 MB | FBX, OBJ, glTF |
-| Weapons / fences / tools / props | Fantasy Props MegaKit | https://quaternius.com/packs/fantasypropsmegakit.html | 143 MB | FBX, OBJ, glTF |
-| Base humanoid body / heads / hair | Universal Base Characters | https://quaternius.com/packs/universalbasecharacters.html | Standard/free tier | FBX, glTF |
-| Modular medieval/fantasy outfits | Modular Character Outfits - Fantasy | https://quaternius.com/packs/modularcharacteroutfitsfantasy.html | Standard/free tier | FBX, glTF |
-| Shared humanoid animation | Universal Animation Library | https://quaternius.com/packs/universalanimationlibrary.html | Standard/free tier | FBX, GLB |
-| Later combat animation expansion | Universal Animation Library 2 | https://quaternius.com/packs/universalanimationlibrary2.html | Standard/free tier | FBX, glTF |
+## What the free Standard archives actually contain
 
-All of the above are published by Quaternius as CC0 and may be used in proprietary commercial projects.
+| Pack | ZIP size | Relevant Standard content | Source formats | Source texture sizes |
+| --- | ---: | --- | --- | --- |
+| Medieval Village MegaKit | 153.54 MiB | 176 glTF models plus matching FBX/OBJ; walls, floors, doors, fences, modular village parts | glTF + BIN, FBX, OBJ/MTL | mostly 2048², some 512²/1024²/4096² |
+| Stylized Nature MegaKit | 99.27 MiB | 68 glTF models; trees, rocks, bushes, flowers, grass, rock paths | glTF + BIN, FBX, OBJ/MTL | mostly 1024²/2048² |
+| Fantasy Props MegaKit | 143.25 MiB | 94 glTF models; furniture/props plus bronze sword/axe and wooden shield | glTF + BIN, FBX, OBJ/MTL | mostly 2048², a few 4096² |
+| Universal Base Characters | 122.99 MiB | male/female full-body universal-rig characters plus hair/eyebrow assets | glTF + BIN, FBX | mostly 2048² |
+| Modular Character Outfits - Fantasy | 280.71 MiB | free subset contains **Peasant and Ranger only**, male/female, plus modular parts | glTF + BIN, FBX | outfit maps are 4096²; body maps 2048² |
+| Universal Animation Library 1 | 15.17 MiB | 43 animations, root-motion and non-root-motion variants | GLB, FBX | no runtime character textures required |
+| Universal Animation Library 2 | 17.87 MiB | 43 additional animations, root-motion and non-root-motion variants | GLB, FBX | no runtime character textures required |
 
-## Findings relevant to Three.js
+The marketing preview for Modular Character Outfits shows many more outfits than the free Standard archive. Do not design progression assuming those armor sets exist in the free pack.
 
-### Character/rig compatibility
+Likewise, the Standard Fantasy Props archive contains `Sword_Bronze`, `Axe_Bronze` and `Shield_Wooden`, but **no hammer or spear model**. The current five hammer/five spear gameplay definitions therefore still need another visual source or bespoke models.
 
-The Universal Base Characters use a shared humanoid rig and are explicitly compatible with the Universal Animation Library. Quaternius states an average of roughly 13k triangles per base character, which is reasonable for our mobile target provided we keep visible character counts controlled and share textures/materials where possible.
+## Rig and animation compatibility
 
-The Fantasy Outfit pack is built on the same rig and is explicitly compatible with the Base Characters and Universal Animation Library. This is the key reason to prefer Quaternius over KayKit for the main character pipeline: the outfit pieces support the equipment-driven appearance we want.
+The outfit/base-character glTFs and UAL libraries use the same universal skeleton naming. The inspected outfit skin has 65 joints; important bones include `pelvis`, `hand_l`, `hand_r`, leg/foot chains and finger chains. The animation GLBs expose the same node names, so the initial Three.js implementation does not need an external retargeting pipeline.
 
-A public Three.js implementation using these same CC0 Quaternius packs confirms a practical runtime pattern:
+Use the **non-root-motion** `UAL1_Standard.glb` first. Infuse already owns world movement and combat scheduling, so root motion would fight gameplay state.
 
-- load base/outfit glTF with `GLTFLoader`;
-- clone rigged instances with `SkeletonUtils.clone`;
-- load the Universal Animation Library once and share its `AnimationClip`s between compatible characters;
-- map bones by name for modular/skinned attachments;
-- attach weapons to the right/left hand bone (`hand_r` / corresponding left-hand bone);
-- use `THREE.AnimationMixer` per character instance;
-- keep animation clips separate from gameplay timing.
+UAL1 Standard contains 43 clips. The directly useful first-pass clips are:
 
-This fits our existing architecture: `HeroView` / `EnemyView` own visual rigs and mixers while combat systems remain authoritative.
+- `Idle_Loop` — 2.5 s
+- `Jog_Fwd_Loop` — 0.933 s
+- `Walk_Loop` — 1.333 s
+- `Death01` — 2.4 s
+- `Hit_Chest` / `Hit_Head`
+- `Punch_Jab` — 0.867 s
+- `Punch_Cross` — 1.0 s
+- `Sword_Attack` — 1.533 s
+- `Sword_Idle` — 1.667 s
 
-### Animation clips useful for Infuse
+UAL2 adds another 43 clips including `Sword_Regular_A/B/C`, `Sword_Regular_Combo`, `Sword_Heavy_Combo`, `Sword_Block`, `Sword_Dash`, `Melee_Hook`, `Zombie_Idle_Loop`, `Zombie_Walk_Fwd_Loop` and `Zombie_Scratch`. Do not ship UAL2 until a feature actually consumes those clips.
 
-The first Universal Animation Library contains locomotion, death and combat actions. A working Three.js consumer of the Standard library resolves names such as:
+## Character cost and practical implication
 
-- `Idle_Loop`
-- `Jog_Fwd_Loop`
-- `Death01`
-- `Sword_Attack`
-- `Punch_Jab`
-- `Punch_Cross`
-- sitting / interaction / spell clips
+Measured from the actual glTF accessors:
 
-Exact clip names must be re-audited from the downloaded Standard GLB before implementation; visual code should provide an alias map rather than scatter literal animation names through gameplay code.
+| Model | Approx. triangles | Skinned meshes | Height |
+| --- | ---: | ---: | ---: |
+| Male Ranger outfit | 26,982 | 9 | 1.87 m |
+| Male Peasant outfit | 12,894 | 4 | 1.56 m clothing extent |
+| Female Ranger outfit | 26,966 | 9 | 1.80 m |
+| Female Peasant outfit | 13,568 | 4 | 1.53 m clothing extent |
+| Superhero Male full body | 14,318 | 3 | 1.82 m |
 
-For Infuse, the initial curated set should be small:
+The outfit README explicitly says only the base character **head** should be used under clothing; using the full body causes clipping and wastes work. The Standard archive, however, only provides full-body glTF characters. For a quick prototype, a full-body graft can work, but before populating Area 1 with many humanoids we should create a head/eyes/skin-only runtime derivative rather than render a hidden full body under every outfit.
 
-- idle
-- locomotion forward
-- unarmed punch A/B
-- 1H slash
-- 1H stab
-- heavy/chop attack if available
-- hit/reaction if available
-- death
-- resurrection/stand-up candidate if available
+`Male_Ranger.gltf` is already split into named skinned meshes such as `Male_Ranger_Body`, `Male_Ranger_Legs`, `Male_Ranger_Feet_Boots`, `Male_Ranger_Head_Hood` and `Male_Ranger_Acc_Pauldron`. This is useful for equipment-driven visibility: hood and pauldron can be independently shown/hidden without changing gameplay state.
 
-Do not ship the complete animation library to the browser merely because it is present in the source archive.
+## Environment candidates verified from the actual files
+
+### Bright Area 1 nature
+
+Recommended first subset from Stylized Nature:
+
+- `CommonTree_1.gltf` — 6,265 tris, ~7.26 m tall
+- `CommonTree_3.gltf` — 3,505 tris, ~9.43 m tall
+- `Rock_Medium_1.gltf` — 342 tris
+- `Rock_Medium_2.gltf` — 244 tris
+- `Bush_Common_Flowers.gltf` — 1,368 tris
+- `Flower_3_Group.gltf` — 755 tris
+- `Grass_Common_Short.gltf` — 155 tris
+- `RockPath_Round_Wide.gltf` — 3,500 tris, ~2.1 m tile
+
+The nature art direction matches the bright, saturated, stylized starting area very well. Trees are more detailed than the current procedural primitives without becoming photorealistic.
+
+### Fences, ruins and gate
+
+Recommended first subset from Medieval Village:
+
+- `Prop_WoodenFence_Single.gltf` — 40 tris, ~2.06 m span
+- `Prop_WoodenFence_Extension1.gltf` — 32 tris
+- `Prop_Brick1.gltf` — 108 tris for ruin scatter
+- `Floor_UnevenBrick.gltf` — four triangles, 2 m × 2 m tiled stone surface
+- `DoorFrame_Round_Brick.gltf` — 2,046 tris, ~1.6 × 2.59 m
+- `Door_4_Round.gltf` — 1,228 tris, ~1.11 × 2.32 m
+
+`DoorFrame_Round_Brick` + `Door_4_Round` is a viable **physical gate prototype** for the current boss-gated passage concept. The door mesh itself can rotate around a parent pivot when unlocked; rendering remains a projection of the gameplay gate state.
+
+### Weapon proof-of-concept
+
+`Sword_Bronze.gltf` is 1,540 triangles and ~1.13 m long. Its model origin is close to the grip (Y range approximately -0.21 to +0.92), making it practical to attach to `hand_l` or `hand_r` with a small authored orientation/offset.
+
+Do not map the bronze axe to the hammer class merely because it is available. Keep missing hammer/spear visuals explicit until appropriate assets are selected.
+
+## Runtime subset prepared during this inspection
+
+A curated runtime package was generated locally from the supplied archives with these rules:
+
+- source ZIPs are not included;
+- glTF geometry/UVs are unchanged;
+- only the models listed above plus Male Ranger, Male Peasant, Superhero Male and `UAL1_Standard.glb` are included;
+- referenced 2K/4K PNG textures are resized to a maximum of **1024 px** for the browser/mobile target;
+- shared textures remain external to the glTF models so repeated trees/fences/outfits reuse cached files instead of embedding duplicate images in every GLB;
+- the non-root-motion animation library is used;
+- the two incorrect image URIs in the Standard male base glTF (`*_png.png`) are corrected to the actual PNG filenames.
+
+The resulting runtime subset is about **37.9 MiB** unzipped / **31 MiB** zipped, broken down roughly as:
+
+- animations: 7.27 MiB
+- characters: 14.13 MiB
+- nature: 6.35 MiB
+- village/gate: 7.19 MiB
+- sword: 2.97 MiB
+
+This is far below the combined source archive size and should be loaded lazily by area/feature. It should not all be fetched during first paint.
 
 ## Proposed repository layout
 
 ```text
 public/assets/quaternius/
+├── manifest.json
+├── README.md
+├── animations/
+│   └── UAL1_Standard.glb
 ├── characters/
-│   ├── hero-base.glb
-│   ├── enemy-base.glb
-│   ├── outfits/
-│   │   ├── leather-starter.glb
-│   │   ├── common.glb
-│   │   ├── uncommon.glb
-│   │   ├── rare.glb
-│   │   ├── epic.glb
-│   │   └── legendary.glb
-│   └── animations/
-│       └── humanoid-core.glb
+│   ├── models/
+│   │   ├── Male_Ranger.gltf + .bin
+│   │   ├── Male_Peasant.gltf + .bin
+│   │   └── Superhero_Male_FullBody.gltf + .bin
+│   └── textures/
+├── nature/
+│   ├── models/
+│   └── textures/
+├── village/
+│   ├── models/
+│   └── textures/
 ├── weapons/
-│   ├── sword-*.glb
-│   ├── hammer-*.glb
-│   └── spear-*.glb
-├── area-1/
-│   ├── trees/
-│   ├── rocks/
-│   ├── flowers/
-│   ├── fences/
-│   ├── ruins/
-│   ├── road/
-│   └── gate/
-└── LICENSE.md
+│   ├── models/Sword_Bronze.gltf + .bin
+│   └── textures/
+└── licenses/
+    └── one source license record per inspected pack
 ```
 
-The filenames above are **runtime aliases**, not assumptions about the original Quaternius filenames. The import/build step should map selected source filenames to stable game-facing names.
+## Recommended Three.js implementation
 
-## Asset loading architecture
+1. Add a rendering-only `AssetLoader` using `GLTFLoader`; cache promises by asset URL so shared models/textures are never loaded twice.
+2. Load static environment assets once per area and clone ordinary `Object3D` trees/rocks/fences as needed. Use `InstancedMesh` later for repeated non-skinned props if draw calls become material.
+3. Clone rigged humanoids with `SkeletonUtils.clone`, not `Object3D.clone`, so each entity receives a valid independent skeleton.
+4. Reuse one loaded `UAL1_Standard.glb` animation clip catalog across all compatible humanoids. Create one `AnimationMixer` per animated visible humanoid.
+5. Keep gameplay movement authoritative. Animation selects Idle/Jog/Attack/Death based on runtime state but never moves or damages entities by itself.
+6. Attach hand weapons to `hand_l`/`hand_r`. Both hand visuals must remain independent because gameplay already schedules both hand attacks independently.
+7. Before replacing every Area 1 enemy with a skinned model, create a head-only base-character derivative and consider animation LOD: only advance mixers for the active area, and reduce/stop animation work for distant passive enemies if profiling requires it.
+8. Build `GateView` from the brick frame + wooden door. The gameplay gate owns open/locked state; `GateView` only animates the physical opening.
+9. Keep procedural fallback visuals until each asset path has loaded successfully; failed cosmetic loading must not break gameplay or saves.
 
-Add a reusable `AssetLoader` rather than loading GLB files directly inside `Game.ts`.
+## Decision
 
-Recommended responsibilities:
+The inspected Quaternius Standard assets are suitable to begin the real graphical replacement work. The strongest immediate implementation order is:
 
-1. resolve URLs using Vite's production base;
-2. cache parsed GLTF assets and shared animation libraries;
-3. expose cloning helpers for skinned meshes using `SkeletonUtils.clone`;
-4. return explicit errors/fallbacks if an asset is missing;
-5. optionally preload Area 1 / hero essentials before play and defer later-area assets;
-6. keep source asset IDs/data mapping outside rendering implementation.
-
-`HeroView` should compose:
-
-- one base body/head rig;
-- modular torso/legs/helmet visual parts;
-- independently attached left/right weapons;
-- eventually orbit weapon scene objects;
-- one mixer using shared clips.
-
-Do not bake both hand weapons into a single character asset. Each hand remains an independent gameplay attack source and the visual weapon/attack animation must follow the corresponding hand event/state.
-
-## Environment implementation recommendation
-
-Do not replace `EnvironmentView` with one giant exported scene. Use individual props or small reusable clusters so we retain culling, authored placement and data-driven areas.
-
-For Area 1, start with a deliberately small subset:
-
-- 3-4 tree variants;
-- 3-5 rock variants;
-- 3 flower/plant variants;
-- 1-2 fence variants;
-- a few stone wall/ruin pieces;
-- road/path pieces or a material/mesh solution compatible with the winding path;
-- one physical medieval gate assembly;
-- 2-4 small medieval props for landmarks.
-
-Repeated props should reuse loaded geometry/materials and use instancing where it materially lowers draw calls.
-
-## Texture/runtime budget
-
-The creator pages do not consistently publish exact texture dimensions for the modern packs, so inspect the real Standard archives before setting final limits.
-
-Initial runtime policy for iPhone 12:
-
-- prefer 512-1024 px shared color textures for normal gameplay assets;
-- retain higher resolution only where a real phone-scale comparison proves useful;
-- convert textures to KTX2/Basis later if the benefit is measurable;
-- use Meshopt/Draco only after measuring decoding cost vs payload benefit on Safari;
-- avoid shipping unused alternate colors, source scenes or duplicate FBX/OBJ copies;
-- track total initial asset transfer separately from the full downloadable game payload.
-
-## Licensing record
-
-Quaternius official pages state CC0 / free commercial use. Attribution is not required. Still retain an internal record for provenance:
-
-- creator: Quaternius
-- official pack URL
-- pack name
-- source archive/version/date downloaded
-- source filename -> runtime filename mapping
-- CC0 1.0 license
-- any transformations performed
-
-This record is for project hygiene and future proprietary distribution audits, not because attribution is legally required.
-
-## Current download limitation
-
-The free Standard archives are delivered by itch.io through its interactive `No thanks, just take me to the downloads` flow. The current GitHub/web tooling can inspect the official pages but cannot complete that interactive binary download and push the resulting ZIP contents directly into this repository.
-
-When the Standard ZIPs are available locally/uploaded to the working session, perform the next pass:
-
-1. inventory every glTF/GLB and texture;
-2. record dimensions, file sizes, meshes, materials, bones and animation clips;
-3. preview candidate assets;
-4. select the Area 1 + starter-character subset;
-5. convert selected glTF + external buffers/textures to runtime GLB where useful;
-6. optimize and measure the selected files;
-7. commit only that runtime subset plus the license manifest;
-8. implement `AssetLoader`, then replace procedural placeholders incrementally.
-
-## Implementation order
-
-1. Import/inspect Standard ZIPs.
-2. Hero base + starter leather outfit + idle/run animation proof-of-concept.
-3. One sword/hammer/spear attachment proof-of-concept for each hand.
-4. Area 1 tree/rock/flower/ruin proof-of-concept in `EnvironmentView`.
-5. Physical gate assembly.
-6. Enemy outfit rarity variants using the same humanoid rig.
-7. Optimize payload and draw calls before expanding the asset catalog.
+1. static Area 1 environment assets;
+2. physical gate;
+3. one Ranger hero + UAL1 locomotion;
+4. Peasant common enemies + animation;
+5. hand-attached bronze sword;
+6. then solve head-only optimization and source proper hammer/spear visuals before broad equipment rendering.
