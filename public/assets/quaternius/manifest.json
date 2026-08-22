@@ -1,0 +1,282 @@
+{
+  "creator": "Quaternius",
+  "license": "CC0-1.0",
+  "attributionRequired": false,
+  "runtimePreparation": {
+    "maxTextureDimension": 1024,
+    "sourceArchivesCommitted": false,
+    "rootMotionAnimations": false
+  },
+  "assets": [
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/CommonTree_1.gltf",
+      "textures": [
+        "Bark_NormalTree_Normal.png",
+        "Bark_NormalTree.png",
+        "Leaves_NormalTree_C.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/CommonTree_3.gltf",
+      "textures": [
+        "Bark_NormalTree_Normal.png",
+        "Bark_NormalTree.png",
+        "Leaves_NormalTree_C.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/Rock_Medium_1.gltf",
+      "textures": [
+        "Rocks_Diffuse.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/Rock_Medium_2.gltf",
+      "textures": [
+        "Rocks_Diffuse.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/Flower_3_Group.gltf",
+      "textures": [
+        "Leaves.png",
+        "Flowers.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/Bush_Common_Flowers.gltf",
+      "textures": [
+        "Leaves_NormalTree_C.png",
+        "Flowers.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/RockPath_Round_Wide.gltf",
+      "textures": [
+        "PathRocks_Diffuse.png"
+      ]
+    },
+    {
+      "group": "nature",
+      "pack": "nature",
+      "model": "nature/models/Grass_Common_Short.gltf",
+      "textures": [
+        "Grass.png"
+      ]
+    },
+    {
+      "group": "village",
+      "pack": "village",
+      "model": "village/models/DoorFrame_Round_Brick.gltf",
+      "textures": [
+        "T_RockTrim_Normal.png",
+        "T_RockTrim_BaseColor.png",
+        "T_RockTrim_ORM.png"
+      ]
+    },
+    {
+      "group": "village",
+      "pack": "village",
+      "model": "village/models/Door_4_Round.gltf",
+      "textures": [
+        "T_WoodTrim_Normal.png",
+        "T_WoodTrim_BaseColor.png",
+        "T_WoodTrim_Roughness.png",
+        "T_MetalOrnaments_BaseColor.png",
+        "T_MetalOrnaments_Roughness.png"
+      ]
+    },
+    {
+      "group": "village",
+      "pack": "village",
+      "model": "village/models/Prop_WoodenFence_Single.gltf",
+      "textures": [
+        "T_WoodTrim_Normal.png",
+        "T_WoodTrim_BaseColor.png",
+        "T_WoodTrim_Roughness.png"
+      ]
+    },
+    {
+      "group": "village",
+      "pack": "village",
+      "model": "village/models/Prop_WoodenFence_Extension1.gltf",
+      "textures": [
+        "T_WoodTrim_Normal.png",
+        "T_WoodTrim_BaseColor.png",
+        "T_WoodTrim_Roughness.png"
+      ]
+    },
+    {
+      "group": "village",
+      "pack": "village",
+      "model": "village/models/Prop_Brick1.gltf",
+      "textures": [
+        "T_RockTrim_Normal.png",
+        "T_RockTrim_BaseColor.png",
+        "T_RockTrim_ORM.png"
+      ]
+    },
+    {
+      "group": "village",
+      "pack": "village",
+      "model": "village/models/Floor_UnevenBrick.gltf",
+      "textures": [
+        "T_UnevenBrick_Normal.png",
+        "T_UnevenBrick_BaseColor.png",
+        "T_UnevenBrick_Roughness.png"
+      ]
+    },
+    {
+      "group": "weapons",
+      "pack": "props",
+      "model": "weapons/models/Sword_Bronze.gltf",
+      "textures": [
+        "T_Trim_Props_Normal.png",
+        "T_Trim_Props_BaseColor.png",
+        "T_Trim_Props_ORM.png"
+      ]
+    },
+    {
+      "group": "characters",
+      "pack": "outfits",
+      "model": "characters/models/Male_Ranger.gltf",
+      "textures": [
+        "T_Ranger_Normal.png",
+        "T_Ranger_BaseColor.png",
+        "T_Ranger_ORM.png",
+        "T_Regular_Male_Normal.png",
+        "T_Regular_Male_Dark_BaseColor.png",
+        "T_Regular_Male_Roughness.png"
+      ]
+    },
+    {
+      "group": "characters",
+      "pack": "outfits",
+      "model": "characters/models/Male_Peasant.gltf",
+      "textures": [
+        "T_Peasant_Normal.png",
+        "T_Peasant_BaseColor.png",
+        "T_Peasant_ORM.png",
+        "T_Regular_Male_Normal.png",
+        "T_Regular_Male_Dark_BaseColor.png",
+        "T_Regular_Male_Roughness.png"
+      ]
+    },
+    {
+      "group": "characters",
+      "pack": "base",
+      "model": "characters/models/Superhero_Male_FullBody.gltf",
+      "textures": [
+        "T_Hair_1_Normal.png",
+        "T_Hair_1_BaseColor.png",
+        "T_Eye_Normal.png",
+        "T_Eye_Brown.png",
+        "T_Superhero_Male_Normal.png",
+        "T_Superhero_Male_Dark.png",
+        "T_Superhero_Male_Roughness.png"
+      ]
+    }
+  ],
+  "animations": {
+    "file": "animations/UAL1_Standard.glb",
+    "clipCount": 43,
+    "clips": [
+      "A_TPose",
+      "Crouch_Fwd_Loop",
+      "Crouch_Idle_Loop",
+      "Dance_Loop",
+      "Death01",
+      "Driving_Loop",
+      "Fixing_Kneeling",
+      "Hit_Chest",
+      "Hit_Head",
+      "Idle_Loop",
+      "Idle_Talking_Loop",
+      "Idle_Torch_Loop",
+      "Interact",
+      "Jog_Fwd_Loop",
+      "Jump_Land",
+      "Jump_Loop",
+      "Jump_Start",
+      "PickUp_Table",
+      "Pistol_Aim_Down",
+      "Pistol_Aim_Neutral",
+      "Pistol_Aim_Up",
+      "Pistol_Idle_Loop",
+      "Pistol_Reload",
+      "Pistol_Shoot",
+      "Punch_Cross",
+      "Punch_Jab",
+      "Push_Loop",
+      "Roll",
+      "Sitting_Enter",
+      "Sitting_Exit",
+      "Sitting_Idle_Loop",
+      "Sitting_Talking_Loop",
+      "Spell_Simple_Enter",
+      "Spell_Simple_Exit",
+      "Spell_Simple_Idle_Loop",
+      "Spell_Simple_Shoot",
+      "Sprint_Loop",
+      "Swim_Fwd_Loop",
+      "Swim_Idle_Loop",
+      "Sword_Attack",
+      "Sword_Idle",
+      "Walk_Formal_Loop",
+      "Walk_Loop"
+    ]
+  },
+  "implementationCandidates": {
+    "hero": {
+      "outfit": "characters/models/Male_Ranger.gltf",
+      "baseBody": "characters/models/Superhero_Male_FullBody.gltf",
+      "animations": "animations/UAL1_Standard.glb"
+    },
+    "commonEnemy": {
+      "outfit": "characters/models/Male_Peasant.gltf",
+      "baseBody": "characters/models/Superhero_Male_FullBody.gltf",
+      "animations": "animations/UAL1_Standard.glb"
+    },
+    "sword": "weapons/models/Sword_Bronze.gltf",
+    "gateParts": [
+      "village/models/DoorFrame_Round_Brick.gltf",
+      "village/models/Door_4_Round.gltf"
+    ],
+    "area1Nature": [
+      "nature/models/CommonTree_1.gltf",
+      "nature/models/CommonTree_3.gltf",
+      "nature/models/Rock_Medium_1.gltf",
+      "nature/models/Rock_Medium_2.gltf",
+      "nature/models/Bush_Common_Flowers.gltf",
+      "nature/models/Flower_3_Group.gltf",
+      "nature/models/Grass_Common_Short.gltf",
+      "nature/models/RockPath_Round_Wide.gltf"
+    ],
+    "area1Structures": [
+      "village/models/Prop_WoodenFence_Single.gltf",
+      "village/models/Prop_WoodenFence_Extension1.gltf",
+      "village/models/Prop_Brick1.gltf",
+      "village/models/Floor_UnevenBrick.gltf"
+    ]
+  },
+  "knownGaps": [
+    "The free Standard Fantasy Props archive has no hammer or spear model.",
+    "The free Standard Fantasy Outfits archive only includes Peasant and Ranger families; higher-tier armor seen in pack marketing is not in the free archive.",
+    "Universal Base Characters Standard supplies full-body meshes rather than a head-only runtime mesh; rendering the full body under outfits can clip and wastes skinned triangles. Create a head-only derivative before scaling to many enemies.",
+    "UAL2 Standard was inspected but is not shipped yet; add it only when its extra sword/zombie/farming clips are needed."
+  ]
+}
