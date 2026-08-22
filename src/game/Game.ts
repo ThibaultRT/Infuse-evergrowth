@@ -18,7 +18,7 @@ import {
   enemyStatReward
 } from '../config';
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
-import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
+import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, rollLoot, save } from '../save';
 import type { CombatAffinity, DamageType, HandSlotId, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showEquipmentDrop, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
@@ -540,6 +540,15 @@ ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target 
 ui.settingsButton.addEventListener('click', () => setSettingsPanel(true));
 ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
 ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
+ui.resetAttributesButton.addEventListener('click', () => {
+  if (!window.confirm('Reset all permanent hero attributes? Your equipment and its progress will be kept.')) return;
+  resetPermanentStats();
+  heroHp = Math.min(heroHp, maxHeroHp());
+  persist();
+  renderStats(save.stats);
+  updateHud();
+  showToast('Permanent attributes reset · equipment kept');
+});
 ui.settingsPanel.addEventListener('change', (event) => {
   const input = event.target as HTMLInputElement;
   if (input.name === 'render-scale') applyRenderingQuality({ ...renderingQuality, renderScale: input.value === '0.7' ? 0.7 : 1 });

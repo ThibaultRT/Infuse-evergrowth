@@ -97,6 +97,12 @@ canvas { display: block; width: 100%; height: 100%; }
 .settings-group small { font-size: 10px; opacity: .6; }
 .settings-stats { display: flex; align-items: center; gap: 9px; margin-top: 17px; font-size: 12px; }
 .settings-help { margin: 16px 0 0; font-size: 11px; line-height: 1.45; opacity: .62; }
+.settings-danger { display: grid; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,91,104,.3); }
+.settings-danger div { display: grid; gap: 3px; }
+.settings-danger strong { color: #ff6b76; font-size: 13px; }
+.settings-danger small { font-size: 10px; line-height: 1.4; opacity: .65; }
+.settings-danger button { width: 100%; padding: 10px; border: 1px solid #ff5968; border-radius: 9px; background: rgba(255,50,67,.16); color: #ff7b86; font: inherit; font-size: 10px; font-weight: 900; letter-spacing: .06em; cursor: pointer; }
+.settings-danger button:active { background: rgba(255,50,67,.3); }
 .renderer-stats { position: absolute; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); z-index: 8; display: none; padding: 7px 9px; border-radius: 7px; background: rgba(0,0,0,.78); color: #b8ffca; font: 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; pointer-events: none; }
 .renderer-stats.visible { display: block; }
 
