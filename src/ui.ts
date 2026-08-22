@@ -29,6 +29,7 @@ app.innerHTML = `
         <button id="spawn-button" class="card stats-button" type="button" title="Reset active respawn cooldowns">SPAWN</button>
       </div>
     </div>
+    <button id="settings-button" class="settings-button card" type="button" aria-label="Graphics settings" title="Graphics settings">&#9881;</button>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
     <div class="bottom-dock card">
@@ -66,6 +67,27 @@ app.innerHTML = `
         <div id="weapon-detail" class="weapon-detail"></div>
       </div>
     </div>
+    <div id="settings-panel" class="modal-panel" aria-hidden="true">
+      <div class="card modal-sheet settings-sheet">
+        <div class="modal-header">
+          <div><div class="brand">Display</div><h2>Graphics settings</h2></div>
+          <button id="settings-close" class="modal-close" type="button">CLOSE</button>
+        </div>
+        <fieldset class="settings-group">
+          <legend>Rendering resolution</legend>
+          <label><input type="radio" name="render-scale" value="1"> <span><strong>Full</strong><small>Sharpest image</small></span></label>
+          <label><input type="radio" name="render-scale" value="0.7"> <span><strong>Reduced</strong><small>Lower GPU load</small></span></label>
+        </fieldset>
+        <fieldset class="settings-group">
+          <legend>Frame rate</legend>
+          <label><input type="radio" name="frame-rate" value="60"> <span><strong>Smooth</strong><small>Up to 60 FPS</small></span></label>
+          <label><input type="radio" name="frame-rate" value="30"> <span><strong>Battery saver</strong><small>Target 30 FPS</small></span></label>
+        </fieldset>
+        <label id="renderer-stats-option" class="settings-stats"><input id="renderer-stats-toggle" type="checkbox"> Show renderer statistics</label>
+        <p class="settings-help">Changes apply immediately and are kept on this device.</p>
+      </div>
+    </div>
+    <output id="renderer-stats" class="renderer-stats" aria-live="off"></output>
   </div>
 </div>`;
 
@@ -76,6 +98,9 @@ export const ui = {
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   spawnButton: q<HTMLButtonElement>('#spawn-button'),
+  settingsButton: q<HTMLButtonElement>('#settings-button'), settingsPanel: q<HTMLDivElement>('#settings-panel'),
+  settingsClose: q<HTMLButtonElement>('#settings-close'), rendererStatsOption: q<HTMLLabelElement>('#renderer-stats-option'),
+  rendererStatsToggle: q<HTMLInputElement>('#renderer-stats-toggle'), rendererStats: q<HTMLOutputElement>('#renderer-stats'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),

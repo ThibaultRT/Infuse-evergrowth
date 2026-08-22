@@ -171,6 +171,12 @@ Avoid blocking the graphical pass on a complete architecture refactor. These bou
 
 ## Implementation phases
 
+## Implementation status
+
+- **Slice 1 — rendering quality controls and baseline tooling: implemented in v0.35.0.** The settings wheel exposes full/reduced (70%) render scale and smooth/30 FPS modes, persists those device preferences, and includes a development-build renderer statistics toggle.
+- Baseline capture is reproducible with the viewport and measurement matrix in `WIP/graphical-baseline.md`. Measurements requiring representative or physical hardware remain explicitly pending rather than being inferred from a development desktop.
+- Slices 2–13 remain planned. In accordance with the delivery guidance below, this change intentionally stops before the Area 1 environment pass so the rendering foundation can be built and validated independently.
+
 ### Phase 0 — Baseline, device targets, and quality controls
 
 1. Capture reference screenshots from iPhone-12-sized portrait, larger iPhone portrait, tablet, and desktop viewports.
