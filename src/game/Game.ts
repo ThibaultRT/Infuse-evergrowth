@@ -27,6 +27,7 @@ import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
 import { applyEquipmentCopies, ascend, attackProfile, equip, unequip } from '../systems/EquipmentSystem';
 import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
+import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 
 export class Game {
   private started = false;
@@ -42,7 +43,8 @@ scene.background = new THREE.Color(0x93b8cf);
 scene.fog = new THREE.Fog(0x93b8cf, 42, 82);
 const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 180);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+let renderingQuality = loadRenderingQuality();
+renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -465,22 +467,44 @@ function autoAttack(): void {
 }
 
 function setStatsPanel(open: boolean): void {
-  if (open) {
-    ui.inventoryPanel.classList.remove('visible');
-    ui.inventoryPanel.setAttribute('aria-hidden', 'true');
-  }
+  if (open) closeOtherPanels('stats');
   ui.statsPanel.classList.toggle('visible', open);
   ui.statsPanel.setAttribute('aria-hidden', String(!open));
   if (open) renderStats(save.stats);
 }
-function setInventoryPanel(open: boolean): void {
-  if (open) {
-    ui.statsPanel.classList.remove('visible');
-    ui.statsPanel.setAttribute('aria-hidden', 'true');
+function closeOtherPanels(except: 'stats' | 'inventory' | 'settings'): void {
+  for (const [name, panel] of [['stats', ui.statsPanel], ['inventory', ui.inventoryPanel], ['settings', ui.settingsPanel]] as const) {
+    if (name === except) continue;
+    panel.classList.remove('visible');
+    panel.setAttribute('aria-hidden', 'true');
   }
+}
+function setInventoryPanel(open: boolean): void {
+  if (open) closeOtherPanels('inventory');
   ui.inventoryPanel.classList.toggle('visible', open);
   ui.inventoryPanel.setAttribute('aria-hidden', String(!open));
   if (open) renderInventory(save.inventory);
+}
+function renderQualityControls(): void {
+  const scale = ui.settingsPanel.querySelector<HTMLInputElement>(`input[name="render-scale"][value="${renderingQuality.renderScale}"]`);
+  const frameRate = ui.settingsPanel.querySelector<HTMLInputElement>(`input[name="frame-rate"][value="${renderingQuality.frameRateLimit}"]`);
+  if (scale) scale.checked = true;
+  if (frameRate) frameRate.checked = true;
+  ui.rendererStatsToggle.checked = renderingQuality.showStats;
+  ui.rendererStatsOption.hidden = !import.meta.env.DEV;
+  ui.rendererStats.classList.toggle('visible', import.meta.env.DEV && renderingQuality.showStats);
+}
+function setSettingsPanel(open: boolean): void {
+  if (open) closeOtherPanels('settings');
+  ui.settingsPanel.classList.toggle('visible', open);
+  ui.settingsPanel.setAttribute('aria-hidden', String(!open));
+  if (open) renderQualityControls();
+}
+function applyRenderingQuality(next: RenderingQualitySettings): void {
+  renderingQuality = next;
+  saveRenderingQuality(next);
+  resizeViewport();
+  renderQualityControls();
 }
 ui.statsButton.addEventListener('click', () => setStatsPanel(true));
 ui.spawnButton.addEventListener('click', resetSpawnCooldowns);
@@ -489,6 +513,15 @@ ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === 
 ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
 ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
 ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
+ui.settingsButton.addEventListener('click', () => setSettingsPanel(true));
+ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
+ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
+ui.settingsPanel.addEventListener('change', (event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.name === 'render-scale') applyRenderingQuality({ ...renderingQuality, renderScale: input.value === '0.7' ? 0.7 : 1 });
+  if (input.name === 'frame-rate') applyRenderingQuality({ ...renderingQuality, frameRateLimit: input.value === '30' ? 30 : 60 });
+  if (input === ui.rendererStatsToggle) applyRenderingQuality({ ...renderingQuality, showStats: input.checked });
+});
 let suppressInventoryClick = false;
 ui.inventoryBag.addEventListener('click', (event) => {
   if (suppressInventoryClick) { suppressInventoryClick = false; return; }
@@ -695,7 +728,7 @@ function resizeViewport(): void {
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 }
 addEventListener('resize', resizeViewport);
 window.visualViewport?.addEventListener('resize', resizeViewport);
@@ -709,8 +742,15 @@ document.addEventListener('visibilitychange', () => {
 
 syncAreaVisibility();
 let previous = performance.now();
+let lastRenderedAt = 0;
+let statsStartedAt = performance.now();
+let statsFrames = 0;
 let midnightAccumulator = 0;
 function frame(now: number): void {
+  requestAnimationFrame(frame);
+  const minimumFrameMs = 1000 / renderingQuality.frameRateLimit;
+  if (now - lastRenderedAt < minimumFrameMs - 1) return;
+  lastRenderedAt = now;
   const dt = Math.min((now - previous) / 1000, .05);
   previous = now;
   handCooldowns.hand1 = Math.max(0, handCooldowns.hand1 - dt);
@@ -730,7 +770,16 @@ function frame(now: number): void {
   updateHud();
   updateCombatTexts(dt);
   renderer.render(scene, camera);
-  requestAnimationFrame(frame);
+  if (import.meta.env.DEV && renderingQuality.showStats) {
+    statsFrames += 1;
+    const elapsed = now - statsStartedAt;
+    if (elapsed >= 500) {
+      const info = renderer.info.render;
+      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
+      statsFrames = 0;
+      statsStartedAt = now;
+    }
+  }
 }
 
 renderStats(save.stats);
