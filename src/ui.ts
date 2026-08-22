@@ -85,6 +85,10 @@ app.innerHTML = `
         </fieldset>
         <label id="renderer-stats-option" class="settings-stats"><input id="renderer-stats-toggle" type="checkbox"> Show renderer statistics</label>
         <p class="settings-help">Changes apply immediately and are kept on this device.</p>
+        <div class="settings-danger">
+          <div><strong>Reset attributes</strong><small>Remove all permanent stat gains. Equipment and its progress are kept.</small></div>
+          <button id="reset-attributes-button" type="button">RESET ATTRIBUTES</button>
+        </div>
       </div>
     </div>
     <output id="renderer-stats" class="renderer-stats" aria-live="off"></output>
@@ -101,6 +105,7 @@ export const ui = {
   settingsButton: q<HTMLButtonElement>('#settings-button'), settingsPanel: q<HTMLDivElement>('#settings-panel'),
   settingsClose: q<HTMLButtonElement>('#settings-close'), rendererStatsOption: q<HTMLLabelElement>('#renderer-stats-option'),
   rendererStatsToggle: q<HTMLInputElement>('#renderer-stats-toggle'), rendererStats: q<HTMLOutputElement>('#renderer-stats'),
+  resetAttributesButton: q<HTMLButtonElement>('#reset-attributes-button'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
