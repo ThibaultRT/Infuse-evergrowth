@@ -3,6 +3,7 @@
     {
       "id": 1,
       "name": "Area 1",
+      "environmentTheme": "sunlit-meadow",
       "enemyWeapon": "blunt",
       "enemyWeakness": "slash",
       "worldOrigin": { "x": 0, "z": 0 },
@@ -53,6 +54,7 @@
     {
       "id": 2,
       "name": "Area 2",
+      "environmentTheme": "legacy",
       "enemyWeapon": "slash",
       "enemyWeakness": "pierce",
       "worldOrigin": { "x": 60, "z": 0 },

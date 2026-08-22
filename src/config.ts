@@ -32,7 +32,8 @@ export const AREAS: AreaDefinition[] = areaData.areas.map((area) => ({
   originZ: area.worldOrigin.z,
   bossSpawnId: area.bossSpawnId,
   enemyWeapon: area.enemyWeapon as CombatAffinity,
-  enemyWeakness: area.enemyWeakness as CombatAffinity
+  enemyWeakness: area.enemyWeakness as CombatAffinity,
+  environmentTheme: area.environmentTheme
 }));
 
 export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>

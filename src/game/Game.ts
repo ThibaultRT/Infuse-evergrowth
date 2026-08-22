@@ -28,6 +28,7 @@ import { GameEvents } from './GameEvents';
 import { applyEquipmentCopies, ascend, attackProfile, equip, unequip } from '../systems/EquipmentSystem';
 import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
+import { EnvironmentView } from '../rendering/EnvironmentView';
 
 export class Game {
   private started = false;
@@ -50,7 +51,8 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 ui.canvasHost.append(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xdaf2ff, 0x51613f, 2.2));
+const hemisphere = new THREE.HemisphereLight(0xdaf2ff, 0x51613f, 2.2);
+scene.add(hemisphere);
 const sun = new THREE.DirectionalLight(0xfff0d2, 2.8);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
@@ -65,21 +67,12 @@ const ROCK_LAYOUT = [
   [-16, -17, .85], [16, -16, .9], [-10, 23, .8], [10, 24, 1], [-5, -24, .8], [5, -25, 1.1]
 ] as const;
 
-for (const area of AREAS) {
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(38, 56), new THREE.MeshStandardMaterial({ color: area.id === 1 ? 0x668d52 : 0x5d8556, roughness: 0.95 }));
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.set(area.originX, 0, area.originZ);
-  ground.receiveShadow = true;
-  scene.add(ground);
-
-  const path = new THREE.Mesh(new THREE.PlaneGeometry(6, 50), new THREE.MeshStandardMaterial({ color: area.id === 1 ? 0x9c906c : 0x879574, roughness: 1 }));
-  path.rotation.x = -Math.PI / 2;
-  path.position.set(area.originX, 0.012, area.originZ);
-  path.receiveShadow = true;
-  scene.add(path);
-
-  for (const [x, z, scale] of ROCK_LAYOUT) addRock(scene, area.originX + x, area.originZ + z, scale);
-}
+const environmentViews = AREAS.map((area) => {
+  const view = new EnvironmentView(area);
+  scene.add(view.root);
+  if (area.environmentTheme === 'legacy') for (const [x, z, scale] of ROCK_LAYOUT) addRock(scene, area.originX + x, area.originZ + z, scale);
+  return view;
+});
 
 let currentAreaId = save.currentAreaId;
 const initialArea = areaById(currentAreaId);
@@ -94,6 +87,15 @@ const cameraController = new CameraController(camera, hero.position);
 
 function syncLighting(): void {
   const area = areaById(currentAreaId);
+  const sunlit = area.environmentTheme === 'sunlit-meadow';
+  const sky = sunlit ? 0xadd8e6 : 0x93b8cf;
+  scene.background = new THREE.Color(sky);
+  scene.fog = new THREE.Fog(sky, sunlit ? 48 : 42, sunlit ? 88 : 82);
+  hemisphere.color.setHex(sunlit ? 0xe9f8ff : 0xdaf2ff);
+  hemisphere.groundColor.setHex(sunlit ? 0x567044 : 0x51613f);
+  hemisphere.intensity = sunlit ? 2.45 : 2.2;
+  sun.color.setHex(sunlit ? 0xfff2cc : 0xfff0d2);
+  sun.intensity = sunlit ? 3.1 : 2.8;
   sun.position.set(area.originX - 12, 22, area.originZ + 8);
   sun.target.position.set(area.originX, 0, area.originZ);
 }
@@ -277,8 +279,6 @@ class SpawnEntity {
     if (this.provoked && fromSpawn >= ENEMY_LEASH_RADIUS_METERS) this.provoked = false;
 
     if (this.provoked) {
-      // An enemy can land the first hit at its slightly longer range, but keeps
-      // closing until it is safely inside the hero's bare-hands reach.
       if (distance >= HERO_ATTACK_RANGE_METERS * .95) {
         toHero.normalize();
         this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
@@ -336,6 +336,7 @@ const portalEntities = PORTALS.map((portal) => new PortalEntity(portal));
 function syncAreaVisibility(): void {
   entities.forEach((entity) => entity.syncAreaVisibility());
   portalEntities.forEach((portal) => portal.syncAreaVisibility());
+  environmentViews.forEach((view) => { view.root.visible = view.area.id === currentAreaId; });
   syncLighting();
 }
 
@@ -505,6 +506,11 @@ function applyRenderingQuality(next: RenderingQualitySettings): void {
   saveRenderingQuality(next);
   resizeViewport();
   renderQualityControls();
+  if (import.meta.env.DEV && next.showStats) {
+    statsFrames = 0;
+    statsStartedAt = performance.now();
+    ui.rendererStats.textContent = 'Measuring renderer…';
+  }
 }
 ui.statsButton.addEventListener('click', () => setStatsPanel(true));
 ui.spawnButton.addEventListener('click', resetSpawnCooldowns);
@@ -528,11 +534,19 @@ ui.inventoryBag.addEventListener('click', (event) => {
   const button = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
   if (button?.dataset.itemId) renderWeaponDetail(save.inventory.items[button.dataset.itemId] ?? null);
 });
+ui.inventoryEquipped.addEventListener('click', (event) => {
+  const slot = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
+  if (slot?.dataset.itemId) renderWeaponDetail(save.inventory.items[slot.dataset.itemId] ?? null);
+});
 ui.weaponDetail.addEventListener('click', (event) => {
   const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
   const itemId = button?.dataset.itemId;
   if (!button || !itemId) return;
-  if (button.dataset.equip) { const hand = button.dataset.equip as HandSlotId; equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand }); }
+  if (button.hasAttribute('data-equip')) {
+    const hand = (['hand1', 'hand2'] as const).find((slot) => save.inventory.equipped[slot] === null);
+    if (!hand) { showToast('no free slots!'); return; }
+    equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand });
+  }
   if (button.dataset.unequip) { const hand = button.dataset.unequip as HandSlotId; if (unequip(hand)) events.emit('equipmentUnequipped', { itemId, hand }); }
   if (button.hasAttribute('data-ascend')) { const previousAscend = save.inventory.items[itemId].ascend; if (ascend(itemId)) events.emit('weaponAscended', { itemId, previousAscend, newAscend: previousAscend + 1 }); }
   persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
