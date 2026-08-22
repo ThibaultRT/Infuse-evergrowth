@@ -1,5 +1,6 @@
 import { LoadingManager, Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
 const ASSET_ROOT = 'assets/quaternius/';
 
@@ -26,6 +27,10 @@ export class AssetLoader {
 
   async cloneScene(path: string): Promise<Object3D> {
     return (await this.load(path)).scene.clone(true);
+  }
+
+  async cloneSkinnedScene(path: string): Promise<Object3D> {
+    return clone((await this.load(path)).scene);
   }
 }
 

@@ -21,7 +21,7 @@ import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, rollLoot, save } from '../save';
 import type { CombatAffinity, DamageType, HandSlotId, LootType, PortalDefinition, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showEquipmentDrop, showToast, ui } from '../ui';
-import { addRock, makeCrystal, makeHumanoid, makeTierRing } from '../visuals';
+import { addRock, makeCrystal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
@@ -30,6 +30,8 @@ import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView } from '../rendering/EnvironmentView';
 import { GateView } from '../rendering/GateView';
+import { HeroView } from '../rendering/HeroView';
+import { EnemyView } from '../rendering/EnemyView';
 
 export class Game {
   private started = false;
@@ -77,7 +79,8 @@ const environmentViews = AREAS.map((area) => {
 
 let currentAreaId = save.currentAreaId;
 const initialArea = areaById(currentAreaId);
-const hero = makeHumanoid(0x2f3540, true);
+const heroView = new HeroView();
+const hero = heroView.root;
 hero.position.set(initialArea.originX, 0, initialArea.originZ);
 scene.add(hero);
 let heroHp = maxHeroHp();
@@ -143,6 +146,9 @@ class SpawnEntity {
   alive = true;
   provoked = false;
   attackCooldown = 0;
+  readonly enemyView: EnemyView | null;
+  moving = false;
+  deathPresentationRemaining = 0;
 
   constructor(readonly def: SpawnDefinition) {
     this.config = TIER_CONFIG[def.tier];
@@ -153,7 +159,8 @@ class SpawnEntity {
     this.damageType = areaById(def.areaId).enemyWeapon;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
-    this.root.add(def.tier === 'crystal' ? makeCrystal(this.config.color) : makeHumanoid(this.config.color), makeTierRing(this.config.color));
+    this.enemyView = def.tier === 'crystal' ? null : new EnemyView(def.tier, this.config.color);
+    this.root.add(this.enemyView?.root ?? makeCrystal(this.config.color), makeTierRing(this.config.color));
     scene.add(this.root);
 
     this.targetUi.className = 'world-target-ui';
@@ -183,14 +190,15 @@ class SpawnEntity {
   }
 
   syncAreaVisibility(): void {
-    const visible = this.alive && this.def.areaId === currentAreaId;
+    const visible = (this.alive || this.deathPresentationRemaining > 0) && this.def.areaId === currentAreaId;
     this.root.visible = visible;
-    this.targetUi.classList.toggle('hidden', !visible);
+    this.targetUi.classList.toggle('hidden', !this.alive || this.def.areaId !== currentAreaId);
   }
 
   setAlive(value: boolean): void {
     this.alive = value;
     if (value) {
+      this.deathPresentationRemaining = 0;
       this.hp = this.maxHp;
       this.healthFill.style.width = '100%';
       this.provoked = false;
@@ -214,6 +222,7 @@ class SpawnEntity {
   receiveDamage(amount: number, type: DamageType): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
     events.emit('enemyDamaged', { enemyId: this.def.id, amount, damageType: type });
+    this.enemyView?.playHit();
     showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), amount, type);
     this.hp = Math.max(0, this.hp - amount);
     this.healthFill.style.width = `${(this.hp / this.maxHp) * 100}%`;
@@ -222,6 +231,8 @@ class SpawnEntity {
   }
 
   defeat(): void {
+    this.enemyView?.playDeath();
+    this.deathPresentationRemaining = 1.1;
     const state = save.spawns[this.def.id];
     const now = Date.now();
     state.killsToday += 1;
@@ -258,6 +269,7 @@ class SpawnEntity {
   }
 
   update(dt: number): void {
+    this.moving = false;
     if (!this.alive) {
       const state = save.spawns[this.def.id];
       if (state?.respawnAt && Date.now() >= state.respawnAt) {
@@ -284,6 +296,7 @@ class SpawnEntity {
         toHero.normalize();
         this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
         this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
+        this.moving = true;
       }
       this.attackCooldown = Math.max(0, this.attackCooldown - dt);
       if (distance <= ENEMY_ATTACK_RANGE_METERS && this.attackCooldown === 0) {
@@ -294,8 +307,16 @@ class SpawnEntity {
     }
 
     const back = this.spawnPosition.clone().sub(this.root.position);
-    if (back.length() > .08) this.root.position.addScaledVector(back.normalize(), 3 * dt);
+    if (back.length() > .08) { this.root.position.addScaledVector(back.normalize(), 3 * dt); this.moving = true; }
     else this.root.position.copy(this.spawnPosition);
+  }
+
+  updateView(dt: number): void {
+    if (this.deathPresentationRemaining > 0) {
+      this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
+      if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();
+    }
+    this.enemyView?.update(dt, this.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
   }
 }
 
@@ -419,11 +440,13 @@ function resetSpawnCooldowns(): void {
 function damageHero(amount: number, type: CombatAffinity): void {
   if (heroDead) return;
   events.emit('heroDamaged', { amount, damageType: type });
+  heroView.playHit();
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, type, true);
   heroHp = Math.max(0, heroHp - amount);
   updateHud();
   if (heroHp !== 0) return;
   heroDead = true;
+  heroView.playDeath();
   events.emit('heroDefeated', undefined);
   input.reset();
   entities.forEach((entity) => entity.resetAfterHeroDefeat());
@@ -458,7 +481,7 @@ function autoAttack(): void {
     handCooldowns[hand] = profile.cooldownSeconds;
     target.receiveDamage(profile.damage, profile.damageType);
     const direction = target.root.position.clone().sub(hero.position);
-    if (direction.lengthSq() > 0) hero.rotation.y = Math.atan2(direction.x, direction.z);
+    if (direction.lengthSq() > 0) heroView.setFacing(Math.atan2(direction.x, direction.z));
   }
 }
 
@@ -609,15 +632,18 @@ ui.inventoryPanel.addEventListener('pointerup', (event) => {
 ui.inventoryPanel.addEventListener('pointercancel', () => { pointerDrag?.source.classList.remove('dragging'); pointerDrag = null; });
 
 function updateHero(dt: number): void {
-  if (heroDead || cameraController.isScripted) return;
+  if (heroDead || cameraController.isScripted) { heroView.update(dt, false); return; }
   const move = input.movement;
-  if (move.x === 0 && move.y === 0) return;
-  hero.position.x += move.x * HERO_SPEED * dt;
-  hero.position.z -= move.y * HERO_SPEED * dt;
-  const area = areaById(currentAreaId);
-  hero.position.x = THREE.MathUtils.clamp(hero.position.x, area.originX - 17.2, area.originX + 17.2);
-  hero.position.z = THREE.MathUtils.clamp(hero.position.z, area.originZ - 26.2, area.originZ + 26.2);
-  hero.rotation.y = Math.atan2(move.x, -move.y);
+  const moving = move.x !== 0 || move.y !== 0;
+  if (moving) {
+    hero.position.x += move.x * HERO_SPEED * dt;
+    hero.position.z -= move.y * HERO_SPEED * dt;
+    const area = areaById(currentAreaId);
+    hero.position.x = THREE.MathUtils.clamp(hero.position.x, area.originX - 17.2, area.originX + 17.2);
+    hero.position.z = THREE.MathUtils.clamp(hero.position.z, area.originZ - 26.2, area.originZ + 26.2);
+    heroView.setFacing(Math.atan2(move.x, -move.y));
+  }
+  heroView.update(dt, moving);
 }
 
 function enterArea(targetAreaId: number): void {
@@ -775,6 +801,7 @@ function frame(now: number): void {
   updatePortals(dt);
   autoAttack();
   if (!cameraController.isScripted) entities.forEach((entity) => entity.update(dt));
+  entities.forEach((entity) => entity.updateView(dt));
   if (!heroDead) heroHp = Math.min(maxHeroHp(), heroHp + heroRegen() * dt);
   cameraController.update(dt, now);
   updateHud();
@@ -785,7 +812,8 @@ function frame(now: number): void {
     const elapsed = now - statsStartedAt;
     if (elapsed >= 500) {
       const info = renderer.info.render;
-      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
+      const activeMixers = entities.filter((entity) => entity.alive && entity.def.areaId === currentAreaId && entity.enemyView?.animationReady).length + (heroView.animationReady ? 1 : 0);
+      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\n${activeMixers} active character mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
       statsFrames = 0;
       statsStartedAt = now;
     }
