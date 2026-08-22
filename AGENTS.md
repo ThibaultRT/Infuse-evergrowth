@@ -126,3 +126,18 @@ This order is intentional: do not start a gameplay feature by editing the render
 - Run `npm run build` after code changes. For visible web-app changes, also inspect the running app at a mobile-sized viewport and capture a screenshot when tooling permits.
 - Before committing, review `git diff` and `git status`. Commit changes on the current branch.
 - Systematically increment the package version before creating a pull request. Use `package.json` as the single source of truth and apply semantic versioning appropriate to the change.
+
+## Consecutive pull requests from one agent session
+
+When a task is delivered as several successive pull requests from the same Codex/agent session, **never start the next slice from the previous slice's stale checkout after that PR has been merged**.
+
+Before starting each new slice after a previous PR was merged:
+
+1. Fetch the latest remote state.
+2. Reset/switch the working base to the latest `origin/main` so it includes the just-merged PR.
+3. Create a fresh branch for the new slice from that updated `origin/main`; do not keep building on the already-merged slice branch.
+4. Implement only the new slice.
+5. Before opening the PR, verify `git log origin/main..HEAD` and `git diff origin/main...HEAD` (or equivalent) show only the new slice and do not reintroduce files/commits already merged into `main`.
+6. If the new PR unexpectedly contains changes from an earlier merged slice, stop and rebase/recreate the branch from current `origin/main` before opening or updating the PR.
+
+This rule applies even when the user continues in the same Codex Cloud conversation or task window: conversational continuity does not guarantee that the underlying checkout automatically refreshed after a GitHub merge.
