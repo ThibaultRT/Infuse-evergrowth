@@ -51,6 +51,17 @@ scene.background = new THREE.Color(0x93b8cf);
 scene.fog = new THREE.Fog(0x93b8cf, 42, 82);
 const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 180);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+let rendererContextAvailable = true;
+renderer.domElement.addEventListener('webglcontextlost', (event) => {
+  event.preventDefault();
+  rendererContextAvailable = false;
+  showToast('Graphics paused while the display recovers. Progress is safe.');
+});
+renderer.domElement.addEventListener('webglcontextrestored', () => {
+  rendererContextAvailable = true;
+  resizeViewport();
+  showToast('Graphics restored.');
+});
 const effects = new EffectManager(scene);
 const worldUi = new WorldUiManager(camera, renderer.domElement, ui.world);
 const combat = new CombatSystem({
@@ -791,7 +802,7 @@ function frame(now: number): void {
   updateHud();
   worldUi.update(dt);
   effects.update(dt);
-  renderer.render(scene, camera);
+  if (rendererContextAvailable) renderer.render(scene, camera);
   if (import.meta.env.DEV && renderingQuality.showStats) {
     statsFrames += 1;
     const elapsed = now - statsStartedAt;
