@@ -42,7 +42,9 @@ export class HeroView extends AnimatedHumanoidView {
     for (const slot of ['hand1', 'hand2'] as const) {
       this.attackTime[slot] = Math.max(0, this.attackTime[slot] - dt);
       const style = attackStyle(this.attackType[slot]);
-      const phase = Math.sin(this.attackTime[slot] / this.attackDuration[slot] * Math.PI);
+      const progress = 1 - this.attackTime[slot] / this.attackDuration[slot];
+      // One smooth out-and-back swing occupies the weapon's complete attack interval.
+      const phase = Math.sin(THREE.MathUtils.smoothstep(progress, 0, 1) * Math.PI);
       const root = slot === 'hand1' ? this.weaponRoots.right : this.weaponRoots.left;
       root.rotation.y = (slot === 'hand1' ? -1 : 1) * style.arc * phase;
       root.position.z = -style.reach * phase;
@@ -67,7 +69,11 @@ export class HeroView extends AnimatedHumanoidView {
   }
 
   playWeaponAttack(slot: EquipmentSlotId, type: DamageType, target: THREE.Vector3, duration: number): void {
-    if (slot === 'hand1' || slot === 'hand2') { this.attackType[slot] = type; this.attackDuration[slot] = duration; this.attackTime[slot] = duration; }
+    if (slot === 'hand1' || slot === 'hand2') {
+      this.attackType[slot] = type;
+      this.attackDuration[slot] = Math.max(duration, Number.EPSILON);
+      this.attackTime[slot] = this.attackDuration[slot];
+    }
     else this.orbitFlights[slot] = { target: this.root.worldToLocal(target.clone()), progress: 0 };
   }
 
