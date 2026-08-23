@@ -58,7 +58,7 @@ The key rule is **model/domain state first, systems operate on it, views render 
 ## Source map
 
 - `src/main.ts`: application entry point; loads global CSS, applies the package version, and starts the game.
-- `src/game/Game.ts`: top-level runtime/coordinator. It still contains legacy combat, AI, respawn, world-UI, and area-flow responsibilities that should be extracted incrementally; do not add new large gameplay subsystems here.
+- `src/game/Game.ts`: top-level runtime/coordinator for composition, lifecycle, update ordering, and high-level commands.
 - `src/game/GameEvents.ts`: typed event bus for gameplay events and cross-system reactions.
 - `src/domain/combat/Affinity.ts`: cyclic hero-vs-enemy affinity rules.
 - `src/domain/items/EquipmentCatalog.ts`: authored equipment definitions/catalog lookup.
@@ -68,6 +68,11 @@ The key rule is **model/domain state first, systems operate on it, views render 
 - `src/domain/spawning/SpawnerModel.ts`: first-class spawner state/lifecycle rules; stable spawn IDs own persistent respawn state and per-life rolls.
 - `src/systems/EquipmentSystem.ts`: coordinates equipment domain rules with persistent inventory/equipment slots.
 - `src/systems/EquipmentDropSystem.ts`: area/tier equipment drop resolution.
+- `src/systems/CombatSystem.ts`: attack scheduling, target selection, and renderer-independent damage resolution.
+- `src/systems/EnemyAISystem.ts`: hostile aggro, leash, movement, and attack-intent resolution.
+- `src/systems/RespawnSystem.ts`: persistent spawn death/revival transitions and per-life rerolls.
+- `src/systems/AreaFlowSystem.ts`: area-entry and gate-progression decisions.
+- `src/rendering/WorldUiManager.ts`: world-to-screen DOM projection and floating combat-text lifetime.
 - `src/rendering/`: Three.js asset loading, environment, hero, enemy, gate, and effect presentation.
 - `src/ui.ts`: HUD/modal HTML, cached DOM references, toasts, stat rendering, reward feedback, and inventory rendering.
 - `src/style.css` and `src/reward-popups.css`: application and reward-popup presentation.
@@ -81,7 +86,6 @@ The key rule is **model/domain state first, systems operate on it, views render 
 - `src/controllers/`: camera and input handling.
 - `src/visuals.ts` and `src/icons.ts`: remaining shared Three.js helpers/materials and inline UI icon markup.
 - `src/version.ts`: reads the app version injected from `package.json`; `package.json` is the version source of truth.
-- `implementation-cleanup.md`: only the remaining architecture cleanup work; completed historical migration steps should not be reintroduced.
 - `WIP/graphical.md`: durable graphical direction and the remaining graphical validation/optimization slice.
 
 ## Dependency rules
