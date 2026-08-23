@@ -9,8 +9,15 @@ if (!app) throw new Error('Missing #app');
 
 app.innerHTML = `
 <div id="game-shell">
+  <div id="loading-screen" class="loading-screen" role="status" aria-live="polite">
+    <div class="loading-mark" aria-hidden="true"><span></span></div>
+    <div class="loading-title">Infuse: Evergrowth</div>
+    <div class="loading-subtitle">Preparing the realm</div>
+    <div class="loading-track"><span id="loading-progress"></span></div>
+    <div id="loading-percent" class="loading-percent">0%</div>
+  </div>
   <div id="canvas-host"></div>
-  <div class="hud">
+  <div class="hud boot-hidden">
     <div class="version-tag">0.31</div>
     <div class="topbar">
       <div class="card hp-wrap">
@@ -97,6 +104,7 @@ app.innerHTML = `
 
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
+  loadingScreen: q<HTMLDivElement>('#loading-screen'), loadingProgress: q<HTMLSpanElement>('#loading-progress'), loadingPercent: q<HTMLDivElement>('#loading-percent'),
   hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), hand2Stat: q<HTMLSpanElement>('#hand2-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
@@ -112,6 +120,18 @@ export const ui = {
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
   inventoryBag: q<HTMLDivElement>('#inventory-bag'), weaponDetail: q<HTMLDivElement>('#weapon-detail'), equipmentDropLayer: q<HTMLDivElement>('#equipment-drop-layer'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
 };
+
+export function setLoadingProgress(progress: number): void {
+  const percent = Math.round(progress * 100);
+  ui.loadingProgress.style.width = `${percent}%`;
+  ui.loadingPercent.textContent = `${percent}%`;
+}
+
+export function finishLoading(): void {
+  document.querySelector('.hud')?.classList.remove('boot-hidden');
+  ui.loadingScreen.classList.add('finished');
+  window.setTimeout(() => ui.loadingScreen.remove(), 450);
+}
 
 export function renderEnemyAffinities(area: AreaDefinition): void {
   const weapon = combatAffinityIcon(area.enemyWeapon, 11);

@@ -96,18 +96,45 @@ export class EnvironmentView {
       [model('village', 'Prop_Brick1'), -11, 5, 1.2, .4], [model('village', 'Prop_Brick1'), -13, 8, 1, 2.2]
     ];
     for (let z = -22; z <= 22; z += 3.8) placements.push([model('nature', 'RockPath_Round_Wide'), Math.sin(z * .19) * 1.25, z, 1.15, z * .025]);
-    for (const [x, z] of [[-12, 5], [-12, 7], [-12, 9], [-10, 5]] as const) placements.push([model('village', 'Floor_UnevenBrick'), x, z, 1, 0]);
-
     try {
-      const objects = await Promise.all(placements.map(async ([path, x, z, scale = 1, rotation = 0]) => {
-        const object = await this.assets.cloneScene(path);
-        object.position.set(x, .025, z); object.scale.setScalar(scale); object.rotation.y = rotation; shadows(object);
-        return object;
-      }));
-      this.root.add(...objects);
+      const [objects, pavement] = await Promise.all([
+        Promise.all(placements.map(async ([path, x, z, scale = 1, rotation = 0]) => {
+          const object = await this.assets.cloneScene(path);
+          object.position.set(x, .025, z); object.scale.setScalar(scale); object.rotation.y = rotation; shadows(object);
+          return object;
+        })),
+        this.buildPavement()
+      ]);
+      this.root.add(pavement, ...objects);
       this.proceduralDetails.visible = false;
     } catch (error) {
       console.warn('Quaternius Area 1 assets unavailable; keeping procedural environment.', error);
     }
+  }
+
+  private async buildPavement(): Promise<THREE.Object3D> {
+    const pavement = await this.assets.cloneScene(model('village', 'Floor_UnevenBrick'));
+    pavement.name = 'area-1-stone-pavement';
+    pavement.position.y = .018;
+    pavement.scale.set(19, 1, 28);
+    pavement.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      child.receiveShadow = true;
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      const tiled = materials.map((source) => {
+        const material = source.clone() as THREE.MeshStandardMaterial;
+        for (const key of ['map', 'normalMap', 'roughnessMap'] as const) {
+          const texture = material[key];
+          if (!texture) continue;
+          material[key] = texture.clone();
+          material[key]!.wrapS = material[key]!.wrapT = THREE.RepeatWrapping;
+          material[key]!.repeat.set(19, 28);
+          material[key]!.needsUpdate = true;
+        }
+        return material;
+      });
+      child.material = Array.isArray(child.material) ? tiled : tiled[0];
+    });
+    return pavement;
   }
 }

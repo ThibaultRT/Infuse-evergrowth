@@ -21,6 +21,7 @@ export class HeroView extends AnimatedHumanoidView {
   private inventory: InventoryState | null = null;
   private readonly weaponRoots: Record<'left' | 'right', THREE.Group> = { left: new THREE.Group(), right: new THREE.Group() };
   private readonly attackTime: Record<'hand1' | 'hand2', number> = { hand1: 0, hand2: 0 };
+  private readonly attackDuration: Record<'hand1' | 'hand2', number> = { hand1: 1, hand2: 1 };
   private readonly attackType: Record<'hand1' | 'hand2', DamageType> = { hand1: 'blunt', hand2: 'blunt' };
   readonly orbitRoot = new THREE.Group();
   private orbitWeapons: Partial<Record<'orbit1' | 'orbit2', THREE.Object3D>> = {};
@@ -39,9 +40,9 @@ export class HeroView extends AnimatedHumanoidView {
     this.setMotion(moving ? 'jog' : 'idle');
     this.updateAnimation(dt, active);
     for (const slot of ['hand1', 'hand2'] as const) {
-      this.attackTime[slot] = Math.max(0, this.attackTime[slot] - dt * 4.5);
+      this.attackTime[slot] = Math.max(0, this.attackTime[slot] - dt);
       const style = attackStyle(this.attackType[slot]);
-      const phase = Math.sin(this.attackTime[slot] * Math.PI);
+      const phase = Math.sin(this.attackTime[slot] / this.attackDuration[slot] * Math.PI);
       const root = slot === 'hand1' ? this.weaponRoots.right : this.weaponRoots.left;
       root.rotation.y = (slot === 'hand1' ? -1 : 1) * style.arc * phase;
       root.position.z = -style.reach * phase;
@@ -65,8 +66,8 @@ export class HeroView extends AnimatedHumanoidView {
     }
   }
 
-  playWeaponAttack(slot: EquipmentSlotId, type: DamageType, target: THREE.Vector3): void {
-    if (slot === 'hand1' || slot === 'hand2') { this.attackType[slot] = type; this.attackTime[slot] = 1; }
+  playWeaponAttack(slot: EquipmentSlotId, type: DamageType, target: THREE.Vector3, duration: number): void {
+    if (slot === 'hand1' || slot === 'hand2') { this.attackType[slot] = type; this.attackDuration[slot] = duration; this.attackTime[slot] = duration; }
     else this.orbitFlights[slot] = { target: this.root.worldToLocal(target.clone()), progress: 0 };
   }
 
