@@ -28,6 +28,7 @@ export abstract class AnimatedHumanoidView {
   private action: THREE.AnimationAction | null = null;
   private motion: HumanoidMotion = 'idle';
   private oneShotRemaining = 0;
+  private deathRequested = false;
 
   protected constructor(fallback: THREE.Object3D, protected readonly assets: AssetLoader = quaterniusAssets) {
     fallback.name = 'procedural-fallback';
@@ -70,8 +71,9 @@ export abstract class AnimatedHumanoidView {
   }
 
   playHit(): void { this.playOneShot('hit'); }
-  playDeath(): void { this.playOneShot('death'); }
+  playDeath(): void { this.deathRequested = true; this.playOneShot('death'); }
   get animationReady(): boolean { return this.mixer !== null; }
+  get deathAnimationFinished(): boolean { return this.deathRequested && this.oneShotRemaining <= 0; }
 
   updateAnimation(dt: number, active = true): void {
     if (!active || !this.mixer) return;

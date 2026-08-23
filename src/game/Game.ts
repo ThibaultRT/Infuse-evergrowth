@@ -90,7 +90,14 @@ hero.position.set(initialArea.originX, 0, initialArea.originZ);
 scene.add(hero);
 let heroHp = maxHeroHp();
 let heroDead = false;
-const attackCooldowns: Record<EquipmentSlotId, number> = { hand1: 0, hand2: 0, orbit1: 0, orbit2: 0 };
+let heroRespawnAt = 0;
+let heroDeathHidden = false;
+const attackCooldowns: Record<EquipmentSlotId, number> = {
+  hand1: 0,
+  hand2: attackProfile('hand2').cooldownSeconds * .5,
+  orbit1: attackProfile('orbit1').cooldownSeconds * .25,
+  orbit2: attackProfile('orbit2').cooldownSeconds * .75
+};
 let gateTransitionCooldown = 0;
 const cameraController = new CameraController(camera, hero.position);
 
@@ -458,6 +465,9 @@ function damageHero(amount: number, type: CombatAffinity): void {
   updateHud();
   if (heroHp !== 0) return;
   heroDead = true;
+  heroRespawnAt = performance.now() + HERO_RESPAWN_DELAY_MS;
+  heroDeathHidden = false;
+  hero.visible = true;
   heroView.playDeath();
   events.emit('heroDefeated', undefined);
   input.reset();
@@ -466,8 +476,11 @@ function damageHero(amount: number, type: CombatAffinity): void {
   window.setTimeout(() => {
     const area = areaById(currentAreaId);
     hero.position.set(area.originX, 0, area.originZ);
+    hero.visible = true;
     heroHp = maxHeroHp();
     heroDead = false;
+    heroDeathHidden = false;
+    cameraController.returnToHero();
     effects.resurrection(hero.position);
     events.emit('heroResurrected', { areaId: currentAreaId });
     updateHud();
@@ -657,7 +670,17 @@ ui.inventoryPanel.addEventListener('pointerup', (event) => {
 ui.inventoryPanel.addEventListener('pointercancel', () => { pointerDrag?.source.classList.remove('dragging'); pointerDrag = null; });
 
 function updateHero(dt: number): void {
-  if (heroDead || cameraController.isScripted) { heroView.update(dt, false); return; }
+  if (heroDead) {
+    heroView.update(dt, false);
+    if (!heroDeathHidden && heroView.deathAnimationFinished) {
+      heroDeathHidden = true;
+      hero.visible = false;
+      const area = areaById(currentAreaId);
+      cameraController.focus(new THREE.Vector3(area.originX, 0, area.originZ), Math.max(0, heroRespawnAt - performance.now()));
+    }
+    return;
+  }
+  if (cameraController.isScripted) { heroView.update(dt, false); return; }
   const move = input.movement;
   const moving = move.x !== 0 || move.y !== 0;
   if (moving) {
