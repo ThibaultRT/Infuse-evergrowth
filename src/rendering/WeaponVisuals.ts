@@ -24,7 +24,6 @@ export function makeWeaponVisual(weaponClass: WeaponClass, rarity: EquipmentRari
     const tip = new THREE.Mesh(new THREE.ConeGeometry(.1, .42, 6), metal); tip.rotation.x = -Math.PI / 2; tip.position.z = -1.08;
     root.add(tip, shaft);
   }
-  root.traverse((child) => { if (child instanceof THREE.Mesh) child.castShadow = true; });
   return root;
 }
 

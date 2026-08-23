@@ -51,20 +51,12 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'hi
 const effects = new EffectManager(scene);
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 ui.canvasHost.append(renderer.domElement);
 
 const hemisphere = new THREE.HemisphereLight(0xdaf2ff, 0x51613f, 2.2);
 scene.add(hemisphere);
 const sun = new THREE.DirectionalLight(0xfff0d2, 2.8);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
-sun.shadow.camera.left = -30;
-sun.shadow.camera.right = 30;
-sun.shadow.camera.top = 30;
-sun.shadow.camera.bottom = -30;
 scene.add(sun, sun.target);
 
 const ROCK_LAYOUT = [
@@ -271,7 +263,7 @@ class SpawnEntity {
 
     this.setAlive(false);
     events.emit('statGained', { sourceId: this.def.id, stat, amount });
-    showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase(), this.config.label);
+    showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase());
     handleBossDefeat(this.def.areaId, this.def.id);
     const itemId = rollEquipmentDrop(this.def.areaId, this.def.tier);
     if (itemId) {
@@ -767,7 +759,7 @@ function formatCountdown(ms: number): string {
 function updateRespawnIndicators(): void {
   const now = Date.now();
   for (const indicator of respawnIndicators) {
-    if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.every((member) => !member.alive)) {
+    if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.every((member) => !member.alive && member.deathPresentationRemaining === 0)) {
       indicator.element.classList.add('hidden');
       continue;
     }

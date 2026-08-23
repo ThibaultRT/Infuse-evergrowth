@@ -16,15 +16,14 @@ export function makeHumanoid(primary: number, hero = false): THREE.Group {
     const arm = new THREE.Mesh(arms, skin); arm.position.set(side * 0.48, 1.6, 0); arm.rotation.z = side * 0.08; root.add(arm);
     const leg = new THREE.Mesh(legs, skin); leg.position.set(side * 0.2, 0.5, 0); root.add(leg);
   }
-  root.traverse((o) => { if (o instanceof THREE.Mesh) { o.castShadow = true; o.receiveShadow = true; } });
   return root;
 }
 
 export function makeCrystal(color: number): THREE.Group {
   const root = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.25, roughness: 0.35, metalness: 0.15 });
-  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.62, 0), material); core.scale.y = 1.55; core.position.y = 0.9; core.castShadow = true;
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.62, 0.28, 7), new THREE.MeshStandardMaterial({ color: 0x53616a, roughness: 1 })); base.position.y = 0.14; base.castShadow = true;
+  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.62, 0), material); core.scale.y = 1.55; core.position.y = 0.9;
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.62, 0.28, 7), new THREE.MeshStandardMaterial({ color: 0x53616a, roughness: 1 })); base.position.y = 0.14;
   root.add(core, base); return root;
 }
 
@@ -46,11 +45,10 @@ export function makePortal(): { root: THREE.Group; barrier: THREE.Mesh; glow: TH
   const barrier = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 2.75), barrierMaterial); barrier.position.set(0, 1.63, 0.08);
 
   root.add(left, right, top, inner, barrier);
-  root.traverse((object) => { if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; } });
   return { root, barrier, glow };
 }
 
 export function addRock(scene: THREE.Scene, x: number, z: number, scale: number): void {
   const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(scale, 0), new THREE.MeshStandardMaterial({ color: 0x68706e, roughness: 1 }));
-  rock.position.set(x, scale * 0.55, z); rock.scale.y = 0.72; rock.rotation.set(x * 0.17, z * 0.11, x * z * 0.01); rock.castShadow = true; rock.receiveShadow = true; scene.add(rock);
+  rock.position.set(x, scale * 0.55, z); rock.scale.y = 0.72; rock.rotation.set(x * 0.17, z * 0.11, x * z * 0.01); scene.add(rock);
 }
