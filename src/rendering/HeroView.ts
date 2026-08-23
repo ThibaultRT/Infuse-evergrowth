@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { makeHumanoid } from '../visuals';
-import { AnimatedHumanoidView } from './AnimatedHumanoidView';
-import type { DamageType, InventoryState, WeaponSlotId } from '../types';
+import { AnimatedHumanoidView, type HumanoidHand } from './AnimatedHumanoidView';
+import type { InventoryState, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
-import { attackStyle, makeWeaponVisual } from './WeaponVisuals';
+import { makeWeaponVisual } from './WeaponVisuals';
 
 const RANGER = 'characters/models/Male_Ranger.gltf';
 
@@ -22,7 +22,8 @@ export class HeroView extends AnimatedHumanoidView {
   private readonly weaponRoots: Record<'left' | 'right', THREE.Group> = { left: new THREE.Group(), right: new THREE.Group() };
   private readonly attackTime: Record<'hand1' | 'hand2', number> = { hand1: 0, hand2: 0 };
   private readonly attackDuration: Record<'hand1' | 'hand2', number> = { hand1: 1, hand2: 1 };
-  private readonly attackType: Record<'hand1' | 'hand2', DamageType> = { hand1: 'blunt', hand2: 'blunt' };
+  private readonly attackTargets: Record<'hand1' | 'hand2', THREE.Vector3> = { hand1: new THREE.Vector3(), hand2: new THREE.Vector3() };
+  private readonly targetLocal = new THREE.Vector3();
   readonly orbitRoot = new THREE.Group();
   private orbitWeapons: Partial<Record<'orbit1' | 'orbit2', THREE.Object3D>> = {};
   private orbitFlights: Partial<Record<'orbit1' | 'orbit2', { target: THREE.Vector3; progress: number }>> = {};
@@ -41,13 +42,8 @@ export class HeroView extends AnimatedHumanoidView {
     this.updateAnimation(dt, active);
     for (const slot of ['hand1', 'hand2'] as const) {
       this.attackTime[slot] = Math.max(0, this.attackTime[slot] - dt);
-      const style = attackStyle(this.attackType[slot]);
       const progress = 1 - this.attackTime[slot] / this.attackDuration[slot];
-      // One smooth out-and-back swing occupies the weapon's complete attack interval.
-      const phase = Math.sin(THREE.MathUtils.smoothstep(progress, 0, 1) * Math.PI);
-      const root = slot === 'hand1' ? this.weaponRoots.right : this.weaponRoots.left;
-      root.rotation.y = (slot === 'hand1' ? -1 : 1) * style.arc * phase;
-      root.position.z = style.reach * phase;
+      if (this.attackTime[slot] > 0) this.biasLimbTowardTarget(slot, progress);
     }
     this.updateOrbits(dt);
   }
@@ -68,13 +64,34 @@ export class HeroView extends AnimatedHumanoidView {
     }
   }
 
-  playWeaponAttack(slot: WeaponSlotId, type: DamageType, target: THREE.Vector3, duration: number): void {
+  playWeaponAttack(slot: WeaponSlotId, target: THREE.Vector3, duration: number): void {
     if (slot === 'hand1' || slot === 'hand2') {
-      this.attackType[slot] = type;
       this.attackDuration[slot] = Math.max(duration, Number.EPSILON);
       this.attackTime[slot] = this.attackDuration[slot];
+      this.attackTargets[slot].copy(target);
+      const side = slot === 'hand1' ? 'right' : 'left';
+      this.playLimbClip(side, this.attackClip(slot), this.attackDuration[slot]);
     }
     else this.orbitFlights[slot] = { target: this.root.worldToLocal(target.clone()), progress: 0 };
+  }
+
+  private attackClip(slot: 'hand1' | 'hand2'): string {
+    const item = EQUIPMENT_BY_ID.get(this.inventory?.equipped[slot] ?? '');
+    if (item?.kind === 'weapon' && (item.weaponClass === 'sword' || item.weaponClass === 'hammer')) return 'Sword_Attack';
+    // Jab carries the left arm and Cross the right; both also make convincing restrained thrusts.
+    return slot === 'hand1' ? 'Punch_Cross' : 'Punch_Jab';
+  }
+
+  private biasLimbTowardTarget(slot: 'hand1' | 'hand2', progress: number): void {
+    // Facing supplies the gross aim. A small shoulder correction peaks around contact without stretching the limb.
+    const side: HumanoidHand = slot === 'hand1' ? 'right' : 'left';
+    const shoulder = this.getRigBone(`upperarm_${side === 'right' ? 'r' : 'l'}`);
+    if (!shoulder) return;
+    this.targetLocal.copy(this.attackTargets[slot]);
+    this.root.worldToLocal(this.targetLocal);
+    const yaw = THREE.MathUtils.clamp(Math.atan2(this.targetLocal.x, this.targetLocal.z), -.45, .45);
+    const contact = Math.sin(THREE.MathUtils.smoothstep(progress, .18, .72) * Math.PI);
+    shoulder.rotateY(yaw * contact * .35);
   }
 
   protected override async onModelReady(): Promise<void> {

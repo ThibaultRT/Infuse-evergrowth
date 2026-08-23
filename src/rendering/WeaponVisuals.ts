@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { DamageType, EquipmentRarity, WeaponClass, WeaponDefinition } from '../types';
+import type { EquipmentRarity, WeaponClass, WeaponDefinition } from '../types';
 
 const RARITY: Record<EquipmentRarity, number> = { common: 0xaeb5ae, uncommon: 0x68b86d, rare: 0x5c90d9, epic: 0xa66ed1, legendary: 0xe7b94e };
 
@@ -27,10 +27,4 @@ export function makeWeaponVisual(weaponClass: WeaponClass, rarity: EquipmentRari
     root.add(tip, shaft);
   }
   return root;
-}
-
-export function attackStyle(type: DamageType): { arc: number; reach: number } {
-  if (type === 'blunt') return { arc: 1.15, reach: .18 };
-  if (type === 'slash') return { arc: .9, reach: .08 };
-  return { arc: .18, reach: .5 };
 }
