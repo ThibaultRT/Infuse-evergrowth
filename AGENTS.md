@@ -60,6 +60,8 @@ The key rule is **model/domain state first, systems operate on it, views render 
 - `src/main.ts`: application entry point; loads global CSS, applies the package version, and starts the game.
 - `src/game/Game.ts`: top-level runtime/coordinator for composition, lifecycle, update ordering, and high-level commands.
 - `src/game/GameEvents.ts`: typed event bus for gameplay events and cross-system reactions.
+- `src/game/GameplayRuntime.ts`: renderer-independent authoritative hero/spawn live state, spatial simulation, enemy intents, hero death timing, and area transitions.
+- `src/domain/world/Position.ts`: plain engine-neutral world-coordinate value and operations.
 - `src/domain/combat/Affinity.ts`: cyclic hero-vs-enemy affinity rules.
 - `src/domain/items/EquipmentCatalog.ts`: authored equipment definitions/catalog lookup.
 - `src/domain/items/EquipmentProgression.ts`: pure equipment level/ascend/damage/defense calculations.

@@ -4,14 +4,15 @@ This document describes the architecture that exists today, evaluates how safely
 
 ## Executive assessment
 
-The project has a **good gameplay foundation, but not yet a replaceable renderer boundary**.
+The project has a **good gameplay foundation and a renderer-independent live-world runtime, but not yet a fully replaceable renderer boundary**.
 
 - The authored JSON, save model, domain rules, and most classes in `src/systems/` do not depend on Three.js. Combat affinity, equipment progression, spawn rolls, respawn decisions, area-flow decisions, and enemy intent can be reused or ported without deriving their rules from a rendered object.
 - `src/rendering/` has a clear presentation responsibility, and `GameEvents` already provides useful semantic notifications such as attacks, defeats, respawns, equipment changes, and area transitions.
-- However, `src/game/Game.ts` is currently both the application composition root **and** a browser/Three.js runtime. It owns scene creation, rendered entity classes, positions, movement, live HP, target selection adapters, damage consequences, death/revival flow, DOM interaction, camera behavior, effects, and the animation loop.
+- `src/game/GameplayRuntime.ts` now owns plain hero/spawn positions, live HP, enemy aggro and movement, hero movement/death timing, and area transitions without importing Three.js or the DOM. `Game.ts` copies that state into transient views.
+- However, `src/game/Game.ts` is still both the application composition root **and** a browser/Three.js runtime. It still owns rendered entity wrappers, reward/drop consequences, persistent respawn coordination, boss/gate consequences, DOM interaction, camera behavior, effects, and the animation loop.
 - Some presentation helpers still live outside `src/rendering/` (`src/visuals.ts`, `src/controllers/CameraController.ts`, browser UI code), although their purpose is graphical or platform-specific.
 
-Consequently, replacing Three.js with another browser renderer today would leave the pure domain and system modules intact, but it would require substantial work in `Game.ts` and its entity/runtime wiring. Moving to Unity is a larger platform migration: Unity cannot directly consume the TypeScript runtime as ordinary game code. The choices would be to port the renderer-independent rules to C#, retain them behind a JavaScript/service boundary, or share only language-neutral data and behavioral specifications.
+Consequently, replacing Three.js with another browser renderer today would preserve the pure domain, systems, and live-world simulation, but it would still require work in `Game.ts` to replace presentation and extract the remaining consequence/persistence wiring. Moving to Unity is a larger platform migration: Unity cannot directly consume the TypeScript runtime as ordinary game code. The choices would be to port the renderer-independent rules to C#, retain them behind a JavaScript/service boundary, or share only language-neutral data and behavioral specifications.
 
 The realistic goal is therefore not “change engines without touching any gameplay-related file.” It is:
 
@@ -24,6 +25,7 @@ That separation is worth making. It improves testability and iteration now, even
 ```text
 Browser entry (`main.ts`)
   -> coordinator/browser runtime (`game/Game.ts`)
+       -> headless live-world state (`game/GameplayRuntime.ts`)
        -> domain + systems + save/config
        -> Three.js rendering views and effects
        -> browser UI and world-space DOM labels
@@ -44,17 +46,17 @@ GameEvents <- gameplay consequences -> UI/rendering reactions
 | `src/systems/EnemyAISystem.ts` | Returns semantic intents from scalar state/distances | High: the renderer can animate an intent rather than decide it |
 | Equipment, drops, respawn, area flow | Operate on domain/save data rather than meshes | High |
 | `src/game/GameEvents.ts` | Typed semantic event boundary without rendering payloads | High; suitable for presentation subscribers |
+| `src/game/GameplayRuntime.ts` | Plain live hero/spawn state, movement, enemy intent, damage/life state, and area transitions | High: runs without Three.js, DOM, or browser globals |
 | `src/data/*.json` | Language-neutral authored definitions | High, provided equivalent validation/loading is implemented in the destination runtime |
 | `src/save.ts` | Renderer-independent persisted progression | Conceptually portable; storage and TypeScript implementation are platform adapters |
 
 ### Current migration blockers
 
-1. **`Game.ts` mixes simulation and presentation.** `SpawnEntity` owns gameplay state such as HP, provocation, cooldown, and life state alongside `THREE.Group`, `EnemyView`, effects, and DOM health labels. `GateEntity` similarly combines gate state, spatial checks, and a `GateView`.
-2. **World position is represented by rendered transforms.** Hero/enemy positions and distances use `THREE.Vector3` and `Object3D.position`; movement and arena constraints mutate those transforms directly. A headless simulation cannot currently advance the world without constructing Three.js objects.
-3. **The browser loop is the game loop.** Simulation updates, presentation updates, UI refresh, persistence checks, and rendering are scheduled together by `requestAnimationFrame`.
-4. **Gameplay consequences are applied inside presentation-aware methods.** Receiving damage, defeat rewards, boss progression, hero death, resurrection, and area entry trigger domain mutations and graphical effects in the same call path.
-5. **Input and UI are wired directly to the coordinator.** DOM events call equipment/progression commands, and browser input feeds rendered hero movement without a platform-neutral command boundary.
-6. **Events are notifications, not a complete simulation API.** They help decouple reactions, but the authoritative runtime state is still distributed through `Game.ts`, save globals, and rendered entities.
+1. **`Game.ts` still mixes consequences and presentation.** `SpawnEntity` is now a view wrapper over runtime state, but its damage presentation, defeat rewards/drops, persistent respawn calls, and DOM health labels remain in one class. `GateEntity` still combines gate state, spatial checks, and a `GateView`.
+2. **The browser loop still schedules the simulation.** Runtime updates are distinct from view synchronization, but gameplay updates, UI refresh, persistence checks, and rendering are all currently initiated by `requestAnimationFrame`.
+3. **Some gameplay consequences remain presentation-aware.** Defeat rewards, boss progression, resurrection reactions, and area entry still trigger domain mutations and graphical effects in nearby call paths.
+4. **Input and UI are wired directly to the coordinator.** DOM events call equipment/progression functions directly; movement input does enter the runtime as a plain value, but there is not yet a general command boundary.
+5. **Events are notifications, not a complete simulation API.** They help decouple reactions, but persistent state and some gate/progression authority remain distributed between `Game.ts`, save globals, and focused systems.
 
 These are boundary problems, not evidence that the gameplay rules themselves need to be rewritten.
 
@@ -140,7 +142,7 @@ For a Unity migration, preserve stable authored IDs and publish a documented JSO
 
 Do not pause feature development for a broad engine abstraction. Apply these steps when nearby code is already changing:
 
-1. **Introduce platform-neutral position/state models.** Move hero and live spawn state out of `THREE.Object3D` and `SpawnEntity`; make views consume that state.
+1. **Introduce platform-neutral position/state models — complete for hero/spawn live state.** `Position` and `GameplayRuntime` now own coordinates, HP/life, movement, aggro, cooldowns, and hero death timing; Three.js views synchronize from them.
 2. **Extract gameplay consequences from rendered entities.** Move damage application, defeat/reward resolution, hero resurrection, and boss/gate progression into domain systems or focused runtime services.
 3. **Split simulation tick from render tick.** Advance gameplay independently, then synchronize views and UI. A fixed simulation step can be considered if determinism or offline advancement requires it; it is not mandatory merely for architectural purity.
 4. **Make `Game.ts` a thin composition root.** It should construct the runtime and platform adapters, route commands, subscribe presentation to events, and order lifecycle calls—not contain feature rules or entity models.
@@ -180,4 +182,4 @@ The presentation boundary is ready for an engine experiment when all of the foll
 - swapping or disabling a view cannot change damage, cooldowns, rewards, drops, respawns, or unlocks;
 - representative fixtures produce equivalent results in any ported runtime.
 
-Until those checks pass, describe the codebase as **renderer-conscious and increasingly separated**, not renderer-independent.
+Until those checks pass, describe the codebase as having a **renderer-independent simulation core with browser-owned integration**, not as a completely renderer-independent application.

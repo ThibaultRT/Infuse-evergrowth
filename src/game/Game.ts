@@ -32,10 +32,10 @@ import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
 import { CombatSystem } from '../systems/CombatSystem';
-import { EnemyAISystem } from '../systems/EnemyAISystem';
 import { RespawnSystem } from '../systems/RespawnSystem';
 import { WorldUiManager } from '../rendering/WorldUiManager';
 import { AreaFlowSystem } from '../systems/AreaFlowSystem';
+import { GameplayRuntime, type RuntimeSpawn } from './GameplayRuntime';
 
 export class Game {
   private started = false;
@@ -69,9 +69,36 @@ const combat = new CombatSystem({
   orbit1: attackProfile('orbit1').cooldownSeconds * .25,
   orbit2: attackProfile('orbit2').cooldownSeconds * .75
 });
-const enemyAI = new EnemyAISystem(ENEMY_AGGRO_RADIUS_METERS, ENEMY_LEASH_RADIUS_METERS, ENEMY_ATTACK_RANGE_METERS);
 const respawns = new RespawnSystem();
 const areaFlow = new AreaFlowSystem();
+let normalizedExpiredSpawn = false;
+for (const definition of SPAWNS) {
+  const state = save.spawns[definition.id];
+  if (state.respawnAt && state.respawnAt <= Date.now()) {
+    respawns.reroll(state, definition);
+    normalizedExpiredSpawn = true;
+  }
+}
+if (normalizedExpiredSpawn) persist();
+const gameplay = new GameplayRuntime({
+  areas: AREAS,
+  spawns: SPAWNS.map((definition) => ({
+    definition,
+    tier: TIER_CONFIG[definition.tier],
+    maxHp: save.spawns[definition.id].roll.maxHp,
+    alive: !save.spawns[definition.id].respawnAt,
+    damage: enemyAttack(definition.areaId, definition.tier),
+    damageType: areaById(definition.areaId).enemyWeapon
+  })),
+  currentAreaId: save.currentAreaId,
+  heroHp: maxHeroHp(),
+  heroSpeed: HERO_SPEED,
+  heroRespawnSeconds: HERO_RESPAWN_DELAY_MS / 1000,
+  enemyAggroRadius: ENEMY_AGGRO_RADIUS_METERS,
+  enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS,
+  enemyAttackRange: ENEMY_ATTACK_RANGE_METERS,
+  enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN
+});
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -94,18 +121,15 @@ const environmentViews = AREAS.map((area) => {
   return view;
 });
 
-let currentAreaId = save.currentAreaId;
+let currentAreaId = gameplay.currentAreaId;
 const initialArea = areaById(currentAreaId);
 const heroView = new HeroView();
 heroView.syncEquipment(save.inventory);
 events.on('equipmentEquipped', () => heroView.syncEquipment(save.inventory));
 events.on('equipmentUnequipped', () => heroView.syncEquipment(save.inventory));
 const hero = heroView.root;
-hero.position.set(initialArea.originX, 0, initialArea.originZ);
+hero.position.copy(gameplay.hero.position);
 scene.add(hero);
-let heroHp = maxHeroHp();
-let heroDead = false;
-let heroRespawnAt = 0;
 let heroDeathHidden = false;
 
 let gateTransitionCooldown = 0;
@@ -144,28 +168,18 @@ class SpawnEntity {
   readonly config: TierConfig;
   readonly root = new THREE.Group();
   readonly spawnPosition: THREE.Vector3;
-  maxHp: number;
-  readonly damage: number;
-  readonly damageType: CombatAffinity;
   readonly weakness: CombatAffinity | null;
   readonly targetUi = document.createElement('div');
   readonly lootLabel = document.createElement('div');
   readonly healthBar = document.createElement('div');
   readonly healthFill = document.createElement('span');
-  hp: number;
-  alive = true;
-  provoked = false;
-  attackCooldown = 0;
   readonly enemyView: EnemyView | null;
-  moving = false;
   deathPresentationRemaining = 0;
+  readonly state: RuntimeSpawn;
 
   constructor(readonly def: SpawnDefinition) {
+    this.state = gameplay.spawnById.get(def.id)!;
     this.config = TIER_CONFIG[def.tier];
-    this.maxHp = save.spawns[def.id].roll.maxHp;
-    this.hp = this.maxHp;
-    this.damage = enemyAttack(def.areaId, def.tier);
-    this.damageType = areaById(def.areaId).enemyWeapon;
     this.weakness = def.enemyWeakness === undefined ? areaById(def.areaId).enemyWeakness : def.enemyWeakness;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
@@ -181,16 +195,13 @@ class SpawnEntity {
     this.targetUi.append(this.lootLabel, this.healthBar);
     ui.world.append(this.targetUi);
 
-    const state = save.spawns[def.id];
-    if (state?.respawnAt && state.respawnAt > Date.now()) this.setAlive(false);
-    else if (state?.respawnAt) {
-      respawns.reroll(state, this.def);
-      this.setAlive(true);
-      persist();
-    } else this.renderLoot();
+    this.renderLoot();
     this.syncAreaVisibility();
   }
 
+  get alive(): boolean { return this.state.alive; }
+  get hp(): number { return this.state.hp; }
+  get maxHp(): number { return this.state.maxHp; }
   renderLoot(): void {
     const reward = save.spawns[this.def.id].roll.reward;
     const loot = reward.stat;
@@ -205,29 +216,22 @@ class SpawnEntity {
   }
 
   setAlive(value: boolean): void {
-    this.alive = value;
+    gameplay.setSpawnAlive(this.def.id, value, value ? save.spawns[this.def.id].roll.maxHp : undefined);
     if (value) {
-      this.maxHp = save.spawns[this.def.id].roll.maxHp;
       this.deathPresentationRemaining = 0;
-      this.hp = this.maxHp;
       this.healthFill.style.width = '100%';
-      this.provoked = false;
-      this.attackCooldown = 0;
-      this.root.position.copy(this.spawnPosition);
       this.renderLoot();
     }
+    this.syncTransform();
     this.syncAreaVisibility();
   }
 
   forceRespawn(): void { this.setAlive(true); }
   resetAfterHeroDefeat(): void {
-    this.hp = this.maxHp;
     this.healthFill.style.width = '100%';
-    this.provoked = false;
-    this.attackCooldown = 0;
-    this.root.position.copy(this.spawnPosition);
+    this.syncTransform();
   }
-  distanceToHero(): number { return this.root.position.distanceTo(hero.position); }
+  distanceToHero(): number { return gameplay.distanceFromHero(this.state.position); }
 
   receiveDamage(amount: number, type: DamageType): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
@@ -236,10 +240,10 @@ class SpawnEntity {
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
     showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), affinityAmount, type);
-    this.hp = Math.max(0, this.hp - affinityAmount);
-    this.healthFill.style.width = `${(this.hp / this.maxHp) * 100}%`;
-    if (this.config.hostile) this.provoked = true;
-    if (this.hp === 0) this.defeat();
+    const result = gameplay.damageSpawn(this.def.id, affinityAmount);
+    if (!result) return;
+    this.healthFill.style.width = `${(result.hp / this.maxHp) * 100}%`;
+    if (result.defeated) this.defeat();
   }
 
   defeat(): void {
@@ -254,7 +258,7 @@ class SpawnEntity {
     if (stat === 'hp') {
       const oldMax = maxHeroHp();
       save.stats.maxHp.additive.kills = (save.stats.maxHp.additive.kills ?? 0) + amount;
-      heroHp = Math.min(maxHeroHp(), heroHp + maxHeroHp() - oldMax);
+      gameplay.hero.hp = Math.min(maxHeroHp(), gameplay.hero.hp + maxHeroHp() - oldMax);
     } else if (stat === 'regen') {
       save.stats.regen.additive.kills = (save.stats.regen.additive.kills ?? 0) + amount;
     } else {
@@ -262,7 +266,7 @@ class SpawnEntity {
       attack.additive.kills = (attack.additive.kills ?? 0) + amount;
     }
 
-    this.setAlive(false);
+    this.syncAreaVisibility();
     events.emit('statGained', { sourceId: this.def.id, stat, amount });
     showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase());
     handleBossDefeat(this.def.areaId, this.def.id);
@@ -278,8 +282,7 @@ class SpawnEntity {
     renderStats(save.stats);
   }
 
-  update(dt: number): void {
-    this.moving = false;
+  update(): void {
     if (!this.alive) {
       const state = save.spawns[this.def.id];
       if (respawns.reviveIfDue(state, this.def, Date.now())) {
@@ -289,25 +292,14 @@ class SpawnEntity {
       }
       return;
     }
-    if (this.def.areaId !== currentAreaId || !this.config.hostile || heroDead) return;
+    this.syncTransform();
+  }
 
-    const toHero = hero.position.clone().sub(this.root.position);
-    const distance = toHero.length();
-    const fromSpawn = this.root.position.distanceTo(this.spawnPosition);
-
-    const intent = enemyAI.update(this, distance, fromSpawn, dt);
-    if (intent === 'chase') {
-      toHero.normalize();
-      this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
-      this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
-      this.moving = true;
-    } else if (intent === 'attack') {
-      damageHero(this.damage, this.damageType);
-      this.attackCooldown = ENEMY_ATTACK_COOLDOWN;
-    } else if (intent === 'return') {
-      const back = this.spawnPosition.clone().sub(this.root.position);
-      this.root.position.addScaledVector(back.normalize(), 3 * dt); this.moving = true;
-    } else if (!this.provoked) this.root.position.copy(this.spawnPosition);
+  syncTransform(): void {
+    const previousX = this.root.position.x;
+    const previousZ = this.root.position.z;
+    this.root.position.copy(this.state.position);
+    if (this.state.moving) this.root.rotation.y = Math.atan2(this.root.position.x - previousX, this.root.position.z - previousZ);
   }
 
   updateView(dt: number): void {
@@ -315,7 +307,7 @@ class SpawnEntity {
       this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
       if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();
     }
-    this.enemyView?.update(dt, this.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
+    this.enemyView?.update(dt, this.state.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
   }
 }
 
@@ -343,7 +335,7 @@ class GateEntity {
 
   update(dt: number): void { this.view.update(dt); }
   syncAreaVisibility(): void { this.root.visible = this.def.sourceAreaId === currentAreaId; }
-  distanceToHero(): number { return this.root.position.distanceTo(hero.position); }
+  distanceToHero(): number { return gameplay.distanceFromHero({ x: this.def.x, y: 0, z: this.def.z }); }
 }
 
 const gateEntities = GATES.map((gate) => new GateEntity(gate));
@@ -441,15 +433,13 @@ function resetSpawnCooldowns(): void {
 }
 
 function damageHero(amount: number, type: CombatAffinity): void {
-  if (heroDead) return;
+  if (gameplay.hero.dead) return;
   const reducedAmount = combat.enemyAttackDamage(amount, type, equippedDefense);
   events.emit('heroDamaged', { amount: reducedAmount, damageType: type });
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true);
-  heroHp = Math.max(0, heroHp - reducedAmount);
+  const defeated = gameplay.damageHero(reducedAmount);
   updateHud();
-  if (heroHp !== 0) return;
-  heroDead = true;
-  heroRespawnAt = performance.now() + HERO_RESPAWN_DELAY_MS;
+  if (!defeated) return;
   heroDeathHidden = false;
   hero.visible = true;
   heroView.playDeath();
@@ -457,22 +447,10 @@ function damageHero(amount: number, type: CombatAffinity): void {
   input.reset();
   entities.forEach((entity) => entity.resetAfterHeroDefeat());
   showToast('Defeated · respawning in 5 seconds');
-  window.setTimeout(() => {
-    const area = areaById(currentAreaId);
-    hero.position.set(area.originX, 0, area.originZ);
-    hero.visible = true;
-    heroHp = maxHeroHp();
-    heroDead = false;
-    heroDeathHidden = false;
-    cameraController.returnToHero();
-    effects.resurrection(hero.position);
-    events.emit('heroResurrected', { areaId: currentAreaId });
-    updateHud();
-  }, HERO_RESPAWN_DELAY_MS);
 }
 
 function autoAttack(): void {
-  if (heroDead || cameraController.isScripted) return;
+  if (gameplay.hero.dead || cameraController.isScripted) return;
   for (const hand of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
     if (!combat.ready(hand) || ((hand === 'orbit1' || hand === 'orbit2') && !save.inventory.equipped[hand])) continue;
     const target = combat.nearestTarget(entities.filter((entity) => entity.def.areaId === currentAreaId), HERO_ATTACK_RANGE_METERS);
@@ -483,7 +461,10 @@ function autoAttack(): void {
     events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
     target.receiveDamage(profile.damage, profile.damageType);
     const direction = target.root.position.clone().sub(hero.position);
-    if (direction.lengthSq() > 0) heroView.setFacing(Math.atan2(direction.x, direction.z));
+    if (direction.lengthSq() > 0) {
+      gameplay.hero.facing = Math.atan2(direction.x, direction.z);
+      heroView.setFacing(gameplay.hero.facing);
+    }
   }
 }
 
@@ -545,7 +526,7 @@ ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target =
 ui.resetAttributesButton.addEventListener('click', () => {
   if (!window.confirm('Reset all permanent hero attributes? Your equipment and its progress will be kept.')) return;
   resetPermanentStats();
-  heroHp = Math.min(heroHp, maxHeroHp());
+  gameplay.hero.hp = Math.min(gameplay.hero.hp, maxHeroHp());
   persist();
   renderStats(save.stats);
   updateHud();
@@ -645,42 +626,32 @@ ui.inventoryPanel.addEventListener('pointerup', (event) => {
 ui.inventoryPanel.addEventListener('pointercancel', () => { pointerDrag?.source.classList.remove('dragging'); pointerDrag = null; });
 
 function updateHero(dt: number): void {
-  if (heroDead) {
+  hero.position.copy(gameplay.hero.position);
+  if (gameplay.hero.dead) {
     heroView.update(dt, false);
     if (!heroDeathHidden && heroView.deathAnimationFinished) {
       heroDeathHidden = true;
       hero.visible = false;
       const area = areaById(currentAreaId);
-      cameraController.focus(new THREE.Vector3(area.originX, 0, area.originZ), Math.max(0, heroRespawnAt - performance.now()));
+      cameraController.focus(new THREE.Vector3(area.originX, 0, area.originZ), gameplay.hero.respawnRemaining * 1000);
     }
     return;
   }
   if (cameraController.isScripted) { heroView.update(dt, false); return; }
-  const move = input.movement;
-  const moving = move.x !== 0 || move.y !== 0;
-  if (moving) {
-    hero.position.x += move.x * HERO_SPEED * dt;
-    hero.position.z -= move.y * HERO_SPEED * dt;
-    const area = areaById(currentAreaId);
-    hero.position.x = THREE.MathUtils.clamp(hero.position.x, area.originX - 17.2, area.originX + 17.2);
-    hero.position.z = THREE.MathUtils.clamp(hero.position.z, area.originZ - 27.2, area.originZ + 27.2);
-    heroView.setFacing(Math.atan2(move.x, -move.y));
-  }
-  heroView.update(dt, moving);
+  heroView.setFacing(gameplay.hero.facing);
+  heroView.update(dt, gameplay.hero.moving);
 }
 
 function enterArea(targetAreaId: number): void {
   if (!areaFlow.canEnter(targetAreaId, save.unlockedAreas)) return;
   const previous = areaById(currentAreaId);
-  currentAreaId = targetAreaId;
+  gameplay.enterArea(targetAreaId, areaFlow.crossesAdjacentBoundary(previous, areaById(targetAreaId)));
+  currentAreaId = gameplay.currentAreaId;
   events.emit('areaEntered', { areaId: targetAreaId });
   save.currentAreaId = targetAreaId;
   const area = areaById(targetAreaId);
   renderEnemyAffinities(area);
-  const crossedAdjacentBoundary = areaFlow.crossesAdjacentBoundary(previous, area);
-  if (crossedAdjacentBoundary) hero.position.z += area.originZ < previous.originZ ? -2.8 : 2.8;
-  else hero.position.set(area.originX, 0, area.originZ);
-  entities.forEach((entity) => { entity.provoked = false; });
+  hero.position.copy(gameplay.hero.position);
   cameraController.returnToHero();
   gateTransitionCooldown = 1;
   input.reset();
@@ -693,7 +664,7 @@ function enterArea(targetAreaId: number): void {
 function updateGates(dt: number): void {
   gateEntities.forEach((gate) => gate.update(dt));
   gateTransitionCooldown = Math.max(0, gateTransitionCooldown - dt);
-  if (gateTransitionCooldown > 0 || cameraController.isScripted || heroDead) return;
+  if (gateTransitionCooldown > 0 || cameraController.isScripted || gameplay.hero.dead) return;
   const gate = gateEntities.find((candidate) => candidate.def.sourceAreaId === currentAreaId && candidate.open && candidate.distanceToHero() <= 1.45);
   if (gate) {
     events.emit('gateCrossed', { gateId: gate.def.id, destinationAreaId: gate.def.targetAreaId });
@@ -742,8 +713,8 @@ function updateRespawnIndicators(): void {
 
 function updateHud(): void {
   const maxHp = maxHeroHp();
-  ui.hpText.textContent = `${Math.round(heroHp)} / ${Math.round(maxHp)}`;
-  ui.hpBar.style.width = `${heroHp / maxHp * 100}%`;
+  ui.hpText.textContent = `${Math.round(gameplay.hero.hp)} / ${Math.round(maxHp)}`;
+  ui.hpBar.style.width = `${gameplay.hero.hp / maxHp * 100}%`;
   for (const hand of ['hand1', 'hand2'] as const) {
     const profile = attackProfile(hand);
     ui[hand === 'hand1' ? 'hand1Stat' : 'hand2Stat'].innerHTML = `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`;
@@ -768,7 +739,7 @@ resizeViewport();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     resetAtMidnightIfNeeded();
-    entities.forEach((entity) => entity.update(0));
+    entities.forEach((entity) => entity.update());
   }
 });
 
@@ -783,7 +754,8 @@ function frame(now: number): void {
   const minimumFrameMs = 1000 / renderingQuality.frameRateLimit;
   if (now - lastRenderedAt < minimumFrameMs - 1) return;
   lastRenderedAt = now;
-  const dt = Math.min((now - previous) / 1000, .05);
+  const elapsedSeconds = (now - previous) / 1000;
+  const dt = Math.min(elapsedSeconds, .05);
   previous = now;
   combat.update(dt);
   midnightAccumulator += dt;
@@ -792,12 +764,25 @@ function frame(now: number): void {
     resetAtMidnightIfNeeded();
   }
 
+  const runtimeEvents = gameplay.update(dt, input.movement, !cameraController.isScripted, elapsedSeconds);
+  for (const event of runtimeEvents) {
+    if (event.type === 'enemyAttack') damageHero(event.amount, event.damageType);
+    else {
+      gameplay.hero.hp = maxHeroHp();
+      hero.position.copy(gameplay.hero.position);
+      hero.visible = true;
+      heroDeathHidden = false;
+      cameraController.returnToHero();
+      effects.resurrection(hero.position);
+      events.emit('heroResurrected', { areaId: event.areaId });
+    }
+  }
   updateHero(dt);
   updateGates(dt);
+  if (!cameraController.isScripted) entities.forEach((entity) => entity.update());
   autoAttack();
-  if (!cameraController.isScripted) entities.forEach((entity) => entity.update(dt));
   entities.forEach((entity) => entity.updateView(dt));
-  if (!heroDead) heroHp = Math.min(maxHeroHp(), heroHp + heroRegen() * dt);
+  if (!gameplay.hero.dead) gameplay.hero.hp = Math.min(maxHeroHp(), gameplay.hero.hp + heroRegen() * dt);
   cameraController.update(dt, now);
   updateHud();
   worldUi.update(dt);
