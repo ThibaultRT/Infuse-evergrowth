@@ -2,7 +2,7 @@
 
 An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
-## v0.45.0 vertical slice
+## v0.47.1 vertical slice
 
 - Two authored adjacent areas with **29 fixed targets each** and per-revival HP/reward rolls
 - Area 1 population: 10 Crystals, 15 Commons, 3 Uncommons, 1 Rare; `area1-uncommon-03` is the gate boss
@@ -90,7 +90,7 @@ Ascend intentionally increases both the weapon's starting power and its growth r
 
 Long-lived contributor/agent rules are in [`AGENTS.md`](AGENTS.md).
 
-- [`implementation-cleanup.md`](implementation-cleanup.md) contains only remaining architecture cleanup work.
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) reviews the current dependency boundaries, explains why a Three.js replacement is not yet isolated from gameplay wiring, and defines an incremental path toward a headless runtime and replaceable presentation adapters.
 - [`WIP/graphical.md`](WIP/graphical.md) records the durable visual direction; slices 1–9 are complete and slice 10 is the remaining optimization/release-validation pass.
 
 ## Run locally
