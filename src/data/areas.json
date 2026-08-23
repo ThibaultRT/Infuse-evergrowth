@@ -253,14 +253,9 @@
           },
           "rewards": [
             {
-              "stat": "blunt",
-              "min": 1,
-              "max": 10
-            },
-            {
-              "stat": "hp",
-              "min": 2,
-              "max": 20
+              "stat": "regen",
+              "min": 0.5,
+              "max": 0.5
             }
           ],
           "group": "area1-common-a"
@@ -276,14 +271,9 @@
           },
           "rewards": [
             {
-              "stat": "blunt",
-              "min": 1,
-              "max": 10
-            },
-            {
-              "stat": "hp",
-              "min": 2,
-              "max": 20
+              "stat": "regen",
+              "min": 0.5,
+              "max": 0.5
             }
           ],
           "group": "area1-common-a"
