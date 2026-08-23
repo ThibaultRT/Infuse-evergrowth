@@ -14,6 +14,7 @@ An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 - Hero starts at **20 Max HP**, **5 Blunt Attack**, and **0.10 HP/s** passive regeneration
 - Central touch joystick for iPhone plus WASD / arrow keys on desktop
 - Automatic combat: the hero attacks the nearest living target inside the current weapon range
+- Cyclic combat affinities double weakness damage and halve resisted damage, with area defaults and per-spawn enemy overrides
 - Bare hands use **Blunt** damage, shown with a hammer icon
 - Targets advertise their current stat loot above the HP bar using only a value + icon
 - Stat gains from kills appear on the right as number + icon only and cascade upward
@@ -38,6 +39,7 @@ All tunable gameplay numbers live in [`src/data/balance.json`](src/data/balance.
 - respawn base time;
 - loot roll weights;
 - cross-area HP and attack scaling.
+- combat affinity multipliers and the hero's current armor affinity.
 
 Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, and gate definitions/tags.
 

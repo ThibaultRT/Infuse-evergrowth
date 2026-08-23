@@ -123,13 +123,15 @@ Current hero base stats:
 
 Attack values are stored by damage type.
 
-Current damage type:
+Current damage types:
 
 - **Blunt** — bare hands and Area 1 enemy attacks; represented by a hammer icon.
 - **Slash** — Area 2 enemy attacks; represented by a sword icon.
 - **Pierce** — the displayed weakness for Area 2 enemies; represented by a spear icon.
 
-Area 1 enemies are weak to Slash. Area 2 enemies are weak to Pierce. Weaknesses are surfaced in the HUD for loadout planning; damage modifiers will be applied when those hero damage types become available.
+Area 1 enemies are weak to Slash. Area 2 enemies are weak to Pierce. A hit matching the defender's weakness deals **2× damage**, while the affinity the defender is strong against deals **0.5× damage**. The remaining affinity deals normal damage. Individual spawns can override their area's weakness or set it to `null`; the Area 1 Legendary boss is affinity-neutral.
+
+The hero currently wears Blunt-affinity armor. Blunt armor is weak to Pierce and strong against Blunt; Slash armor is weak to Blunt and strong against Slash; Pierce armor is weak to Slash and strong against Pierce. Hero armor and enemy affinities use the same cyclic rules.
 
 Future weapons can introduce additional damage types and their own attack ranges.
 
