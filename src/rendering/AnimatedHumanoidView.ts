@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
 const ANIMATIONS = 'animations/UAL1_Standard.glb';
+const ARM_BONES = ['clavicle', 'upperarm', 'lowerarm', 'hand', 'thumb', 'index', 'middle', 'ring', 'pinky'] as const;
 
 export type HumanoidMotion = 'idle' | 'walk' | 'jog' | 'hit' | 'death';
 export type HumanoidHand = 'left' | 'right';
@@ -111,7 +112,10 @@ export abstract class AnimatedHumanoidView {
       for (const clipName of ['Punch_Jab', 'Punch_Cross', 'Sword_Attack']) {
         const source = this.clips.get(clipName);
         if (!source) continue;
-        const tracks = source.tracks.filter((track) => track.name.slice(0, track.name.lastIndexOf('.')).endsWith(suffix));
+        const tracks = source.tracks.filter((track) => {
+          const bone = track.name.slice(0, track.name.lastIndexOf('.'));
+          return bone.endsWith(suffix) && ARM_BONES.some((name) => bone.startsWith(name));
+        });
         if (!tracks.length) continue;
         const clip = new THREE.AnimationClip(`${clipName}:${side}`, source.duration, tracks);
         this.limbActions[side].set(clipName, mixer.clipAction(clip));
