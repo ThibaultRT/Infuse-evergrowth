@@ -1,8 +1,9 @@
-import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, LOOT_HP_WEIGHT, SPAWNS } from './config';
-import type { DamageType, InventoryState, LootType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
+import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
+import { rollSpawn } from './domain/spawning/SpawnRoll';
+import type { DamageType, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v9';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const SAVE_KEY = 'infuse-evergrowth-save-v10';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -15,12 +16,23 @@ export function nextLocalMidnightMs(now = new Date()): number {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0).getTime();
 }
 
-export function rollLoot(): LootType {
-  return Math.random() < LOOT_HP_WEIGHT ? 'hp' : 'blunt';
+export function emptySpawnState(): Record<string, SavedSpawnState> {
+  return Object.fromEntries(SPAWNS.map((spawn) => [spawn.id, { killsToday: 0, respawnAt: null, defeatedAt: null, roll: rollSpawn(spawn) }]));
 }
 
-export function emptySpawnState(): Record<string, SavedSpawnState> {
-  return Object.fromEntries(SPAWNS.map((s) => [s.id, { killsToday: 0, respawnAt: null, defeatedAt: null, loot: rollLoot() }]));
+function migrateSpawns(value: unknown): Record<string, SavedSpawnState> {
+  const source = value && typeof value === 'object' ? value as Record<string, Partial<SavedSpawnState>> : {};
+  return Object.fromEntries(SPAWNS.map((spawn) => {
+    const previous = source[spawn.id];
+    const roll = previous?.roll;
+    const validRoll = roll && Number.isFinite(roll.maxHp) && Number.isFinite(roll.reward?.amount);
+    return [spawn.id, {
+      killsToday: Math.max(0, Number(previous?.killsToday) || 0),
+      respawnAt: typeof previous?.respawnAt === 'number' ? previous.respawnAt : null,
+      defeatedAt: typeof previous?.defeatedAt === 'number' ? previous.defeatedAt : null,
+      roll: validRoll ? roll : rollSpawn(spawn)
+    }];
+  }));
 }
 
 function freshStat(base: number): StatSources {
@@ -72,7 +84,7 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 
 function loadSave(): SaveData {
   const fresh: SaveData = {
-    version: 9,
+    version: 10,
     dailyKey: localDailyKey(),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -84,12 +96,12 @@ function loadSave(): SaveData {
   try {
     const raw = localStorage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
-    const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version'> & { version?: number };
-    if (![7, 8, 9].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
+    if (![7, 8, 9, 10].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
     const unlockedAreas = Array.from(new Set([1, ...(parsed.unlockedAreas ?? [])]));
     const requestedArea = parsed.currentAreaId ?? 1;
     return {
-      version: 9,
+      version: 10,
       dailyKey: localDailyKey(),
       currentAreaId: unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
@@ -100,7 +112,7 @@ function loadSave(): SaveData {
         regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN)
       },
       inventory: migrateInventory(parsed.inventory),
-      spawns: parsed.dailyKey === localDailyKey() ? { ...emptySpawnState(), ...(parsed.spawns ?? {}) } : emptySpawnState()
+      spawns: parsed.dailyKey === localDailyKey() ? migrateSpawns(parsed.spawns) : emptySpawnState()
     };
   } catch {
     return fresh;

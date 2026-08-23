@@ -1,7 +1,10 @@
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type DamageType = 'blunt' | 'slash' | 'piercing';
 export type CombatAffinity = 'blunt' | 'slash' | 'pierce';
-export type LootType = 'hp' | DamageType;
+export type LootType = 'hp' | 'regen' | DamageType;
+export type NumberRange = { min: number; max: number };
+export type SpawnRewardDefinition = NumberRange & { stat: LootType };
+export type SpawnRoll = { maxHp: number; reward: { stat: LootType; amount: number } };
 export type WeaponSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
 export type ArmorSlotId = 'helmet' | 'armor' | 'legs';
 export type EquipmentSlotId = WeaponSlotId | ArmorSlotId;
@@ -13,6 +16,9 @@ export type SpawnDefinition = {
   x: number;
   z: number;
   group?: string;
+  hp: NumberRange;
+  rewards: SpawnRewardDefinition[];
+  isBoss?: boolean;
   enemyWeakness?: CombatAffinity | null;
 };
 
@@ -41,7 +47,7 @@ export type SavedSpawnState = {
   killsToday: number;
   respawnAt: number | null;
   defeatedAt: number | null;
-  loot: LootType;
+  roll: SpawnRoll;
 };
 
 export type StatSources = {
@@ -72,7 +78,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 9;
+  version: 10;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
@@ -85,7 +91,6 @@ export type SaveData = {
 export type TierConfig = {
   label: string;
   statMultiplier: number;
-  statReward: number;
   respawnMultiplier: number;
   color: number;
   hostile: boolean;

@@ -6,8 +6,11 @@
       "environmentTheme": "sunlit-meadow",
       "enemyWeapon": "blunt",
       "enemyWeakness": "slash",
-      "worldOrigin": { "x": 0, "z": 0 },
-      "bossSpawnId": "area1-legendary-01",
+      "worldOrigin": {
+        "x": 0,
+        "z": 0
+      },
+      "bossSpawnId": "area1-uncommon-03",
       "gates": [
         {
           "id": "area1-to-area2",
@@ -19,36 +22,641 @@
         }
       ],
       "spawns": [
-        { "id": "area1-crystal-01", "tier": "crystal", "x": -4, "z": 7 },
-        { "id": "area1-crystal-02", "tier": "crystal", "x": 4, "z": 8 },
-        { "id": "area1-crystal-03", "tier": "crystal", "x": -8, "z": 2 },
-        { "id": "area1-crystal-04", "tier": "crystal", "x": 8, "z": 1 },
-        { "id": "area1-crystal-05", "tier": "crystal", "x": -10, "z": -6 },
-        { "id": "area1-crystal-06", "tier": "crystal", "x": 10, "z": -7 },
-        { "id": "area1-common-a1", "tier": "common", "x": -8, "z": 14, "group": "area1-common-a" },
-        { "id": "area1-common-a2", "tier": "common", "x": -6, "z": 15, "group": "area1-common-a" },
-        { "id": "area1-common-a3", "tier": "common", "x": -4, "z": 14, "group": "area1-common-a" },
-        { "id": "area1-common-a4", "tier": "common", "x": -7, "z": 12, "group": "area1-common-a" },
-        { "id": "area1-common-a5", "tier": "common", "x": -5, "z": 12, "group": "area1-common-a" },
-        { "id": "area1-common-a6", "tier": "common", "x": -3, "z": 13, "group": "area1-common-a" },
-        { "id": "area1-common-b1", "tier": "common", "x": 5, "z": -13, "group": "area1-common-b" },
-        { "id": "area1-common-b2", "tier": "common", "x": 7, "z": -14, "group": "area1-common-b" },
-        { "id": "area1-common-b3", "tier": "common", "x": 9, "z": -13, "group": "area1-common-b" },
-        { "id": "area1-common-b4", "tier": "common", "x": 4, "z": -15, "group": "area1-common-b" },
-        { "id": "area1-common-b5", "tier": "common", "x": 6, "z": -16, "group": "area1-common-b" },
-        { "id": "area1-common-b6", "tier": "common", "x": 8, "z": -16, "group": "area1-common-b" },
-        { "id": "area1-common-b7", "tier": "common", "x": 10, "z": -15, "group": "area1-common-b" },
-        { "id": "area1-common-b8", "tier": "common", "x": 11, "z": -12, "group": "area1-common-b" },
-        { "id": "area1-uncommon-a1", "tier": "uncommon", "x": 9, "z": 15, "group": "area1-uncommon-a" },
-        { "id": "area1-uncommon-a2", "tier": "uncommon", "x": 12, "z": 14, "group": "area1-uncommon-a" },
-        { "id": "area1-uncommon-b1", "tier": "uncommon", "x": -12, "z": -13, "group": "area1-uncommon-b" },
-        { "id": "area1-uncommon-b2", "tier": "uncommon", "x": -9, "z": -15, "group": "area1-uncommon-b" },
-        { "id": "area1-rare-01", "tier": "rare", "x": -14, "z": 19 },
-        { "id": "area1-rare-02", "tier": "rare", "x": 14, "z": 20 },
-        { "id": "area1-rare-03", "tier": "rare", "x": 0, "z": -21 },
-        { "id": "area1-epic-01", "tier": "epic", "x": -14, "z": -21 },
-        { "id": "area1-epic-02", "tier": "epic", "x": 14, "z": -20 },
-        { "id": "area1-legendary-01", "tier": "legendary", "x": 0, "z": 23, "enemyWeakness": null }
+        {
+          "id": "area1-crystal-01",
+          "tier": "crystal",
+          "x": -4,
+          "z": 7,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-02",
+          "tier": "crystal",
+          "x": 4,
+          "z": 8,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-03",
+          "tier": "crystal",
+          "x": -8,
+          "z": 2,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-04",
+          "tier": "crystal",
+          "x": 8,
+          "z": 1,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-05",
+          "tier": "crystal",
+          "x": -10,
+          "z": -6,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-06",
+          "tier": "crystal",
+          "x": 10,
+          "z": -7,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-07",
+          "tier": "crystal",
+          "x": -13,
+          "z": 5,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-08",
+          "tier": "crystal",
+          "x": 13,
+          "z": 5,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-09",
+          "tier": "crystal",
+          "x": -5,
+          "z": -2,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-crystal-10",
+          "tier": "crystal",
+          "x": 5,
+          "z": -3,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ]
+        },
+        {
+          "id": "area1-common-01",
+          "tier": "common",
+          "x": -8,
+          "z": 14,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-02",
+          "tier": "common",
+          "x": -6,
+          "z": 15,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-03",
+          "tier": "common",
+          "x": -4,
+          "z": 14,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-04",
+          "tier": "common",
+          "x": -7,
+          "z": 12,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-05",
+          "tier": "common",
+          "x": -5,
+          "z": 12,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-06",
+          "tier": "common",
+          "x": -3,
+          "z": 13,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-07",
+          "tier": "common",
+          "x": 5,
+          "z": -13,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-a"
+        },
+        {
+          "id": "area1-common-08",
+          "tier": "common",
+          "x": 7,
+          "z": -14,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-09",
+          "tier": "common",
+          "x": 9,
+          "z": -13,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-10",
+          "tier": "common",
+          "x": 4,
+          "z": -15,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-11",
+          "tier": "common",
+          "x": 6,
+          "z": -16,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-12",
+          "tier": "common",
+          "x": 8,
+          "z": -16,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-13",
+          "tier": "common",
+          "x": 10,
+          "z": -15,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-14",
+          "tier": "common",
+          "x": 11,
+          "z": -12,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-common-15",
+          "tier": "common",
+          "x": 1,
+          "z": 17,
+          "hp": {
+            "min": 80,
+            "max": 800
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 2,
+              "max": 20
+            }
+          ],
+          "group": "area1-common-b"
+        },
+        {
+          "id": "area1-uncommon-01",
+          "tier": "uncommon",
+          "x": 9,
+          "z": 15,
+          "hp": {
+            "min": 200,
+            "max": 200
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 50,
+              "max": 50
+            }
+          ]
+        },
+        {
+          "id": "area1-uncommon-02",
+          "tier": "uncommon",
+          "x": -12,
+          "z": -13,
+          "hp": {
+            "min": 500,
+            "max": 500
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 50,
+              "max": 50
+            }
+          ]
+        },
+        {
+          "id": "area1-uncommon-03",
+          "tier": "uncommon",
+          "x": 0,
+          "z": 23,
+          "hp": {
+            "min": 2000,
+            "max": 2000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 50,
+              "max": 50
+            }
+          ],
+          "isBoss": true,
+          "enemyWeakness": null
+        },
+        {
+          "id": "area1-rare-01",
+          "tier": "rare",
+          "x": -14,
+          "z": 19,
+          "hp": {
+            "min": 4500,
+            "max": 4500
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 500,
+              "max": 500
+            }
+          ]
+        }
       ]
     },
     {
@@ -57,8 +665,11 @@
       "environmentTheme": "ashwood",
       "enemyWeapon": "slash",
       "enemyWeakness": "pierce",
-      "worldOrigin": { "x": 0, "z": -56 },
-      "bossSpawnId": "area2-legendary-01",
+      "worldOrigin": {
+        "x": 0,
+        "z": -56
+      },
+      "bossSpawnId": "area2-rare-01",
       "gates": [
         {
           "id": "area2-to-area1",
@@ -70,36 +681,662 @@
         }
       ],
       "spawns": [
-        { "id": "area2-crystal-01", "tier": "crystal", "x": -4, "z": 7 },
-        { "id": "area2-crystal-02", "tier": "crystal", "x": 4, "z": 8 },
-        { "id": "area2-crystal-03", "tier": "crystal", "x": -8, "z": 2 },
-        { "id": "area2-crystal-04", "tier": "crystal", "x": 8, "z": 1 },
-        { "id": "area2-crystal-05", "tier": "crystal", "x": -10, "z": -6 },
-        { "id": "area2-crystal-06", "tier": "crystal", "x": 10, "z": -7 },
-        { "id": "area2-common-a1", "tier": "common", "x": -8, "z": 14, "group": "area2-common-a" },
-        { "id": "area2-common-a2", "tier": "common", "x": -6, "z": 15, "group": "area2-common-a" },
-        { "id": "area2-common-a3", "tier": "common", "x": -4, "z": 14, "group": "area2-common-a" },
-        { "id": "area2-common-a4", "tier": "common", "x": -7, "z": 12, "group": "area2-common-a" },
-        { "id": "area2-common-a5", "tier": "common", "x": -5, "z": 12, "group": "area2-common-a" },
-        { "id": "area2-common-a6", "tier": "common", "x": -3, "z": 13, "group": "area2-common-a" },
-        { "id": "area2-common-b1", "tier": "common", "x": 5, "z": -13, "group": "area2-common-b" },
-        { "id": "area2-common-b2", "tier": "common", "x": 7, "z": -14, "group": "area2-common-b" },
-        { "id": "area2-common-b3", "tier": "common", "x": 9, "z": -13, "group": "area2-common-b" },
-        { "id": "area2-common-b4", "tier": "common", "x": 4, "z": -15, "group": "area2-common-b" },
-        { "id": "area2-common-b5", "tier": "common", "x": 6, "z": -16, "group": "area2-common-b" },
-        { "id": "area2-common-b6", "tier": "common", "x": 8, "z": -16, "group": "area2-common-b" },
-        { "id": "area2-common-b7", "tier": "common", "x": 10, "z": -15, "group": "area2-common-b" },
-        { "id": "area2-common-b8", "tier": "common", "x": 11, "z": -12, "group": "area2-common-b" },
-        { "id": "area2-uncommon-a1", "tier": "uncommon", "x": 9, "z": 15, "group": "area2-uncommon-a" },
-        { "id": "area2-uncommon-a2", "tier": "uncommon", "x": 12, "z": 14, "group": "area2-uncommon-a" },
-        { "id": "area2-uncommon-b1", "tier": "uncommon", "x": -12, "z": -13, "group": "area2-uncommon-b" },
-        { "id": "area2-uncommon-b2", "tier": "uncommon", "x": -9, "z": -15, "group": "area2-uncommon-b" },
-        { "id": "area2-rare-01", "tier": "rare", "x": -14, "z": 19 },
-        { "id": "area2-rare-02", "tier": "rare", "x": 14, "z": 20 },
-        { "id": "area2-rare-03", "tier": "rare", "x": 0, "z": -21 },
-        { "id": "area2-epic-01", "tier": "epic", "x": -14, "z": -21 },
-        { "id": "area2-epic-02", "tier": "epic", "x": 14, "z": -20 },
-        { "id": "area2-legendary-01", "tier": "legendary", "x": 0, "z": 23 }
+        {
+          "id": "area2-crystal-01",
+          "tier": "crystal",
+          "x": -4,
+          "z": 7,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-02",
+          "tier": "crystal",
+          "x": 4,
+          "z": 8,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-03",
+          "tier": "crystal",
+          "x": -8,
+          "z": 2,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-04",
+          "tier": "crystal",
+          "x": 8,
+          "z": 1,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-05",
+          "tier": "crystal",
+          "x": -10,
+          "z": -6,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-06",
+          "tier": "crystal",
+          "x": 10,
+          "z": -7,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-07",
+          "tier": "crystal",
+          "x": -13,
+          "z": 5,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-08",
+          "tier": "crystal",
+          "x": 13,
+          "z": 5,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-09",
+          "tier": "crystal",
+          "x": -5,
+          "z": -2,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-10",
+          "tier": "crystal",
+          "x": 5,
+          "z": -3,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-11",
+          "tier": "crystal",
+          "x": -15,
+          "z": 10,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-12",
+          "tier": "crystal",
+          "x": 15,
+          "z": 10,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-13",
+          "tier": "crystal",
+          "x": -12,
+          "z": -10,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-14",
+          "tier": "crystal",
+          "x": 12,
+          "z": -10,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-15",
+          "tier": "crystal",
+          "x": -2,
+          "z": -10,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-16",
+          "tier": "crystal",
+          "x": 2,
+          "z": 13,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-crystal-17",
+          "tier": "crystal",
+          "x": 0,
+          "z": 18,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            }
+          ]
+        },
+        {
+          "id": "area2-common-01",
+          "tier": "common",
+          "x": -8,
+          "z": 14,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-common-02",
+          "tier": "common",
+          "x": -6,
+          "z": 15,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-common-03",
+          "tier": "common",
+          "x": -4,
+          "z": 14,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-common-04",
+          "tier": "common",
+          "x": 5,
+          "z": -13,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-common-05",
+          "tier": "common",
+          "x": 7,
+          "z": -14,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-common-06",
+          "tier": "common",
+          "x": 9,
+          "z": -13,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-common-07",
+          "tier": "common",
+          "x": 4,
+          "z": -15,
+          "hp": {
+            "min": 140,
+            "max": 1400
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 10
+            },
+            {
+              "stat": "hp",
+              "min": 4,
+              "max": 40
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ],
+          "group": "area2-common"
+        },
+        {
+          "id": "area2-uncommon-01",
+          "tier": "uncommon",
+          "x": 9,
+          "z": 15,
+          "hp": {
+            "min": 3000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 50
+            }
+          ]
+        },
+        {
+          "id": "area2-uncommon-02",
+          "tier": "uncommon",
+          "x": -12,
+          "z": -13,
+          "hp": {
+            "min": 3000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 50
+            }
+          ]
+        },
+        {
+          "id": "area2-uncommon-03",
+          "tier": "uncommon",
+          "x": 14,
+          "z": 20,
+          "hp": {
+            "min": 3000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 50
+            }
+          ]
+        },
+        {
+          "id": "area2-rare-01",
+          "tier": "rare",
+          "x": 0,
+          "z": 23,
+          "hp": {
+            "min": 30000,
+            "max": 30000
+          },
+          "rewards": [
+            {
+              "stat": "regen",
+              "min": 1000,
+              "max": 1000
+            }
+          ],
+          "isBoss": true
+        },
+        {
+          "id": "area2-epic-01",
+          "tier": "epic",
+          "x": -14,
+          "z": -21,
+          "hp": {
+            "min": 18000,
+            "max": 18000
+          },
+          "rewards": [
+            {
+              "stat": "regen",
+              "min": 30,
+              "max": 30
+            }
+          ]
+        }
       ]
     }
   ]
