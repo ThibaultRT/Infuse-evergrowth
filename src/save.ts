@@ -47,12 +47,19 @@ function freshStats(): PlayerStats {
   };
 }
 
-function freshInventory(): InventoryState {
+function emptyInventory(): InventoryState {
   return { items: {}, equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null, helmet: null, armor: null, legs: null } };
 }
 
+function freshInventory(): InventoryState {
+  return {
+    items: { 'hammer-common': { itemId: 'hammer-common', level: 1, ascend: 0 } },
+    equipped: { hand1: 'hammer-common', hand2: null, orbit1: null, orbit2: null, helmet: null, armor: null, legs: null }
+  };
+}
+
 function migrateInventory(value: unknown): InventoryState {
-  const fresh = freshInventory();
+  const fresh = emptyInventory();
   if (!value || typeof value !== 'object') return fresh;
   const source = value as { items?: unknown; equipped?: Partial<InventoryState['equipped']> };
   if (Array.isArray(source.items)) {

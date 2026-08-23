@@ -21,7 +21,7 @@ The two physical hand slots must look physically wielded:
 
 - right-hand attacks visibly move the right shoulder/arm/hand and attached weapon;
 - left-hand attacks visibly move the left shoulder/arm/hand and attached weapon;
-- bare hands visibly punch;
+- empty weapon slots remain inactive;
 - both hands remain independently schedulable and may overlap;
 - locomotion continues underneath instead of stopping for every attack;
 - the strike direction should visually bias toward the actual target;
@@ -109,13 +109,10 @@ The arm animation should carry the weapon naturally through space.
 
 Keep any authored per-weapon grip orientation/offset separate from attack timing. The visual weapon object should not become gameplay authority.
 
-### 5. Bare-hand attacks
+### 5. Weapon attacks
 
-An empty physical hand should visibly punch.
+Empty weapon slots do not attack. Preferred mapping for equipped weapons:
 
-Preferred mapping for first pass:
-
-- hand without weapon -> `Punch_Jab` / `Punch_Cross` style motion;
 - sword/slash weapon -> `Sword_Attack` style motion;
 - hammer/blunt weapon -> use the closest convincing existing arm swing if no hammer-specific clip exists;
 - spear/piercing weapon -> use a forward/thrust-like arm motion if available, otherwise a restrained procedural forward extension until a better asset exists.
@@ -194,7 +191,6 @@ Keep visual attack style separate from gameplay calculations.
 A small rendering-only mapping may be useful, e.g.:
 
 ```text
-bare hand         -> punch
 sword / slash     -> slash
 hammer / blunt    -> heavy swing
 spear / piercing  -> thrust
@@ -245,10 +241,9 @@ Do not in this task:
 
 Manually validate at least these cases in addition to `npm run build`:
 
-1. Hero idle, empty right hand attacks: right arm visibly punches.
-2. Hero idle, empty left hand attacks: left arm visibly punches.
-3. One equipped hand weapon attacks: arm and weapon move together.
-4. Left and right hand attacks overlap: both arms can animate without one cancelling the other.
+1. Hero with no equipped weapons does not attack.
+2. One equipped hand weapon attacks: arm and weapon move together.
+3. Left and right hand attacks overlap: both arms can animate without one cancelling the other.
 5. Hero jogs while one hand attacks: legs/locomotion continue naturally.
 6. Hero jogs while both hands overlap attacks: no full-body animation fighting/collapse.
 7. Enemy is offset to the side within valid range: attack visually aims plausibly toward it.
@@ -268,7 +263,7 @@ The task is complete when:
 - right and left arm attacks are independently schedulable;
 - overlapping dual-hand attacks work;
 - locomotion remains active underneath attacks;
-- empty hands visibly punch;
+- empty weapon slots do not attack;
 - equipped weapons move as part of the hand/arm chain;
 - attack direction plausibly follows the actual target;
 - gameplay combat timing and damage remain renderer-independent and unchanged;

@@ -11,13 +11,13 @@ export type AttackProfile = { damage: number; damageType: DamageType; cooldownSe
  * Runtime equipment orchestration. Static definitions and progression math live
  * in the item domain; this system only connects them to persistent player state.
  */
-export function attackProfile(hand: WeaponSlotId): AttackProfile {
+export function attackProfile(hand: WeaponSlotId): AttackProfile | null {
   const itemId = save.inventory.equipped[hand];
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
   const owned = itemId ? save.inventory.items[itemId] : undefined;
   return item?.kind === 'weapon' && owned
     ? { damage: equipmentDamage(item, owned) + heroDamage(item.damageType), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds }
-    : { damage: heroDamage('blunt'), damageType: 'blunt', cooldownSeconds: 1 };
+    : null;
 }
 
 export function applyEquipmentCopies(itemId: string, quantity: number): { previousLevel: number | null; owned: OwnedEquipment } {

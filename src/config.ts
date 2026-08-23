@@ -1,6 +1,6 @@
 import balance from './data/balance.json';
 import areaData from './data/areas.json';
-import type { AreaDefinition, CombatAffinity, DamageType, GateDefinition, SpawnDefinition, Tier, TierConfig } from './types';
+import type { AreaDefinition, CombatAffinity, GateDefinition, SpawnDefinition, Tier, TierConfig } from './types';
 
 const tierBalance = balance.enemy.tiers;
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
@@ -75,12 +75,10 @@ export const BASE_RESPAWN_MS = balance.respawn.baseSeconds * 1000;
 export const BASE_HERO_MAX_HP = balance.hero.baseMaxHp;
 export const BASE_HERO_BLUNT_ATTACK = balance.hero.baseBluntAttack;
 export const BASE_HERO_REGEN = balance.hero.baseRegenHpPerSecond;
-export const BARE_HANDS_DAMAGE_TYPE: DamageType = 'blunt';
 export const HERO_SPEED = balance.hero.moveSpeed;
-export const HERO_ATTACK_RANGE_METERS = balance.hero.bareHandsRangeMeters;
-export const HERO_ATTACK_COOLDOWN = balance.hero.attackCooldownSeconds;
+export const HERO_ATTACK_RANGE_METERS = balance.hero.attackRangeMeters;
 export const HERO_RESPAWN_DELAY_MS = balance.hero.respawnDelaySeconds * 1000;
 export const ENEMY_AGGRO_RADIUS_METERS = balance.enemy.aggroRadiusMeters;
 export const ENEMY_LEASH_RADIUS_METERS = balance.enemy.leashRadiusMeters;
-export const ENEMY_ATTACK_RANGE_METERS = HERO_ATTACK_RANGE_METERS * balance.enemy.attackRangeVsBareHandsMultiplier;
+export const ENEMY_ATTACK_RANGE_METERS = HERO_ATTACK_RANGE_METERS * balance.enemy.attackRangeMultiplier;
 export const ENEMY_ATTACK_COOLDOWN = balance.enemy.attackCooldownSeconds;

@@ -69,13 +69,13 @@ Current explicit damage types are:
 
 | Type | Current examples |
 | --- | --- |
-| Blunt | Bare hands, hammers, Area 1 enemy attacks |
+| Blunt | Hammers and Area 1 enemy attacks |
 | Slash | Swords, Area 2 enemy attacks |
 | Piercing | Spears and matching armor mitigation |
 
 Hero attacks use the enemy's authored weakness/resistance relationship. Enemy attacks do not use that affinity multiplier against the hero; equipped armor instead subtracts matching flat defense.
 
-Both hand slots are independent attack sources. Equipment definitions and owned progression are separate so static item data does not become duplicated save state.
+New heroes begin with a Level 1 Common hammer equipped. Every equipped weapon slot is an independent attack source: one weapon attacks by itself, multiple weapons attack asynchronously, and an empty slot does not attack. Equipment definitions and owned progression are separate so static item data does not become duplicated save state.
 
 For equipped weapons, total attack damage is:
 
@@ -83,7 +83,7 @@ For equipped weapons, total attack damage is:
 weapon attack = calculated weapon damage + hero attack stat for that weapon's damage type
 ```
 
-The hero stat is persistent across equipment changes. For example, permanent Blunt gains continue to apply when switching from a Common hammer to an Uncommon hammer; only the weapon contribution changes. A bare hand is not added as another damage term on top of a weapon.
+The hero stat is persistent across equipment changes. For example, permanent Blunt gains continue to apply when switching from a Common hammer to an Uncommon hammer; only the weapon contribution changes.
 
 Ascend intentionally increases both the weapon's starting power and its growth rate. A new Ascend starts from the configured multiple of the previous Ascend's Level-50 damage, and the current `perLevelMultiplierPerAscend = 2` means damage gained per level also doubles with each Ascend.
 

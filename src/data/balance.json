@@ -4,8 +4,7 @@
     "baseBluntAttack": 3,
     "baseRegenHpPerSecond": 0.1,
     "moveSpeed": 7.6,
-    "bareHandsRangeMeters": 2.15,
-    "attackCooldownSeconds": 1,
+    "attackRangeMeters": 2.15,
     "respawnDelaySeconds": 5
   },
   "affinities": {
@@ -16,7 +15,7 @@
     "commonBaseAttack": 2,
     "aggroRadiusMeters": 5,
     "leashRadiusMeters": 7,
-    "attackRangeVsBareHandsMultiplier": 1.05,
+    "attackRangeMultiplier": 1.05,
     "attackCooldownSeconds": 1.15,
     "tiers": {
       "crystal": {
