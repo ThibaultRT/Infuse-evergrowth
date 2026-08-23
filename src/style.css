@@ -48,9 +48,9 @@ canvas { display: block; width: 100%; height: 100%; }
 .enemy-affinities span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .damage-icon, .stat-icon { display: inline-block; flex: 0 0 auto; vertical-align: -.12em; }
 .stats-button, .dock-button { pointer-events: auto; color: inherit; font: inherit; font-size: 10px; font-weight: 800; letter-spacing: .08em; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.stats-button { padding: 7px 10px; }
+.stats-button { min-width: 44px; min-height: 44px; padding: 7px 10px; }
 .debug-actions { display: flex; flex-direction: column; gap: 6px; }
-.settings-button { position: absolute; top: max(118px, calc(env(safe-area-inset-top) + 106px)); right: 12px; width: 38px; height: 38px; padding: 0; color: inherit; font-size: 21px; line-height: 1; pointer-events: auto; cursor: pointer; }
+.settings-button { position: absolute; top: max(118px, calc(env(safe-area-inset-top) + 106px)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; padding: 0; color: inherit; font-size: 21px; line-height: 1; pointer-events: auto; cursor: pointer; }
 .world-ui { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .world-target-ui { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; transform: translate(-50%,-50%); }
 .world-target-ui.hidden { display: none; }
@@ -75,13 +75,13 @@ canvas { display: block; width: 100%; height: 100%; }
 .joystick-zone { pointer-events: auto; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 116px; height: 116px; border-radius: 50%; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(6px); }
 .joystick-knob { position: absolute; left: 50%; top: 50%; width: 50px; height: 50px; transform: translate(-50%,-50%); border-radius: 50%; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.18); box-shadow: inset 0 0 20px rgba(255,255,255,.06); }
 
-.bottom-dock { pointer-events: auto; position: absolute; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 7px; white-space: nowrap; }
+.bottom-dock { pointer-events: auto; position: absolute; left: 50%; bottom: max(8px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 6px 7px; white-space: nowrap; max-width: calc(100vw - max(16px, env(safe-area-inset-left)) - max(16px, env(safe-area-inset-right))); }
 .quick-slots { display: flex; gap: 5px; }
 .quick-slot { width: 38px; height: 38px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.055); display: grid; place-items: center; padding: 2px; overflow: hidden; font-size: 8px; text-align: center; line-height: 1.05; }
 .quick-slot span { opacity: .65; font-weight: 800; }
 .quick-slot strong { max-width: 34px; overflow: hidden; text-overflow: ellipsis; }
 .quick-slot.locked { opacity: .38; }
-.dock-button { border: 1px solid rgba(255,255,255,.12); border-radius: 9px; background: rgba(255,255,255,.06); padding: 10px 8px; }
+.dock-button { min-height: 44px; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; background: rgba(255,255,255,.06); padding: 10px 8px; }
 
 .toast { position: absolute; left: 50%; bottom: 202px; transform: translateX(-50%) translateY(12px); background: rgba(12,17,26,.88); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 8px 12px; font-weight: 700; font-size: 12px; opacity: 0; transition: opacity .18s ease, transform .18s ease; white-space: nowrap; }
 .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -91,7 +91,7 @@ canvas { display: block; width: 100%; height: 100%; }
 .modal-sheet { width: min(460px,100%); max-height: calc(100dvh - 48px); padding: 18px; overflow-y: auto; }
 .modal-header { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 14px; }
 .modal-sheet h2 { margin: 3px 0 0; font-size: 24px; }
-.modal-close { border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.06); color: inherit; border-radius: 9px; padding: 7px 9px; font: inherit; font-size: 10px; font-weight: 800; }
+.modal-close { min-width: 44px; min-height: 44px; border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.06); color: inherit; border-radius: 9px; padding: 7px 9px; font: inherit; font-size: 10px; font-weight: 800; }
 .stat-row, .stat-line { display: flex; justify-content: space-between; gap: 18px; }
 .stat-row { padding-top: 15px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,.09); font-size: 16px; }
 .stat-row strong, .stat-line strong { font-variant-numeric: tabular-nums; }
@@ -120,11 +120,15 @@ canvas { display: block; width: 100%; height: 100%; }
 .renderer-stats { position: absolute; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); z-index: 8; display: none; padding: 7px 9px; border-radius: 7px; background: rgba(0,0,0,.78); color: #b8ffca; font: 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; pointer-events: none; }
 .renderer-stats.visible { display: block; }
 
-.inventory-equipped { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-top: 7px; }
+.inventory-equipped { margin-top: 7px; }
+.equipment-layout { display: grid; grid-template-columns: 3fr 4fr; gap: 9px; }
+.armor-preview { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.weapon-slots { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; }
 .inventory-equip-slot { min-width: 0; aspect-ratio: 1; border-radius: 10px; border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 5px; text-align: center; }
 .inventory-equip-slot span { font-size: 9px; opacity: .55; }
 .inventory-equip-slot strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: 9px; }
 .inventory-equip-slot.locked { opacity: .38; }
+.future-slot { border-style: dashed; opacity: .42; }
 .inventory-bag { margin-top: 7px; min-height: 110px; border: 1px dashed rgba(255,255,255,.10); border-radius: 10px; padding: 10px; display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; align-content: start; }
 .inventory-empty { grid-column: 1/-1; align-self: center; justify-self: center; font-size: 12px; opacity: .48; }
 .inventory-item { min-height: 62px; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; background: rgba(255,255,255,.055); color: inherit; font: inherit; font-size: 9px; display: grid; gap: 4px; padding: 5px; overflow-wrap: anywhere; }
@@ -148,7 +152,26 @@ canvas { display: block; width: 100%; height: 100%; }
 .equipment-drop span { font-size: 11px; opacity: .7; }
 .equipment-drop strong { font-size: 12px; }
 .rarity-common { color: #d5dae0; }.rarity-uncommon { color: #64dc8c; }.rarity-rare { color: #5d98ff; }.rarity-epic { color: #bf75ff; }.rarity-legendary { color: #ffb33d; }
+.world-target-ui[class*="rarity-"] .world-hp-bar { border-color: currentColor; box-shadow: 0 0 7px color-mix(in srgb,currentColor 38%,transparent), 0 1px 4px rgba(0,0,0,.45); }
+.progression-layer { position: absolute; inset: 0; z-index: 4; display: grid; place-items: 28% center; pointer-events: none; }
+.progression-banner { min-width: min(310px, calc(100vw - 40px)); display: grid; justify-items: center; gap: 4px; padding: 16px 24px; border-block: 1px solid rgba(255,216,139,.55); background: linear-gradient(90deg,transparent,rgba(9,14,20,.92) 15%,rgba(9,14,20,.92) 85%,transparent); text-align: center; animation: progression-in .35s ease-out; }
+.progression-kicker { color: #ffd88b; font-size: 10px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; }
+.progression-banner strong { font-family: Georgia,serif; font-size: 24px; font-weight: 500; }
+.progression-route { margin-top: 3px; color: #dcebdc; font-size: 11px; letter-spacing: .06em; }
 @keyframes equipment-in { from { transform: scale(.75); opacity: 0; } }
+@keyframes progression-in { from { opacity: 0; transform: translateY(8px); } }
+
+@media (max-width: 430px) {
+  .topbar { top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); gap: 6px; }
+  .brand { font-size: 10px; }
+  .card { border-radius: 12px; padding: 9px 10px; }
+  .modal-panel { padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+  .modal-sheet { max-height: calc(var(--viewport-height, 100dvh) - max(24px, env(safe-area-inset-top)) - max(24px, env(safe-area-inset-bottom))); padding: 14px; }
+  .inventory-bag { grid-template-columns: repeat(3,1fr); }
+  .equipment-layout { grid-template-columns: 1fr; }
+  .armor-preview { order: 2; }
+  .inventory-equip-slot { min-height: 58px; aspect-ratio: auto; }
+}
 
 @media (min-width: 900px) {
   .controls { opacity: .72; }
