@@ -74,13 +74,22 @@ Hero attacks use the enemy's authored weakness/resistance relationship. Enemy at
 
 Both hand slots are independent attack sources. Equipment definitions and owned progression are separate so static item data does not become duplicated save state.
 
+For equipped weapons, total attack damage is:
+
+```text
+weapon attack = calculated weapon damage + hero attack stat for that weapon's damage type
+```
+
+The hero stat is persistent across equipment changes. For example, permanent Blunt gains earned while farming Area 1 continue to apply when switching from a Common hammer to an Uncommon hammer; only the weapon contribution changes. A bare hand is not added as another damage term on top of a weapon.
+
+Ascend intentionally increases both the weapon's starting power and its growth rate. A new Ascend starts from the configured multiple of the previous Ascend's Level-50 damage, and the current `perLevelMultiplierPerAscend = 2` means damage gained per level also doubles with each Ascend.
+
 ## Architecture and work-in-progress docs
 
 Long-lived contributor/agent rules are in [`AGENTS.md`](AGENTS.md).
 
 - [`implementation-cleanup.md`](implementation-cleanup.md) contains only remaining architecture cleanup work.
 - [`WIP/graphical.md`](WIP/graphical.md) records the durable visual direction; slices 1–9 are complete and slice 10 is the remaining optimization/release-validation pass.
-- [`WIP/weapon-drop.md`](WIP/weapon-drop.md) is retained only for unresolved implementation differences from the original weapon-drop design.
 
 ## Run locally
 
