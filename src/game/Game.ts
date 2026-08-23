@@ -487,7 +487,7 @@ function autoAttack(): void {
     if (!target) continue;
     const profile = attackProfile(hand);
     attackCooldowns[hand] = profile.cooldownSeconds;
-    heroView.playWeaponAttack(hand, profile.damageType, target.root.position);
+    heroView.playWeaponAttack(hand, profile.damageType, target.root.position, profile.cooldownSeconds);
     events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
     target.receiveDamage(profile.damage, profile.damageType);
     const direction = target.root.position.clone().sub(hero.position);
