@@ -2,7 +2,7 @@
   "hero": {
     "baseMaxHp": 20,
     "baseBluntAttack": 3,
-    "baseRegenHpPerSecond": 0.1,
+    "baseRegenHpPerSecond": 0.5,
     "moveSpeed": 7.6,
     "attackRangeMeters": 2.15,
     "respawnDelaySeconds": 5
