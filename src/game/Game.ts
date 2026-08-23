@@ -13,12 +13,10 @@ import {
   SPAWNS,
   TIER_CONFIG,
   areaById,
-  enemyAttack,
-  enemyMaxHp,
-  enemyStatReward
+  enemyAttack
 } from '../config';
-import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
-import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, rollLoot, save } from '../save';
+import { combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
+import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig, WeaponSlotId } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
@@ -34,6 +32,7 @@ import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
 import { affinityDamage } from '../domain/combat/Affinity';
+import { rollSpawn } from '../domain/spawning/SpawnRoll';
 
 export class Game {
   private started = false;
@@ -124,7 +123,7 @@ function formatRewardAmount(amount: number): string {
 }
 
 function lootIcon(type: LootType, size = 9): string {
-  return type === 'hp' ? heartIcon(size) : bluntHammerIcon(size);
+  return type === 'hp' || type === 'regen' ? heartIcon(size) : damageTypeIcon(type, size);
 }
 
 type FloatingCombatText = {
@@ -147,9 +146,8 @@ class SpawnEntity {
   readonly config: TierConfig;
   readonly root = new THREE.Group();
   readonly spawnPosition: THREE.Vector3;
-  readonly maxHp: number;
+  maxHp: number;
   readonly damage: number;
-  readonly statReward: number;
   readonly damageType: CombatAffinity;
   readonly weakness: CombatAffinity | null;
   readonly targetUi = document.createElement('div');
@@ -166,10 +164,9 @@ class SpawnEntity {
 
   constructor(readonly def: SpawnDefinition) {
     this.config = TIER_CONFIG[def.tier];
-    this.maxHp = enemyMaxHp(def.areaId, def.tier);
+    this.maxHp = save.spawns[def.id].roll.maxHp;
     this.hp = this.maxHp;
     this.damage = enemyAttack(def.areaId, def.tier);
-    this.statReward = enemyStatReward(def.areaId, def.tier);
     this.damageType = areaById(def.areaId).enemyWeapon;
     this.weakness = def.enemyWeakness === undefined ? areaById(def.areaId).enemyWeakness : def.enemyWeakness;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
@@ -191,7 +188,7 @@ class SpawnEntity {
     else if (state?.respawnAt) {
       state.respawnAt = null;
       state.defeatedAt = null;
-      state.loot = rollLoot();
+      state.roll = rollSpawn(this.def);
       this.setAlive(true);
       persist();
     } else this.renderLoot();
@@ -199,9 +196,10 @@ class SpawnEntity {
   }
 
   renderLoot(): void {
-    const loot = save.spawns[this.def.id].loot;
+    const reward = save.spawns[this.def.id].roll.reward;
+    const loot = reward.stat;
     this.lootLabel.className = `world-loot ${loot}`;
-    this.lootLabel.innerHTML = `<span>${formatRewardAmount(this.statReward)}</span>${lootIcon(loot)}`;
+    this.lootLabel.innerHTML = `<span>${formatRewardAmount(reward.amount)}</span>${lootIcon(loot)}`;
   }
 
   syncAreaVisibility(): void {
@@ -213,6 +211,7 @@ class SpawnEntity {
   setAlive(value: boolean): void {
     this.alive = value;
     if (value) {
+      this.maxHp = save.spawns[this.def.id].roll.maxHp;
       this.deathPresentationRemaining = 0;
       this.hp = this.maxHp;
       this.healthFill.style.width = '100%';
@@ -257,21 +256,22 @@ class SpawnEntity {
     const timer = BASE_RESPAWN_MS * this.config.respawnMultiplier * 2 ** (state.killsToday - 1);
     state.respawnAt = Math.min(now + timer, nextLocalMidnightMs());
 
-    const stat = state.loot;
-    const amount = this.statReward;
+    const { stat, amount } = state.roll.reward;
     events.emit('enemyDefeated', { enemyId: this.def.id });
     if (stat === 'hp') {
       const oldMax = maxHeroHp();
       save.stats.maxHp.additive.kills = (save.stats.maxHp.additive.kills ?? 0) + amount;
       heroHp = Math.min(maxHeroHp(), heroHp + maxHeroHp() - oldMax);
+    } else if (stat === 'regen') {
+      save.stats.regen.additive.kills = (save.stats.regen.additive.kills ?? 0) + amount;
     } else {
-      const blunt = save.stats.attack[stat];
-      blunt.additive.kills = (blunt.additive.kills ?? 0) + amount;
+      const attack = save.stats.attack[stat];
+      attack.additive.kills = (attack.additive.kills ?? 0) + amount;
     }
 
     this.setAlive(false);
     events.emit('statGained', { sourceId: this.def.id, stat, amount });
-    showStatGain(amount, stat === 'hp' ? 'HP' : 'BLUNT', this.config.label);
+    showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase(), this.config.label);
     handleBossDefeat(this.def.areaId, this.def.id);
     const itemId = rollEquipmentDrop(this.def.areaId, this.def.tier);
     if (itemId) {
@@ -292,7 +292,7 @@ class SpawnEntity {
       if (state?.respawnAt && Date.now() >= state.respawnAt) {
         state.respawnAt = null;
         state.defeatedAt = null;
-        state.loot = rollLoot();
+        state.roll = rollSpawn(this.def);
         this.setAlive(true);
         events.emit('enemyRespawned', { enemyId: this.def.id });
         persist();
@@ -380,11 +380,11 @@ function startGateCinematic(gate: GateEntity): void {
 
 function handleBossDefeat(areaId: number, spawnId: string): void {
   const area = areaById(areaId);
-  if (spawnId !== area.bossSpawnId || save.defeatedBosses.includes(spawnId)) return;
+  const bossEntity = entities.find((entity) => entity.def.id === spawnId && entity.def.isBoss);
+  if (!bossEntity || spawnId !== area.bossSpawnId || save.defeatedBosses.includes(spawnId)) return;
   save.defeatedBosses.push(spawnId);
   events.emit('bossDefeated', { bossId: spawnId, areaId });
-  const bossEntity = entities.find((entity) => entity.def.id === spawnId);
-  if (bossEntity) effects.bossDefeat(bossEntity.spawnPosition);
+  effects.bossDefeat(bossEntity.spawnPosition);
 
   const openedGates = gateEntities.filter((gate) => gate.def.sourceAreaId === areaId && gate.def.requiresBossDefeated);
   for (const gate of openedGates) {
@@ -451,7 +451,7 @@ function resetSpawnCooldowns(): void {
     if (!state.respawnAt) return;
     state.respawnAt = null;
     state.defeatedAt = null;
-    state.loot = rollLoot();
+    state.roll = rollSpawn(entity.def);
     entity.forceRespawn();
     events.emit('enemyRespawned', { enemyId: entity.def.id });
     resetCount += 1;

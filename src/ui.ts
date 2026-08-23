@@ -144,16 +144,17 @@ export function renderEnemyAffinities(area: AreaDefinition): void {
 
 const gainItems: HTMLDivElement[] = [];
 function layoutGainItems(): void { gainItems.forEach((element, index) => { element.style.transform = `translateY(${-index * 27}px)`; }); }
-function showGain(amount: string, stat: 'HP' | 'BLUNT', source?: string): void {
+function showGain(amount: string, stat: string, source?: string): void {
   const element = document.createElement('div');
-  element.className = `gain-pop ${stat === 'HP' ? 'hp' : 'blunt'}`;
-  element.innerHTML = `<span class="gain-source">${source ?? 'Permanent'}</span><strong>+${amount}</strong>${stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13)}`;
+  const healthStat = stat === 'HP' || stat === 'HP/S';
+  element.className = `gain-pop ${healthStat ? 'hp' : 'blunt'}`;
+  element.innerHTML = `<span class="gain-source">${source ?? 'Permanent'}</span><strong>+${amount}${stat === 'HP/S' ? ' HP/s' : ''}</strong>${healthStat ? heartIcon(13) : bluntHammerIcon(13)}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
   requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
   window.setTimeout(() => { const index = gainItems.indexOf(element); if (index >= 0) gainItems.splice(index, 1); element.classList.add('leaving'); layoutGainItems(); window.setTimeout(() => element.remove(), 180); }, 1600);
 }
 
-export function showStatGain(amount: number, stat: 'HP' | 'BLUNT', source: string): void {
+export function showStatGain(amount: number, stat: string, source: string): void {
   showGain(Number.isInteger(amount) ? String(amount) : amount.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''), stat, source);
 }
 

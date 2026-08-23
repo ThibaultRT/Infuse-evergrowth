@@ -4,12 +4,11 @@ An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
 ## v0.33 vertical slice
 
-- Two authored areas with 30 fixed targets each across Crystal → Legendary tiers
-- Area 1's Legendary target is the current boss
+- Two authored areas with 29 fixed targets each and per-revival HP/reward rolls
+- Area 1's third Uncommon target is the current boss; Area 2's Rare target is its boss
 - Area 1 and the darker ashwood Area 2 meet at a shared, boss-gated physical passage
 - Defeating the boss opens the gate, briefly focuses the camera on it, and unlocks Area 2
 - Walking through the open gate crosses the shared boundary; Area 2's side remains open for the return journey
-- Area 2 enemies grant twice the permanent-stat rewards of their Area 1 counterparts
 - Animated Quaternius humanoids, an equipment-driven Ranger hero, dual hand weapons, and trial orbit slots
 - Hero starts at **20 Max HP**, **5 Blunt Attack**, and **0.10 HP/s** passive regeneration
 - Central touch joystick for iPhone plus WASD / arrow keys on desktop
@@ -35,34 +34,16 @@ All tunable gameplay numbers live in [`src/data/balance.json`](src/data/balance.
 
 - hero base HP / attack / regeneration;
 - movement and bare-hand combat values (all configured distances are in meters);
-- Common enemy base HP / attack;
-- tier multipliers, loot rewards, respawn multipliers and colors;
-- respawn base time;
-- loot roll weights;
-- cross-area HP and attack scaling.
+- enemy attack scaling;
+- tier respawn multipliers and colors;
+- respawn base time.
 - combat affinity multipliers.
 
-Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, and gate definitions/tags.
+Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, per-spawn HP/reward ranges, and gate definitions/tags.
 
-## Area scaling
+## Authored difficulty
 
-Common enemy stats define the baseline for each area:
-
-```text
-Common HP(area) = commonBaseHp × hpGrowthPerArea^(area - 1)
-Common Attack(area) = commonBaseAttack × area
-```
-
-Current HP growth is **4.65× per area**. Tier multipliers are applied after the area scaling.
-
-With the current values:
-
-- Area 1 Common: 32 HP
-- Area 2 Common: ~149 HP
-- Area 15 Common: ~70.7B HP
-- Area 15 Legendary: ~990B HP
-
-This is intentionally aimed at a ~15-area progression ending around billions to roughly one trillion HP for the top tier.
+Enemy HP and permanent rewards are authored per spawn rather than derived from area/tier scaling. Each living occupant rolls HP, a reward type, and its reward amount from that spawn's configured ranges; a fresh roll is made on every revival and persisted with the spawn. Enemy attack damage continues to use the existing area/tier scaling.
 
 ## Current damage types
 

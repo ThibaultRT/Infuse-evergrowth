@@ -13,7 +13,6 @@
     "strongDamageMultiplier": 0.5
   },
   "enemy": {
-    "commonBaseHp": 32,
     "commonBaseAttack": 2,
     "aggroRadiusMeters": 5,
     "leashRadiusMeters": 7,
@@ -23,7 +22,6 @@
       "crystal": {
         "label": "Crystal",
         "statMultiplier": 0.35,
-        "statReward": 0.5,
         "respawnMultiplier": 1,
         "color": "#8dd9ff",
         "hostile": false
@@ -31,7 +29,6 @@
       "common": {
         "label": "Common",
         "statMultiplier": 1,
-        "statReward": 1,
         "respawnMultiplier": 1,
         "color": "#b8bec8",
         "hostile": true
@@ -39,7 +36,6 @@
       "uncommon": {
         "label": "Uncommon",
         "statMultiplier": 2.25,
-        "statReward": 1.25,
         "respawnMultiplier": 3,
         "color": "#64dc8c",
         "hostile": true
@@ -47,7 +43,6 @@
       "rare": {
         "label": "Rare",
         "statMultiplier": 4.5,
-        "statReward": 1.5,
         "respawnMultiplier": 6,
         "color": "#5d98ff",
         "hostile": true
@@ -55,7 +50,6 @@
       "epic": {
         "label": "Epic",
         "statMultiplier": 8,
-        "statReward": 1.75,
         "respawnMultiplier": 9,
         "color": "#bf75ff",
         "hostile": true
@@ -63,41 +57,59 @@
       "legendary": {
         "label": "Legendary",
         "statMultiplier": 14,
-        "statReward": 2,
         "respawnMultiplier": 15,
         "color": "#ffb33d",
         "hostile": true
       }
     }
   },
-  "loot": {
-    "hpWeight": 0.5,
-    "bluntWeight": 0.5
-  },
   "equipmentDrops": {
     "areaChanceGrowth": 0.15,
     "areaChanceMultiplierCap": 3,
-    "baseChanceByEnemyTier": { "uncommon": 0.01, "rare": 0.02, "epic": 0.04, "legendary": 0.08 },
+    "baseChanceByEnemyTier": {
+      "uncommon": 0.01,
+      "rare": 0.02,
+      "epic": 0.04,
+      "legendary": 0.08
+    },
     "rarityWeightsByEnemyTier": {
-      "uncommon": { "common": 0.7, "uncommon": 0.3 },
-      "rare": { "common": 0.4, "uncommon": 0.4, "rare": 0.2 },
-      "epic": { "common": 0.2, "uncommon": 0.3, "rare": 0.3, "epic": 0.2 },
-      "legendary": { "common": 0.1, "uncommon": 0.15, "rare": 0.2, "epic": 0.25, "legendary": 0.3 }
+      "uncommon": {
+        "common": 0.7,
+        "uncommon": 0.3
+      },
+      "rare": {
+        "common": 0.4,
+        "uncommon": 0.4,
+        "rare": 0.2
+      },
+      "epic": {
+        "common": 0.2,
+        "uncommon": 0.3,
+        "rare": 0.3,
+        "epic": 0.2
+      },
+      "legendary": {
+        "common": 0.1,
+        "uncommon": 0.15,
+        "rare": 0.2,
+        "epic": 0.25,
+        "legendary": 0.3
+      }
     }
   },
-  "equipmentProgression": { "ascendLevel": 50, "ascendBaseMultiplier": 2, "perLevelMultiplierPerAscend": 2 },
+  "equipmentProgression": {
+    "ascendLevel": 50,
+    "ascendBaseMultiplier": 2,
+    "perLevelMultiplierPerAscend": 2
+  },
   "respawn": {
     "baseSeconds": 180
   },
   "areaScaling": {
     "plannedAreaCount": 15,
-    "hpGrowthPerArea": 4.65,
     "attackMultiplierPerArea": 1,
-    "statRewardMultiplierPerArea": 2,
     "formulaNotes": {
-      "hp": "commonBaseHp * hpGrowthPerArea^(area - 1)",
-      "attack": "commonBaseAttack * area * attackMultiplierPerArea",
-      "statReward": "tierStatReward * statRewardMultiplierPerArea^(area - 1)"
+      "attack": "commonBaseAttack * area * attackMultiplierPerArea"
     }
   }
 }

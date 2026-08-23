@@ -1,4 +1,4 @@
-import type { LootType, SavedSpawnState, SpawnDefinition, TierConfig } from '../../types';
+import type { SavedSpawnState, SpawnDefinition, SpawnRoll, TierConfig } from '../../types';
 
 export type SpawnerDefinition = SpawnDefinition;
 
@@ -11,8 +11,8 @@ export type SpawnerRuntimeState = {
 };
 
 /** Persistent state belongs to the spawner identity, not to a transient enemy view. */
-export function createSpawnState(loot: LootType): SavedSpawnState {
-  return { killsToday: 0, defeatedAt: null, respawnAt: null, loot };
+export function createSpawnState(roll: SpawnRoll): SavedSpawnState {
+  return { killsToday: 0, defeatedAt: null, respawnAt: null, roll };
 }
 
 export function respawnDeadline(now: number, killsToday: number, baseRespawnMs: number, tier: TierConfig, nextResetMs: number): number {
