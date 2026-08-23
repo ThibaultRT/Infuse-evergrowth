@@ -3,12 +3,6 @@ import type { CombatAffinity, DamageType } from '../../types';
 
 export type AffinityAttackType = CombatAffinity | DamageType;
 
-const weaknessByArmor: Record<CombatAffinity, CombatAffinity> = {
-  blunt: 'pierce',
-  slash: 'blunt',
-  pierce: 'slash'
-};
-
 const resistanceByWeakness: Record<CombatAffinity, CombatAffinity> = {
   blunt: 'slash',
   slash: 'pierce',
@@ -17,11 +11,6 @@ const resistanceByWeakness: Record<CombatAffinity, CombatAffinity> = {
 
 function normalizeAffinity(type: AffinityAttackType): CombatAffinity {
   return type === 'piercing' ? 'pierce' : type;
-}
-
-/** Returns the attack affinity that deals bonus damage to a given armor type. */
-export function armorWeakness(armor: CombatAffinity): CombatAffinity {
-  return weaknessByArmor[armor];
 }
 
 /** Applies the cyclic weak/strong relationship; null means an affinity-neutral defender. */

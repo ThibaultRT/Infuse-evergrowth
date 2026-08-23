@@ -6,7 +6,6 @@ import {
   ENEMY_ATTACK_COOLDOWN,
   ENEMY_ATTACK_RANGE_METERS,
   ENEMY_LEASH_RADIUS_METERS,
-  HERO_ARMOR_AFFINITY,
   HERO_ATTACK_RANGE_METERS,
   HERO_RESPAWN_DELAY_MS,
   HERO_SPEED,
@@ -34,7 +33,7 @@ import { GateView } from '../rendering/GateView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
-import { affinityDamage, armorWeakness } from '../domain/combat/Affinity';
+import { affinityDamage } from '../domain/combat/Affinity';
 
 export class Game {
   private started = false;
@@ -464,11 +463,11 @@ function resetSpawnCooldowns(): void {
 function damageHero(amount: number, type: CombatAffinity): void {
   if (heroDead) return;
   const damageType: DamageType = type === 'pierce' ? 'piercing' : type;
-  const affinityAmount = Math.max(0, affinityDamage(amount, type, armorWeakness(HERO_ARMOR_AFFINITY)) - equippedDefense(damageType));
-  events.emit('heroDamaged', { amount: affinityAmount, damageType: type });
+  const reducedAmount = Math.max(0, amount - equippedDefense(damageType));
+  events.emit('heroDamaged', { amount: reducedAmount, damageType: type });
   heroView.playHit();
-  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), affinityAmount, type, true);
-  heroHp = Math.max(0, heroHp - affinityAmount);
+  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true);
+  heroHp = Math.max(0, heroHp - reducedAmount);
   updateHud();
   if (heroHp !== 0) return;
   heroDead = true;

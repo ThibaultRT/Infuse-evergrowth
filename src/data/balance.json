@@ -6,8 +6,7 @@
     "moveSpeed": 7.6,
     "bareHandsRangeMeters": 2.15,
     "attackCooldownSeconds": 1,
-    "respawnDelaySeconds": 5,
-    "armorAffinity": "blunt"
+    "respawnDelaySeconds": 5
   },
   "affinities": {
     "weakDamageMultiplier": 2,
