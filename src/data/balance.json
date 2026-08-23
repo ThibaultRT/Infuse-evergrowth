@@ -6,7 +6,12 @@
     "moveSpeed": 7.6,
     "bareHandsRangeMeters": 2.15,
     "attackCooldownSeconds": 1,
-    "respawnDelaySeconds": 5
+    "respawnDelaySeconds": 5,
+    "armorAffinity": "blunt"
+  },
+  "affinities": {
+    "weakDamageMultiplier": 2,
+    "strongDamageMultiplier": 0.5
   },
   "enemy": {
     "commonBaseHp": 32,

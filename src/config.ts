@@ -43,7 +43,8 @@ export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>
     areaId: area.id,
     x: area.worldOrigin.x + spawn.x,
     z: area.worldOrigin.z + spawn.z,
-    ...(spawn.group ? { group: spawn.group } : {})
+    ...(spawn.group ? { group: spawn.group } : {}),
+    ...('enemyWeakness' in spawn ? { enemyWeakness: spawn.enemyWeakness as CombatAffinity | null } : {})
   }))
 );
 
@@ -81,6 +82,7 @@ export const BASE_RESPAWN_MS = balance.respawn.baseSeconds * 1000;
 export const BASE_HERO_MAX_HP = balance.hero.baseMaxHp;
 export const BASE_HERO_BLUNT_ATTACK = balance.hero.baseBluntAttack;
 export const BASE_HERO_REGEN = balance.hero.baseRegenHpPerSecond;
+export const HERO_ARMOR_AFFINITY = balance.hero.armorAffinity as CombatAffinity;
 export const BARE_HANDS_DAMAGE_TYPE: DamageType = 'blunt';
 export const HERO_SPEED = balance.hero.moveSpeed;
 export const HERO_ATTACK_RANGE_METERS = balance.hero.bareHandsRangeMeters;

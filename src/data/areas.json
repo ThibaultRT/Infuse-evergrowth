@@ -48,7 +48,7 @@
         { "id": "area1-rare-03", "tier": "rare", "x": 0, "z": -21 },
         { "id": "area1-epic-01", "tier": "epic", "x": -14, "z": -21 },
         { "id": "area1-epic-02", "tier": "epic", "x": 14, "z": -20 },
-        { "id": "area1-legendary-01", "tier": "legendary", "x": 0, "z": 23 }
+        { "id": "area1-legendary-01", "tier": "legendary", "x": 0, "z": 23, "enemyWeakness": null }
       ]
     },
     {

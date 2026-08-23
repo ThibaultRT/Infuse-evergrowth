@@ -11,6 +11,7 @@ export type SpawnDefinition = {
   x: number;
   z: number;
   group?: string;
+  enemyWeakness?: CombatAffinity | null;
 };
 
 export type AreaDefinition = {

@@ -6,6 +6,7 @@ import {
   ENEMY_ATTACK_COOLDOWN,
   ENEMY_ATTACK_RANGE_METERS,
   ENEMY_LEASH_RADIUS_METERS,
+  HERO_ARMOR_AFFINITY,
   HERO_ATTACK_RANGE_METERS,
   HERO_RESPAWN_DELAY_MS,
   HERO_SPEED,
@@ -33,6 +34,7 @@ import { GateView } from '../rendering/GateView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
+import { affinityDamage, armorWeakness } from '../domain/combat/Affinity';
 
 export class Game {
   private started = false;
@@ -150,6 +152,7 @@ class SpawnEntity {
   readonly damage: number;
   readonly statReward: number;
   readonly damageType: CombatAffinity;
+  readonly weakness: CombatAffinity | null;
   readonly targetUi = document.createElement('div');
   readonly lootLabel = document.createElement('div');
   readonly healthBar = document.createElement('div');
@@ -169,6 +172,7 @@ class SpawnEntity {
     this.damage = enemyAttack(def.areaId, def.tier);
     this.statReward = enemyStatReward(def.areaId, def.tier);
     this.damageType = areaById(def.areaId).enemyWeapon;
+    this.weakness = def.enemyWeakness === undefined ? areaById(def.areaId).enemyWeakness : def.enemyWeakness;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
     this.enemyView = def.tier === 'crystal' ? null : new EnemyView(def.tier, this.config.color);
@@ -233,11 +237,12 @@ class SpawnEntity {
 
   receiveDamage(amount: number, type: DamageType): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
-    events.emit('enemyDamaged', { enemyId: this.def.id, amount, damageType: type });
+    const affinityAmount = affinityDamage(amount, type, this.weakness);
+    events.emit('enemyDamaged', { enemyId: this.def.id, amount: affinityAmount, damageType: type });
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
-    showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), amount, type);
-    this.hp = Math.max(0, this.hp - amount);
+    showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), affinityAmount, type);
+    this.hp = Math.max(0, this.hp - affinityAmount);
     this.healthFill.style.width = `${(this.hp / this.maxHp) * 100}%`;
     if (this.config.hostile) this.provoked = true;
     if (this.hp === 0) this.defeat();
@@ -458,10 +463,11 @@ function resetSpawnCooldowns(): void {
 
 function damageHero(amount: number, type: CombatAffinity): void {
   if (heroDead) return;
-  events.emit('heroDamaged', { amount, damageType: type });
+  const affinityAmount = affinityDamage(amount, type, armorWeakness(HERO_ARMOR_AFFINITY));
+  events.emit('heroDamaged', { amount: affinityAmount, damageType: type });
   heroView.playHit();
-  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, type, true);
-  heroHp = Math.max(0, heroHp - amount);
+  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), affinityAmount, type, true);
+  heroHp = Math.max(0, heroHp - affinityAmount);
   updateHud();
   if (heroHp !== 0) return;
   heroDead = true;
