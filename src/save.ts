@@ -1,9 +1,10 @@
-import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, SPAWNS } from './config';
+import { BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPAWNS } from './config';
+import { logarithmicChance, logarithmicStat } from './domain/combat/HeroStats';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import type { DamageType, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v10';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const SAVE_KEY = 'infuse-evergrowth-save-v11';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -43,7 +44,11 @@ function freshStats(): PlayerStats {
   return {
     maxHp: freshStat(BASE_HERO_MAX_HP),
     attack: { blunt: freshStat(BASE_HERO_BLUNT_ATTACK), slash: freshStat(0), piercing: freshStat(0) },
-    regen: freshStat(BASE_HERO_REGEN)
+    regen: freshStat(BASE_HERO_REGEN),
+    speed: freshStat(BASE_HERO_SPEED_RAW),
+    criticalChance: freshStat(BASE_HERO_CRITICAL_CHANCE_RAW),
+    criticalDamage: freshStat(BASE_HERO_CRITICAL_DAMAGE_RAW),
+    blockChance: freshStat(BASE_HERO_BLOCK_CHANCE_RAW)
   };
 }
 
@@ -91,7 +96,7 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 
 function loadSave(): SaveData {
   const fresh: SaveData = {
-    version: 10,
+    version: 11,
     dailyKey: localDailyKey(),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -104,11 +109,11 @@ function loadSave(): SaveData {
     const raw = localStorage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (![7, 8, 9, 10].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    if (![7, 8, 9, 10, 11].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
     const unlockedAreas = Array.from(new Set([1, ...(parsed.unlockedAreas ?? [])]));
     const requestedArea = parsed.currentAreaId ?? 1;
     return {
-      version: 10,
+      version: 11,
       dailyKey: localDailyKey(),
       currentAreaId: unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
@@ -116,7 +121,11 @@ function loadSave(): SaveData {
       stats: {
         maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
         attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK), slash: normalizeStat(parsed.stats.attack?.slash, 0), piercing: normalizeStat(parsed.stats.attack?.piercing, 0) },
-        regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN)
+        regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN),
+        speed: normalizeStat(parsed.stats.speed, BASE_HERO_SPEED_RAW),
+        criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
+        criticalDamage: normalizeStat(parsed.stats.criticalDamage, BASE_HERO_CRITICAL_DAMAGE_RAW),
+        blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW)
       },
       inventory: migrateInventory(parsed.inventory),
       spawns: parsed.dailyKey === localDailyKey() ? migrateSpawns(parsed.spawns) : emptySpawnState()
@@ -135,3 +144,7 @@ export function statTotal(stat: StatSources): number { return statAdditiveTotal(
 export function maxHeroHp(): number { return statTotal(save.stats.maxHp); }
 export function heroDamage(type: DamageType): number { return statTotal(save.stats.attack[type]); }
 export function heroRegen(): number { return statTotal(save.stats.regen); }
+export function heroSpeed(): number { return logarithmicStat(statTotal(save.stats.speed), HERO_SPEED); }
+export function heroCriticalChance(): number { return logarithmicChance(statTotal(save.stats.criticalChance), HERO_CRITICAL_CHANCE_PERCENT); }
+export function heroCriticalDamageMultiplier(): number { return 1 + logarithmicStat(statTotal(save.stats.criticalDamage), HERO_CRITICAL_DAMAGE_PERCENT) / 100; }
+export function heroBlockChance(): number { return logarithmicChance(statTotal(save.stats.blockChance), HERO_BLOCK_CHANCE_PERCENT); }

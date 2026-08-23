@@ -6,7 +6,7 @@ export type GameEventMap = {
   enemyDefeated: { enemyId: string };
   enemyRespawned: { enemyId: string };
   bossDefeated: { bossId: string; areaId: number };
-  heroDamaged: { amount: number; damageType: CombatAffinity };
+  heroDamaged: { amount: number; damageType: CombatAffinity; blocked: boolean };
   heroDefeated: undefined;
   heroResurrected: { areaId: number };
   gateUnlocked: { gateId: string };

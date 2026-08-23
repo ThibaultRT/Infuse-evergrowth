@@ -8,15 +8,15 @@ import {
   ENEMY_LEASH_RADIUS_METERS,
   HERO_ATTACK_RANGE_METERS,
   HERO_RESPAWN_DELAY_MS,
-  HERO_SPEED,
+  BLOCKED_DAMAGE_MULTIPLIER,
   GATES,
   SPAWNS,
   TIER_CONFIG,
   areaById,
   enemyAttack
 } from '../config';
-import { combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
-import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, save } from '../save';
+import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon } from '../icons';
+import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
@@ -93,7 +93,7 @@ const gameplay = new GameplayRuntime({
   })),
   currentAreaId: save.currentAreaId,
   heroHp: maxHeroHp(),
-  heroSpeed: HERO_SPEED,
+  heroSpeed: heroSpeed(),
   heroRespawnSeconds: HERO_RESPAWN_DELAY_MS / 1000,
   enemyAggroRadius: ENEMY_AGGRO_RADIUS_METERS,
   enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS,
@@ -161,8 +161,9 @@ function lootIcon(type: LootType, size = 9): string {
   return type === 'hp' || type === 'regen' ? heartIcon(size) : damageTypeIcon(type, size);
 }
 
-function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false): void {
-  worldUi.addCombatText(position, `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${incoming ? combatAffinityIcon(type as CombatAffinity, 10) : damageTypeIcon(type as DamageType, 10)}`, incoming);
+function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false, blocked = false): void {
+  const icon = blocked ? shieldIcon(11) : incoming ? combatAffinityIcon(type as CombatAffinity, 10) : damageTypeIcon(type as DamageType, 10);
+  worldUi.addCombatText(position, `${blocked ? icon : ''}<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${blocked ? '' : icon}`, incoming);
 }
 
 class SpawnEntity {
@@ -444,9 +445,11 @@ function resetSpawnCooldowns(): void {
 
 function damageHero(amount: number, type: CombatAffinity): void {
   if (gameplay.hero.dead) return;
-  const reducedAmount = combat.enemyAttackDamage(amount, type, equippedDefense);
-  events.emit('heroDamaged', { amount: reducedAmount, damageType: type });
-  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true);
+  const defendedAmount = combat.enemyAttackDamage(amount, type, equippedDefense);
+  const blocked = combat.rollChance(heroBlockChance());
+  const reducedAmount = defendedAmount * (blocked ? BLOCKED_DAMAGE_MULTIPLIER : 1);
+  events.emit('heroDamaged', { amount: reducedAmount, damageType: type, blocked });
+  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true, blocked);
   const defeated = gameplay.damageHero(reducedAmount);
   updateHud();
   if (!defeated) return;
@@ -470,7 +473,8 @@ function autoAttack(): void {
     combat.schedule(hand, profile.cooldownSeconds);
     heroView.playWeaponAttack(hand, target.root.position, profile.cooldownSeconds);
     events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
-    target.receiveDamage(profile.damage, profile.damageType);
+    const critical = combat.rollChance(heroCriticalChance());
+    target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType);
     const direction = target.root.position.clone().sub(hero.position);
     if (direction.lengthSq() > 0) {
       gameplay.hero.facing = Math.atan2(direction.x, direction.z);

@@ -41,4 +41,8 @@ export class CombatSystem {
     const damageType: DamageType = type === 'pierce' ? 'piercing' : type;
     return Math.max(0, amount - defense(damageType));
   }
+
+  rollChance(chance: number, random = Math.random): boolean {
+    return random() < Math.max(0, Math.min(1, chance));
+  }
 }
