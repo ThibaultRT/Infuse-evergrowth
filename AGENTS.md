@@ -86,6 +86,7 @@ The key rule is **model/domain state first, systems operate on it, views render 
 - `src/controllers/`: camera and input handling.
 - `src/visuals.ts` and `src/icons.ts`: remaining shared Three.js helpers/materials and inline UI icon markup.
 - `src/version.ts`: reads the app version injected from `package.json`; `package.json` is the version source of truth.
+- `ARCHITECTURE.md`: current architecture review, renderer-migration risks, target headless-runtime boundary, and incremental separation plan.
 - `WIP/graphical.md`: durable graphical direction and the remaining graphical validation/optimization slice.
 
 ## Dependency rules
@@ -98,6 +99,7 @@ To keep domain logic testable and portable:
 4. UI may invoke explicit commands/actions and render state; it must not calculate combat, spawn rolls, loot, progression, respawn, or unlock rules.
 5. `Game.ts` coordinates lifecycle/update order. New feature-specific logic should normally be implemented in a domain module/system and called from the coordinator.
 6. Static authored definitions belong in JSON or definition catalogs; per-player/per-life mutable state belongs in the save model.
+7. New gameplay/runtime boundaries must use plain domain values and stable IDs, not `THREE.Vector3`, scene objects, DOM nodes, animation objects, or other presentation-engine types. See `ARCHITECTURE.md` for the migration target.
 
 ## Gameplay/data conventions
 
