@@ -13,12 +13,6 @@ const CLIPS: Record<HumanoidMotion, readonly string[]> = {
   death: ['Death01']
 };
 
-function enableShadows(object: THREE.Object3D): void {
-  object.traverse((child) => {
-    if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; }
-  });
-}
-
 export abstract class AnimatedHumanoidView {
   readonly root = new THREE.Group();
   protected model: THREE.Object3D | null = null;
@@ -41,7 +35,6 @@ export abstract class AnimatedHumanoidView {
         this.assets.cloneSkinnedScene(path),
         this.assets.load(ANIMATIONS)
       ]);
-      enableShadows(model);
       this.model = model;
       this.hands.left = model.getObjectByName('hand_l') ?? null;
       this.hands.right = model.getObjectByName('hand_r') ?? null;

@@ -4,15 +4,9 @@ import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
 const model = (group: 'nature' | 'village', name: string): string => `${group}/models/${name}.gltf`;
 
-function shadows(object: THREE.Object3D): void {
-  object.traverse((child) => {
-    if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; }
-  });
-}
-
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, x: number, y: number, z: number): THREE.Mesh {
   const object = new THREE.Mesh(geometry, material);
-  object.position.set(x, y, z); shadows(object);
+  object.position.set(x, y, z);
   return object;
 }
 
@@ -100,7 +94,7 @@ export class EnvironmentView {
       const [objects, pavement] = await Promise.all([
         Promise.all(placements.map(async ([path, x, z, scale = 1, rotation = 0]) => {
           const object = await this.assets.cloneScene(path);
-          object.position.set(x, .025, z); object.scale.setScalar(scale); object.rotation.y = rotation; shadows(object);
+          object.position.set(x, .025, z); object.scale.setScalar(scale); object.rotation.y = rotation;
           return object;
         })),
         this.buildPavement()
@@ -119,7 +113,6 @@ export class EnvironmentView {
     pavement.scale.set(19, 1, 28);
     pavement.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) return;
-      child.receiveShadow = true;
       const materials = Array.isArray(child.material) ? child.material : [child.material];
       const tiled = materials.map((source) => {
         const material = source.clone() as THREE.MeshStandardMaterial;

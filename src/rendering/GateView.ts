@@ -4,12 +4,6 @@ import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 const FRAME = 'village/models/DoorFrame_Round_Brick.gltf';
 const DOOR = 'village/models/Door_4_Round.gltf';
 
-function configure(object: THREE.Object3D): void {
-  object.traverse((child) => {
-    if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; }
-  });
-}
-
 export class GateView {
   readonly root = new THREE.Group();
   private doorPivot = new THREE.Group();
@@ -27,7 +21,7 @@ export class GateView {
     left.position.set(-1.35, 1.7, 0); right.position.set(1.35, 1.7, 0); lintel.position.set(0, 3.1, 0);
     door.position.set(1.02, 1.34, 0); this.doorPivot.position.x = -1.02;
     this.doorPivot.add(door); this.fallback.add(left, right, lintel, this.doorPivot);
-    configure(this.fallback); this.root.add(this.fallback);
+    this.root.add(this.fallback);
     void this.loadQuaterniusGate();
   }
 
@@ -41,7 +35,6 @@ export class GateView {
   private async loadQuaterniusGate(): Promise<void> {
     try {
       const [frame, door] = await Promise.all([this.assets.cloneScene(FRAME), this.assets.cloneScene(DOOR)]);
-      configure(frame); configure(door);
       const assembly = new THREE.Group();
       assembly.scale.setScalar(1.65);
       const pivot = new THREE.Group();
