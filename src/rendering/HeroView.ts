@@ -47,7 +47,7 @@ export class HeroView extends AnimatedHumanoidView {
       const phase = Math.sin(THREE.MathUtils.smoothstep(progress, 0, 1) * Math.PI);
       const root = slot === 'hand1' ? this.weaponRoots.right : this.weaponRoots.left;
       root.rotation.y = (slot === 'hand1' ? -1 : 1) * style.arc * phase;
-      root.position.z = -style.reach * phase;
+      root.position.z = style.reach * phase;
     }
     this.updateOrbits(dt);
   }

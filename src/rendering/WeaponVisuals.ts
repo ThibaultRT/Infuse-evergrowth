@@ -9,6 +9,8 @@ export function equipmentVisualId(item: WeaponDefinition): string { return `weap
 export function makeWeaponVisual(weaponClass: WeaponClass, rarity: EquipmentRarity): THREE.Group {
   const root = new THREE.Group();
   root.name = `weapon:${weaponClass}:${rarity}`;
+  // Hand attachments face local +Z, while the procedural weapons are authored toward -Z.
+  root.rotation.y = Math.PI;
   const metal = new THREE.MeshStandardMaterial({ color: RARITY[rarity], metalness: .62, roughness: .3 });
   const wood = new THREE.MeshStandardMaterial({ color: 0x56371f, roughness: .82 });
   const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.035, .045, weaponClass === 'spear' ? 1.75 : .7, 8), wood);
