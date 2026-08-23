@@ -64,10 +64,11 @@ renderer.domElement.addEventListener('webglcontextrestored', () => {
 });
 const effects = new EffectManager(scene);
 const worldUi = new WorldUiManager(camera, renderer.domElement, ui.world);
+const cooldown = (slot: 'hand1' | 'hand2' | 'orbit1' | 'orbit2'): number => attackProfile(slot)?.cooldownSeconds ?? 0;
 const combat = new CombatSystem({
-  hand2: attackProfile('hand2').cooldownSeconds * .5,
-  orbit1: attackProfile('orbit1').cooldownSeconds * .25,
-  orbit2: attackProfile('orbit2').cooldownSeconds * .75
+  hand2: cooldown('hand2') * .5,
+  orbit1: cooldown('orbit1') * .25,
+  orbit2: cooldown('orbit2') * .75
 });
 const respawns = new RespawnSystem();
 const areaFlow = new AreaFlowSystem();
@@ -452,10 +453,11 @@ function damageHero(amount: number, type: CombatAffinity): void {
 function autoAttack(): void {
   if (gameplay.hero.dead || cameraController.isScripted) return;
   for (const hand of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
-    if (!combat.ready(hand) || ((hand === 'orbit1' || hand === 'orbit2') && !save.inventory.equipped[hand])) continue;
+    if (!combat.ready(hand)) continue;
+    const profile = attackProfile(hand);
+    if (!profile) continue;
     const target = combat.nearestTarget(entities.filter((entity) => entity.def.areaId === currentAreaId), HERO_ATTACK_RANGE_METERS);
     if (!target) continue;
-    const profile = attackProfile(hand);
     combat.schedule(hand, profile.cooldownSeconds);
     heroView.playWeaponAttack(hand, target.root.position, profile.cooldownSeconds);
     events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
@@ -717,7 +719,9 @@ function updateHud(): void {
   ui.hpBar.style.width = `${gameplay.hero.hp / maxHp * 100}%`;
   for (const hand of ['hand1', 'hand2'] as const) {
     const profile = attackProfile(hand);
-    ui[hand === 'hand1' ? 'hand1Stat' : 'hand2Stat'].innerHTML = `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`;
+    ui[hand === 'hand1' ? 'hand1Stat' : 'hand2Stat'].innerHTML = profile
+      ? `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`
+      : '—';
   }
   updateTargetUi();
   updateRespawnIndicators();

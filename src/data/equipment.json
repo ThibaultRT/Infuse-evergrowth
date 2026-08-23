@@ -5,8 +5,8 @@
     "weaponClass": "sword",
     "rarity": "common",
     "damageType": "slash",
-    "baseDamage": 3,
-    "baseDamagePerLevel": 3,
+    "baseDamage": 12,
+    "baseDamagePerLevel": 12,
     "attackCooldownSeconds": 1,
     "kind": "weapon"
   },
@@ -60,8 +60,8 @@
     "weaponClass": "hammer",
     "rarity": "common",
     "damageType": "blunt",
-    "baseDamage": 3,
-    "baseDamagePerLevel": 3,
+    "baseDamage": 12,
+    "baseDamagePerLevel": 12,
     "attackCooldownSeconds": 1.5,
     "kind": "weapon"
   },
@@ -115,8 +115,8 @@
     "weaponClass": "spear",
     "rarity": "common",
     "damageType": "piercing",
-    "baseDamage": 3,
-    "baseDamagePerLevel": 3,
+    "baseDamage": 12,
+    "baseDamagePerLevel": 12,
     "attackCooldownSeconds": 1.25,
     "kind": "weapon"
   },

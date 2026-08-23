@@ -7,15 +7,6 @@ import { makeWeaponVisual } from './WeaponVisuals';
 
 const RANGER = 'characters/models/Male_Ranger.gltf';
 
-function handFocus(color: number): THREE.Mesh {
-  const focus = new THREE.Mesh(
-    new THREE.OctahedronGeometry(.055),
-    new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: .3, roughness: .5 })
-  );
-  focus.name = 'independent-hand-attachment';
-  return focus;
-}
-
 export class HeroView extends AnimatedHumanoidView {
   private targetFacing = 0;
   private inventory: InventoryState | null = null;
@@ -77,9 +68,8 @@ export class HeroView extends AnimatedHumanoidView {
 
   private attackClip(slot: 'hand1' | 'hand2'): string {
     const item = EQUIPMENT_BY_ID.get(this.inventory?.equipped[slot] ?? '');
-    if (item?.kind === 'weapon' && (item.weaponClass === 'sword' || item.weaponClass === 'hammer')) return 'Sword_Attack';
-    // Jab carries the left arm and Cross the right; both also make convincing restrained thrusts.
-    return slot === 'hand1' ? 'Punch_Cross' : 'Punch_Jab';
+    if (item?.kind === 'weapon' && item.weaponClass === 'spear') return 'Punch_Jab';
+    return 'Sword_Attack';
   }
 
   private biasLimbTowardTarget(slot: 'hand1' | 'hand2', progress: number): void {
@@ -96,7 +86,6 @@ export class HeroView extends AnimatedHumanoidView {
 
   protected override async onModelReady(): Promise<void> {
     this.root.add(this.orbitRoot);
-    this.weaponRoots.left.add(handFocus(0x63d9ff)); this.weaponRoots.right.add(handFocus(0xffc457));
     this.attach('left', this.weaponRoots.left); this.attach('right', this.weaponRoots.right);
     if (this.inventory) this.syncEquipment(this.inventory);
   }
