@@ -129,9 +129,9 @@ Current damage types:
 - **Slash** — Area 2 enemy attacks; represented by a sword icon.
 - **Pierce** — the displayed weakness for Area 2 enemies; represented by a spear icon.
 
-Area 1 enemies are weak to Slash. Area 2 enemies are weak to Pierce. A hit matching the defender's weakness deals **2× damage**, while the affinity the defender is strong against deals **0.5× damage**. The remaining affinity deals normal damage. Individual spawns can override their area's weakness or set it to `null`; the Area 1 Legendary boss is affinity-neutral.
+Area 1 enemies are weak to Slash. Area 2 enemies are weak to Pierce. A hero hit matching the enemy's weakness deals **2× damage**, while the affinity the enemy is strong against deals **0.5× damage**. The remaining affinity deals normal damage. Individual spawns can override their area's weakness or set it to `null`; the Area 1 Legendary boss is affinity-neutral.
 
-The hero currently wears Blunt-affinity armor. Blunt armor is weak to Pierce and strong against Blunt; Slash armor is weak to Blunt and strong against Slash; Pierce armor is weak to Slash and strong against Pierce. Hero armor and enemy affinities use the same cyclic rules.
+Enemy attacks do not apply affinity multipliers against the hero. Equipped helmets, armor, and boots instead provide flat damage reduction when their authored damage type matches the incoming attack. Matching gear can therefore reduce Slash, Blunt, or Piercing damage without doubling or halving the original attack.
 
 Future weapons can introduce additional damage types and their own attack ranges.
 
