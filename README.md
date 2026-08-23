@@ -2,54 +2,96 @@
 
 An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
-## v0.33 vertical slice
+## v0.45.0 vertical slice
 
-- Two authored areas with 29 fixed targets each and per-revival HP/reward rolls
-- Area 1's third Uncommon target is the current boss; Area 2's Rare target is its boss
+- Two authored adjacent areas with **29 fixed targets each** and per-revival HP/reward rolls
+- Area 1 population: 10 Crystals, 15 Commons, 3 Uncommons, 1 Rare; `area1-uncommon-03` is the gate boss
+- Area 2 population: 17 Crystals, 7 Commons, 3 Uncommons, 1 Rare, 1 Epic; `area2-rare-01` is its boss
 - Area 1 and the darker ashwood Area 2 meet at a shared, boss-gated physical passage
-- Defeating the boss opens the gate, briefly focuses the camera on it, and unlocks Area 2
-- Walking through the open gate crosses the shared boundary; Area 2's side remains open for the return journey
-- Animated Quaternius humanoids, an equipment-driven Ranger hero, dual hand weapons, and trial orbit slots
-- Hero starts at **20 Max HP**, **5 Blunt Attack**, and **0.10 HP/s** passive regeneration
+- Defeating the explicit boss opens the gate, briefly focuses the camera on it, and unlocks the destination area
+- Walking through the open gate crosses the shared boundary; Area 2 remains open for the return journey
+- Animated Quaternius humanoids, an equipment-driven Ranger hero, visible dual-hand weapons, armor slots, and orbit weapon slots
+- Hero starts at **20 Max HP**, **3 Blunt Attack**, and **0.10 HP/s** passive regeneration
 - Central touch joystick for iPhone plus WASD / arrow keys on desktop
-- Automatic combat: the hero attacks the nearest living target inside the current weapon range
+- Automatic combat: each active hand/orbit source attacks independently when its own cooldown and range permit
 - Hero attacks use cyclic combat affinities to double weakness damage and halve resisted damage, with area defaults and per-spawn enemy overrides
-- Enemy attacks ignore affinities; matching equipped armor instead provides flat damage reduction
-- Bare hands use **Blunt** damage, shown with a hammer icon
-- Targets advertise their current stat loot above the HP bar using only a value + icon
-- Stat gains from kills appear on the right as number + icon only and cascade upward
+- Enemy attacks ignore affinities; matching equipped helmet/armor/boots instead provide flat damage reduction
+- Rare equipment drops are resolved from area-specific loot tables and enemy-tier rarity ceilings
+- Equipment has persistent Level / Ascend progression and can be equipped through the inventory UI
+- Each spawn authors its own HP range and allowed permanent rewards; one roll is persisted for that life and rerolled on revival
+- Permanent rewards can increase Max HP, HP/s regeneration, or a specific damage-type attack stat
+- Stat gains and equipment drops use restrained reward feedback suited to portrait play
 - Fully defeated Common/Uncommon packs show a circular countdown until the first member respawns
-- Four equipment slots are shown side by side in a bottom dock, with an Inventory window ready for future equipment
-- Per-spawn escalating respawn timers with a local-midnight reset
-- Local save for permanent stats, area unlocks, boss progression, inventory, loot rolls, and daily spawn state
+- Per-spawn escalating respawn timers reset at local midnight
+- Save schema **v10** preserves permanent stats, area unlocks, boss progression, inventory/equipment progression, daily spawn state, and each spawn's current per-life roll
 - Installable PWA shell deployed through GitHub Pages
 
 ## Version source
 
-`package.json` is the single source of truth for the app version. The tiny in-game version label reads that package version at runtime, so a release bump does not require editing the UI separately.
+`package.json` is the single source of truth for the app version. The in-game version label reads that package version at runtime, so a release bump does not require editing the UI separately.
 
-## Balance data
+## Data sources
 
-All tunable gameplay numbers live in [`src/data/balance.json`](src/data/balance.json), including:
+Tunable gameplay values live in [`src/data/balance.json`](src/data/balance.json), including hero baselines, movement/combat values, enemy **attack** scaling, tier respawn multipliers, equipment-drop chances, affinity multipliers, and equipment progression coefficients.
 
-- hero base HP / attack / regeneration;
-- movement and bare-hand combat values (all configured distances are in meters);
-- enemy attack scaling;
-- tier respawn multipliers and colors;
-- respawn base time.
-- combat affinity multipliers.
+Authored content is kept separate:
 
-Authored map content lives separately in [`src/data/areas.json`](src/data/areas.json): area origins, spawn positions/groups, boss IDs, per-spawn HP/reward ranges, and gate definitions/tags.
+- [`src/data/areas.json`](src/data/areas.json): area origins, fixed spawns/groups, explicit bosses, gates, affinities, environment data, and per-spawn HP/reward ranges
+- [`src/data/equipment.json`](src/data/equipment.json): weapon and armor definitions
+- [`src/data/equipment-loot-tables.json`](src/data/equipment-loot-tables.json): area-specific equipment pools/unlocks
 
-## Authored difficulty
+## Authored spawn difficulty
 
-Enemy HP and permanent rewards are authored per spawn rather than derived from area/tier scaling. Each living occupant rolls HP, a reward type, and its reward amount from that spawn's configured ranges; a fresh roll is made on every revival and persisted with the spawn. Enemy attack damage continues to use the existing area/tier scaling.
+Enemy HP and permanent rewards are no longer derived from one global area/tier HP-and-reward formula.
 
-## Current damage types
+Each authored spawn defines:
 
-| Type | Current source | Base attack |
-| --- | --- | ---: |
-| Blunt | Bare hands | 5 |
+```text
+hp: { min, max }
+rewards: [{ stat, min, max }, ...]
+isBoss: optional explicit boss marker
+```
+
+When a spawn gets a new life, the game rolls:
+
+1. its Max HP inside the authored HP range;
+2. one allowed reward definition;
+3. that reward's amount inside its authored range.
+
+The complete roll is persisted in the save for that life, so the HP and reward shown to the player do not change until the spawn revives. A fresh roll is generated on revival or the local-midnight daily reset.
+
+Enemy **attack** damage still uses the existing area/tier scaling path. Boss progression is driven by authored boss identity rather than assuming that a particular rarity is always a boss.
+
+## Combat affinities and equipment
+
+Current explicit damage types are:
+
+| Type | Current examples |
+| --- | --- |
+| Blunt | Bare hands, hammers, Area 1 enemy attacks |
+| Slash | Swords, Area 2 enemy attacks |
+| Piercing | Spears and matching armor mitigation |
+
+Hero attacks use the enemy's authored weakness/resistance relationship. Enemy attacks do not use that affinity multiplier against the hero; equipped armor instead subtracts matching flat defense.
+
+Both hand slots are independent attack sources. Equipment definitions and owned progression are separate so static item data does not become duplicated save state.
+
+For equipped weapons, total attack damage is:
+
+```text
+weapon attack = calculated weapon damage + hero attack stat for that weapon's damage type
+```
+
+The hero stat is persistent across equipment changes. For example, permanent Blunt gains continue to apply when switching from a Common hammer to an Uncommon hammer; only the weapon contribution changes. A bare hand is not added as another damage term on top of a weapon.
+
+Ascend intentionally increases both the weapon's starting power and its growth rate. A new Ascend starts from the configured multiple of the previous Ascend's Level-50 damage, and the current `perLevelMultiplierPerAscend = 2` means damage gained per level also doubles with each Ascend.
+
+## Architecture and work-in-progress docs
+
+Long-lived contributor/agent rules are in [`AGENTS.md`](AGENTS.md).
+
+- [`implementation-cleanup.md`](implementation-cleanup.md) contains only remaining architecture cleanup work.
+- [`WIP/graphical.md`](WIP/graphical.md) records the durable visual direction; slices 1–9 are complete and slice 10 is the remaining optimization/release-validation pass.
 
 ## Run locally
 
