@@ -174,6 +174,7 @@ class SpawnEntity {
   readonly lootLabel = document.createElement('div');
   readonly healthBar = document.createElement('div');
   readonly healthFill = document.createElement('span');
+  readonly healthValue = document.createElement('strong');
   readonly enemyView: EnemyView | null;
   deathPresentationRemaining = 0;
   readonly state: RuntimeSpawn;
@@ -191,12 +192,13 @@ class SpawnEntity {
     this.targetUi.className = `world-target-ui rarity-${def.tier}`;
     this.lootLabel.className = 'world-loot';
     this.healthBar.className = 'world-hp-bar';
-    this.healthFill.style.backgroundColor = `#${this.config.color.toString(16).padStart(6, '0')}`;
-    this.healthBar.append(this.healthFill);
+    this.healthValue.className = 'world-hp-value';
+    this.healthBar.append(this.healthFill, this.healthValue);
     this.targetUi.append(this.lootLabel, this.healthBar);
     ui.world.append(this.targetUi);
 
     this.renderLoot();
+    this.renderHealth();
     this.syncAreaVisibility();
   }
 
@@ -210,6 +212,13 @@ class SpawnEntity {
     this.lootLabel.innerHTML = `<span>${formatRewardAmount(reward.amount)}</span>${lootIcon(loot)}`;
   }
 
+  renderHealth(): void {
+    const hp = Math.max(0, this.hp);
+    this.healthFill.style.width = `${(hp / this.maxHp) * 100}%`;
+    this.healthValue.textContent = String(Math.ceil(hp));
+    this.healthBar.setAttribute('aria-label', `${Math.ceil(hp)} of ${this.maxHp} health`);
+  }
+
   syncAreaVisibility(): void {
     const visible = (this.alive || this.deathPresentationRemaining > 0) && this.def.areaId === currentAreaId;
     this.root.visible = visible;
@@ -220,16 +229,16 @@ class SpawnEntity {
     gameplay.setSpawnAlive(this.def.id, value, value ? save.spawns[this.def.id].roll.maxHp : undefined);
     if (value) {
       this.deathPresentationRemaining = 0;
-      this.healthFill.style.width = '100%';
       this.renderLoot();
     }
+    this.renderHealth();
     this.syncTransform();
     this.syncAreaVisibility();
   }
 
   forceRespawn(): void { this.setAlive(true); }
   resetAfterHeroDefeat(): void {
-    this.healthFill.style.width = '100%';
+    this.renderHealth();
     this.syncTransform();
   }
   distanceToHero(): number { return gameplay.distanceFromHero(this.state.position); }
@@ -243,7 +252,7 @@ class SpawnEntity {
     showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), affinityAmount, type);
     const result = gameplay.damageSpawn(this.def.id, affinityAmount);
     if (!result) return;
-    this.healthFill.style.width = `${(result.hp / this.maxHp) * 100}%`;
+    this.renderHealth();
     if (result.defeated) this.defeat();
   }
 
