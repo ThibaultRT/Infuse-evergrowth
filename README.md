@@ -2,7 +2,7 @@
 
 An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
-## v0.47.1 vertical slice
+## v0.48.0 vertical slice
 
 - Two authored adjacent areas with **29 fixed targets each** and per-revival HP/reward rolls
 - Area 1 population: 10 Crystals, 15 Commons, 3 Uncommons, 1 Rare; `area1-uncommon-03` is the gate boss
@@ -25,6 +25,7 @@ An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 - Per-spawn escalating respawn timers reset at local midnight
 - Save schema **v10** preserves permanent stats, area unlocks, boss progression, inventory/equipment progression, daily spawn state, and each spawn's current per-life roll
 - Installable PWA shell deployed through GitHub Pages
+- Renderer-independent live-world simulation; Three.js views mirror plain gameplay positions and life state
 
 ## Version source
 
