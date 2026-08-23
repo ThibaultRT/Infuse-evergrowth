@@ -1,8 +1,8 @@
 import { BASE_HERO_BLUNT_ATTACK, BASE_HERO_MAX_HP, BASE_HERO_REGEN, LOOT_HP_WEIGHT, SPAWNS } from './config';
 import type { DamageType, InventoryState, LootType, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v8';
-const PREVIOUS_SAVE_KEY = 'infuse-evergrowth-save-v7';
+const SAVE_KEY = 'infuse-evergrowth-save-v9';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -36,7 +36,7 @@ function freshStats(): PlayerStats {
 }
 
 function freshInventory(): InventoryState {
-  return { items: {}, equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null } };
+  return { items: {}, equipped: { hand1: null, hand2: null, orbit1: null, orbit2: null, helmet: null, armor: null, legs: null } };
 }
 
 function migrateInventory(value: unknown): InventoryState {
@@ -72,7 +72,7 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 
 function loadSave(): SaveData {
   const fresh: SaveData = {
-    version: 8,
+    version: 9,
     dailyKey: localDailyKey(),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -82,14 +82,14 @@ function loadSave(): SaveData {
     spawns: emptySpawnState()
   };
   try {
-    const raw = localStorage.getItem(SAVE_KEY) ?? localStorage.getItem(PREVIOUS_SAVE_KEY);
+    const raw = localStorage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version'> & { version?: number };
-    if ((parsed.version !== 7 && parsed.version !== 8) || !parsed.stats) return fresh;
+    if (![7, 8, 9].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
     const unlockedAreas = Array.from(new Set([1, ...(parsed.unlockedAreas ?? [])]));
     const requestedArea = parsed.currentAreaId ?? 1;
     return {
-      version: 8,
+      version: 9,
       dailyKey: localDailyKey(),
       currentAreaId: unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,

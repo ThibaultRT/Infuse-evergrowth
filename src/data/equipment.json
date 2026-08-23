@@ -1,17 +1,572 @@
 [
-  {"id":"sword-common","name":"Militia Shortsword","weaponClass":"sword","rarity":"common","damageType":"slash","baseDamage":3,"baseDamagePerLevel":3,"attackCooldownSeconds":1},
-  {"id":"sword-uncommon","name":"Verdant Longsword","weaponClass":"sword","rarity":"uncommon","damageType":"slash","baseDamage":5,"baseDamagePerLevel":4,"attackCooldownSeconds":1},
-  {"id":"sword-rare","name":"Azure Knightblade","weaponClass":"sword","rarity":"rare","damageType":"slash","baseDamage":8,"baseDamagePerLevel":6,"attackCooldownSeconds":1},
-  {"id":"sword-epic","name":"Runebound Falchion","weaponClass":"sword","rarity":"epic","damageType":"slash","baseDamage":13,"baseDamagePerLevel":9,"attackCooldownSeconds":1},
-  {"id":"sword-legendary","name":"Dawnbreaker","weaponClass":"sword","rarity":"legendary","damageType":"slash","baseDamage":21,"baseDamagePerLevel":13,"attackCooldownSeconds":1},
-  {"id":"hammer-common","name":"Blacksmith's Hammer","weaponClass":"hammer","rarity":"common","damageType":"blunt","baseDamage":3,"baseDamagePerLevel":3,"attackCooldownSeconds":1.5},
-  {"id":"hammer-uncommon","name":"Ironroot Maul","weaponClass":"hammer","rarity":"uncommon","damageType":"blunt","baseDamage":5,"baseDamagePerLevel":4,"attackCooldownSeconds":1.5},
-  {"id":"hammer-rare","name":"Watchtower Crusher","weaponClass":"hammer","rarity":"rare","damageType":"blunt","baseDamage":8,"baseDamagePerLevel":6,"attackCooldownSeconds":1.5},
-  {"id":"hammer-epic","name":"Earthshaker","weaponClass":"hammer","rarity":"epic","damageType":"blunt","baseDamage":13,"baseDamagePerLevel":9,"attackCooldownSeconds":1.5},
-  {"id":"hammer-legendary","name":"Kingfall","weaponClass":"hammer","rarity":"legendary","damageType":"blunt","baseDamage":21,"baseDamagePerLevel":13,"attackCooldownSeconds":1.5},
-  {"id":"spear-common","name":"Ashwood Spear","weaponClass":"spear","rarity":"common","damageType":"piercing","baseDamage":3,"baseDamagePerLevel":3,"attackCooldownSeconds":1.25},
-  {"id":"spear-uncommon","name":"Briar Pike","weaponClass":"spear","rarity":"uncommon","damageType":"piercing","baseDamage":5,"baseDamagePerLevel":4,"attackCooldownSeconds":1.25},
-  {"id":"spear-rare","name":"Sentinel's Lance","weaponClass":"spear","rarity":"rare","damageType":"piercing","baseDamage":8,"baseDamagePerLevel":6,"attackCooldownSeconds":1.25},
-  {"id":"spear-epic","name":"Starfall Glaive","weaponClass":"spear","rarity":"epic","damageType":"piercing","baseDamage":13,"baseDamagePerLevel":9,"attackCooldownSeconds":1.25},
-  {"id":"spear-legendary","name":"Skyspike","weaponClass":"spear","rarity":"legendary","damageType":"piercing","baseDamage":21,"baseDamagePerLevel":13,"attackCooldownSeconds":1.25}
+  {
+    "id": "sword-common",
+    "name": "Militia Shortsword",
+    "weaponClass": "sword",
+    "rarity": "common",
+    "damageType": "slash",
+    "baseDamage": 3,
+    "baseDamagePerLevel": 3,
+    "attackCooldownSeconds": 1,
+    "kind": "weapon"
+  },
+  {
+    "id": "sword-uncommon",
+    "name": "Verdant Longsword",
+    "weaponClass": "sword",
+    "rarity": "uncommon",
+    "damageType": "slash",
+    "baseDamage": 5,
+    "baseDamagePerLevel": 4,
+    "attackCooldownSeconds": 1,
+    "kind": "weapon"
+  },
+  {
+    "id": "sword-rare",
+    "name": "Azure Knightblade",
+    "weaponClass": "sword",
+    "rarity": "rare",
+    "damageType": "slash",
+    "baseDamage": 8,
+    "baseDamagePerLevel": 6,
+    "attackCooldownSeconds": 1,
+    "kind": "weapon"
+  },
+  {
+    "id": "sword-epic",
+    "name": "Runebound Falchion",
+    "weaponClass": "sword",
+    "rarity": "epic",
+    "damageType": "slash",
+    "baseDamage": 13,
+    "baseDamagePerLevel": 9,
+    "attackCooldownSeconds": 1,
+    "kind": "weapon"
+  },
+  {
+    "id": "sword-legendary",
+    "name": "Dawnbreaker",
+    "weaponClass": "sword",
+    "rarity": "legendary",
+    "damageType": "slash",
+    "baseDamage": 21,
+    "baseDamagePerLevel": 13,
+    "attackCooldownSeconds": 1,
+    "kind": "weapon"
+  },
+  {
+    "id": "hammer-common",
+    "name": "Blacksmith's Hammer",
+    "weaponClass": "hammer",
+    "rarity": "common",
+    "damageType": "blunt",
+    "baseDamage": 3,
+    "baseDamagePerLevel": 3,
+    "attackCooldownSeconds": 1.5,
+    "kind": "weapon"
+  },
+  {
+    "id": "hammer-uncommon",
+    "name": "Ironroot Maul",
+    "weaponClass": "hammer",
+    "rarity": "uncommon",
+    "damageType": "blunt",
+    "baseDamage": 5,
+    "baseDamagePerLevel": 4,
+    "attackCooldownSeconds": 1.5,
+    "kind": "weapon"
+  },
+  {
+    "id": "hammer-rare",
+    "name": "Watchtower Crusher",
+    "weaponClass": "hammer",
+    "rarity": "rare",
+    "damageType": "blunt",
+    "baseDamage": 8,
+    "baseDamagePerLevel": 6,
+    "attackCooldownSeconds": 1.5,
+    "kind": "weapon"
+  },
+  {
+    "id": "hammer-epic",
+    "name": "Earthshaker",
+    "weaponClass": "hammer",
+    "rarity": "epic",
+    "damageType": "blunt",
+    "baseDamage": 13,
+    "baseDamagePerLevel": 9,
+    "attackCooldownSeconds": 1.5,
+    "kind": "weapon"
+  },
+  {
+    "id": "hammer-legendary",
+    "name": "Kingfall",
+    "weaponClass": "hammer",
+    "rarity": "legendary",
+    "damageType": "blunt",
+    "baseDamage": 21,
+    "baseDamagePerLevel": 13,
+    "attackCooldownSeconds": 1.5,
+    "kind": "weapon"
+  },
+  {
+    "id": "spear-common",
+    "name": "Ashwood Spear",
+    "weaponClass": "spear",
+    "rarity": "common",
+    "damageType": "piercing",
+    "baseDamage": 3,
+    "baseDamagePerLevel": 3,
+    "attackCooldownSeconds": 1.25,
+    "kind": "weapon"
+  },
+  {
+    "id": "spear-uncommon",
+    "name": "Briar Pike",
+    "weaponClass": "spear",
+    "rarity": "uncommon",
+    "damageType": "piercing",
+    "baseDamage": 5,
+    "baseDamagePerLevel": 4,
+    "attackCooldownSeconds": 1.25,
+    "kind": "weapon"
+  },
+  {
+    "id": "spear-rare",
+    "name": "Sentinel's Lance",
+    "weaponClass": "spear",
+    "rarity": "rare",
+    "damageType": "piercing",
+    "baseDamage": 8,
+    "baseDamagePerLevel": 6,
+    "attackCooldownSeconds": 1.25,
+    "kind": "weapon"
+  },
+  {
+    "id": "spear-epic",
+    "name": "Starfall Glaive",
+    "weaponClass": "spear",
+    "rarity": "epic",
+    "damageType": "piercing",
+    "baseDamage": 13,
+    "baseDamagePerLevel": 9,
+    "attackCooldownSeconds": 1.25,
+    "kind": "weapon"
+  },
+  {
+    "id": "spear-legendary",
+    "name": "Skyspike",
+    "weaponClass": "spear",
+    "rarity": "legendary",
+    "damageType": "piercing",
+    "baseDamage": 21,
+    "baseDamagePerLevel": 13,
+    "attackCooldownSeconds": 1.25,
+    "kind": "weapon"
+  },
+  {
+    "id": "helmet-blunt-common",
+    "name": "Common Stonecap",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "common",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "helmet-slash-common",
+    "name": "Common Briar Helm",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "common",
+    "damageType": "slash",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "helmet-piercing-common",
+    "name": "Common Sentinel Hood",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "common",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "helmet-blunt-uncommon",
+    "name": "Uncommon Stonecap",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "uncommon",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "helmet-slash-uncommon",
+    "name": "Uncommon Briar Helm",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "uncommon",
+    "damageType": "slash",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "helmet-piercing-uncommon",
+    "name": "Uncommon Sentinel Hood",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "uncommon",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "helmet-blunt-rare",
+    "name": "Rare Stonecap",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "rare",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "helmet-slash-rare",
+    "name": "Rare Briar Helm",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "rare",
+    "damageType": "slash",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "helmet-piercing-rare",
+    "name": "Rare Sentinel Hood",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "rare",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "helmet-blunt-epic",
+    "name": "Epic Stonecap",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "epic",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "helmet-slash-epic",
+    "name": "Epic Briar Helm",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "epic",
+    "damageType": "slash",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "helmet-piercing-epic",
+    "name": "Epic Sentinel Hood",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "epic",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "helmet-blunt-legendary",
+    "name": "Legendary Stonecap",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "legendary",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "helmet-slash-legendary",
+    "name": "Legendary Briar Helm",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "legendary",
+    "damageType": "slash",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "helmet-piercing-legendary",
+    "name": "Legendary Sentinel Hood",
+    "kind": "armor",
+    "armorClass": "helmet",
+    "rarity": "legendary",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "armor-blunt-common",
+    "name": "Common Stoneplate",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "common",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "armor-slash-common",
+    "name": "Common Briar Mail",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "common",
+    "damageType": "slash",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "armor-piercing-common",
+    "name": "Common Sentinel Vest",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "common",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "armor-blunt-uncommon",
+    "name": "Uncommon Stoneplate",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "uncommon",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "armor-slash-uncommon",
+    "name": "Uncommon Briar Mail",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "uncommon",
+    "damageType": "slash",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "armor-piercing-uncommon",
+    "name": "Uncommon Sentinel Vest",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "uncommon",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "armor-blunt-rare",
+    "name": "Rare Stoneplate",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "rare",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "armor-slash-rare",
+    "name": "Rare Briar Mail",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "rare",
+    "damageType": "slash",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "armor-piercing-rare",
+    "name": "Rare Sentinel Vest",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "rare",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "armor-blunt-epic",
+    "name": "Epic Stoneplate",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "epic",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "armor-slash-epic",
+    "name": "Epic Briar Mail",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "epic",
+    "damageType": "slash",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "armor-piercing-epic",
+    "name": "Epic Sentinel Vest",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "epic",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "armor-blunt-legendary",
+    "name": "Legendary Stoneplate",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "legendary",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "armor-slash-legendary",
+    "name": "Legendary Briar Mail",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "legendary",
+    "damageType": "slash",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "armor-piercing-legendary",
+    "name": "Legendary Sentinel Vest",
+    "kind": "armor",
+    "armorClass": "armor",
+    "rarity": "legendary",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "boots-blunt-common",
+    "name": "Common Stonegreaves",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "common",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "boots-slash-common",
+    "name": "Common Briar Treads",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "common",
+    "damageType": "slash",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "boots-piercing-common",
+    "name": "Common Sentinel Boots",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "common",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 1
+  },
+  {
+    "id": "boots-blunt-uncommon",
+    "name": "Uncommon Stonegreaves",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "uncommon",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "boots-slash-uncommon",
+    "name": "Uncommon Briar Treads",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "uncommon",
+    "damageType": "slash",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "boots-piercing-uncommon",
+    "name": "Uncommon Sentinel Boots",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "uncommon",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 2
+  },
+  {
+    "id": "boots-blunt-rare",
+    "name": "Rare Stonegreaves",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "rare",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "boots-slash-rare",
+    "name": "Rare Briar Treads",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "rare",
+    "damageType": "slash",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "boots-piercing-rare",
+    "name": "Rare Sentinel Boots",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "rare",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 4
+  },
+  {
+    "id": "boots-blunt-epic",
+    "name": "Epic Stonegreaves",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "epic",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "boots-slash-epic",
+    "name": "Epic Briar Treads",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "epic",
+    "damageType": "slash",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "boots-piercing-epic",
+    "name": "Epic Sentinel Boots",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "epic",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 8
+  },
+  {
+    "id": "boots-blunt-legendary",
+    "name": "Legendary Stonegreaves",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "legendary",
+    "damageType": "blunt",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "boots-slash-legendary",
+    "name": "Legendary Briar Treads",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "legendary",
+    "damageType": "slash",
+    "baseDefensePerLevel": 15
+  },
+  {
+    "id": "boots-piercing-legendary",
+    "name": "Legendary Sentinel Boots",
+    "kind": "armor",
+    "armorClass": "boots",
+    "rarity": "legendary",
+    "damageType": "piercing",
+    "baseDefensePerLevel": 15
+  }
 ]

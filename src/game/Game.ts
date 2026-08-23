@@ -20,13 +20,13 @@ import {
 } from '../config';
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, rollLoot, save } from '../save';
-import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig, WeaponSlotId } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
-import { applyEquipmentCopies, ascend, attackProfile, equip, unequip } from '../systems/EquipmentSystem';
+import { applyEquipmentCopies, ascend, attackProfile, equip, equipmentSlot, equippedDefense, unequip } from '../systems/EquipmentSystem';
 import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView } from '../rendering/EnvironmentView';
@@ -94,7 +94,7 @@ let heroHp = maxHeroHp();
 let heroDead = false;
 let heroRespawnAt = 0;
 let heroDeathHidden = false;
-const attackCooldowns: Record<EquipmentSlotId, number> = {
+const attackCooldowns: Record<WeaponSlotId, number> = {
   hand1: 0,
   hand2: attackProfile('hand2').cooldownSeconds * .5,
   orbit1: attackProfile('orbit1').cooldownSeconds * .25,
@@ -463,7 +463,8 @@ function resetSpawnCooldowns(): void {
 
 function damageHero(amount: number, type: CombatAffinity): void {
   if (heroDead) return;
-  const affinityAmount = affinityDamage(amount, type, armorWeakness(HERO_ARMOR_AFFINITY));
+  const damageType: DamageType = type === 'pierce' ? 'piercing' : type;
+  const affinityAmount = Math.max(0, affinityDamage(amount, type, armorWeakness(HERO_ARMOR_AFFINITY)) - equippedDefense(damageType));
   events.emit('heroDamaged', { amount: affinityAmount, damageType: type });
   heroView.playHit();
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), affinityAmount, type, true);
@@ -605,7 +606,8 @@ ui.weaponDetail.addEventListener('click', (event) => {
   const itemId = button?.dataset.itemId;
   if (!button || !itemId) return;
   if (button.hasAttribute('data-equip')) {
-    const hand = (['hand1', 'hand2'] as const).find((slot) => save.inventory.equipped[slot] === null);
+    const armorSlot = equipmentSlot(itemId);
+    const hand = armorSlot ?? (['hand1', 'hand2'] as const).find((slot) => save.inventory.equipped[slot] === null);
     if (!hand) { showToast('no free slots!'); return; }
     equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand });
   }
@@ -619,13 +621,14 @@ function dragFrom(element: HTMLElement): EquipmentDrag | null {
   const itemId = element.dataset.itemId;
   if (!itemId) return null;
   const slot = element.closest<HTMLElement>('[data-slot]')?.dataset.slot;
-  return { itemId, sourceHand: slot === 'hand1' || slot === 'hand2' || slot === 'orbit1' || slot === 'orbit2' ? slot : null };
+  return { itemId, sourceHand: slot && ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs'].includes(slot) ? slot as EquipmentSlotId : null };
 }
 function completeEquipmentDrag(drag: EquipmentDrag, target: Element | null): void {
   const slot = target?.closest<HTMLElement>('.inventory-equip-slot:not(.locked)')?.dataset.slot;
-  if (slot === 'hand1' || slot === 'hand2' || slot === 'orbit1' || slot === 'orbit2') {
-    equip(drag.itemId, slot);
-    events.emit('equipmentEquipped', { itemId: drag.itemId, hand: slot });
+  if (slot && ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs'].includes(slot)) {
+    const equipmentSlotId = slot as EquipmentSlotId;
+    equip(drag.itemId, equipmentSlotId);
+    events.emit('equipmentEquipped', { itemId: drag.itemId, hand: equipmentSlotId });
   } else if (target?.closest('#inventory-bag') && drag.sourceHand) {
     unequip(drag.sourceHand);
     events.emit('equipmentUnequipped', { itemId: drag.itemId, hand: drag.sourceHand });
