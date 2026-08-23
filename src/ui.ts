@@ -1,6 +1,8 @@
 import './reward-popups.css';
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from './icons';
 import { save, statAdditiveTotal, statTotal } from './save';
+import { logarithmicStat } from './domain/combat/HeroStats';
+import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED } from './config';
 import { EQUIPMENT_BY_ID, equipmentDamage, equipmentDefense } from './systems/EquipmentSystem';
 import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, PlayerStats, StatSources } from './types';
 
@@ -177,7 +179,8 @@ function renderBreakdown(label: string, stat: StatSources, suffix = ''): string 
 
 export function renderStats(stats: PlayerStats): void {
   const bluntLabel = `<span class="stat-title-with-icon">${bluntHammerIcon(14)} Blunt attack</span>`;
-  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Health regeneration', stats.regen, ' HP/s')].join('');
+  const scaled = (label: string, stat: StatSources, baseline: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${logarithmicStat(statTotal(stat), baseline).toFixed(2)}${suffix}</strong></div>`;
+  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Health regeneration', stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%')].join('');
 }
 
 const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Hand 1', hand2: 'Hand 2', orbit1: 'Orbit 1', orbit2: 'Orbit 2', helmet: 'Helmet', armor: 'Armor', legs: 'Legs' };

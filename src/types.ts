@@ -60,6 +60,10 @@ export type PlayerStats = {
   maxHp: StatSources;
   attack: Record<DamageType, StatSources>;
   regen: StatSources;
+  speed: StatSources;
+  criticalChance: StatSources;
+  criticalDamage: StatSources;
+  blockChance: StatSources;
 };
 
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -78,7 +82,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 10;
+  version: 11;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];

@@ -35,3 +35,9 @@ export function heartIcon(size = 12): string {
     <path d="M12 21s-7.5-4.7-9.4-9.2C.9 7.9 3.2 4 7.2 4c2.1 0 3.7 1.1 4.8 2.7C13.1 5.1 14.7 4 16.8 4c4 0 6.3 3.9 4.6 7.8C19.5 16.3 12 21 12 21Z" fill="currentColor"/>
   </svg>`;
 }
+
+export function shieldIcon(size = 12): string {
+  return `<svg class="stat-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 2 21 5v6c0 5.7-3.8 9.4-9 11-5.2-1.6-9-5.3-9-11V5l9-3Zm0 3.1L6 7v4c0 3.9 2.3 6.6 6 8 3.7-1.4 6-4.1 6-8V7l-6-1.9Z" fill="currentColor"/>
+  </svg>`;
+}
