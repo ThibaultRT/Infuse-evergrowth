@@ -101,6 +101,8 @@ To keep domain logic testable and portable:
 - Player source-aware stats use `total = (base + sum(additive sources)) × product(multiplicative sources)`; keep this renderer-independent.
 - Damage types are explicit (`DamageType`). Do not introduce an untracked generic weapon-damage type.
 - Both hero hand slots are independent attack sources. Bare-hand and equipped-weapon attacks must remain independently schedulable.
+- An empty hand attacks using the hero's Blunt attack stat alone. An equipped weapon attacks for **that weapon's calculated equipment damage + the hero's persistent attack stat of the same damage type**. Do not add a separate bare-hand damage term on top of an equipped weapon. This means accumulated permanent Blunt growth continues to benefit any equipped hammer, and switching from one hammer to another preserves the hero's permanent Blunt contribution while replacing only the weapon contribution.
+- Equipment Ascend intentionally scales both dimensions of weapon progression: a new Ascend base starts from the configured multiple of the previous Ascend's Level-50 damage, and per-level growth is also multiplied by `perLevelMultiplierPerAscend` for each Ascend. The current configured per-level multiplier is `2`, so per-level growth doubles on every Ascend; do not revert this to constant per-level growth as an alleged cleanup.
 - Spawns have stable authored IDs. Respawn state is stored per spawn with `killsToday`, `defeatedAt`, `respawnAt`, and rolled loot.
 - Daily spawn state resets at local midnight. Permanent player stats, boss progression, inventory, and unlocked areas persist.
 - Boss identity is explicit authored data and must not be inferred permanently from `Legendary` rarity.
