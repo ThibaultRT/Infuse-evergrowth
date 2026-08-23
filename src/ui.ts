@@ -199,7 +199,8 @@ export function renderInventory(inventory: InventoryState): void {
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
     slotEl.innerHTML = item ? `<span>${label}</span>${damageTypeIcon(item.damageType, 19)}` : `<span>${label}</span>`;
   });
-  const items = Object.values(inventory.items);
+  const equippedItemIds = new Set(Object.values(inventory.equipped));
+  const items = Object.values(inventory.items).filter((owned) => !equippedItemIds.has(owned.itemId));
   ui.inventoryBag.innerHTML = items.length ? items.map((owned) => { const item = EQUIPMENT_BY_ID.get(owned.itemId); return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}" type="button" data-item-id="${owned.itemId}" draggable="true" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}">${item ? damageTypeIcon(item.damageType, 27) : ''}<span>Lv ${owned.level} · A${owned.ascend}</span></button>`; }).join('') : '<div class="inventory-empty">No equipment found yet.</div>';
 }
 
