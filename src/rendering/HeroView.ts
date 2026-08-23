@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { makeHumanoid } from '../visuals';
 import { AnimatedHumanoidView } from './AnimatedHumanoidView';
-import type { DamageType, EquipmentSlotId, InventoryState } from '../types';
+import type { DamageType, InventoryState, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { attackStyle, makeWeaponVisual } from './WeaponVisuals';
 
@@ -57,18 +57,18 @@ export class HeroView extends AnimatedHumanoidView {
     for (const [slot, side] of [['hand1', 'right'], ['hand2', 'left']] as const) {
       const root = this.weaponRoots[side]; root.clear();
       const item = EQUIPMENT_BY_ID.get(inventory.equipped[slot] ?? '');
-      if (item) root.add(makeWeaponVisual(item.weaponClass, item.rarity));
+      if (item?.kind === 'weapon') root.add(makeWeaponVisual(item.weaponClass, item.rarity));
     }
     this.orbitRoot.clear(); this.orbitWeapons = {};
     for (const [index, slot] of (['orbit1', 'orbit2'] as const).entries()) {
       const item = EQUIPMENT_BY_ID.get(inventory.equipped[slot] ?? '');
-      if (!item) continue;
+      if (item?.kind !== 'weapon') continue;
       const weapon = makeWeaponVisual(item.weaponClass, item.rarity); weapon.scale.setScalar(.85);
       this.orbitRoot.add(weapon); this.orbitWeapons[slot] = weapon; weapon.userData.orbitIndex = index;
     }
   }
 
-  playWeaponAttack(slot: EquipmentSlotId, type: DamageType, target: THREE.Vector3, duration: number): void {
+  playWeaponAttack(slot: WeaponSlotId, type: DamageType, target: THREE.Vector3, duration: number): void {
     if (slot === 'hand1' || slot === 'hand2') {
       this.attackType[slot] = type;
       this.attackDuration[slot] = Math.max(duration, Number.EPSILON);

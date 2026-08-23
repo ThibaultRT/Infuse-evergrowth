@@ -2,10 +2,12 @@ import balance from '../../data/balance.json';
 import type { EquipmentDefinition, OwnedEquipment } from '../../types';
 
 function growthAtAscend(item: EquipmentDefinition, ascend: number): number {
+  if (item.kind !== 'weapon') return 0;
   return item.baseDamagePerLevel * balance.equipmentProgression.perLevelMultiplierPerAscend ** ascend;
 }
 
 function baseAtAscend(item: EquipmentDefinition, ascend: number): number {
+  if (item.kind !== 'weapon') return 0;
   let base = item.baseDamage;
   for (let current = 0; current < ascend; current += 1) {
     base = balance.equipmentProgression.ascendBaseMultiplier * (base + (balance.equipmentProgression.ascendLevel - 1) * growthAtAscend(item, current));
@@ -15,7 +17,13 @@ function baseAtAscend(item: EquipmentDefinition, ascend: number): number {
 
 /** Pure item-domain calculation: no save, renderer, UI, or world dependencies. */
 export function equipmentDamage(item: EquipmentDefinition, owned: OwnedEquipment): number {
+  if (item.kind !== 'weapon') return 0;
   return baseAtAscend(item, owned.ascend) + (owned.level - 1) * growthAtAscend(item, owned.ascend);
+}
+
+/** Flat mitigation supplied by one armor item for its authored damage type. */
+export function equipmentDefense(item: EquipmentDefinition, owned: OwnedEquipment): number {
+  return item.kind === 'armor' ? owned.level * item.baseDefensePerLevel * 2 ** owned.ascend : 0;
 }
 
 export function canAscend(owned: OwnedEquipment): boolean {

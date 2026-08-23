@@ -2,7 +2,9 @@ export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legend
 export type DamageType = 'blunt' | 'slash' | 'piercing';
 export type CombatAffinity = 'blunt' | 'slash' | 'pierce';
 export type LootType = 'hp' | DamageType;
-export type EquipmentSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
+export type WeaponSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
+export type ArmorSlotId = 'helmet' | 'armor' | 'legs';
+export type EquipmentSlotId = WeaponSlotId | ArmorSlotId;
 
 export type SpawnDefinition = {
   id: string;
@@ -57,7 +59,11 @@ export type PlayerStats = {
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type WeaponClass = 'sword' | 'hammer' | 'spear';
 export type HandSlotId = 'hand1' | 'hand2';
-export type EquipmentDefinition = { id: string; name: string; weaponClass: WeaponClass; rarity: EquipmentRarity; damageType: DamageType; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
+export type ArmorClass = 'helmet' | 'armor' | 'boots';
+type EquipmentBase = { id: string; name: string; rarity: EquipmentRarity; damageType: DamageType };
+export type WeaponDefinition = EquipmentBase & { kind: 'weapon'; weaponClass: WeaponClass; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
+export type ArmorDefinition = EquipmentBase & { kind: 'armor'; armorClass: ArmorClass; baseDefensePerLevel: number };
+export type EquipmentDefinition = WeaponDefinition | ArmorDefinition;
 export type OwnedEquipment = { itemId: string; level: number; ascend: number };
 
 export type InventoryState = {
@@ -66,7 +72,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 8;
+  version: 9;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];

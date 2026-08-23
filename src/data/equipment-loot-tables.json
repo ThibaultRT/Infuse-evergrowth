@@ -1,1 +1,73 @@
-{"areas":{"1":{"items":["sword-common","sword-uncommon","sword-rare","sword-epic","sword-legendary","hammer-common","hammer-uncommon","hammer-rare","hammer-epic","hammer-legendary","spear-common","spear-uncommon","spear-rare","spear-epic","spear-legendary"]},"2":{"inherits":1,"add":[]}}}
+{
+  "areas": {
+    "1": {
+      "items": [
+        "sword-common",
+        "sword-uncommon",
+        "hammer-common",
+        "hammer-uncommon",
+        "spear-common",
+        "spear-uncommon",
+        "helmet-blunt-common",
+        "helmet-slash-common",
+        "helmet-piercing-common",
+        "helmet-blunt-uncommon",
+        "helmet-slash-uncommon",
+        "helmet-piercing-uncommon",
+        "armor-blunt-common",
+        "armor-slash-common",
+        "armor-piercing-common",
+        "armor-blunt-uncommon",
+        "armor-slash-uncommon",
+        "armor-piercing-uncommon",
+        "boots-blunt-common",
+        "boots-slash-common",
+        "boots-piercing-common",
+        "boots-blunt-uncommon",
+        "boots-slash-uncommon",
+        "boots-piercing-uncommon"
+      ]
+    },
+    "2": {
+      "inherits": 1,
+      "add": [
+        "sword-rare",
+        "sword-epic",
+        "sword-legendary",
+        "hammer-rare",
+        "hammer-epic",
+        "hammer-legendary",
+        "spear-rare",
+        "spear-epic",
+        "spear-legendary",
+        "helmet-blunt-rare",
+        "helmet-slash-rare",
+        "helmet-piercing-rare",
+        "helmet-blunt-epic",
+        "helmet-slash-epic",
+        "helmet-piercing-epic",
+        "helmet-blunt-legendary",
+        "helmet-slash-legendary",
+        "helmet-piercing-legendary",
+        "armor-blunt-rare",
+        "armor-slash-rare",
+        "armor-piercing-rare",
+        "armor-blunt-epic",
+        "armor-slash-epic",
+        "armor-piercing-epic",
+        "armor-blunt-legendary",
+        "armor-slash-legendary",
+        "armor-piercing-legendary",
+        "boots-blunt-rare",
+        "boots-slash-rare",
+        "boots-piercing-rare",
+        "boots-blunt-epic",
+        "boots-slash-epic",
+        "boots-piercing-epic",
+        "boots-blunt-legendary",
+        "boots-slash-legendary",
+        "boots-piercing-legendary"
+      ]
+    }
+  }
+}
