@@ -20,7 +20,7 @@ import {
 import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, rollLoot, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
-import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showEquipmentDrop, showToast, ui } from '../ui';
+import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
@@ -168,7 +168,7 @@ class SpawnEntity {
     this.root.add(this.enemyView?.root ?? makeCrystal(this.config.color), makeTierRing(this.config.color));
     scene.add(this.root);
 
-    this.targetUi.className = 'world-target-ui';
+    this.targetUi.className = `world-target-ui rarity-${def.tier}`;
     this.lootLabel.className = 'world-loot';
     this.healthBar.className = 'world-hp-bar';
     this.healthFill.style.backgroundColor = `#${this.config.color.toString(16).padStart(6, '0')}`;
@@ -260,6 +260,7 @@ class SpawnEntity {
 
     this.setAlive(false);
     events.emit('statGained', { sourceId: this.def.id, stat, amount });
+    showStatGain(amount, stat === 'hp' ? 'HP' : 'BLUNT', this.config.label);
     handleBossDefeat(this.def.areaId, this.def.id);
     const itemId = rollEquipmentDrop(this.def.areaId, this.def.tier);
     if (itemId) {
@@ -271,7 +272,6 @@ class SpawnEntity {
     }
     persist();
     renderStats(save.stats);
-    showToast(`+${formatRewardAmount(amount)} ${stat === 'hp' ? 'HP' : 'BLUNT'} · ${this.config.label}`);
   }
 
   update(dt: number): void {
@@ -372,6 +372,8 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   if (spawnId !== area.bossSpawnId || save.defeatedBosses.includes(spawnId)) return;
   save.defeatedBosses.push(spawnId);
   events.emit('bossDefeated', { bossId: spawnId, areaId });
+  const bossEntity = entities.find((entity) => entity.def.id === spawnId);
+  if (bossEntity) effects.bossDefeat(bossEntity.spawnPosition);
 
   const openedGates = gateEntities.filter((gate) => gate.def.sourceAreaId === areaId && gate.def.requiresBossDefeated);
   for (const gate of openedGates) {
@@ -381,7 +383,11 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   }
   if (openedGates[0]) {
     startGateCinematic(openedGates[0]);
-    showToast(`${areaById(openedGates[0].def.targetAreaId).name} unlocked`);
+    const destination = areaById(openedGates[0].def.targetAreaId).name;
+    effects.gateOpening(openedGates[0].root.position);
+    showBossProgression(`${bossEntity?.config.label ?? 'Area'} guardian`, destination);
+  } else {
+    showBossProgression(`${bossEntity?.config.label ?? 'Area'} guardian`);
   }
 }
 

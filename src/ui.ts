@@ -50,6 +50,7 @@ app.innerHTML = `
     </div>
     <div id="gain-stack" class="gain-stack" aria-live="polite"></div>
     <div id="equipment-drop-layer" class="equipment-drop-layer" aria-live="polite"></div>
+    <div id="progression-layer" class="progression-layer" aria-live="assertive"></div>
     <div id="toast" class="toast"></div>
     <div id="stats-panel" class="modal-panel" aria-hidden="true">
       <div class="card modal-sheet stats-sheet">
@@ -118,7 +119,8 @@ export const ui = {
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
-  inventoryBag: q<HTMLDivElement>('#inventory-bag'), weaponDetail: q<HTMLDivElement>('#weapon-detail'), equipmentDropLayer: q<HTMLDivElement>('#equipment-drop-layer'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
+  inventoryBag: q<HTMLDivElement>('#inventory-bag'), weaponDetail: q<HTMLDivElement>('#weapon-detail'), equipmentDropLayer: q<HTMLDivElement>('#equipment-drop-layer'),
+  progressionLayer: q<HTMLDivElement>('#progression-layer'), quickSlots: Array.from(document.querySelectorAll<HTMLDivElement>('.quick-slot'))
 };
 
 export function setLoadingProgress(progress: number): void {
@@ -142,13 +144,17 @@ export function renderEnemyAffinities(area: AreaDefinition): void {
 
 const gainItems: HTMLDivElement[] = [];
 function layoutGainItems(): void { gainItems.forEach((element, index) => { element.style.transform = `translateY(${-index * 27}px)`; }); }
-function showGain(amount: string, stat: 'HP' | 'BLUNT'): void {
+function showGain(amount: string, stat: 'HP' | 'BLUNT', source?: string): void {
   const element = document.createElement('div');
   element.className = `gain-pop ${stat === 'HP' ? 'hp' : 'blunt'}`;
-  element.innerHTML = `<span>${amount}</span>${stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13)}`;
+  element.innerHTML = `<span class="gain-source">${source ?? 'Permanent'}</span><strong>+${amount}</strong>${stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13)}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
   requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
   window.setTimeout(() => { const index = gainItems.indexOf(element); if (index >= 0) gainItems.splice(index, 1); element.classList.add('leaving'); layoutGainItems(); window.setTimeout(() => element.remove(), 180); }, 1600);
+}
+
+export function showStatGain(amount: number, stat: 'HP' | 'BLUNT', source: string): void {
+  showGain(Number.isInteger(amount) ? String(amount) : amount.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''), stat, source);
 }
 
 let toastTimer: number | null = null;
@@ -177,13 +183,15 @@ const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Hand 1', hand2: '
 const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2'];
 
 export function renderInventory(inventory: InventoryState): void {
-  ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
+  const armorPreview = ['helmet', 'torso', 'legs'].map((slot) => `<div class="inventory-equip-slot future-slot" aria-label="${sourceLabel(slot)} armor slot, coming later"><span>${sourceLabel(slot)}</span><strong>FUTURE</strong></div>`).join('');
+  const weapons = SLOT_ORDER.map((slot) => {
     const locked = false;
     const itemId = inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
     const value = locked ? '<strong>LOCKED</strong>' : item ? damageTypeIcon(item.damageType, 25) : '<strong>EMPTY</strong>';
     return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"${itemId && !locked ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span>${value}</div>`;
   }).join('');
+  ui.inventoryEquipped.innerHTML = `<div class="equipment-layout"><div class="armor-preview" aria-label="Future armor slots">${armorPreview}</div><div class="weapon-slots">${weapons}</div></div>`;
   ui.quickSlots.forEach((slotEl) => {
     const slot = slotEl.dataset.slot as EquipmentSlotId;
     const itemId = inventory.equipped[slot];
@@ -193,6 +201,13 @@ export function renderInventory(inventory: InventoryState): void {
   });
   const items = Object.values(inventory.items);
   ui.inventoryBag.innerHTML = items.length ? items.map((owned) => { const item = EQUIPMENT_BY_ID.get(owned.itemId); return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}" type="button" data-item-id="${owned.itemId}" draggable="true" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}">${item ? damageTypeIcon(item.damageType, 27) : ''}<span>Lv ${owned.level} · A${owned.ascend}</span></button>`; }).join('') : '<div class="inventory-empty">No equipment found yet.</div>';
+}
+
+let progressionTimer: number | null = null;
+export function showBossProgression(bossName: string, destinationName?: string): void {
+  if (progressionTimer !== null) window.clearTimeout(progressionTimer);
+  ui.progressionLayer.innerHTML = `<div class="progression-banner"><span class="progression-kicker">Boss defeated</span><strong>${bossName}</strong>${destinationName ? `<span class="progression-route">Route opened · ${destinationName}</span>` : ''}</div>`;
+  progressionTimer = window.setTimeout(() => { ui.progressionLayer.innerHTML = ''; progressionTimer = null; }, 3200);
 }
 
 export function renderWeaponDetail(owned: OwnedEquipment | null): void {

@@ -22,6 +22,21 @@ export class EffectManager {
     this.add(ring, .9, new THREE.Vector3(0, .15, 0));
   }
 
+  bossDefeat(position: THREE.Vector3): void {
+    for (let index = 0; index < 8; index++) {
+      const shard = new THREE.Mesh(new THREE.OctahedronGeometry(.07, 0), new THREE.MeshBasicMaterial({ color: 0xffd37a, transparent: true, opacity: .82 }));
+      shard.position.copy(position).add(new THREE.Vector3(0, 1.2, 0));
+      const angle = index / 8 * Math.PI * 2;
+      this.add(shard, 1.15, new THREE.Vector3(Math.cos(angle) * .75, .45, Math.sin(angle) * .75));
+    }
+  }
+
+  gateOpening(position: THREE.Vector3): void {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(.55, .68, 24), new THREE.MeshBasicMaterial({ color: 0xffdc91, transparent: true, opacity: .65, side: THREE.DoubleSide }));
+    ring.position.copy(position).add(new THREE.Vector3(0, .06, 0)); ring.rotation.x = -Math.PI / 2;
+    this.add(ring, 1.4, new THREE.Vector3(0, .08, 0));
+  }
+
   update(dt: number): void {
     for (let i = this.effects.length - 1; i >= 0; i--) {
       const effect = this.effects[i]; effect.age += dt; effect.root.position.addScaledVector(effect.velocity, dt);

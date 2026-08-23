@@ -3,7 +3,7 @@
   top: 62%;
   right: 18px;
   z-index: 4;
-  width: 76px;
+  width: 128px;
   height: 1px;
   pointer-events: none;
 }
@@ -26,6 +26,7 @@
   transition: transform .18s ease, opacity .18s ease;
   will-change: transform, opacity;
 }
+.gain-source { max-width: 66px; overflow: hidden; color: rgba(255,255,255,.65); font-size: 9px; font-weight: 800; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 
 .gain-pop.hp { color: #ff9fb0; }
 .gain-pop.blunt { color: #fff6d9; }
