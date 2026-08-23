@@ -183,9 +183,18 @@ Merged in PR #22 / `feat: polish rewards and portrait HUD`.
 - graphics/performance settings retained;
 - inventory/equipment presentation prepared for armor + hand/orbit slots.
 
-## Slice 10 — optimization and release validation — remaining
+## Slice 10 — optimization and release validation — in progress
 
 This is the **next graphical slice**.
+
+Automated/repository-side work completed in v0.46.0:
+
+- the production release validator enforces the 500 MB payload ceiling, GitHub Pages base path, PWA output, declared asset presence, and matching Quaternius license records;
+- Quaternius assets use runtime Cache First caching so assets already loaded online remain available to an installed PWA;
+- WebGL context loss no longer attempts to render into a lost context, does not interrupt gameplay/save authority, and reports restoration to the player;
+- the production build and automated release validation pass at 38.63 MiB.
+
+The hardware/browser measurements below remain deliberately open. They cannot be certified from a desktop container.
 
 1. Profile dense combat, animated humanoids, gate opening/traversal, inventory, boss defeat, resurrection, dual-hand attacks, and orbit attacks.
 2. Share geometry/materials and use instancing where measurable.
@@ -193,10 +202,10 @@ This is the **next graphical slice**.
 4. Compress/optimize meshes/textures only after measuring Safari decode/runtime tradeoffs.
 5. Measure iPhone 12 portrait in normal and reduced/battery-saver modes on representative constrained hardware.
 6. Validate initial load against the **20-second maximum**.
-7. Validate total downloadable payload remains below **500 MB** and materially smaller where practical.
-8. Validate asset provenance/licensing remains complete.
+7. Validate total downloadable payload remains below **500 MB** and materially smaller where practical. **Automated: 38.63 MiB in v0.46.0.**
+8. Validate asset provenance/licensing remains complete. **Automated manifest/file/license consistency check added in v0.46.0.**
 9. Test PWA installation/offline reload, GitHub Pages asset paths, Safari lifecycle restoration, and WebGL context recovery.
-10. Run `npm run build` and ensure graphical optimization does not alter gameplay rules/saves.
+10. Run `npm run build` and ensure graphical optimization does not alter gameplay rules/saves. **Complete for v0.46.0; no gameplay or save shape changed.**
 
 ### Slice 10 exit criteria
 

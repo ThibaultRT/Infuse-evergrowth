@@ -29,7 +29,16 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}']
+        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
+        runtimeCaching: [{
+          urlPattern: /\/assets\/quaternius\//,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'quaternius-assets-v1',
+            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            cacheableResponse: { statuses: [0, 200] }
+          }
+        }]
       }
     })
   ]
