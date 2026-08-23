@@ -17,7 +17,7 @@ import {
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, heartIcon } from '../icons';
 import { emptySpawnState, heroRegen, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, save } from '../save';
-import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig, WeaponSlotId } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
@@ -31,8 +31,11 @@ import { GateView } from '../rendering/GateView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
-import { affinityDamage } from '../domain/combat/Affinity';
-import { rollSpawn } from '../domain/spawning/SpawnRoll';
+import { CombatSystem } from '../systems/CombatSystem';
+import { EnemyAISystem } from '../systems/EnemyAISystem';
+import { RespawnSystem } from '../systems/RespawnSystem';
+import { WorldUiManager } from '../rendering/WorldUiManager';
+import { AreaFlowSystem } from '../systems/AreaFlowSystem';
 
 export class Game {
   private started = false;
@@ -49,6 +52,15 @@ scene.fog = new THREE.Fog(0x93b8cf, 42, 82);
 const camera = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 180);
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
 const effects = new EffectManager(scene);
+const worldUi = new WorldUiManager(camera, renderer.domElement, ui.world);
+const combat = new CombatSystem({
+  hand2: attackProfile('hand2').cooldownSeconds * .5,
+  orbit1: attackProfile('orbit1').cooldownSeconds * .25,
+  orbit2: attackProfile('orbit2').cooldownSeconds * .75
+});
+const enemyAI = new EnemyAISystem(ENEMY_AGGRO_RADIUS_METERS, ENEMY_LEASH_RADIUS_METERS, ENEMY_ATTACK_RANGE_METERS);
+const respawns = new RespawnSystem();
+const areaFlow = new AreaFlowSystem();
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -84,12 +96,7 @@ let heroHp = maxHeroHp();
 let heroDead = false;
 let heroRespawnAt = 0;
 let heroDeathHidden = false;
-const attackCooldowns: Record<WeaponSlotId, number> = {
-  hand1: 0,
-  hand2: attackProfile('hand2').cooldownSeconds * .5,
-  orbit1: attackProfile('orbit1').cooldownSeconds * .25,
-  orbit2: attackProfile('orbit2').cooldownSeconds * .75
-};
+
 let gateTransitionCooldown = 0;
 const cameraController = new CameraController(camera, hero.position);
 
@@ -118,20 +125,8 @@ function lootIcon(type: LootType, size = 9): string {
   return type === 'hp' || type === 'regen' ? heartIcon(size) : damageTypeIcon(type, size);
 }
 
-type FloatingCombatText = {
-  element: HTMLDivElement;
-  position: THREE.Vector3;
-  age: number;
-  duration: number;
-};
-const combatTexts: FloatingCombatText[] = [];
-
 function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false): void {
-  const element = document.createElement('div');
-  element.className = `combat-text${incoming ? ' incoming' : ''}`;
-  element.innerHTML = `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${incoming ? combatAffinityIcon(type as CombatAffinity, 10) : damageTypeIcon(type as DamageType, 10)}`;
-  ui.world.append(element);
-  combatTexts.push({ element, position: position.clone(), age: 0, duration: .9 });
+  worldUi.addCombatText(position, `<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${incoming ? combatAffinityIcon(type as CombatAffinity, 10) : damageTypeIcon(type as DamageType, 10)}`, incoming);
 }
 
 class SpawnEntity {
@@ -178,9 +173,7 @@ class SpawnEntity {
     const state = save.spawns[def.id];
     if (state?.respawnAt && state.respawnAt > Date.now()) this.setAlive(false);
     else if (state?.respawnAt) {
-      state.respawnAt = null;
-      state.defeatedAt = null;
-      state.roll = rollSpawn(this.def);
+      respawns.reroll(state, this.def);
       this.setAlive(true);
       persist();
     } else this.renderLoot();
@@ -227,7 +220,7 @@ class SpawnEntity {
 
   receiveDamage(amount: number, type: DamageType): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
-    const affinityAmount = affinityDamage(amount, type, this.weakness);
+    const affinityAmount = combat.heroAttackDamage(amount, type, this.weakness);
     events.emit('enemyDamaged', { enemyId: this.def.id, amount: affinityAmount, damageType: type });
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
@@ -243,10 +236,7 @@ class SpawnEntity {
     this.deathPresentationRemaining = 1.1;
     const state = save.spawns[this.def.id];
     const now = Date.now();
-    state.killsToday += 1;
-    state.defeatedAt = now;
-    const timer = BASE_RESPAWN_MS * this.config.respawnMultiplier * 2 ** (state.killsToday - 1);
-    state.respawnAt = Math.min(now + timer, nextLocalMidnightMs());
+    respawns.defeat(state, this.config, now, BASE_RESPAWN_MS, nextLocalMidnightMs());
 
     const { stat, amount } = state.roll.reward;
     events.emit('enemyDefeated', { enemyId: this.def.id });
@@ -281,10 +271,7 @@ class SpawnEntity {
     this.moving = false;
     if (!this.alive) {
       const state = save.spawns[this.def.id];
-      if (state?.respawnAt && Date.now() >= state.respawnAt) {
-        state.respawnAt = null;
-        state.defeatedAt = null;
-        state.roll = rollSpawn(this.def);
+      if (respawns.reviveIfDue(state, this.def, Date.now())) {
         this.setAlive(true);
         events.emit('enemyRespawned', { enemyId: this.def.id });
         persist();
@@ -297,27 +284,19 @@ class SpawnEntity {
     const distance = toHero.length();
     const fromSpawn = this.root.position.distanceTo(this.spawnPosition);
 
-    if (!this.provoked && distance <= ENEMY_AGGRO_RADIUS_METERS && fromSpawn < ENEMY_LEASH_RADIUS_METERS) this.provoked = true;
-    if (this.provoked && fromSpawn >= ENEMY_LEASH_RADIUS_METERS) this.provoked = false;
-
-    if (this.provoked) {
-      if (distance >= HERO_ATTACK_RANGE_METERS * .95) {
-        toHero.normalize();
-        this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
-        this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
-        this.moving = true;
-      }
-      this.attackCooldown = Math.max(0, this.attackCooldown - dt);
-      if (distance <= ENEMY_ATTACK_RANGE_METERS && this.attackCooldown === 0) {
-        damageHero(this.damage, this.damageType);
-        this.attackCooldown = ENEMY_ATTACK_COOLDOWN;
-      }
-      return;
-    }
-
-    const back = this.spawnPosition.clone().sub(this.root.position);
-    if (back.length() > .08) { this.root.position.addScaledVector(back.normalize(), 3 * dt); this.moving = true; }
-    else this.root.position.copy(this.spawnPosition);
+    const intent = enemyAI.update(this, distance, fromSpawn, dt);
+    if (intent === 'chase') {
+      toHero.normalize();
+      this.root.position.addScaledVector(toHero, Math.min(4.8, 2.4 + this.config.statMultiplier * .18) * dt);
+      this.root.rotation.y = Math.atan2(toHero.x, toHero.z);
+      this.moving = true;
+    } else if (intent === 'attack') {
+      damageHero(this.damage, this.damageType);
+      this.attackCooldown = ENEMY_ATTACK_COOLDOWN;
+    } else if (intent === 'return') {
+      const back = this.spawnPosition.clone().sub(this.root.position);
+      this.root.position.addScaledVector(back.normalize(), 3 * dt); this.moving = true;
+    } else if (!this.provoked) this.root.position.copy(this.spawnPosition);
   }
 
   updateView(dt: number): void {
@@ -378,9 +357,9 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   events.emit('bossDefeated', { bossId: spawnId, areaId });
   effects.bossDefeat(bossEntity.spawnPosition);
 
-  const openedGates = gateEntities.filter((gate) => gate.def.sourceAreaId === areaId && gate.def.requiresBossDefeated);
+  const openedDefinitions = areaFlow.unlockBossGates(areaId, GATES, save.unlockedAreas);
+  const openedGates = gateEntities.filter((gate) => openedDefinitions.includes(gate.def));
   for (const gate of openedGates) {
-    if (!save.unlockedAreas.includes(gate.def.targetAreaId)) save.unlockedAreas.push(gate.def.targetAreaId);
     gate.setOpen(true);
     events.emit('gateUnlocked', { gateId: gate.def.id });
   }
@@ -441,9 +420,7 @@ function resetSpawnCooldowns(): void {
   entities.forEach((entity) => {
     const state = save.spawns[entity.def.id];
     if (!state.respawnAt) return;
-    state.respawnAt = null;
-    state.defeatedAt = null;
-    state.roll = rollSpawn(entity.def);
+    respawns.reroll(state, entity.def);
     entity.forceRespawn();
     events.emit('enemyRespawned', { enemyId: entity.def.id });
     resetCount += 1;
@@ -454,10 +431,8 @@ function resetSpawnCooldowns(): void {
 
 function damageHero(amount: number, type: CombatAffinity): void {
   if (heroDead) return;
-  const damageType: DamageType = type === 'pierce' ? 'piercing' : type;
-  const reducedAmount = Math.max(0, amount - equippedDefense(damageType));
+  const reducedAmount = combat.enemyAttackDamage(amount, type, equippedDefense);
   events.emit('heroDamaged', { amount: reducedAmount, damageType: type });
-  heroView.playHit();
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true);
   heroHp = Math.max(0, heroHp - reducedAmount);
   updateHud();
@@ -485,25 +460,14 @@ function damageHero(amount: number, type: CombatAffinity): void {
   }, HERO_RESPAWN_DELAY_MS);
 }
 
-function nearestTarget(maxDistance = HERO_ATTACK_RANGE_METERS): SpawnEntity | null {
-  let best: SpawnEntity | null = null;
-  let distance = maxDistance;
-  for (const entity of entities) {
-    if (!entity.alive || entity.def.areaId !== currentAreaId) continue;
-    const candidate = entity.distanceToHero();
-    if (candidate < distance) { best = entity; distance = candidate; }
-  }
-  return best;
-}
-
 function autoAttack(): void {
   if (heroDead || cameraController.isScripted) return;
   for (const hand of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
-    if (attackCooldowns[hand] > 0 || ((hand === 'orbit1' || hand === 'orbit2') && !save.inventory.equipped[hand])) continue;
-    const target = nearestTarget();
+    if (!combat.ready(hand) || ((hand === 'orbit1' || hand === 'orbit2') && !save.inventory.equipped[hand])) continue;
+    const target = combat.nearestTarget(entities.filter((entity) => entity.def.areaId === currentAreaId), HERO_ATTACK_RANGE_METERS);
     if (!target) continue;
     const profile = attackProfile(hand);
-    attackCooldowns[hand] = profile.cooldownSeconds;
+    combat.schedule(hand, profile.cooldownSeconds);
     heroView.playWeaponAttack(hand, profile.damageType, target.root.position, profile.cooldownSeconds);
     events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
     target.receiveDamage(profile.damage, profile.damageType);
@@ -695,14 +659,14 @@ function updateHero(dt: number): void {
 }
 
 function enterArea(targetAreaId: number): void {
-  if (!save.unlockedAreas.includes(targetAreaId)) return;
+  if (!areaFlow.canEnter(targetAreaId, save.unlockedAreas)) return;
   const previous = areaById(currentAreaId);
   currentAreaId = targetAreaId;
   events.emit('areaEntered', { areaId: targetAreaId });
   save.currentAreaId = targetAreaId;
   const area = areaById(targetAreaId);
   renderEnemyAffinities(area);
-  const crossedAdjacentBoundary = previous.id !== area.id && Math.abs(previous.originZ - area.originZ) <= 60 && previous.originX === area.originX;
+  const crossedAdjacentBoundary = areaFlow.crossesAdjacentBoundary(previous, area);
   if (crossedAdjacentBoundary) hero.position.z += area.originZ < previous.originZ ? -2.8 : 2.8;
   else hero.position.set(area.originX, 0, area.originZ);
   entities.forEach((entity) => { entity.provoked = false; });
@@ -726,26 +690,13 @@ function updateGates(dt: number): void {
   }
 }
 
-const projected = new THREE.Vector3();
-function projectWorldElement(position: THREE.Vector3, element: HTMLElement, yOffset = 0): boolean {
-  projected.copy(position);
-  projected.y += yOffset;
-  projected.project(camera);
-  const shown = projected.z >= -1 && projected.z <= 1 && projected.x >= -1.08 && projected.x <= 1.08 && projected.y >= -1.08 && projected.y <= 1.08;
-  element.style.visibility = shown ? 'visible' : 'hidden';
-  if (!shown) return false;
-  element.style.left = `${(projected.x * .5 + .5) * renderer.domElement.clientWidth}px`;
-  element.style.top = `${(-projected.y * .5 + .5) * renderer.domElement.clientHeight}px`;
-  return true;
-}
-
 function updateTargetUi(): void {
   for (const entity of entities) {
     if (!entity.alive || entity.def.areaId !== currentAreaId) {
       entity.targetUi.style.visibility = 'hidden';
       continue;
     }
-    projectWorldElement(entity.root.position, entity.targetUi, entity.def.tier === 'crystal' ? 2.05 : 3.05);
+    worldUi.project(entity.root.position, entity.targetUi, entity.def.tier === 'crystal' ? 2.05 : 3.05);
   }
 }
 
@@ -774,24 +725,7 @@ function updateRespawnIndicators(): void {
     const progress = THREE.MathUtils.clamp((end - now) / (end - start), 0, 1);
     indicator.progress.style.strokeDashoffset = `${GROUP_CIRCUMFERENCE * (1 - progress)}`;
     indicator.timer.textContent = formatCountdown(end - now);
-    projectWorldElement(indicator.center, indicator.element, indicator.members[0].def.tier === 'crystal' ? .9 : 1.1);
-  }
-}
-
-function updateCombatTexts(dt: number): void {
-  for (let index = combatTexts.length - 1; index >= 0; index--) {
-    const item = combatTexts[index];
-    item.age += dt;
-    if (item.age >= item.duration) {
-      item.element.remove();
-      combatTexts.splice(index, 1);
-      continue;
-    }
-    if (projectWorldElement(item.position, item.element)) {
-      const progress = item.age / item.duration;
-      item.element.style.transform = `translate(-50%, calc(-50% - ${progress * 24}px))`;
-      item.element.style.opacity = String(1 - progress);
-    }
+    worldUi.project(indicator.center, indicator.element, indicator.members[0].def.tier === 'crystal' ? .9 : 1.1);
   }
 }
 
@@ -840,7 +774,7 @@ function frame(now: number): void {
   lastRenderedAt = now;
   const dt = Math.min((now - previous) / 1000, .05);
   previous = now;
-  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) attackCooldowns[slot] = Math.max(0, attackCooldowns[slot] - dt);
+  combat.update(dt);
   midnightAccumulator += dt;
   if (midnightAccumulator >= 1) {
     midnightAccumulator = 0;
@@ -855,7 +789,7 @@ function frame(now: number): void {
   if (!heroDead) heroHp = Math.min(maxHeroHp(), heroHp + heroRegen() * dt);
   cameraController.update(dt, now);
   updateHud();
-  updateCombatTexts(dt);
+  worldUi.update(dt);
   effects.update(dt);
   renderer.render(scene, camera);
   if (import.meta.env.DEV && renderingQuality.showStats) {
