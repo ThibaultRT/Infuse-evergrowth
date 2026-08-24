@@ -11,16 +11,6 @@
         "z": 0
       },
       "bossSpawnId": "area1-uncommon-03",
-      "gates": [
-        {
-          "id": "area1-to-area2",
-          "tag": "meadow gate - ashwood",
-          "targetAreaId": 2,
-          "x": 0,
-          "z": -28,
-          "requiresBossDefeated": true
-        }
-      ],
       "spawns": [
         {
           "id": "area1-crystal-01",
@@ -657,7 +647,11 @@
             }
           ]
         }
-      ]
+      ],
+      "size": {
+        "width": 36,
+        "depth": 56
+      }
     },
     {
       "id": 2,
@@ -666,28 +660,10 @@
       "enemyWeapon": "slash",
       "enemyWeakness": "pierce",
       "worldOrigin": {
-        "x": 0,
+        "x": 20,
         "z": -56
       },
       "bossSpawnId": "area2-rare-01",
-      "gates": [
-        {
-          "id": "area2-to-area1",
-          "tag": "ashwood gate - meadow",
-          "targetAreaId": 1,
-          "x": 0,
-          "z": 28,
-          "requiresBossDefeated": false
-        },
-        {
-          "id": "area2-to-area3",
-          "tag": "ashwood gate - stonefield",
-          "targetAreaId": 3,
-          "x": 0,
-          "z": -28,
-          "requiresBossDefeated": true
-        }
-      ],
       "spawns": [
         {
           "id": "area2-crystal-01",
@@ -1430,29 +1406,23 @@
             }
           ]
         }
-      ]
+      ],
+      "size": {
+        "width": 76,
+        "depth": 56
+      }
     },
     {
       "id": 3,
       "name": "Area 3",
-      "environmentTheme": "flat",
+      "environmentTheme": "ruined-fortress",
       "enemyWeapon": "pierce",
       "enemyWeakness": "blunt",
       "worldOrigin": {
-        "x": 0,
-        "z": -112
+        "x": 38,
+        "z": 0
       },
       "bossSpawnId": "area3-epic-01",
-      "gates": [
-        {
-          "id": "area3-to-area2",
-          "tag": "stonefield gate - ashwood",
-          "targetAreaId": 2,
-          "x": 0,
-          "z": 28,
-          "requiresBossDefeated": false
-        }
-      ],
       "spawns": [
         {
           "id": "area3-crystal-01",
@@ -2485,7 +2455,48 @@
             }
           ]
         }
-      ]
+      ],
+      "size": {
+        "width": 40,
+        "depth": 56
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "area1-area2",
+      "areaAId": 1,
+      "areaBId": 2,
+      "x": 8,
+      "z": -28,
+      "axis": "z",
+      "width": 5,
+      "requiredUnlockedAreaId": 2,
+      "unlockOnBossOfAreaId": 1,
+      "visualStyle": "lake-gate"
+    },
+    {
+      "id": "area2-area3",
+      "areaAId": 2,
+      "areaBId": 3,
+      "x": 38,
+      "z": -28,
+      "axis": "z",
+      "width": 5,
+      "requiredUnlockedAreaId": 3,
+      "unlockOnBossOfAreaId": 2,
+      "visualStyle": "ruined-fortress-gate"
+    },
+    {
+      "id": "area1-area3",
+      "areaAId": 1,
+      "areaBId": 3,
+      "x": 18,
+      "z": 0,
+      "axis": "x",
+      "width": 5,
+      "requiredUnlockedAreaId": 3,
+      "visualStyle": "ruined-fortress-gate"
     }
   ]
 }

@@ -1,7 +1,7 @@
 import type { Position } from '../domain/world/Position';
 import { copyPosition, distanceBetween } from '../domain/world/Position';
 import { EnemyAISystem, type EnemyAIState } from '../systems/EnemyAISystem';
-import type { AreaDefinition, CombatAffinity, SpawnDefinition, TierConfig } from '../types';
+import type { AreaDefinition, CombatAffinity, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 
 export type RuntimeSpawn = EnemyAIState & {
   id: string;
@@ -29,7 +29,8 @@ export type RuntimeHero = {
 
 export type GameplayRuntimeEvent =
   | { type: 'enemyAttack'; spawnId: string; amount: number; damageType: CombatAffinity }
-  | { type: 'heroRespawned'; areaId: number };
+  | { type: 'heroRespawned'; areaId: number }
+  | { type: 'areaEntered'; areaId: number; connectionId: string };
 
 type SpawnRuntimeDefinition = {
   definition: SpawnDefinition;
@@ -42,6 +43,8 @@ type SpawnRuntimeDefinition = {
 
 export type GameplayRuntimeOptions = {
   areas: AreaDefinition[];
+  connections: WorldConnection[];
+  unlockedAreas: number[];
   spawns: SpawnRuntimeDefinition[];
   currentAreaId: number;
   heroHp: number;
@@ -104,7 +107,10 @@ export class GameplayRuntime {
         this.hero.dead = false;
         events.push({ type: 'heroRespawned', areaId: this.currentAreaId });
       }
-    } else this.updateHero(dt, movement, controlsEnabled);
+    } else {
+      const crossing = this.updateHero(dt, movement, controlsEnabled);
+      if (crossing) events.push(crossing);
+    }
 
     if (!controlsEnabled) return events;
     for (const spawn of this.spawns) {
@@ -166,26 +172,45 @@ export class GameplayRuntime {
     return true;
   }
 
-  enterArea(targetAreaId: number, crossedAdjacentBoundary: boolean): void {
-    const previous = this.area(this.currentAreaId);
-    const area = this.area(targetAreaId);
-    this.currentAreaId = targetAreaId;
-    if (crossedAdjacentBoundary) this.hero.position.z += area.originZ < previous.originZ ? -2.8 : 2.8;
-    else this.hero.position = { x: area.originX, y: 0, z: area.originZ };
-    for (const spawn of this.spawns) spawn.provoked = false;
-  }
-
   distanceFromHero(position: Position): number { return distanceBetween(this.hero.position, position); }
 
-  private updateHero(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean): void {
+  private updateHero(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean): GameplayRuntimeEvent | null {
     this.hero.moving = controlsEnabled && (movement.x !== 0 || movement.y !== 0);
-    if (!this.hero.moving) return;
-    this.hero.position.x += movement.x * this.options.heroSpeed * dt;
-    this.hero.position.z -= movement.y * this.options.heroSpeed * dt;
+    if (!this.hero.moving) return null;
+    const previous = { ...this.hero.position };
+    const candidate = { x: previous.x + movement.x * this.options.heroSpeed * dt, y: 0, z: previous.z - movement.y * this.options.heroSpeed * dt };
     const area = this.area(this.currentAreaId);
-    this.hero.position.x = Math.min(area.originX + 17.2, Math.max(area.originX - 17.2, this.hero.position.x));
-    this.hero.position.z = Math.min(area.originZ + 27.2, Math.max(area.originZ - 27.2, this.hero.position.z));
+    const halfWidth = area.size.width / 2 - .45;
+    const halfDepth = area.size.depth / 2 - .45;
+    const outsideX = Math.abs(candidate.x - area.originX) > halfWidth;
+    const outsideZ = Math.abs(candidate.z - area.originZ) > halfDepth;
+    if (outsideX || outsideZ) {
+      const connection = this.options.connections.find((item) => {
+        if (item.areaAId !== area.id && item.areaBId !== area.id) return false;
+        if (!this.options.unlockedAreas.includes(item.requiredUnlockedAreaId)) return false;
+        const coordinate = item.axis === 'x' ? candidate.z : candidate.x;
+        const center = item.axis === 'x' ? item.z : item.x;
+        const crossed = item.axis === 'x' ? outsideX : outsideZ;
+        return crossed && Math.abs(coordinate - center) <= item.width / 2 - .3;
+      });
+      if (connection) {
+        const target = connection.areaAId === area.id ? connection.areaBId : connection.areaAId;
+        const targetArea = this.area(target);
+        const targetHalfWidth = targetArea.size.width / 2 + .05;
+        const targetHalfDepth = targetArea.size.depth / 2 + .05;
+        if (Math.abs(candidate.x - targetArea.originX) <= targetHalfWidth && Math.abs(candidate.z - targetArea.originZ) <= targetHalfDepth) {
+          this.hero.position = candidate;
+          this.currentAreaId = target;
+          for (const spawn of this.spawns) spawn.provoked = false;
+          this.hero.facing = Math.atan2(movement.x, -movement.y);
+          return { type: 'areaEntered', areaId: target, connectionId: connection.id };
+        }
+      }
+    }
+    this.hero.position.x = Math.min(area.originX + halfWidth, Math.max(area.originX - halfWidth, candidate.x));
+    this.hero.position.z = Math.min(area.originZ + halfDepth, Math.max(area.originZ - halfDepth, candidate.z));
     this.hero.facing = Math.atan2(movement.x, -movement.y);
+    return null;
   }
 
   private moveTowards(spawn: RuntimeSpawn, target: Position, distance: number): void {

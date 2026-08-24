@@ -1,6 +1,6 @@
 import balance from './data/balance.json';
 import areaData from './data/areas.json';
-import type { AreaDefinition, CombatAffinity, GateDefinition, SpawnDefinition, Tier, TierConfig } from './types';
+import type { AreaDefinition, CombatAffinity, SpawnDefinition, Tier, TierConfig, WorldConnection } from './types';
 
 const tierBalance = balance.enemy.tiers;
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
@@ -32,7 +32,8 @@ export const AREAS: AreaDefinition[] = areaData.areas.map((area) => ({
   bossSpawnId: area.bossSpawnId,
   enemyWeapon: area.enemyWeapon as CombatAffinity,
   enemyWeakness: area.enemyWeakness as CombatAffinity,
-  environmentTheme: area.environmentTheme
+  environmentTheme: area.environmentTheme,
+  size: area.size
 }));
 
 export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>
@@ -50,17 +51,11 @@ export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>
   }))
 );
 
-export const GATES: GateDefinition[] = areaData.areas.flatMap((area) =>
-  area.gates.map((gate) => ({
-    id: gate.id,
-    tag: gate.tag,
-    sourceAreaId: area.id,
-    targetAreaId: gate.targetAreaId,
-    x: area.worldOrigin.x + gate.x,
-    z: area.worldOrigin.z + gate.z,
-    requiresBossDefeated: gate.requiresBossDefeated
-  }))
-);
+export const WORLD_CONNECTIONS: WorldConnection[] = areaData.connections.map((connection) => ({
+  ...connection,
+  axis: connection.axis as 'x' | 'z',
+  visualStyle: connection.visualStyle as WorldConnection['visualStyle']
+}));
 
 export function areaById(areaId: number): AreaDefinition {
   return AREAS.find((area) => area.id === areaId) ?? AREAS[0];

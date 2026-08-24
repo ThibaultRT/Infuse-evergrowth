@@ -10,7 +10,7 @@ import {
   HERO_ATTACK_RANGE_METERS,
   HERO_RESPAWN_DELAY_MS,
   BLOCKED_DAMAGE_MULTIPLIER,
-  GATES,
+  WORLD_CONNECTIONS,
   SPAWNS,
   TIER_CONFIG,
   areaById,
@@ -18,7 +18,7 @@ import {
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetHeroProgress, resetPermanentStats, save } from '../save';
-import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
@@ -85,6 +85,8 @@ for (const definition of SPAWNS) {
 if (normalizedExpiredSpawn) persist();
 const gameplay = new GameplayRuntime({
   areas: AREAS,
+  connections: WORLD_CONNECTIONS,
+  unlockedAreas: save.unlockedAreas,
   spawns: SPAWNS.map((definition) => ({
     definition,
     tier: TIER_CONFIG[definition.tier],
@@ -136,7 +138,6 @@ hero.position.copy(gameplay.hero.position);
 scene.add(hero);
 let heroDeathHidden = false;
 
-let gateTransitionCooldown = 0;
 const cameraController = new CameraController(camera, hero.position);
 
 function syncLighting(): void {
@@ -340,17 +341,17 @@ class SpawnEntity {
 const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
 
 class GateEntity {
-  readonly view = new GateView();
-  readonly root = this.view.root;
+  readonly view: GateView;
+  readonly root: THREE.Group;
   open = false;
 
-  constructor(readonly def: GateDefinition) {
+  constructor(readonly def: WorldConnection) {
+    this.view = new GateView(def.axis, def.visualStyle);
+    this.root = this.view.root;
     this.root.position.set(def.x, 0, def.z);
     this.root.userData.gateId = def.id;
-    this.root.userData.tag = def.tag;
-    this.root.userData.targetAreaId = def.targetAreaId;
     scene.add(this.root);
-    this.setOpen(save.unlockedAreas.includes(def.targetAreaId) || !def.requiresBossDefeated);
+    this.setOpen(save.unlockedAreas.includes(def.requiredUnlockedAreaId));
     this.syncAreaVisibility();
   }
 
@@ -360,16 +361,15 @@ class GateEntity {
   }
 
   update(dt: number): void { this.view.update(dt); }
-  syncAreaVisibility(): void { this.root.visible = this.def.sourceAreaId === currentAreaId; }
-  distanceToHero(): number { return gameplay.distanceFromHero({ x: this.def.x, y: 0, z: this.def.z }); }
+  syncAreaVisibility(): void { this.root.visible = true; }
 }
 
-const gateEntities = GATES.map((gate) => new GateEntity(gate));
+const gateEntities = WORLD_CONNECTIONS.map((gate) => new GateEntity(gate));
 
 function syncAreaVisibility(): void {
   entities.forEach((entity) => entity.syncAreaVisibility());
   gateEntities.forEach((gate) => gate.syncAreaVisibility());
-  environmentViews.forEach((view) => { view.root.visible = view.area.id === currentAreaId; });
+  environmentViews.forEach((view) => { view.root.visible = true; });
   syncLighting();
 }
 
@@ -386,7 +386,7 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   events.emit('bossDefeated', { bossId: spawnId, areaId });
   effects.bossDefeat(bossEntity.spawnPosition);
 
-  const openedDefinitions = areaFlow.unlockBossGates(areaId, GATES, save.unlockedAreas);
+  const openedDefinitions = areaFlow.unlockBossGates(areaId, WORLD_CONNECTIONS, save.unlockedAreas);
   const openedGates = gateEntities.filter((gate) => openedDefinitions.includes(gate.def));
   for (const gate of openedGates) {
     gate.setOpen(true);
@@ -394,7 +394,7 @@ function handleBossDefeat(areaId: number, spawnId: string): void {
   }
   if (openedGates[0]) {
     startGateCinematic(openedGates[0]);
-    const destination = areaById(openedGates[0].def.targetAreaId).name;
+    const destination = areaById(openedGates[0].def.requiredUnlockedAreaId).name;
     effects.gateOpening(openedGates[0].root.position);
     showBossProgression(`${bossEntity?.config.label ?? 'Area'} guardian`, destination);
   } else {
@@ -683,34 +683,19 @@ function updateHero(dt: number): void {
   heroView.update(dt, gameplay.hero.moving);
 }
 
-function enterArea(targetAreaId: number): void {
-  if (!areaFlow.canEnter(targetAreaId, save.unlockedAreas)) return;
-  const previous = areaById(currentAreaId);
-  gameplay.enterArea(targetAreaId, areaFlow.crossesAdjacentBoundary(previous, areaById(targetAreaId)));
-  currentAreaId = gameplay.currentAreaId;
-  events.emit('areaEntered', { areaId: targetAreaId });
+function completeContinuousAreaEntry(targetAreaId: number, connectionId: string): void {
+  currentAreaId = targetAreaId;
   save.currentAreaId = targetAreaId;
-  const area = areaById(targetAreaId);
-  renderEnemyAffinities(area);
-  hero.position.copy(gameplay.hero.position);
-  cameraController.returnToHero();
-  gateTransitionCooldown = 1;
-  input.reset();
+  events.emit('gateCrossed', { gateId: connectionId, destinationAreaId: targetAreaId });
+  events.emit('areaEntered', { areaId: targetAreaId });
+  renderEnemyAffinities(areaById(targetAreaId));
   syncAreaVisibility();
-  camera.position.set(area.originX, 19, area.originZ + 16.5);
   persist();
-  showToast(area.name);
+  showToast(areaById(targetAreaId).name);
 }
 
 function updateGates(dt: number): void {
   gateEntities.forEach((gate) => gate.update(dt));
-  gateTransitionCooldown = Math.max(0, gateTransitionCooldown - dt);
-  if (gateTransitionCooldown > 0 || cameraController.isScripted || gameplay.hero.dead) return;
-  const gate = gateEntities.find((candidate) => candidate.def.sourceAreaId === currentAreaId && candidate.open && candidate.distanceToHero() <= 1.45);
-  if (gate) {
-    events.emit('gateCrossed', { gateId: gate.def.id, destinationAreaId: gate.def.targetAreaId });
-    enterArea(gate.def.targetAreaId);
-  }
 }
 
 function updateTargetUi(): void {
@@ -810,6 +795,7 @@ function frame(now: number): void {
   const runtimeEvents = gameplay.update(dt, input.movement, !cameraController.isScripted, elapsedSeconds);
   for (const event of runtimeEvents) {
     if (event.type === 'enemyAttack') damageHero(event.amount, event.damageType);
+    else if (event.type === 'areaEntered') completeContinuousAreaEntry(event.areaId, event.connectionId);
     else {
       gameplay.hero.hp = maxHeroHp();
       hero.position.copy(gameplay.hero.position);
