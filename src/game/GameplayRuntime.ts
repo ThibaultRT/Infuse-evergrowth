@@ -50,6 +50,7 @@ export type GameplayRuntimeOptions = {
   enemyAggroRadius: number;
   enemyLeashRadius: number;
   enemyAttackRange: number;
+  enemyPositioningRange: number;
   enemyAttackCooldown: number;
 };
 
@@ -89,7 +90,7 @@ export class GameplayRuntime {
       speed: Math.min(4.8, 2.4 + tier.statMultiplier * .18)
     }));
     this.spawnById = new Map(this.spawns.map((spawn) => [spawn.id, spawn]));
-    this.enemyAI = new EnemyAISystem(options.enemyAggroRadius, options.enemyLeashRadius, options.enemyAttackRange);
+    this.enemyAI = new EnemyAISystem(options.enemyAggroRadius, options.enemyLeashRadius, options.enemyAttackRange, options.enemyPositioningRange);
   }
 
   update(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean, elapsedSeconds = dt): GameplayRuntimeEvent[] {

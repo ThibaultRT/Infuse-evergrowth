@@ -19,14 +19,6 @@ export function makeHumanoid(primary: number, hero = false): THREE.Group {
   return root;
 }
 
-export function makeCrystal(color: number): THREE.Group {
-  const root = new THREE.Group();
-  const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.25, roughness: 0.35, metalness: 0.15 });
-  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.62, 0), material); core.scale.y = 1.55; core.position.y = 0.9;
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.62, 0.28, 7), new THREE.MeshStandardMaterial({ color: 0x53616a, roughness: 1 })); base.position.y = 0.14;
-  root.add(core, base); return root;
-}
-
 export function makeTierRing(color: number): THREE.Mesh {
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.72, 0.9, 32), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.72, side: THREE.DoubleSide }));
   ring.rotation.x = -Math.PI / 2; ring.position.y = 0.025; return ring;
