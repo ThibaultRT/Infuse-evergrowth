@@ -11,7 +11,7 @@ export class GateView {
   private openAmount = 0;
   private openTarget = 0;
 
-  constructor(private readonly assets: AssetLoader = quaterniusAssets) {
+  constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', private readonly assets: AssetLoader = quaterniusAssets) {
     const stone = new THREE.MeshStandardMaterial({ color: 0x77766d, roughness: .95 });
     const wood = new THREE.MeshStandardMaterial({ color: 0x684329, roughness: .9 });
     const left = new THREE.Mesh(new THREE.BoxGeometry(.65, 3.4, .65), stone);
@@ -22,6 +22,12 @@ export class GateView {
     door.position.set(1.02, 1.34, 0); this.doorPivot.position.x = -1.02;
     this.doorPivot.add(door); this.fallback.add(left, right, lintel, this.doorPivot);
     this.root.add(this.fallback);
+    this.root.rotation.y = axis === 'x' ? Math.PI / 2 : 0;
+    this.root.scale.setScalar(style === 'lake-gate' ? 1.45 : 1.7);
+    const towerGeometry = new THREE.CylinderGeometry(.95, 1.15, 4.7, 8);
+    const towers = [new THREE.Mesh(towerGeometry, stone), new THREE.Mesh(towerGeometry, stone)];
+    towers[0].position.set(-2.5, 2.35, 0); towers[1].position.set(2.5, 2.35, 0);
+    this.root.add(...towers);
     void this.loadQuaterniusGate();
   }
 

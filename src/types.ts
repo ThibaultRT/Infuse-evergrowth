@@ -31,16 +31,20 @@ export type AreaDefinition = {
   enemyWeapon: CombatAffinity;
   enemyWeakness: CombatAffinity;
   environmentTheme: string;
+  size: { width: number; depth: number };
 };
 
-export type GateDefinition = {
+export type WorldConnection = {
   id: string;
-  tag: string;
-  sourceAreaId: number;
-  targetAreaId: number;
+  areaAId: number;
+  areaBId: number;
   x: number;
   z: number;
-  requiresBossDefeated: boolean;
+  axis: 'x' | 'z';
+  width: number;
+  requiredUnlockedAreaId: number;
+  unlockOnBossOfAreaId?: number;
+  visualStyle: 'lake-gate' | 'ruined-fortress-gate';
 };
 
 export type SavedSpawnState = {
