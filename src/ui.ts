@@ -98,6 +98,8 @@ app.innerHTML = `
         <div class="settings-danger">
           <div><strong>Reset attributes</strong><small>Remove all permanent stat gains. Equipment and its progress are kept.</small></div>
           <button id="reset-attributes-button" type="button">RESET ATTRIBUTES</button>
+          <div><strong>Reset hero</strong><small>Remove all permanent stat gains and equipment drops. World progression is kept.</small></div>
+          <button id="reset-hero-button" type="button">RESET HERO</button>
         </div>
       </div>
     </div>
@@ -117,6 +119,7 @@ export const ui = {
   settingsClose: q<HTMLButtonElement>('#settings-close'), rendererStatsOption: q<HTMLLabelElement>('#renderer-stats-option'),
   rendererStatsToggle: q<HTMLInputElement>('#renderer-stats-toggle'), rendererStats: q<HTMLOutputElement>('#renderer-stats'),
   resetAttributesButton: q<HTMLButtonElement>('#reset-attributes-button'),
+  resetHeroButton: q<HTMLButtonElement>('#reset-hero-button'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),

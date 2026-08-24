@@ -67,7 +67,8 @@ export function areaById(areaId: number): AreaDefinition {
 }
 
 export function enemyAttack(areaId: number, tier: Tier): number {
-  const commonAttack = balance.enemy.commonBaseAttack * areaId * balance.areaScaling.attackMultiplierPerArea;
+  const areaMultiplier = balance.areaScaling.attackMultiplierPerArea ** Math.max(0, areaId - 1);
+  const commonAttack = balance.enemy.commonBaseAttack * areaMultiplier;
   return Math.max(1, Math.round(commonAttack * TIER_CONFIG[tier].statMultiplier));
 }
 

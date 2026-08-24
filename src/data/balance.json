@@ -20,7 +20,7 @@
     "strongDamageMultiplier": 0.5
   },
   "enemy": {
-    "commonBaseAttack": 2,
+    "commonBaseAttack": 4,
     "aggroRadiusMeters": 5,
     "leashRadiusMeters": 7,
     "attackRangeMultiplier": 1.05,
@@ -42,14 +42,14 @@
       },
       "uncommon": {
         "label": "Uncommon",
-        "statMultiplier": 2.25,
+        "statMultiplier": 2.5,
         "respawnMultiplier": 3,
         "color": "#64dc8c",
         "hostile": true
       },
       "rare": {
         "label": "Rare",
-        "statMultiplier": 4.5,
+        "statMultiplier": 5,
         "respawnMultiplier": 6,
         "color": "#5d98ff",
         "hostile": true
@@ -110,13 +110,13 @@
     "perLevelMultiplierPerAscend": 2
   },
   "respawn": {
-    "baseSeconds": 180
+    "baseSeconds": 300
   },
   "areaScaling": {
     "plannedAreaCount": 15,
-    "attackMultiplierPerArea": 1,
+    "attackMultiplierPerArea": 3,
     "formulaNotes": {
-      "attack": "commonBaseAttack * area * attackMultiplierPerArea"
+      "attack": "commonBaseAttack * attackMultiplierPerArea ^ (area - 1)"
     }
   }
 }
