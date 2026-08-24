@@ -20,6 +20,7 @@ export class EnvironmentView {
     this.root.position.set(area.originX, 0, area.originZ);
     if (area.environmentTheme === 'sunlit-meadow') this.buildSunlitMeadow();
     else if (area.environmentTheme === 'ashwood') this.buildAshwood();
+    else if (area.environmentTheme === 'flat') this.buildFlatSurface();
     else this.buildLegacyGround();
   }
 
@@ -37,6 +38,12 @@ export class EnvironmentView {
       const coal = mesh(new THREE.DodecahedronGeometry(.35), ember, x + .3, .24, z + .2); details.add(coal);
     }
     this.root.add(ground, road, details);
+  }
+
+  private buildFlatSurface(): void {
+    const ground = mesh(new THREE.PlaneGeometry(38, 56), new THREE.MeshStandardMaterial({ color: 0x68745f, roughness: 1 }), 0, 0, 0);
+    ground.rotation.x = -Math.PI / 2;
+    this.root.add(ground);
   }
 
   private buildLegacyGround(): void {
