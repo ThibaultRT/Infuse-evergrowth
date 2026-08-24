@@ -5,6 +5,7 @@ import {
   ENEMY_AGGRO_RADIUS_METERS,
   ENEMY_ATTACK_COOLDOWN,
   ENEMY_ATTACK_RANGE_METERS,
+  ENEMY_POSITIONING_RANGE_METERS,
   ENEMY_LEASH_RADIUS_METERS,
   HERO_ATTACK_RANGE_METERS,
   HERO_RESPAWN_DELAY_MS,
@@ -19,7 +20,8 @@ import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassI
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetHeroProgress, resetPermanentStats, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
-import { addRock, makeCrystal, makeTierRing } from '../visuals';
+import { addRock, makeTierRing } from '../visuals';
+import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
@@ -98,6 +100,7 @@ const gameplay = new GameplayRuntime({
   enemyAggroRadius: ENEMY_AGGRO_RADIUS_METERS,
   enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS,
   enemyAttackRange: ENEMY_ATTACK_RANGE_METERS,
+  enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS,
   enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN
 });
 let renderingQuality = loadRenderingQuality();
@@ -184,6 +187,7 @@ class SpawnEntity {
   readonly healthFill = document.createElement('span');
   readonly healthValue = document.createElement('strong');
   readonly enemyView: EnemyView | null;
+  readonly crystalView: CrystalView | null;
   deathPresentationRemaining = 0;
   readonly state: RuntimeSpawn;
 
@@ -194,7 +198,8 @@ class SpawnEntity {
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
     this.enemyView = def.tier === 'crystal' ? null : new EnemyView(def.tier, this.config.color);
-    this.root.add(this.enemyView?.root ?? makeCrystal(this.config.color), makeTierRing(this.config.color));
+    this.crystalView = def.tier === 'crystal' ? new CrystalView(this.config.color) : null;
+    this.root.add(this.enemyView?.root ?? this.crystalView!.root, makeTierRing(this.config.color));
     scene.add(this.root);
 
     this.targetUi.className = `world-target-ui rarity-${def.tier}`;
@@ -237,6 +242,7 @@ class SpawnEntity {
     gameplay.setSpawnAlive(this.def.id, value, value ? save.spawns[this.def.id].roll.maxHp : undefined);
     if (value) {
       this.deathPresentationRemaining = 0;
+      this.crystalView?.reset();
       this.renderLoot();
     }
     this.renderHealth();
@@ -266,7 +272,8 @@ class SpawnEntity {
 
   defeat(): void {
     this.enemyView?.playDeath();
-    this.deathPresentationRemaining = 1.1;
+    this.crystalView?.playDeath();
+    this.deathPresentationRemaining = this.crystalView ? .45 : 1.1;
     const state = save.spawns[this.def.id];
     const now = Date.now();
     respawns.defeat(state, this.config, now, BASE_RESPAWN_MS, nextLocalMidnightMs());
@@ -321,6 +328,7 @@ class SpawnEntity {
   }
 
   updateView(dt: number): void {
+    this.crystalView?.update(dt);
     if (this.deathPresentationRemaining > 0) {
       this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
       if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();

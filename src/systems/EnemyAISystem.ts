@@ -10,7 +10,8 @@ export class EnemyAISystem {
   constructor(
     private readonly aggroRadius: number,
     private readonly leashRadius: number,
-    private readonly attackRange: number
+    private readonly attackRange: number,
+    private readonly positioningRange: number
   ) {}
 
   update(state: EnemyAIState, distanceToHero: number, distanceFromSpawn: number, dt: number): EnemyAIIntent {
@@ -19,6 +20,8 @@ export class EnemyAISystem {
     if (state.provoked && distanceFromSpawn >= this.leashRadius) state.provoked = false;
     if (!state.provoked) return distanceFromSpawn > .08 ? 'return' : 'idle';
     if (distanceToHero > this.attackRange) return 'chase';
-    return state.attackCooldown === 0 ? 'attack' : 'idle';
+    if (state.attackCooldown === 0) return 'attack';
+    // Keep closing during cooldown until the hero is comfortably inside retaliation range.
+    return distanceToHero > this.positioningRange ? 'chase' : 'idle';
   }
 }

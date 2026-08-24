@@ -23,7 +23,8 @@
     "commonBaseAttack": 4,
     "aggroRadiusMeters": 5,
     "leashRadiusMeters": 7,
-    "attackRangeMultiplier": 1.05,
+    "attackRangeMultiplier": 1.2,
+    "positioningRangeMultiplier": 0.8,
     "attackCooldownSeconds": 1.15,
     "tiers": {
       "crystal": {
