@@ -15,7 +15,7 @@ import {
   areaById,
   enemyAttack
 } from '../config';
-import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon } from '../icons';
+import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
@@ -23,7 +23,7 @@ import { addRock, makeCrystal, makeTierRing } from '../visuals';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
-import { applyEquipmentCopies, ascend, attackProfile, equip, equipmentSlot, equippedDefense, unequip } from '../systems/EquipmentSystem';
+import { EQUIPMENT_BY_ID, applyEquipmentCopies, ascend, attackProfile, equip, equipmentSlot, equippedDefense, unequip } from '../systems/EquipmentSystem';
 import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView } from '../rendering/EnvironmentView';
@@ -166,6 +166,13 @@ function showCombatText(position: THREE.Vector3, amount: number, type: CombatAff
   worldUi.addCombatText(position, `${blocked ? icon : ''}<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${blocked ? '' : icon}`, incoming);
 }
 
+function weaponCombatIcon(itemId: string): string {
+  const item = EQUIPMENT_BY_ID.get(itemId);
+  return item?.kind === 'weapon'
+    ? `<span class="combat-weapon-icon rarity-${item.rarity}" aria-label="${item.name}">${weaponClassIcon(item.weaponClass, 10)}</span>`
+    : damageTypeIcon('blunt', 10);
+}
+
 class SpawnEntity {
   readonly config: TierConfig;
   readonly root = new THREE.Group();
@@ -244,13 +251,13 @@ class SpawnEntity {
   }
   distanceToHero(): number { return gameplay.distanceFromHero(this.state.position); }
 
-  receiveDamage(amount: number, type: DamageType): void {
+  receiveDamage(amount: number, type: DamageType, itemId: string): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
     const affinityAmount = combat.heroAttackDamage(amount, type, this.weakness);
-    events.emit('enemyDamaged', { enemyId: this.def.id, amount: affinityAmount, damageType: type });
+    events.emit('enemyDamaged', { enemyId: this.def.id, amount: affinityAmount, damageType: type, itemId });
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
-    showCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), affinityAmount, type);
+    worldUi.addCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), `<span>-${Math.round(affinityAmount)}</span>${weaponCombatIcon(itemId)}`, false);
     const result = gameplay.damageSpawn(this.def.id, affinityAmount);
     if (!result) return;
     this.renderHealth();
@@ -472,9 +479,9 @@ function autoAttack(): void {
     if (!target) continue;
     combat.schedule(hand, profile.cooldownSeconds);
     heroView.playWeaponAttack(hand, target.root.position, profile.cooldownSeconds);
-    events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType });
+    events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType, itemId: profile.itemId });
     const critical = combat.rollChance(heroCriticalChance());
-    target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType);
+    target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType, profile.itemId);
     const direction = target.root.position.clone().sub(hero.position);
     if (direction.lengthSq() > 0) {
       gameplay.hero.facing = Math.atan2(direction.x, direction.z);

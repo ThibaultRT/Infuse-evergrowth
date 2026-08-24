@@ -1,8 +1,8 @@
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType } from '../types';
 
 export type GameEventMap = {
-  enemyDamaged: { enemyId: string; amount: number; damageType: DamageType };
-  weaponAttacked: { slot: import('../types').EquipmentSlotId; targetId: string; damageType: DamageType };
+  enemyDamaged: { enemyId: string; amount: number; damageType: DamageType; itemId: string };
+  weaponAttacked: { slot: import('../types').EquipmentSlotId; targetId: string; damageType: DamageType; itemId: string };
   enemyDefeated: { enemyId: string };
   enemyRespawned: { enemyId: string };
   bossDefeated: { bossId: string; areaId: number };

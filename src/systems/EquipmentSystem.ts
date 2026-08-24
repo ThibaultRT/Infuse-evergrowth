@@ -5,7 +5,7 @@ import { ascendOwnedEquipment, canAscend, equipmentDamage, equipmentDefense } fr
 
 export { EQUIPMENT, EQUIPMENT_BY_ID, equipmentDamage, equipmentDefense };
 
-export type AttackProfile = { damage: number; damageType: DamageType; cooldownSeconds: number };
+export type AttackProfile = { itemId: string; damage: number; damageType: DamageType; cooldownSeconds: number };
 
 /**
  * Runtime equipment orchestration. Static definitions and progression math live
@@ -16,7 +16,7 @@ export function attackProfile(hand: WeaponSlotId): AttackProfile | null {
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
   const owned = itemId ? save.inventory.items[itemId] : undefined;
   return item?.kind === 'weapon' && owned
-    ? { damage: equipmentDamage(item, owned) + heroDamage(item.damageType), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds }
+    ? { itemId: item.id, damage: equipmentDamage(item, owned) + heroDamage(item.damageType), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds }
     : null;
 }
 

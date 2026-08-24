@@ -71,6 +71,7 @@ canvas { display: block; width: 100%; height: 100%; }
 
 .combat-text { position: absolute; display: inline-flex; align-items: center; gap: 3px; transform: translate(-50%,-50%); color: #fff6d9; font-size: 11px; font-weight: 900; font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0,0,0,.95); will-change: transform, opacity; }
 .combat-text.incoming { color: #ff5968; font-size: 12px; }
+.combat-weapon-icon { display: inline-flex; filter: drop-shadow(0 0 2px currentColor); }
 
 .controls { position: absolute; left: 0; right: 0; bottom: max(64px, calc(env(safe-area-inset-bottom) + 58px)); height: 124px; pointer-events: none; }
 .joystick-zone { pointer-events: auto; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 116px; height: 116px; border-radius: 50%; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(6px); }
