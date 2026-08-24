@@ -16,7 +16,7 @@ import {
   enemyAttack
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
-import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetPermanentStats, save } from '../save';
+import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetHeroProgress, resetPermanentStats, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, GateDefinition, LootType, SpawnDefinition, TierConfig } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeCrystal, makeTierRing } from '../visuals';
@@ -553,6 +553,17 @@ ui.resetAttributesButton.addEventListener('click', () => {
   renderStats(save.stats);
   updateHud();
   showToast('Permanent attributes reset · equipment kept');
+});
+ui.resetHeroButton.addEventListener('click', () => {
+  if (!window.confirm('Reset all permanent hero attributes and equipment drops? World progression will be kept.')) return;
+  resetHeroProgress();
+  gameplay.hero.hp = Math.min(gameplay.hero.hp, maxHeroHp());
+  heroView.syncEquipment(save.inventory);
+  persist();
+  renderStats(save.stats);
+  renderInventory(save.inventory);
+  updateHud();
+  showToast('Hero reset · attributes and equipment drops removed');
 });
 ui.settingsPanel.addEventListener('change', (event) => {
   const input = event.target as HTMLInputElement;

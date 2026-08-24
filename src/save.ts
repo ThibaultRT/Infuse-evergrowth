@@ -138,6 +138,10 @@ function loadSave(): SaveData {
 export const save = loadSave();
 export function persist(): void { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 export function resetPermanentStats(): void { save.stats = freshStats(); }
+export function resetHeroProgress(): void {
+  save.stats = freshStats();
+  save.inventory = freshInventory();
+}
 export function statAdditiveTotal(stat: StatSources): number { return stat.base + Object.values(stat.additive).reduce((a, b) => a + b, 0); }
 export function statMultiplierTotal(stat: StatSources): number { return Object.values(stat.multiplicative).reduce((a, b) => a * b, 1); }
 export function statTotal(stat: StatSources): number { return statAdditiveTotal(stat) * statMultiplierTotal(stat); }
