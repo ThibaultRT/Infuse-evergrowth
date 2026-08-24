@@ -39,21 +39,30 @@ export class EnvironmentView {
   }
 
   private buildMeadow(): void {
-    this.ground(0x6f9b55);
+    this.ground(0x79a957);
     this.road([[0, 4], [3, -10], [8, -28]]);
     this.road([[0, 4], [10, 3], [18, 0]]);
     this.road([[0, 4], [-10, 7], [-18, 7]]);
     this.road([[0, 4], [-1, 16], [0, 28]]);
-    const water = mesh(new THREE.PlaneGeometry(30, 7), new THREE.MeshStandardMaterial({ color: 0x317fa0, roughness: .35, metalness: .08, transparent: true, opacity: .92 }), -3, .08, -27.2);
+    const water = mesh(new THREE.PlaneGeometry(30, 8.2, 12, 3), new THREE.MeshStandardMaterial({ color: 0x277e9e, roughness: .28, metalness: .05, transparent: true, opacity: .94 }), -3, .06, -27.8);
     water.rotation.x = -Math.PI / 2; this.macroRoot.add(water);
-    const rock = new THREE.MeshStandardMaterial({ color: 0x4c5149, roughness: 1 });
-    for (let z = -24; z <= 24; z += 6) for (const x of [-18.6, -20.1]) {
-      const cliff = mesh(new THREE.DodecahedronGeometry(2.2), rock, x, 1.4 + ((z + 24) % 12) * .08, z); cliff.scale.set(1.5, 1.35, 1.25); this.macroRoot.add(cliff);
+    const rock = new THREE.MeshStandardMaterial({ color: 0x555b4e, roughness: 1 });
+    const cliffRock = new THREE.MeshStandardMaterial({ color: 0x626556, roughness: 1 });
+    for (let z = -25; z <= 25; z += 4.2) for (const [x, offset] of [[-18.8, 0], [-20.2, 2.1]] as const) {
+      const height = 1.5 + Math.sin(z * 1.7 + offset) * .35;
+      const cliff = mesh(new THREE.DodecahedronGeometry(1.45, 0), cliffRock, x, height * .62, z + offset); cliff.scale.set(1.35, height, 1.2); cliff.rotation.y = z; this.macroRoot.add(cliff);
     }
-    for (const x of [-14, -9, -3, 3, 14]) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(1.15), rock, x, .55, -25.5 + Math.sin(x) * 1.2));
-    const chasm = mesh(new THREE.PlaneGeometry(38, 7), new THREE.MeshStandardMaterial({ color: 0x17191c, roughness: 1 }), 0, -.75, 29.8);
-    chasm.rotation.x = -Math.PI / 2; this.macroRoot.add(chasm);
-    for (let x = -17; x <= 17; x += 3.4) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(1.25), rock, x, .15, 27.7 + Math.sin(x) * .45));
+    for (const x of [-15, -10, -4, 2, 14]) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(.8, 0), rock, x, .35, -24.4 + Math.sin(x) * .75));
+    const chasmShape = new THREE.Shape();
+    chasmShape.moveTo(-22, 0); chasmShape.lineTo(-22, 8); chasmShape.lineTo(-17, 7.2); chasmShape.lineTo(-12, 8.5);
+    chasmShape.lineTo(-7, 7.4); chasmShape.lineTo(-2, 8.2); chasmShape.lineTo(4, 7.1); chasmShape.lineTo(10, 8.4);
+    chasmShape.lineTo(16, 7.3); chasmShape.lineTo(22, 8); chasmShape.lineTo(22, 0); chasmShape.closePath();
+    const chasm = mesh(new THREE.ShapeGeometry(chasmShape), new THREE.MeshStandardMaterial({ color: 0x242720, roughness: 1 }), 0, -.32, 26.3);
+    chasm.rotation.x = Math.PI / 2; this.macroRoot.add(chasm);
+    for (let x = -17; x <= 17; x += 2.5) {
+      if (Math.abs(x) < 2.8) continue;
+      const edge = mesh(new THREE.DodecahedronGeometry(.82, 0), rock, x, .18, 27.2 + Math.sin(x * 1.6) * .55); edge.scale.set(1.3, .7, 1); this.macroRoot.add(edge);
+    }
     const blockedBridge = mesh(new THREE.BoxGeometry(4, .35, 6), new THREE.MeshStandardMaterial({ color: 0x65452d, roughness: 1 }), 0, .1, 29);
     this.macroRoot.add(blockedBridge, mesh(new THREE.BoxGeometry(4.5, 1.2, .55), rock, 0, .65, 27.5));
   }
@@ -69,21 +78,30 @@ export class EnvironmentView {
   }
 
   private wall(x: number, z: number, width: number, depth: number, height = 7): void {
-    const stone = new THREE.MeshStandardMaterial({ color: 0x5c625f, roughness: .98 });
-    const body = mesh(new THREE.BoxGeometry(width, height, depth), stone, x, height / 2, z); this.macroRoot.add(body);
-    const count = Math.max(1, Math.floor(Math.max(width, depth) / 2));
-    for (let i=0;i<count;i++) {
-      const along=(i-(count-1)/2)*2;
-      this.macroRoot.add(mesh(new THREE.BoxGeometry(width > depth ? 1.05 : depth, 1.15, width > depth ? depth + .3 : 1.05), stone, x + (width > depth ? along : 0), height + .45 + (i%3===0?.3:0), z + (width > depth ? 0 : along)));
+    const stone = new THREE.MeshStandardMaterial({ color: 0x686b62, roughness: 1 });
+    const mortar = new THREE.MeshStandardMaterial({ color: 0x4e534f, roughness: 1 });
+    const horizontal = width > depth;
+    const length = Math.max(width, depth);
+    const count = Math.ceil(length / 2.35);
+    for (let level = 0; level < Math.ceil(height / 1.05); level++) for (let i = 0; i < count; i++) {
+      const along = -length / 2 + (i + .5) * length / count + (level % 2 ? length / count / 2 : 0);
+      if (Math.abs(along) > length / 2) continue;
+      this.macroRoot.add(mesh(new THREE.BoxGeometry(horizontal ? length / count - .07 : depth, 1, horizontal ? depth : length / count - .07), level % 2 ? stone : mortar,
+        x + (horizontal ? along : 0), .5 + level * 1.02, z + (horizontal ? 0 : along)));
+    }
+    for (let i = 0; i < count; i += 2) {
+      const along = -length / 2 + (i + .5) * length / count;
+      this.macroRoot.add(mesh(new THREE.BoxGeometry(horizontal ? 1.05 : depth + .25, .75, horizontal ? depth + .25 : 1.05), stone,
+        x + (horizontal ? along : 0), height + .25, z + (horizontal ? 0 : along)));
     }
   }
 
   private buildRuinedFortress(): void {
     this.ground(0x686b61);
     this.road([[-20, 0], [-8, 0], [0, -5], [0, -28]], 4.2);
-    this.wall(-20, -15.5, 2.2, 25); this.wall(-20, 15.5, 2.2, 25);
-    this.wall(20, 0, 2.2, 56, 8); this.wall(0, 28, 40, 2.2, 8);
-    this.wall(-11, -28, 17, 2.2); this.wall(11, -28, 17, 2.2);
+    this.wall(-20, -15.5, 2.2, 25, 5.2); this.wall(-20, 15.5, 2.2, 25, 5.2);
+    this.wall(20, 0, 2.2, 56, 5.8); this.wall(0, 28, 40, 2.2, 5.8);
+    this.wall(-11, -28, 17, 2.2, 5.2); this.wall(11, -28, 17, 2.2, 5.2);
     this.wall(4, 8, 10, 2, 4.5); this.wall(10, -11, 2, 12, 5.5);
     const rubble = new THREE.MeshStandardMaterial({ color: 0x777972, roughness: 1 });
     for (const [x,z] of [[-14,8],[-12,-8],[14,14],[8,20],[15,-18],[-5,-19]] as const) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(1.4), rubble, x, .65, z));

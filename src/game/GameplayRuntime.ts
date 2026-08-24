@@ -180,8 +180,9 @@ export class GameplayRuntime {
     const previous = { ...this.hero.position };
     const candidate = { x: previous.x + movement.x * this.options.heroSpeed * dt, y: 0, z: previous.z - movement.y * this.options.heroSpeed * dt };
     const area = this.area(this.currentAreaId);
-    const halfWidth = area.size.width / 2 - .45;
-    const halfDepth = area.size.depth / 2 - .45;
+    const heroRadius = .45;
+    const halfWidth = area.size.width / 2;
+    const halfDepth = area.size.depth / 2;
     const outsideX = Math.abs(candidate.x - area.originX) > halfWidth;
     const outsideZ = Math.abs(candidate.z - area.originZ) > halfDepth;
     if (outsideX || outsideZ) {
@@ -207,8 +208,14 @@ export class GameplayRuntime {
         }
       }
     }
-    this.hero.position.x = Math.min(area.originX + halfWidth, Math.max(area.originX - halfWidth, candidate.x));
-    this.hero.position.z = Math.min(area.originZ + halfDepth, Math.max(area.originZ - halfDepth, candidate.z));
+    // The lake is gameplay geometry, not just decoration. Keep the hero on the
+    // southern bank while leaving the authored fortified causeway traversable.
+    const northConnection = this.options.connections.find((item) => item.axis === 'z' && item.areaAId === area.id && item.z < area.originZ);
+    if (northConnection && candidate.z < northConnection.z + 4.1 && Math.abs(candidate.x - northConnection.x) > northConnection.width / 2 - heroRadius) {
+      candidate.z = northConnection.z + 4.1;
+    }
+    this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
+    this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
     this.hero.facing = Math.atan2(movement.x, -movement.y);
     return null;
   }

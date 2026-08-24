@@ -1,8 +1,5 @@
 import * as THREE from 'three';
-import { quaterniusAssets, type AssetLoader } from './AssetLoader';
-
-const FRAME = 'village/models/DoorFrame_Round_Brick.gltf';
-const DOOR = 'village/models/Door_4_Round.gltf';
+import type { AssetLoader } from './AssetLoader';
 
 export class GateView {
   readonly root = new THREE.Group();
@@ -11,24 +8,33 @@ export class GateView {
   private openAmount = 0;
   private openTarget = 0;
 
-  constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', private readonly assets: AssetLoader = quaterniusAssets) {
-    const stone = new THREE.MeshStandardMaterial({ color: 0x77766d, roughness: .95 });
-    const wood = new THREE.MeshStandardMaterial({ color: 0x684329, roughness: .9 });
-    const left = new THREE.Mesh(new THREE.BoxGeometry(.65, 3.4, .65), stone);
-    const right = left.clone();
-    const lintel = new THREE.Mesh(new THREE.BoxGeometry(3.4, .65, .7), stone);
-    const door = new THREE.Mesh(new THREE.BoxGeometry(2.05, 2.65, .28), wood);
-    left.position.set(-1.35, 1.7, 0); right.position.set(1.35, 1.7, 0); lintel.position.set(0, 3.1, 0);
-    door.position.set(1.02, 1.34, 0); this.doorPivot.position.x = -1.02;
-    this.doorPivot.add(door); this.fallback.add(left, right, lintel, this.doorPivot);
+  constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', _assets?: AssetLoader) {
+    const stone = new THREE.MeshStandardMaterial({ color: style === 'lake-gate' ? 0x8b846d : 0x686d68, roughness: 1 });
+    const darkStone = new THREE.MeshStandardMaterial({ color: 0x454b47, roughness: 1 });
+    const wood = new THREE.MeshStandardMaterial({ color: 0x704527, roughness: .92 });
+    const makeBlock = (x: number, y: number, z: number, w: number, h: number, d: number, material = stone): THREE.Mesh => {
+      const block = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material); block.position.set(x, y, z); return block;
+    };
+    // Low, broad gatehouses remain readable from the close portrait camera and
+    // avoid the previous giant cylinders and incorrectly-scaled imported frame.
+    for (const side of [-1, 1]) {
+      const x = side * 3.05;
+      this.fallback.add(makeBlock(x, 1.35, 0, 1.65, 2.7, 1.8));
+      for (let i = -1; i <= 1; i++) this.fallback.add(makeBlock(x + i * .58, 3, 0, .42, .65 + (i === 0 ? .2 : 0), 1.95));
+      this.fallback.add(makeBlock(x, .35, 1.15, 2.15, .7, .65, darkStone));
+    }
+    this.fallback.add(makeBlock(0, 3.15, 0, 4.55, .72, 1.45));
+    for (let x = -2; x <= 2; x += 1) this.fallback.add(makeBlock(x, 3.8, 0, .62, .6, 1.5));
+    const door = makeBlock(1.15, 1.48, 0, 2.3, 2.75, .22, wood);
+    for (let x = -.9; x <= .9; x += .45) door.add(makeBlock(x - 1.15, 0, -.15, .09, 2.7, .09, darkStone));
+    this.doorPivot.position.x = -1.15; this.doorPivot.add(door);
+    this.fallback.add(this.doorPivot);
+    if (style === 'lake-gate') {
+      this.fallback.add(makeBlock(0, .1, 2.6, 5, .2, 4, wood));
+      for (const x of [-2.25, 2.25]) this.fallback.add(makeBlock(x, .65, 2.6, .14, 1.1, 4.2, wood));
+    }
     this.root.add(this.fallback);
     this.root.rotation.y = axis === 'x' ? Math.PI / 2 : 0;
-    this.root.scale.setScalar(style === 'lake-gate' ? 1.45 : 1.7);
-    const towerGeometry = new THREE.CylinderGeometry(.95, 1.15, 4.7, 8);
-    const towers = [new THREE.Mesh(towerGeometry, stone), new THREE.Mesh(towerGeometry, stone)];
-    towers[0].position.set(-2.5, 2.35, 0); towers[1].position.set(2.5, 2.35, 0);
-    this.root.add(...towers);
-    void this.loadQuaterniusGate();
   }
 
   setOpen(open: boolean): void { this.openTarget = open ? 1 : 0; }
@@ -36,23 +42,5 @@ export class GateView {
   update(dt: number): void {
     this.openAmount = THREE.MathUtils.damp(this.openAmount, this.openTarget, 5, dt);
     this.doorPivot.rotation.y = -this.openAmount * Math.PI * .58;
-  }
-
-  private async loadQuaterniusGate(): Promise<void> {
-    try {
-      const [frame, door] = await Promise.all([this.assets.cloneScene(FRAME), this.assets.cloneScene(DOOR)]);
-      const assembly = new THREE.Group();
-      assembly.scale.setScalar(1.65);
-      const pivot = new THREE.Group();
-      pivot.position.x = -.55;
-      door.position.x = .55;
-      pivot.add(door);
-      assembly.add(frame, pivot);
-      this.root.add(assembly);
-      this.fallback.visible = false;
-      this.doorPivot = pivot;
-    } catch (error) {
-      console.warn('Quaternius gate unavailable; keeping procedural gate.', error);
-    }
   }
 }
