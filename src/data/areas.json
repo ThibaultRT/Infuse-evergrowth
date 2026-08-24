@@ -35,12 +35,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -57,12 +57,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -79,12 +79,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -101,12 +101,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -123,12 +123,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -145,12 +145,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -167,12 +167,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -189,12 +189,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -211,12 +211,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -233,12 +233,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ]
         },
@@ -253,9 +253,14 @@
           },
           "rewards": [
             {
-              "stat": "regen",
-              "min": 0.5,
-              "max": 0.5
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -271,9 +276,14 @@
           },
           "rewards": [
             {
-              "stat": "regen",
-              "min": 0.5,
-              "max": 0.5
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -291,12 +301,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -314,12 +324,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -337,12 +347,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -360,12 +370,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -383,12 +393,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-a"
@@ -406,12 +416,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -429,12 +439,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -452,12 +462,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -475,12 +485,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -498,12 +508,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -521,12 +531,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -544,12 +554,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -567,12 +577,12 @@
             {
               "stat": "blunt",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 2,
-              "max": 20
+              "min": 1,
+              "max": 4
             }
           ],
           "group": "area1-common-b"
@@ -668,6 +678,14 @@
           "x": 0,
           "z": 28,
           "requiresBossDefeated": false
+        },
+        {
+          "id": "area2-to-area3",
+          "tag": "ashwood gate - stonefield",
+          "targetAreaId": 3,
+          "x": 0,
+          "z": -28,
+          "requiresBossDefeated": true
         }
       ],
       "spawns": [
@@ -677,19 +695,24 @@
           "x": -4,
           "z": 7,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -699,19 +722,24 @@
           "x": 4,
           "z": 8,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -721,19 +749,24 @@
           "x": -8,
           "z": 2,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -743,19 +776,24 @@
           "x": 8,
           "z": 1,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -765,19 +803,24 @@
           "x": -10,
           "z": -6,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -787,19 +830,24 @@
           "x": 10,
           "z": -7,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -809,19 +857,24 @@
           "x": -13,
           "z": 5,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -831,19 +884,24 @@
           "x": 13,
           "z": 5,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -853,19 +911,24 @@
           "x": -5,
           "z": -2,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -875,19 +938,24 @@
           "x": 5,
           "z": -3,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -897,19 +965,24 @@
           "x": -15,
           "z": 10,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -919,19 +992,24 @@
           "x": 15,
           "z": 10,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -941,19 +1019,24 @@
           "x": -12,
           "z": -10,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -963,19 +1046,24 @@
           "x": 12,
           "z": -10,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -985,19 +1073,24 @@
           "x": -2,
           "z": -10,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -1007,19 +1100,24 @@
           "x": 2,
           "z": 13,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -1029,19 +1127,24 @@
           "x": 0,
           "z": 18,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 130,
+            "max": 1300
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 2,
+              "max": 10
             }
           ]
         },
@@ -1051,19 +1154,19 @@
           "x": -8,
           "z": 14,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1079,19 +1182,19 @@
           "x": -6,
           "z": 15,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1107,19 +1210,19 @@
           "x": -4,
           "z": 14,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1135,19 +1238,19 @@
           "x": 5,
           "z": -13,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1163,19 +1266,19 @@
           "x": 7,
           "z": -14,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1191,19 +1294,19 @@
           "x": 9,
           "z": -13,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1219,19 +1322,19 @@
           "x": 4,
           "z": -15,
           "hp": {
-            "min": 140,
-            "max": 1400
+            "min": 250,
+            "max": 1250
           },
           "rewards": [
             {
-              "stat": "blunt",
+              "stat": "piercing",
               "min": 1,
-              "max": 10
+              "max": 2
             },
             {
               "stat": "hp",
-              "min": 4,
-              "max": 40
+              "min": 5,
+              "max": 10
             },
             {
               "stat": "regen",
@@ -1296,16 +1399,16 @@
           "id": "area2-rare-01",
           "tier": "rare",
           "x": 0,
-          "z": 23,
+          "z": -23,
           "hp": {
             "min": 30000,
             "max": 30000
           },
           "rewards": [
             {
-              "stat": "regen",
-              "min": 1000,
-              "max": 1000
+              "stat": "hp",
+              "min": 500,
+              "max": 500
             }
           ],
           "isBoss": true
@@ -1324,6 +1427,1061 @@
               "stat": "regen",
               "min": 30,
               "max": 30
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Area 3",
+      "environmentTheme": "flat",
+      "enemyWeapon": "pierce",
+      "enemyWeakness": "blunt",
+      "worldOrigin": {
+        "x": 0,
+        "z": -112
+      },
+      "bossSpawnId": "area3-epic-01",
+      "gates": [
+        {
+          "id": "area3-to-area2",
+          "tag": "stonefield gate - ashwood",
+          "targetAreaId": 2,
+          "x": 0,
+          "z": 28,
+          "requiresBossDefeated": false
+        }
+      ],
+      "spawns": [
+        {
+          "id": "area3-crystal-01",
+          "tier": "crystal",
+          "x": -15,
+          "z": 22,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-02",
+          "tier": "crystal",
+          "x": -10,
+          "z": 22,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-03",
+          "tier": "crystal",
+          "x": -5,
+          "z": 22,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-04",
+          "tier": "crystal",
+          "x": 5,
+          "z": 22,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-05",
+          "tier": "crystal",
+          "x": 10,
+          "z": 22,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-06",
+          "tier": "crystal",
+          "x": 15,
+          "z": 22,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-07",
+          "tier": "crystal",
+          "x": -16,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-08",
+          "tier": "crystal",
+          "x": -11,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-09",
+          "tier": "crystal",
+          "x": -6,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-10",
+          "tier": "crystal",
+          "x": 0,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-11",
+          "tier": "crystal",
+          "x": 6,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-12",
+          "tier": "crystal",
+          "x": 11,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-13",
+          "tier": "crystal",
+          "x": 16,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-14",
+          "tier": "crystal",
+          "x": -15,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-15",
+          "tier": "crystal",
+          "x": -10,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-16",
+          "tier": "crystal",
+          "x": -5,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-17",
+          "tier": "crystal",
+          "x": 5,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-18",
+          "tier": "crystal",
+          "x": 10,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-19",
+          "tier": "crystal",
+          "x": 15,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-20",
+          "tier": "crystal",
+          "x": -14,
+          "z": 7,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-21",
+          "tier": "crystal",
+          "x": -8,
+          "z": 7,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-22",
+          "tier": "crystal",
+          "x": -2,
+          "z": 7,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-23",
+          "tier": "crystal",
+          "x": 4,
+          "z": 7,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-24",
+          "tier": "crystal",
+          "x": 10,
+          "z": 7,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-25",
+          "tier": "crystal",
+          "x": 16,
+          "z": 7,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-26",
+          "tier": "crystal",
+          "x": 14,
+          "z": 2,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-common-01",
+          "tier": "common",
+          "x": -13,
+          "z": 1,
+          "hp": {
+            "min": 13000,
+            "max": 13000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 3,
+              "max": 3
+            }
+          ],
+          "group": "area3-common-a"
+        },
+        {
+          "id": "area3-common-02",
+          "tier": "common",
+          "x": -10,
+          "z": 0,
+          "hp": {
+            "min": 13000,
+            "max": 13000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 3,
+              "max": 3
+            }
+          ],
+          "group": "area3-common-a"
+        },
+        {
+          "id": "area3-common-03",
+          "tier": "common",
+          "x": -7,
+          "z": 1,
+          "hp": {
+            "min": 13000,
+            "max": 13000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 3,
+              "max": 3
+            }
+          ],
+          "group": "area3-common-a"
+        },
+        {
+          "id": "area3-common-04",
+          "tier": "common",
+          "x": 7,
+          "z": 1,
+          "hp": {
+            "min": 3000,
+            "max": 3000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 25
+            }
+          ],
+          "group": "area3-common-b"
+        },
+        {
+          "id": "area3-common-05",
+          "tier": "common",
+          "x": 10,
+          "z": 0,
+          "hp": {
+            "min": 3000,
+            "max": 3000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 25
+            }
+          ],
+          "group": "area3-common-b"
+        },
+        {
+          "id": "area3-common-06",
+          "tier": "common",
+          "x": 13,
+          "z": 1,
+          "hp": {
+            "min": 3000,
+            "max": 3000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 25
+            }
+          ],
+          "group": "area3-common-b"
+        },
+        {
+          "id": "area3-common-07",
+          "tier": "common",
+          "x": -12,
+          "z": -7,
+          "hp": {
+            "min": 7000,
+            "max": 7000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 2,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "area3-common-08",
+          "tier": "common",
+          "x": 0,
+          "z": -6,
+          "hp": {
+            "min": 7000,
+            "max": 7000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 2,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "area3-common-09",
+          "tier": "common",
+          "x": 12,
+          "z": -7,
+          "hp": {
+            "min": 7000,
+            "max": 7000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 2,
+              "max": 4
+            }
+          ]
+        },
+        {
+          "id": "area3-common-10",
+          "tier": "common",
+          "x": -3,
+          "z": -12,
+          "hp": {
+            "min": 3000,
+            "max": 3000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 25
+            }
+          ],
+          "group": "area3-common-c"
+        },
+        {
+          "id": "area3-common-11",
+          "tier": "common",
+          "x": 0,
+          "z": -13,
+          "hp": {
+            "min": 3000,
+            "max": 3000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 25
+            }
+          ],
+          "group": "area3-common-c"
+        },
+        {
+          "id": "area3-common-12",
+          "tier": "common",
+          "x": 3,
+          "z": -12,
+          "hp": {
+            "min": 3000,
+            "max": 3000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 10,
+              "max": 25
+            }
+          ],
+          "group": "area3-common-c"
+        },
+        {
+          "id": "area3-uncommon-01",
+          "tier": "uncommon",
+          "x": -13,
+          "z": -15,
+          "hp": {
+            "min": 4000,
+            "max": 6000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 20,
+              "max": 50
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 5
+            },
+            {
+              "stat": "blunt",
+              "min": 3,
+              "max": 10
+            }
+          ]
+        },
+        {
+          "id": "area3-uncommon-02",
+          "tier": "uncommon",
+          "x": 13,
+          "z": -15,
+          "hp": {
+            "min": 4000,
+            "max": 6000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 20,
+              "max": 50
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 5
+            },
+            {
+              "stat": "blunt",
+              "min": 3,
+              "max": 10
+            }
+          ]
+        },
+        {
+          "id": "area3-rare-01",
+          "tier": "rare",
+          "x": -9,
+          "z": -21,
+          "hp": {
+            "min": 12000,
+            "max": 12000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 80,
+              "max": 80
+            }
+          ]
+        },
+        {
+          "id": "area3-epic-01",
+          "tier": "epic",
+          "x": 0,
+          "z": -24,
+          "hp": {
+            "min": 30000,
+            "max": 45000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 500,
+              "max": 500
+            }
+          ],
+          "isBoss": true
+        },
+        {
+          "id": "area3-epic-02",
+          "tier": "epic",
+          "x": 9,
+          "z": -21,
+          "hp": {
+            "min": 20000,
+            "max": 25000
+          },
+          "rewards": [
+            {
+              "stat": "hp",
+              "min": 250,
+              "max": 250
+            },
+            {
+              "stat": "regen",
+              "min": 3,
+              "max": 3
+            },
+            {
+              "stat": "blunt",
+              "min": 5,
+              "max": 5
             }
           ]
         }
