@@ -1,6 +1,6 @@
 {
   "hero": {
-    "baseMaxHp": 20,
+    "baseMaxHp": 100,
     "baseBluntAttack": 3,
     "baseRegenHpPerSecond": 0.5,
     "moveSpeed": 7.6,
