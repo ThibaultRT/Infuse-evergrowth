@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { WORLD_CONNECTIONS } from '../config';
+import { lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import type { AreaDefinition } from '../types';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
@@ -40,11 +41,16 @@ export class EnvironmentView {
 
   private buildMeadow(): void {
     this.ground(0x79a957); this.road([[0,4],[3,-10],[8,-28]]); this.road([[0,4],[10,3],[18,0]]); this.road([[0,4],[-10,7],[-18,7]]); this.road([[0,4],[-1,16],[0,28]]);
-    // A narrow water band separates the adjacent chunks without flooding deep
-    // into Area 2. Irregular stones conceal both long edges of the water plane.
+    // Two distinct lakes leave a dry opening around the gate and causeway. Their
+    // outer edges extend beyond the chunks while irregular stones soften the banks.
     const lakeConnection=WORLD_CONNECTIONS.find((connection)=>connection.visualStyle==='lake-gate');
-    const waterDepth=lakeConnection?.barrierDepth ?? 8;
-    const water=mesh(new THREE.PlaneGeometry(62,waterDepth),new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93}),0,.04,-28); water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
+    if(lakeConnection){
+      const waterMaterial=new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93});
+      for(const lake of lakeBarrierSegments(lakeConnection,-31,31)){
+        const water=mesh(new THREE.PlaneGeometry(lake.maxX-lake.minX,lake.maxZ-lake.minZ),waterMaterial,(lake.minX+lake.maxX)/2-this.area.originX,.04,(lake.minZ+lake.maxZ)/2-this.area.originZ);
+        water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
+      }
+    }
     for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-25.4+Math.sin(x*.72)*.55+Math.sin(x*1.8)*.2; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
     for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-30.6+Math.sin(x*.61)*.4+Math.sin(x*1.55)*.16; this.macroRoot.add(this.irregularRock(x,.18,z,1.15,.4,.82)); }
     const causewayMaterial=new THREE.MeshStandardMaterial({color:0x8b846d,roughness:1});
