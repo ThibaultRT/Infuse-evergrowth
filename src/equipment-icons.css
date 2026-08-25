@@ -1,28 +1,22 @@
-.hammer-equipment-icon {
+.weapon-equipment-icon {
   position: relative;
   display: inline-block;
   flex: 0 0 auto;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 15%;
-  background-image: url('./assets/ui/hammer-rarity-sprite.svg');
+  background-image: var(--weapon-icon);
   background-repeat: no-repeat;
-  background-size: 500% 100%;
+  background-size: cover;
   box-shadow: 0 2px 6px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.16);
   opacity: 1 !important;
 }
 
-.hammer-rarity-common { background-position: 0% 50%; }
-.hammer-rarity-uncommon { background-position: 25% 50%; }
-.hammer-rarity-rare { background-position: 50% 50%; }
-.hammer-rarity-epic { background-position: 75% 50%; }
-.hammer-rarity-legendary { background-position: 100% 50%; }
+.weapon-icon-bag { width: 100%; max-width: 88px; }
+.weapon-icon-slot { width: min(62px,100%); }
+.weapon-icon-detail { width: 88px; }
 
-.hammer-icon-bag { width: 100%; max-width: 88px; }
-.hammer-icon-slot { width: min(62px,100%); }
-.hammer-icon-detail { width: 88px; }
-
-.hammer-progress-number {
+.weapon-progress-number {
   position: absolute;
   right: 3px;
   bottom: 2px;
@@ -45,7 +39,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,.55);
 }
 
-.inventory-item.hammer-item {
+.inventory-item.weapon-item {
   min-height: 0;
   aspect-ratio: 1;
   padding: 3px;
@@ -55,15 +49,15 @@
   background: color-mix(in srgb,currentColor 8%,rgba(255,255,255,.035));
 }
 
-.inventory-item.hammer-item .hammer-equipment-icon,
-.inventory-equip-slot .hammer-equipment-icon,
-.weapon-art .hammer-equipment-icon { opacity: 1; }
+.inventory-item.weapon-item .weapon-equipment-icon,
+.inventory-equip-slot .weapon-equipment-icon,
+.weapon-art .weapon-equipment-icon { opacity: 1; }
 
-.inventory-equip-slot .hammer-progress-number { font-size: 11px !important; }
-.weapon-art .hammer-progress-number { font-size: 13px !important; }
+.inventory-equip-slot .weapon-progress-number { font-size: 11px !important; }
+.weapon-art .weapon-progress-number { font-size: 13px !important; }
 
 @media (max-width: 500px) {
-  .hammer-icon-slot { width: min(56px,100%); }
-  .hammer-progress-number { min-width: 17px; height: 18px; font-size: 12px !important; }
-  .inventory-equip-slot .hammer-progress-number { font-size: 10px !important; }
+  .weapon-icon-slot { width: min(56px,100%); }
+  .weapon-progress-number { min-width: 17px; height: 18px; font-size: 12px !important; }
+  .inventory-equip-slot .weapon-progress-number { font-size: 10px !important; }
 }
