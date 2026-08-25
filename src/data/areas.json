@@ -1428,7 +1428,7 @@
           "id": "area3-crystal-01",
           "tier": "crystal",
           "x": -15,
-          "z": 22,
+          "z": 18,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1454,8 +1454,8 @@
         {
           "id": "area3-crystal-02",
           "tier": "crystal",
-          "x": -10,
-          "z": 22,
+          "x": -11,
+          "z": 18,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1481,8 +1481,8 @@
         {
           "id": "area3-crystal-03",
           "tier": "crystal",
-          "x": -5,
-          "z": 22,
+          "x": -7,
+          "z": 18,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1508,8 +1508,8 @@
         {
           "id": "area3-crystal-04",
           "tier": "crystal",
-          "x": 5,
-          "z": 22,
+          "x": -14,
+          "z": 14,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1535,8 +1535,8 @@
         {
           "id": "area3-crystal-05",
           "tier": "crystal",
-          "x": 10,
-          "z": 22,
+          "x": -10,
+          "z": 14,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1562,8 +1562,8 @@
         {
           "id": "area3-crystal-06",
           "tier": "crystal",
-          "x": 15,
-          "z": 22,
+          "x": -6,
+          "z": 14,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1588,114 +1588,6 @@
         },
         {
           "id": "area3-crystal-07",
-          "tier": "crystal",
-          "x": -16,
-          "z": 17,
-          "hp": {
-            "min": 2000,
-            "max": 4000
-          },
-          "rewards": [
-            {
-              "stat": "blunt",
-              "min": 1,
-              "max": 2
-            },
-            {
-              "stat": "hp",
-              "min": 5,
-              "max": 15
-            },
-            {
-              "stat": "regen",
-              "min": 1,
-              "max": 1
-            }
-          ]
-        },
-        {
-          "id": "area3-crystal-08",
-          "tier": "crystal",
-          "x": -11,
-          "z": 17,
-          "hp": {
-            "min": 2000,
-            "max": 4000
-          },
-          "rewards": [
-            {
-              "stat": "blunt",
-              "min": 1,
-              "max": 2
-            },
-            {
-              "stat": "hp",
-              "min": 5,
-              "max": 15
-            },
-            {
-              "stat": "regen",
-              "min": 1,
-              "max": 1
-            }
-          ]
-        },
-        {
-          "id": "area3-crystal-09",
-          "tier": "crystal",
-          "x": -6,
-          "z": 17,
-          "hp": {
-            "min": 2000,
-            "max": 4000
-          },
-          "rewards": [
-            {
-              "stat": "blunt",
-              "min": 1,
-              "max": 2
-            },
-            {
-              "stat": "hp",
-              "min": 5,
-              "max": 15
-            },
-            {
-              "stat": "regen",
-              "min": 1,
-              "max": 1
-            }
-          ]
-        },
-        {
-          "id": "area3-crystal-10",
-          "tier": "crystal",
-          "x": 0,
-          "z": 17,
-          "hp": {
-            "min": 2000,
-            "max": 4000
-          },
-          "rewards": [
-            {
-              "stat": "blunt",
-              "min": 1,
-              "max": 2
-            },
-            {
-              "stat": "hp",
-              "min": 5,
-              "max": 15
-            },
-            {
-              "stat": "regen",
-              "min": 1,
-              "max": 1
-            }
-          ]
-        },
-        {
-          "id": "area3-crystal-11",
           "tier": "crystal",
           "x": 6,
           "z": 17,
@@ -1722,10 +1614,118 @@
           ]
         },
         {
+          "id": "area3-crystal-08",
+          "tier": "crystal",
+          "x": 10,
+          "z": 18,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-09",
+          "tier": "crystal",
+          "x": 14,
+          "z": 17,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-10",
+          "tier": "crystal",
+          "x": 6,
+          "z": 12,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
+          "id": "area3-crystal-11",
+          "tier": "crystal",
+          "x": 10,
+          "z": 13,
+          "hp": {
+            "min": 2000,
+            "max": 4000
+          },
+          "rewards": [
+            {
+              "stat": "blunt",
+              "min": 1,
+              "max": 2
+            },
+            {
+              "stat": "hp",
+              "min": 5,
+              "max": 15
+            },
+            {
+              "stat": "regen",
+              "min": 1,
+              "max": 1
+            }
+          ]
+        },
+        {
           "id": "area3-crystal-12",
           "tier": "crystal",
-          "x": 11,
-          "z": 17,
+          "x": 14,
+          "z": 12,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1751,8 +1751,8 @@
         {
           "id": "area3-crystal-13",
           "tier": "crystal",
-          "x": 16,
-          "z": 17,
+          "x": -15,
+          "z": -2,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1778,8 +1778,8 @@
         {
           "id": "area3-crystal-14",
           "tier": "crystal",
-          "x": -15,
-          "z": 12,
+          "x": -12,
+          "z": -3,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1805,8 +1805,8 @@
         {
           "id": "area3-crystal-15",
           "tier": "crystal",
-          "x": -10,
-          "z": 12,
+          "x": -9,
+          "z": -2,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1832,8 +1832,8 @@
         {
           "id": "area3-crystal-16",
           "tier": "crystal",
-          "x": -5,
-          "z": 12,
+          "x": 9,
+          "z": -3,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1859,8 +1859,8 @@
         {
           "id": "area3-crystal-17",
           "tier": "crystal",
-          "x": 5,
-          "z": 12,
+          "x": 12,
+          "z": -4,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1886,8 +1886,8 @@
         {
           "id": "area3-crystal-18",
           "tier": "crystal",
-          "x": 10,
-          "z": 12,
+          "x": 15,
+          "z": -3,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1913,8 +1913,8 @@
         {
           "id": "area3-crystal-19",
           "tier": "crystal",
-          "x": 15,
-          "z": 12,
+          "x": -6,
+          "z": -16,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1940,8 +1940,8 @@
         {
           "id": "area3-crystal-20",
           "tier": "crystal",
-          "x": -14,
-          "z": 7,
+          "x": -3,
+          "z": -18,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1967,8 +1967,8 @@
         {
           "id": "area3-crystal-21",
           "tier": "crystal",
-          "x": -8,
-          "z": 7,
+          "x": 0,
+          "z": -17,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -1994,8 +1994,8 @@
         {
           "id": "area3-crystal-22",
           "tier": "crystal",
-          "x": -2,
-          "z": 7,
+          "x": 3,
+          "z": -18,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -2021,8 +2021,8 @@
         {
           "id": "area3-crystal-23",
           "tier": "crystal",
-          "x": 4,
-          "z": 7,
+          "x": 6,
+          "z": -16,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -2048,8 +2048,8 @@
         {
           "id": "area3-crystal-24",
           "tier": "crystal",
-          "x": 10,
-          "z": 7,
+          "x": -5,
+          "z": -12,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -2075,8 +2075,8 @@
         {
           "id": "area3-crystal-25",
           "tier": "crystal",
-          "x": 16,
-          "z": 7,
+          "x": 5,
+          "z": -12,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -2102,8 +2102,8 @@
         {
           "id": "area3-crystal-26",
           "tier": "crystal",
-          "x": 14,
-          "z": 2,
+          "x": 0,
+          "z": -21,
           "hp": {
             "min": 2000,
             "max": 4000
@@ -2129,8 +2129,8 @@
         {
           "id": "area3-common-01",
           "tier": "common",
-          "x": -13,
-          "z": 1,
+          "x": -14,
+          "z": 7,
           "hp": {
             "min": 13000,
             "max": 13000
@@ -2147,8 +2147,8 @@
         {
           "id": "area3-common-02",
           "tier": "common",
-          "x": -10,
-          "z": 0,
+          "x": -11,
+          "z": 7,
           "hp": {
             "min": 13000,
             "max": 13000
@@ -2165,8 +2165,8 @@
         {
           "id": "area3-common-03",
           "tier": "common",
-          "x": -7,
-          "z": 1,
+          "x": -8,
+          "z": 7,
           "hp": {
             "min": 13000,
             "max": 13000
@@ -2183,8 +2183,8 @@
         {
           "id": "area3-common-04",
           "tier": "common",
-          "x": 7,
-          "z": 1,
+          "x": 8,
+          "z": 5,
           "hp": {
             "min": 3000,
             "max": 3000
@@ -2201,8 +2201,8 @@
         {
           "id": "area3-common-05",
           "tier": "common",
-          "x": 10,
-          "z": 0,
+          "x": 11,
+          "z": 5,
           "hp": {
             "min": 3000,
             "max": 3000
@@ -2219,8 +2219,8 @@
         {
           "id": "area3-common-06",
           "tier": "common",
-          "x": 13,
-          "z": 1,
+          "x": 14,
+          "z": 5,
           "hp": {
             "min": 3000,
             "max": 3000
@@ -2237,8 +2237,8 @@
         {
           "id": "area3-common-07",
           "tier": "common",
-          "x": -12,
-          "z": -7,
+          "x": -5,
+          "z": -5,
           "hp": {
             "min": 7000,
             "max": 7000
@@ -2254,8 +2254,8 @@
         {
           "id": "area3-common-08",
           "tier": "common",
-          "x": 0,
-          "z": -6,
+          "x": 5,
+          "z": -5,
           "hp": {
             "min": 7000,
             "max": 7000
@@ -2271,8 +2271,8 @@
         {
           "id": "area3-common-09",
           "tier": "common",
-          "x": 12,
-          "z": -7,
+          "x": -8,
+          "z": -10,
           "hp": {
             "min": 7000,
             "max": 7000
@@ -2288,8 +2288,8 @@
         {
           "id": "area3-common-10",
           "tier": "common",
-          "x": -3,
-          "z": -12,
+          "x": 8,
+          "z": -10,
           "hp": {
             "min": 3000,
             "max": 3000
@@ -2306,8 +2306,8 @@
         {
           "id": "area3-common-11",
           "tier": "common",
-          "x": 0,
-          "z": -13,
+          "x": -3,
+          "z": -12,
           "hp": {
             "min": 3000,
             "max": 3000
@@ -2396,8 +2396,8 @@
         {
           "id": "area3-rare-01",
           "tier": "rare",
-          "x": -9,
-          "z": -21,
+          "x": -7,
+          "z": -20,
           "hp": {
             "min": 12000,
             "max": 12000
@@ -2414,7 +2414,7 @@
           "id": "area3-epic-01",
           "tier": "epic",
           "x": 0,
-          "z": -24,
+          "z": -18,
           "hp": {
             "min": 30000,
             "max": 45000
@@ -2431,8 +2431,8 @@
         {
           "id": "area3-epic-02",
           "tier": "epic",
-          "x": 9,
-          "z": -21,
+          "x": 7,
+          "z": -20,
           "hp": {
             "min": 20000,
             "max": 25000
