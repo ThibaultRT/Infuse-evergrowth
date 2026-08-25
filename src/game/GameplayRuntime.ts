@@ -1,5 +1,6 @@
 import type { Position } from '../domain/world/Position';
 import { copyPosition, distanceBetween } from '../domain/world/Position';
+import { lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import { EnemyAISystem, type EnemyAIState } from '../systems/EnemyAISystem';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 
@@ -195,7 +196,10 @@ export class GameplayRuntime {
         const coordinate = item.axis === 'x' ? candidate.z : candidate.x;
         const center = item.axis === 'x' ? item.z : item.x;
         const crossed = item.axis === 'x' ? outsideX : outsideZ;
-        return crossed && Math.abs(coordinate - center) <= item.width / 2 - .3;
+        // Match the dry causeway's collision opening exactly. A looser crossing
+        // tolerance let the hero enter the destination while clipping a lake end,
+        // which looked like a teleport from the gate into the water.
+        return crossed && Math.abs(coordinate - center) <= item.width / 2 - heroRadius;
       });
       if (connection) {
         const target = connection.areaAId === area.id ? connection.areaBId : connection.areaAId;
@@ -214,7 +218,7 @@ export class GameplayRuntime {
         }
       }
     }
-    this.constrainToLakeBank(candidate, area, heroRadius);
+    this.constrainToLakeBank(candidate, area, heroRadius, previous);
     this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
     this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
     this.hero.facing = Math.atan2(movement.x, -movement.y);
@@ -241,17 +245,33 @@ export class GameplayRuntime {
     this.constrainToLakeBank(spawn.position, area, radius);
   }
 
-  /** Keep both banks of a lake connection solid, with only its causeway left walkable. */
-  private constrainToLakeBank(position: Position, area: AreaDefinition, radius: number): void {
+  /** Keep both lakes solid while allowing movement along and across the causeway. */
+  private constrainToLakeBank(position: Position, area: AreaDefinition, radius: number, previous?: Position): void {
     const connection = this.options.connections.find((item) =>
       item.visualStyle === 'lake-gate' && item.axis === 'z' && (item.areaAId === area.id || item.areaBId === area.id)
     );
-    if (!connection || Math.abs(position.x - connection.x) <= connection.width / 2 - radius) return;
-    // Keep the actor's full collision circle on land. The barrier is centred on
-    // the shared chunk edge, so half its authored depth extends into each area.
-    const bankInset = (connection.barrierDepth ?? 0) / 2 + radius;
-    if (area.originZ > connection.z) position.z = Math.max(position.z, connection.z + bankInset);
-    else position.z = Math.min(position.z, connection.z - bankInset);
+    if (!connection) return;
+    const worldMinX = Math.min(...this.options.areas.map((candidate) => candidate.originX - candidate.size.width / 2)) - radius;
+    const worldMaxX = Math.max(...this.options.areas.map((candidate) => candidate.originX + candidate.size.width / 2)) + radius;
+    const segments = lakeBarrierSegments(connection, worldMinX, worldMaxX);
+    for (const segment of segments) {
+      const overlapsX = position.x + radius > segment.minX && position.x - radius < segment.maxX;
+      const overlapsZ = position.z + radius > segment.minZ && position.z - radius < segment.maxZ;
+      if (!overlapsX || !overlapsZ) continue;
+
+      // When entering from the causeway, stop at the lake's vertical end instead
+      // of snapping all the way back to a bank. This closes the gate-side leak.
+      const previousWasInOpening = previous && previous.x - radius >= segments[0].maxX && previous.x + radius <= segments[1].minX;
+      const previousWasAlongLake = previous && previous.z + radius > segment.minZ && previous.z - radius < segment.maxZ;
+      if (previousWasInOpening && previousWasAlongLake) {
+        position.x = segment === segments[0] ? segment.maxX + radius : segment.minX - radius;
+        continue;
+      }
+
+      const bankInset = (connection.barrierDepth ?? 0) / 2 + radius;
+      if (area.originZ > connection.z) position.z = connection.z + bankInset;
+      else position.z = connection.z - bankInset;
+    }
   }
 
   private area(id: number): AreaDefinition {
