@@ -39,14 +39,15 @@ export class EnvironmentView {
 
   private buildMeadow(): void {
     this.ground(0x79a957); this.road([[0,4],[3,-10],[8,-28]]); this.road([[0,4],[10,3],[18,0]]); this.road([[0,4],[-10,7],[-18,7]]); this.road([[0,4],[-1,16],[0,28]]);
-    // Keep most of the lake beyond the playable chunk. An irregular shore masks
-    // the plane edge while the raised causeway makes the only crossing explicit.
-    const water=mesh(new THREE.PlaneGeometry(62,18),new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93}),0,.04,-34); water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
+    // A narrow water band separates the adjacent chunks without flooding deep
+    // into Area 2. Irregular stones conceal both long edges of the water plane.
+    const water=mesh(new THREE.PlaneGeometry(62,8),new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93}),0,.04,-28); water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
     for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-25.4+Math.sin(x*.72)*.55+Math.sin(x*1.8)*.2; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
+    for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-30.6+Math.sin(x*.61)*.4+Math.sin(x*1.55)*.16; this.macroRoot.add(this.irregularRock(x,.18,z,1.15,.4,.82)); }
     const causewayMaterial=new THREE.MeshStandardMaterial({color:0x8b846d,roughness:1});
     const causeway=mesh(new THREE.BoxGeometry(4.6,.3,9),causewayMaterial,8,.14,-28); this.macroRoot.add(causeway);
     for(const x of [5.85,10.15]) for(let z=-31.5;z<=-24.5;z+=2.25) this.macroRoot.add(this.irregularRock(x,.35,z,.45,.55,.65,0x626556));
-    for(const [x,z,s] of [[-10,-31,1.8],[1,-33,1.4],[16,-31,1.2]] as const) this.macroRoot.add(this.irregularRock(x,.15,z,s,.5,s*.8));
+    for(const [x,z,s] of [[-10,-28.4,1.35],[1,-29,1.05],[16,-28.2,.9]] as const) this.macroRoot.add(this.irregularRock(x,.15,z,s,.45,s*.75));
     // Layered west ridge: human-scale foreground rocks, larger masses pushed outside play.
     const ridge=new THREE.Group(); ridge.name='west layered ridge'; ridge.userData.cameraOccluder=true;
     for(let z=-31;z<=32;z+=4.1){ const wave=Math.sin(z*.5); ridge.add(this.irregularRock(-19.1,.55,z,1.5,1.1,1.7),this.irregularRock(-22.3,1.5,z+1.5,2.5,2.8+wave*.4,2.3),this.irregularRock(-26,2.8,z-.8,4,4.7,3.5)); } this.macroRoot.add(ridge);
