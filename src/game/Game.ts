@@ -236,9 +236,11 @@ class SpawnEntity {
   }
 
   syncAreaVisibility(): void {
-    const visible = (this.alive || this.deathPresentationRemaining > 0) && this.def.areaId === currentAreaId;
+    // Every area's occupants are part of one continuous world. Gameplay remains
+    // area-scoped, but crossing a boundary must not be what makes its mobs exist.
+    const visible = this.alive || this.deathPresentationRemaining > 0;
     this.root.visible = visible;
-    this.targetUi.classList.toggle('hidden', !this.alive || this.def.areaId !== currentAreaId);
+    this.targetUi.classList.toggle('hidden', !this.alive);
   }
 
   setAlive(value: boolean): void {
@@ -336,6 +338,8 @@ class SpawnEntity {
       this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
       if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();
     }
+    // Distant areas stay rendered, but only the active area's character mixers
+    // advance. This keeps the continuous vista cheap as the world grows.
     this.enemyView?.update(dt, this.state.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
   }
 }
@@ -702,7 +706,7 @@ function updateGates(dt: number): void {
 
 function updateTargetUi(): void {
   for (const entity of entities) {
-    if (!entity.alive || entity.def.areaId !== currentAreaId) {
+    if (!entity.alive) {
       entity.targetUi.style.visibility = 'hidden';
       continue;
     }

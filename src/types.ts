@@ -42,6 +42,7 @@ export type WorldConnection = {
   z: number;
   axis: 'x' | 'z';
   width: number;
+  barrierDepth?: number;
   requiredUnlockedAreaId: number;
   unlockOnBossOfAreaId?: number;
   visualStyle: 'lake-gate' | 'ruined-fortress-gate';

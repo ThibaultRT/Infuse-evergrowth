@@ -247,7 +247,9 @@ export class GameplayRuntime {
       item.visualStyle === 'lake-gate' && item.axis === 'z' && (item.areaAId === area.id || item.areaBId === area.id)
     );
     if (!connection || Math.abs(position.x - connection.x) <= connection.width / 2 - radius) return;
-    const bankInset = 2.6;
+    // Keep the actor's full collision circle on land. The barrier is centred on
+    // the shared chunk edge, so half its authored depth extends into each area.
+    const bankInset = (connection.barrierDepth ?? 0) / 2 + radius;
     if (area.originZ > connection.z) position.z = Math.max(position.z, connection.z + bankInset);
     else position.z = Math.min(position.z, connection.z - bankInset);
   }
