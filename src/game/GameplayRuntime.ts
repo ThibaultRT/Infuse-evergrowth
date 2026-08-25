@@ -119,8 +119,8 @@ export class GameplayRuntime {
       const distanceToHero = distanceBetween(spawn.position, this.hero.position);
       const distanceFromSpawn = distanceBetween(spawn.position, spawn.spawnPosition);
       const intent = this.enemyAI.update(spawn, distanceToHero, distanceFromSpawn, dt);
-      if (intent === 'chase') this.moveTowards(spawn, this.hero.position, spawn.speed * dt);
-      else if (intent === 'return') this.moveTowards(spawn, spawn.spawnPosition, 3 * dt);
+      if (intent === 'chase') { this.moveTowards(spawn, this.hero.position, spawn.speed * dt); this.constrainSpawn(spawn); }
+      else if (intent === 'return') { this.moveTowards(spawn, spawn.spawnPosition, 3 * dt); this.constrainSpawn(spawn); }
       else if (intent === 'attack') {
         spawn.attackCooldown = this.options.enemyAttackCooldown;
         events.push({ type: 'enemyAttack', spawnId: spawn.id, amount: spawn.damage, damageType: spawn.damageType });
@@ -217,8 +217,8 @@ export class GameplayRuntime {
     // The lake is gameplay geometry, not just decoration. Keep the hero on the
     // southern bank while leaving the authored fortified causeway traversable.
     const northConnection = this.options.connections.find((item) => item.axis === 'z' && item.areaAId === area.id && item.z < area.originZ);
-    if (northConnection && candidate.z < northConnection.z + 4.1 && Math.abs(candidate.x - northConnection.x) > northConnection.width / 2 - heroRadius) {
-      candidate.z = northConnection.z + 4.1;
+    if (northConnection && candidate.z < northConnection.z + 2.6 && Math.abs(candidate.x - northConnection.x) > northConnection.width / 2 - heroRadius) {
+      candidate.z = northConnection.z + 2.6;
     }
     this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
     this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
@@ -235,6 +235,16 @@ export class GameplayRuntime {
     spawn.position.x += x / length * step;
     spawn.position.z += z / length * step;
     spawn.moving = true;
+  }
+
+  /** Keep enemy simulation inside its authored walkable land, independent of scenery meshes. */
+  private constrainSpawn(spawn: RuntimeSpawn): void {
+    const area = this.area(spawn.definition.areaId);
+    const radius = .45;
+    spawn.position.x = Math.min(area.originX + area.size.width / 2 - radius, Math.max(area.originX - area.size.width / 2 + radius, spawn.position.x));
+    spawn.position.z = Math.min(area.originZ + area.size.depth / 2 - radius, Math.max(area.originZ - area.size.depth / 2 + radius, spawn.position.z));
+    const northConnection = this.options.connections.find((item) => item.axis === 'z' && item.areaAId === area.id && item.z < area.originZ);
+    if (northConnection && spawn.position.z < northConnection.z + 2.6) spawn.position.z = northConnection.z + 2.6;
   }
 
   private area(id: number): AreaDefinition {
