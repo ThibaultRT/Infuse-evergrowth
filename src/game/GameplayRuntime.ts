@@ -214,12 +214,7 @@ export class GameplayRuntime {
         }
       }
     }
-    // The lake is gameplay geometry, not just decoration. Keep the hero on the
-    // southern bank while leaving the authored fortified causeway traversable.
-    const northConnection = this.options.connections.find((item) => item.axis === 'z' && item.areaAId === area.id && item.z < area.originZ);
-    if (northConnection && candidate.z < northConnection.z + 2.6 && Math.abs(candidate.x - northConnection.x) > northConnection.width / 2 - heroRadius) {
-      candidate.z = northConnection.z + 2.6;
-    }
+    this.constrainToLakeBank(candidate, area, heroRadius);
     this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
     this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
     this.hero.facing = Math.atan2(movement.x, -movement.y);
@@ -243,8 +238,18 @@ export class GameplayRuntime {
     const radius = .45;
     spawn.position.x = Math.min(area.originX + area.size.width / 2 - radius, Math.max(area.originX - area.size.width / 2 + radius, spawn.position.x));
     spawn.position.z = Math.min(area.originZ + area.size.depth / 2 - radius, Math.max(area.originZ - area.size.depth / 2 + radius, spawn.position.z));
-    const northConnection = this.options.connections.find((item) => item.axis === 'z' && item.areaAId === area.id && item.z < area.originZ);
-    if (northConnection && spawn.position.z < northConnection.z + 2.6) spawn.position.z = northConnection.z + 2.6;
+    this.constrainToLakeBank(spawn.position, area, radius);
+  }
+
+  /** Keep both banks of a lake connection solid, with only its causeway left walkable. */
+  private constrainToLakeBank(position: Position, area: AreaDefinition, radius: number): void {
+    const connection = this.options.connections.find((item) =>
+      item.visualStyle === 'lake-gate' && item.axis === 'z' && (item.areaAId === area.id || item.areaBId === area.id)
+    );
+    if (!connection || Math.abs(position.x - connection.x) <= connection.width / 2 - radius) return;
+    const bankInset = 2.6;
+    if (area.originZ > connection.z) position.z = Math.max(position.z, connection.z + bankInset);
+    else position.z = Math.min(position.z, connection.z - bankInset);
   }
 
   private area(id: number): AreaDefinition {
