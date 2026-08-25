@@ -1,0 +1,1367 @@
+[
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_A_Color1.gltf",
+    "filename": "Bush_1_A_Color1.gltf",
+    "dimensions": [
+      0.267,
+      0.234,
+      0.227
+    ],
+    "triangles": 72,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_B_Color1.gltf",
+    "filename": "Bush_1_B_Color1.gltf",
+    "dimensions": [
+      0.722,
+      0.722,
+      0.484
+    ],
+    "triangles": 168,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_C_Color1.gltf",
+    "filename": "Bush_1_C_Color1.gltf",
+    "dimensions": [
+      1.204,
+      1.204,
+      0.807
+    ],
+    "triangles": 168,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_D_Color1.gltf",
+    "filename": "Bush_1_D_Color1.gltf",
+    "dimensions": [
+      1.567,
+      1.567,
+      0.994
+    ],
+    "triangles": 168,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_E_Color1.gltf",
+    "filename": "Bush_1_E_Color1.gltf",
+    "dimensions": [
+      1.575,
+      1.317,
+      0.808
+    ],
+    "triangles": 552,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_F_Color1.gltf",
+    "filename": "Bush_1_F_Color1.gltf",
+    "dimensions": [
+      2.283,
+      1.879,
+      0.994
+    ],
+    "triangles": 576,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_G_Color1.gltf",
+    "filename": "Bush_1_G_Color1.gltf",
+    "dimensions": [
+      3.104,
+      1.748,
+      0.994
+    ],
+    "triangles": 984,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_A_Color1.gltf",
+    "filename": "Bush_2_A_Color1.gltf",
+    "dimensions": [
+      0.528,
+      0.528,
+      0.528
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_B_Color1.gltf",
+    "filename": "Bush_2_B_Color1.gltf",
+    "dimensions": [
+      0.858,
+      0.858,
+      0.858
+    ],
+    "triangles": 108,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_C_Color1.gltf",
+    "filename": "Bush_2_C_Color1.gltf",
+    "dimensions": [
+      1.32,
+      1.32,
+      1.32
+    ],
+    "triangles": 108,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_D_Color1.gltf",
+    "filename": "Bush_2_D_Color1.gltf",
+    "dimensions": [
+      1.572,
+      1.018,
+      0.858
+    ],
+    "triangles": 196,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_E_Color1.gltf",
+    "filename": "Bush_2_E_Color1.gltf",
+    "dimensions": [
+      2.348,
+      2.006,
+      1.332
+    ],
+    "triangles": 476,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_F_Color1.gltf",
+    "filename": "Bush_2_F_Color1.gltf",
+    "dimensions": [
+      2.007,
+      1.594,
+      1.792
+    ],
+    "triangles": 368,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_3_A_Color1.gltf",
+    "filename": "Bush_3_A_Color1.gltf",
+    "dimensions": [
+      1.033,
+      1.033,
+      0.485
+    ],
+    "triangles": 208,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_3_B_Color1.gltf",
+    "filename": "Bush_3_B_Color1.gltf",
+    "dimensions": [
+      1.683,
+      1.683,
+      0.804
+    ],
+    "triangles": 240,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_3_C_Color1.gltf",
+    "filename": "Bush_3_C_Color1.gltf",
+    "dimensions": [
+      2.49,
+      2.49,
+      1.151
+    ],
+    "triangles": 272,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_A_Color1.gltf",
+    "filename": "Bush_4_A_Color1.gltf",
+    "dimensions": [
+      0.577,
+      0.577,
+      0.434
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_B_Color1.gltf",
+    "filename": "Bush_4_B_Color1.gltf",
+    "dimensions": [
+      0.991,
+      0.991,
+      0.743
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_C_Color1.gltf",
+    "filename": "Bush_4_C_Color1.gltf",
+    "dimensions": [
+      1.581,
+      1.581,
+      1.302
+    ],
+    "triangles": 108,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_D_Color1.gltf",
+    "filename": "Bush_4_D_Color1.gltf",
+    "dimensions": [
+      1.741,
+      1.287,
+      0.743
+    ],
+    "triangles": 132,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_E_Color1.gltf",
+    "filename": "Bush_4_E_Color1.gltf",
+    "dimensions": [
+      2.696,
+      2.279,
+      1.302
+    ],
+    "triangles": 284,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_F_Color1.gltf",
+    "filename": "Bush_4_F_Color1.gltf",
+    "dimensions": [
+      3.392,
+      2.139,
+      1.302
+    ],
+    "triangles": 284,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_A_Color1.gltf",
+    "filename": "Grass_1_A_Color1.gltf",
+    "dimensions": [
+      0.339,
+      0.152,
+      0.559
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_A_Singlesided_Color1.gltf",
+    "filename": "Grass_1_A_Singlesided_Color1.gltf",
+    "dimensions": [
+      0.287,
+      0.127,
+      0.559
+    ],
+    "triangles": 14,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_B_Color1.gltf",
+    "filename": "Grass_1_B_Color1.gltf",
+    "dimensions": [
+      0.505,
+      0.556,
+      0.537
+    ],
+    "triangles": 132,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_B_Singlesided_Color1.gltf",
+    "filename": "Grass_1_B_Singlesided_Color1.gltf",
+    "dimensions": [
+      0.512,
+      0.533,
+      0.52
+    ],
+    "triangles": 42,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_C_Color1.gltf",
+    "filename": "Grass_1_C_Color1.gltf",
+    "dimensions": [
+      0.752,
+      0.717,
+      0.583
+    ],
+    "triangles": 396,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_C_Singlesided_Color1.gltf",
+    "filename": "Grass_1_C_Singlesided_Color1.gltf",
+    "dimensions": [
+      0.734,
+      0.725,
+      0.58
+    ],
+    "triangles": 126,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_D_Color1.gltf",
+    "filename": "Grass_1_D_Color1.gltf",
+    "dimensions": [
+      1.081,
+      1.178,
+      0.589
+    ],
+    "triangles": 528,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_D_Singlesided_Color1.gltf",
+    "filename": "Grass_1_D_Singlesided_Color1.gltf",
+    "dimensions": [
+      1.042,
+      1.186,
+      0.584
+    ],
+    "triangles": 168,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_Mesh.gltf",
+    "filename": "Grass_1_Mesh.gltf",
+    "dimensions": [
+      0.339,
+      0.152,
+      0.559
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_1_SingleSided_Mesh.gltf",
+    "filename": "Grass_1_SingleSided_Mesh.gltf",
+    "dimensions": [
+      0.287,
+      0.127,
+      0.559
+    ],
+    "triangles": 14,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_A_Color1.gltf",
+    "filename": "Grass_2_A_Color1.gltf",
+    "dimensions": [
+      0.155,
+      0.254,
+      0.919
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_A_Singlesided_Color1.gltf",
+    "filename": "Grass_2_A_Singlesided_Color1.gltf",
+    "dimensions": [
+      0.155,
+      0.227,
+      0.919
+    ],
+    "triangles": 14,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_B_Color1.gltf",
+    "filename": "Grass_2_B_Color1.gltf",
+    "dimensions": [
+      0.403,
+      0.397,
+      0.919
+    ],
+    "triangles": 132,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_B_Singlesided_Color1.gltf",
+    "filename": "Grass_2_B_Singlesided_Color1.gltf",
+    "dimensions": [
+      0.384,
+      0.378,
+      0.919
+    ],
+    "triangles": 42,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_C_Color1.gltf",
+    "filename": "Grass_2_C_Color1.gltf",
+    "dimensions": [
+      0.896,
+      0.757,
+      0.935
+    ],
+    "triangles": 528,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_C_Singlesided_Color1.gltf",
+    "filename": "Grass_2_C_Singlesided_Color1.gltf",
+    "dimensions": [
+      0.872,
+      0.738,
+      0.934
+    ],
+    "triangles": 168,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_D_Color1.gltf",
+    "filename": "Grass_2_D_Color1.gltf",
+    "dimensions": [
+      1.104,
+      1.366,
+      0.935
+    ],
+    "triangles": 528,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_D_Singlesided_Color1.gltf",
+    "filename": "Grass_2_D_Singlesided_Color1.gltf",
+    "dimensions": [
+      1.083,
+      1.343,
+      0.934
+    ],
+    "triangles": 168,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_Mesh.gltf",
+    "filename": "Grass_2_Mesh.gltf",
+    "dimensions": [
+      0.155,
+      0.254,
+      0.919
+    ],
+    "triangles": 44,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Grass_2_SingleSided_Mesh.gltf",
+    "filename": "Grass_2_SingleSided_Mesh.gltf",
+    "dimensions": [
+      0.155,
+      0.227,
+      0.919
+    ],
+    "triangles": 14,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_A_Color1.gltf",
+    "filename": "Rock_1_A_Color1.gltf",
+    "dimensions": [
+      0.578,
+      0.608,
+      0.54
+    ],
+    "triangles": 48,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_B_Color1.gltf",
+    "filename": "Rock_1_B_Color1.gltf",
+    "dimensions": [
+      0.551,
+      0.578,
+      0.54
+    ],
+    "triangles": 48,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_C_Color1.gltf",
+    "filename": "Rock_1_C_Color1.gltf",
+    "dimensions": [
+      0.519,
+      0.605,
+      0.54
+    ],
+    "triangles": 48,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_D_Color1.gltf",
+    "filename": "Rock_1_D_Color1.gltf",
+    "dimensions": [
+      0.927,
+      1.157,
+      1.13
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_E_Color1.gltf",
+    "filename": "Rock_1_E_Color1.gltf",
+    "dimensions": [
+      1.0,
+      1.085,
+      1.13
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_F_Color1.gltf",
+    "filename": "Rock_1_F_Color1.gltf",
+    "dimensions": [
+      1.0,
+      0.866,
+      1.13
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_G_Color1.gltf",
+    "filename": "Rock_1_G_Color1.gltf",
+    "dimensions": [
+      1.745,
+      1.65,
+      1.868
+    ],
+    "triangles": 104,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_H_Color1.gltf",
+    "filename": "Rock_1_H_Color1.gltf",
+    "dimensions": [
+      1.532,
+      1.532,
+      1.868
+    ],
+    "triangles": 104,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_I_Color1.gltf",
+    "filename": "Rock_1_I_Color1.gltf",
+    "dimensions": [
+      1.605,
+      1.999,
+      1.868
+    ],
+    "triangles": 104,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_J_Color1.gltf",
+    "filename": "Rock_1_J_Color1.gltf",
+    "dimensions": [
+      3.391,
+      3.757,
+      3.356
+    ],
+    "triangles": 521,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_K_Color1.gltf",
+    "filename": "Rock_1_K_Color1.gltf",
+    "dimensions": [
+      3.689,
+      3.13,
+      3.648
+    ],
+    "triangles": 529,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_L_Color1.gltf",
+    "filename": "Rock_1_L_Color1.gltf",
+    "dimensions": [
+      3.294,
+      2.622,
+      3.399
+    ],
+    "triangles": 494,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_M_Color1.gltf",
+    "filename": "Rock_1_M_Color1.gltf",
+    "dimensions": [
+      3.905,
+      2.711,
+      3.516
+    ],
+    "triangles": 528,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_N_Color1.gltf",
+    "filename": "Rock_1_N_Color1.gltf",
+    "dimensions": [
+      2.305,
+      2.243,
+      4.498
+    ],
+    "triangles": 355,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_O_Color1.gltf",
+    "filename": "Rock_1_O_Color1.gltf",
+    "dimensions": [
+      2.11,
+      2.11,
+      4.577
+    ],
+    "triangles": 223,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_P_Color1.gltf",
+    "filename": "Rock_1_P_Color1.gltf",
+    "dimensions": [
+      2.208,
+      1.838,
+      4.006
+    ],
+    "triangles": 405,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_1_Q_Color1.gltf",
+    "filename": "Rock_1_Q_Color1.gltf",
+    "dimensions": [
+      2.216,
+      2.797,
+      4.278
+    ],
+    "triangles": 497,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_A_Color1.gltf",
+    "filename": "Rock_2_A_Color1.gltf",
+    "dimensions": [
+      0.216,
+      0.216,
+      0.216
+    ],
+    "triangles": 12,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_B_Color1.gltf",
+    "filename": "Rock_2_B_Color1.gltf",
+    "dimensions": [
+      0.63,
+      0.63,
+      0.646
+    ],
+    "triangles": 44,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_C_Color1.gltf",
+    "filename": "Rock_2_C_Color1.gltf",
+    "dimensions": [
+      1.295,
+      1.295,
+      1.326
+    ],
+    "triangles": 108,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_D_Color1.gltf",
+    "filename": "Rock_2_D_Color1.gltf",
+    "dimensions": [
+      1.709,
+      1.709,
+      1.74
+    ],
+    "triangles": 108,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_E_Color1.gltf",
+    "filename": "Rock_2_E_Color1.gltf",
+    "dimensions": [
+      3.168,
+      3.307,
+      2.862
+    ],
+    "triangles": 438,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_F_Color1.gltf",
+    "filename": "Rock_2_F_Color1.gltf",
+    "dimensions": [
+      4.143,
+      2.869,
+      2.862
+    ],
+    "triangles": 428,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_G_Color1.gltf",
+    "filename": "Rock_2_G_Color1.gltf",
+    "dimensions": [
+      3.093,
+      3.729,
+      3.196
+    ],
+    "triangles": 488,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_2_H_Color1.gltf",
+    "filename": "Rock_2_H_Color1.gltf",
+    "dimensions": [
+      3.697,
+      3.311,
+      2.757
+    ],
+    "triangles": 312,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_A_Color1.gltf",
+    "filename": "Rock_3_A_Color1.gltf",
+    "dimensions": [
+      0.956,
+      0.807,
+      0.859
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_B_Color1.gltf",
+    "filename": "Rock_3_B_Color1.gltf",
+    "dimensions": [
+      0.819,
+      0.847,
+      1.028
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_C_Color1.gltf",
+    "filename": "Rock_3_C_Color1.gltf",
+    "dimensions": [
+      0.805,
+      0.86,
+      0.968
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_D_Color1.gltf",
+    "filename": "Rock_3_D_Color1.gltf",
+    "dimensions": [
+      0.933,
+      0.794,
+      0.972
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_E_Color1.gltf",
+    "filename": "Rock_3_E_Color1.gltf",
+    "dimensions": [
+      1.145,
+      1.181,
+      1.288
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_F_Color1.gltf",
+    "filename": "Rock_3_F_Color1.gltf",
+    "dimensions": [
+      1.088,
+      1.188,
+      1.176
+    ],
+    "triangles": 84,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_G_Color1.gltf",
+    "filename": "Rock_3_G_Color1.gltf",
+    "dimensions": [
+      1.862,
+      1.734,
+      2.0
+    ],
+    "triangles": 168,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_H_Color1.gltf",
+    "filename": "Rock_3_H_Color1.gltf",
+    "dimensions": [
+      1.955,
+      1.759,
+      2.058
+    ],
+    "triangles": 168,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_I_Color1.gltf",
+    "filename": "Rock_3_I_Color1.gltf",
+    "dimensions": [
+      1.922,
+      1.643,
+      2.109
+    ],
+    "triangles": 168,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_J_Color1.gltf",
+    "filename": "Rock_3_J_Color1.gltf",
+    "dimensions": [
+      1.973,
+      1.736,
+      1.896
+    ],
+    "triangles": 168,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_K_Color1.gltf",
+    "filename": "Rock_3_K_Color1.gltf",
+    "dimensions": [
+      2.608,
+      2.59,
+      2.223
+    ],
+    "triangles": 168,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_L_Color1.gltf",
+    "filename": "Rock_3_L_Color1.gltf",
+    "dimensions": [
+      2.618,
+      2.559,
+      2.268
+    ],
+    "triangles": 168,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_M_Color1.gltf",
+    "filename": "Rock_3_M_Color1.gltf",
+    "dimensions": [
+      3.434,
+      2.809,
+      3.6
+    ],
+    "triangles": 320,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_N_Color1.gltf",
+    "filename": "Rock_3_N_Color1.gltf",
+    "dimensions": [
+      3.425,
+      2.985,
+      3.526
+    ],
+    "triangles": 320,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_O_Color1.gltf",
+    "filename": "Rock_3_O_Color1.gltf",
+    "dimensions": [
+      3.476,
+      2.933,
+      3.472
+    ],
+    "triangles": 320,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_P_Color1.gltf",
+    "filename": "Rock_3_P_Color1.gltf",
+    "dimensions": [
+      3.29,
+      2.874,
+      3.683
+    ],
+    "triangles": 320,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_Q_Color1.gltf",
+    "filename": "Rock_3_Q_Color1.gltf",
+    "dimensions": [
+      4.65,
+      4.478,
+      3.717
+    ],
+    "triangles": 320,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Rock_3_R_Color1.gltf",
+    "filename": "Rock_3_R_Color1.gltf",
+    "dimensions": [
+      5.163,
+      4.215,
+      3.847
+    ],
+    "triangles": 320,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_1_A_Color1.gltf",
+    "filename": "Tree_1_A_Color1.gltf",
+    "dimensions": [
+      3.181,
+      3.251,
+      4.161
+    ],
+    "triangles": 530,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_1_B_Color1.gltf",
+    "filename": "Tree_1_B_Color1.gltf",
+    "dimensions": [
+      4.007,
+      3.445,
+      4.93
+    ],
+    "triangles": 636,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_1_C_Color1.gltf",
+    "filename": "Tree_1_C_Color1.gltf",
+    "dimensions": [
+      6.691,
+      5.753,
+      7.814
+    ],
+    "triangles": 1364,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_A_Color1.gltf",
+    "filename": "Tree_2_A_Color1.gltf",
+    "dimensions": [
+      2.6,
+      2.0,
+      4.675
+    ],
+    "triangles": 336,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_B_Color1.gltf",
+    "filename": "Tree_2_B_Color1.gltf",
+    "dimensions": [
+      3.7,
+      2.1,
+      6.042
+    ],
+    "triangles": 492,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_C_Color1.gltf",
+    "filename": "Tree_2_C_Color1.gltf",
+    "dimensions": [
+      4.6,
+      3.4,
+      6.92
+    ],
+    "triangles": 648,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_D_Color1.gltf",
+    "filename": "Tree_2_D_Color1.gltf",
+    "dimensions": [
+      4.74,
+      4.034,
+      8.088
+    ],
+    "triangles": 1428,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_E_Color1.gltf",
+    "filename": "Tree_2_E_Color1.gltf",
+    "dimensions": [
+      6.051,
+      5.677,
+      8.792
+    ],
+    "triangles": 1560,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_3_A_Color1.gltf",
+    "filename": "Tree_3_A_Color1.gltf",
+    "dimensions": [
+      3.093,
+      3.093,
+      3.507
+    ],
+    "triangles": 978,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_3_B_Color1.gltf",
+    "filename": "Tree_3_B_Color1.gltf",
+    "dimensions": [
+      4.129,
+      4.129,
+      4.353
+    ],
+    "triangles": 988,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_3_C_Color1.gltf",
+    "filename": "Tree_3_C_Color1.gltf",
+    "dimensions": [
+      5.632,
+      4.625,
+      5.792
+    ],
+    "triangles": 2228,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_4_A_Color1.gltf",
+    "filename": "Tree_4_A_Color1.gltf",
+    "dimensions": [
+      2.007,
+      2.004,
+      5.274
+    ],
+    "triangles": 404,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_4_B_Color1.gltf",
+    "filename": "Tree_4_B_Color1.gltf",
+    "dimensions": [
+      2.574,
+      2.27,
+      6.943
+    ],
+    "triangles": 522,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_4_C_Color1.gltf",
+    "filename": "Tree_4_C_Color1.gltf",
+    "dimensions": [
+      3.735,
+      2.869,
+      10.774
+    ],
+    "triangles": 982,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_Bare_1_A_Color1.gltf",
+    "filename": "Tree_Bare_1_A_Color1.gltf",
+    "dimensions": [
+      1.129,
+      1.034,
+      2.857
+    ],
+    "triangles": 324,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_Bare_1_B_Color1.gltf",
+    "filename": "Tree_Bare_1_B_Color1.gltf",
+    "dimensions": [
+      1.965,
+      1.451,
+      3.251
+    ],
+    "triangles": 332,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_Bare_1_C_Color1.gltf",
+    "filename": "Tree_Bare_1_C_Color1.gltf",
+    "dimensions": [
+      3.737,
+      2.074,
+      5.255
+    ],
+    "triangles": 936,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_Bare_2_A_Color1.gltf",
+    "filename": "Tree_Bare_2_A_Color1.gltf",
+    "dimensions": [
+      1.196,
+      0.6,
+      3.843
+    ],
+    "triangles": 404,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_Bare_2_B_Color1.gltf",
+    "filename": "Tree_Bare_2_B_Color1.gltf",
+    "dimensions": [
+      1.788,
+      0.664,
+      5.542
+    ],
+    "triangles": 448,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_Bare_2_C_Color1.gltf",
+    "filename": "Tree_Bare_2_C_Color1.gltf",
+    "dimensions": [
+      1.578,
+      1.104,
+      7.614
+    ],
+    "triangles": 634,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  }
+]

@@ -1,0 +1,2718 @@
+[
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_blue.gltf",
+    "filename": "banner_blue.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_brown.gltf",
+    "filename": "banner_brown.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_green.gltf",
+    "filename": "banner_green.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_blue.gltf",
+    "filename": "banner_patternA_blue.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_brown.gltf",
+    "filename": "banner_patternA_brown.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_green.gltf",
+    "filename": "banner_patternA_green.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_red.gltf",
+    "filename": "banner_patternA_red.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_white.gltf",
+    "filename": "banner_patternA_white.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_yellow.gltf",
+    "filename": "banner_patternA_yellow.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_blue.gltf",
+    "filename": "banner_patternB_blue.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_brown.gltf",
+    "filename": "banner_patternB_brown.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_green.gltf",
+    "filename": "banner_patternB_green.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_red.gltf",
+    "filename": "banner_patternB_red.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_white.gltf",
+    "filename": "banner_patternB_white.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_yellow.gltf",
+    "filename": "banner_patternB_yellow.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_blue.gltf",
+    "filename": "banner_patternC_blue.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_brown.gltf",
+    "filename": "banner_patternC_brown.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_green.gltf",
+    "filename": "banner_patternC_green.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_red.gltf",
+    "filename": "banner_patternC_red.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_white.gltf",
+    "filename": "banner_patternC_white.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_yellow.gltf",
+    "filename": "banner_patternC_yellow.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_red.gltf",
+    "filename": "banner_red.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_blue.gltf",
+    "filename": "banner_shield_blue.gltf",
+    "dimensions": [
+      2.232,
+      0.374,
+      3.196
+    ],
+    "triangles": 639,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_brown.gltf",
+    "filename": "banner_shield_brown.gltf",
+    "dimensions": [
+      2.232,
+      0.374,
+      3.196
+    ],
+    "triangles": 639,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_green.gltf",
+    "filename": "banner_shield_green.gltf",
+    "dimensions": [
+      2.232,
+      0.374,
+      3.196
+    ],
+    "triangles": 639,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_red.gltf",
+    "filename": "banner_shield_red.gltf",
+    "dimensions": [
+      2.232,
+      0.374,
+      3.196
+    ],
+    "triangles": 639,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_white.gltf",
+    "filename": "banner_shield_white.gltf",
+    "dimensions": [
+      2.232,
+      0.374,
+      3.196
+    ],
+    "triangles": 639,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_yellow.gltf",
+    "filename": "banner_shield_yellow.gltf",
+    "dimensions": [
+      2.232,
+      0.374,
+      3.196
+    ],
+    "triangles": 639,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_blue.gltf",
+    "filename": "banner_thin_blue.gltf",
+    "dimensions": [
+      1.1,
+      0.362,
+      3.171
+    ],
+    "triangles": 83,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_brown.gltf",
+    "filename": "banner_thin_brown.gltf",
+    "dimensions": [
+      1.1,
+      0.362,
+      3.171
+    ],
+    "triangles": 83,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_green.gltf",
+    "filename": "banner_thin_green.gltf",
+    "dimensions": [
+      1.1,
+      0.362,
+      3.171
+    ],
+    "triangles": 83,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_red.gltf",
+    "filename": "banner_thin_red.gltf",
+    "dimensions": [
+      1.1,
+      0.362,
+      3.171
+    ],
+    "triangles": 83,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_white.gltf",
+    "filename": "banner_thin_white.gltf",
+    "dimensions": [
+      1.1,
+      0.362,
+      3.171
+    ],
+    "triangles": 83,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_yellow.gltf",
+    "filename": "banner_thin_yellow.gltf",
+    "dimensions": [
+      1.1,
+      0.362,
+      3.171
+    ],
+    "triangles": 83,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_blue.gltf",
+    "filename": "banner_triple_blue.gltf",
+    "dimensions": [
+      3.7,
+      0.362,
+      3.196
+    ],
+    "triangles": 263,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_brown.gltf",
+    "filename": "banner_triple_brown.gltf",
+    "dimensions": [
+      3.7,
+      0.362,
+      3.196
+    ],
+    "triangles": 263,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_green.gltf",
+    "filename": "banner_triple_green.gltf",
+    "dimensions": [
+      3.7,
+      0.362,
+      3.196
+    ],
+    "triangles": 263,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_red.gltf",
+    "filename": "banner_triple_red.gltf",
+    "dimensions": [
+      3.7,
+      0.362,
+      3.196
+    ],
+    "triangles": 263,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_white.gltf",
+    "filename": "banner_triple_white.gltf",
+    "dimensions": [
+      3.7,
+      0.362,
+      3.196
+    ],
+    "triangles": 263,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_yellow.gltf",
+    "filename": "banner_triple_yellow.gltf",
+    "dimensions": [
+      3.7,
+      0.362,
+      3.196
+    ],
+    "triangles": 263,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_white.gltf",
+    "filename": "banner_white.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_yellow.gltf",
+    "filename": "banner_yellow.gltf",
+    "dimensions": [
+      1.5,
+      0.312,
+      3.196
+    ],
+    "triangles": 97,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_large.gltf",
+    "filename": "barrel_large.gltf",
+    "dimensions": [
+      1.8,
+      1.8,
+      2.0
+    ],
+    "triangles": 561,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_large_decorated.gltf",
+    "filename": "barrel_large_decorated.gltf",
+    "dimensions": [
+      1.938,
+      1.855,
+      2.556
+    ],
+    "triangles": 1047,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_small.gltf",
+    "filename": "barrel_small.gltf",
+    "dimensions": [
+      1.001,
+      1.001,
+      1.018
+    ],
+    "triangles": 207,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_small_stack.gltf",
+    "filename": "barrel_small_stack.gltf",
+    "dimensions": [
+      1.85,
+      1.0,
+      1.77
+    ],
+    "triangles": 1149,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier.gltf",
+    "filename": "barrier.gltf",
+    "dimensions": [
+      4.0,
+      0.5,
+      1.1
+    ],
+    "triangles": 90,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_colum_half.gltf",
+    "filename": "barrier_colum_half.gltf",
+    "dimensions": [
+      2.35,
+      0.7,
+      1.4
+    ],
+    "triangles": 86,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_column.gltf",
+    "filename": "barrier_column.gltf",
+    "dimensions": [
+      4.0,
+      0.7,
+      1.4
+    ],
+    "triangles": 110,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_corner.gltf",
+    "filename": "barrier_corner.gltf",
+    "dimensions": [
+      2.395,
+      2.395,
+      1.4
+    ],
+    "triangles": 128,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_half.gltf",
+    "filename": "barrier_half.gltf",
+    "dimensions": [
+      2.0,
+      0.5,
+      1.1
+    ],
+    "triangles": 42,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bed_decorated.gltf",
+    "filename": "bed_decorated.gltf",
+    "dimensions": [
+      2.606,
+      3.057,
+      1.701
+    ],
+    "triangles": 1410,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bed_floor.gltf",
+    "filename": "bed_floor.gltf",
+    "dimensions": [
+      1.5,
+      3.0,
+      0.563
+    ],
+    "triangles": 232,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bed_frame.gltf",
+    "filename": "bed_frame.gltf",
+    "dimensions": [
+      1.5,
+      3.0,
+      1.063
+    ],
+    "triangles": 304,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_brown.gltf",
+    "filename": "bottle_A_brown.gltf",
+    "dimensions": [
+      0.368,
+      0.368,
+      0.886
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_green.gltf",
+    "filename": "bottle_A_green.gltf",
+    "dimensions": [
+      0.368,
+      0.368,
+      0.886
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_labeled_brown.gltf",
+    "filename": "bottle_A_labeled_brown.gltf",
+    "dimensions": [
+      0.368,
+      0.368,
+      0.886
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_labeled_green.gltf",
+    "filename": "bottle_A_labeled_green.gltf",
+    "dimensions": [
+      0.368,
+      0.368,
+      0.886
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_B_brown.gltf",
+    "filename": "bottle_B_brown.gltf",
+    "dimensions": [
+      0.553,
+      0.553,
+      0.886
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_B_green.gltf",
+    "filename": "bottle_B_green.gltf",
+    "dimensions": [
+      0.553,
+      0.553,
+      0.886
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_C_brown.gltf",
+    "filename": "bottle_C_brown.gltf",
+    "dimensions": [
+      0.737,
+      0.737,
+      0.906
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_C_green.gltf",
+    "filename": "bottle_C_green.gltf",
+    "dimensions": [
+      0.737,
+      0.737,
+      0.906
+    ],
+    "triangles": 144,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_large.gltf",
+    "filename": "box_large.gltf",
+    "dimensions": [
+      1.5,
+      1.5,
+      1.5
+    ],
+    "triangles": 188,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_small.gltf",
+    "filename": "box_small.gltf",
+    "dimensions": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "triangles": 188,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_small_decorated.gltf",
+    "filename": "box_small_decorated.gltf",
+    "dimensions": [
+      1.49,
+      1.487,
+      1.483
+    ],
+    "triangles": 928,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_stacked.gltf",
+    "filename": "box_stacked.gltf",
+    "dimensions": [
+      3.475,
+      3.635,
+      3.309
+    ],
+    "triangles": 2173,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle.gltf",
+    "filename": "candle.gltf",
+    "dimensions": [
+      0.334,
+      0.329,
+      0.873
+    ],
+    "triangles": 66,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_lit.gltf",
+    "filename": "candle_lit.gltf",
+    "dimensions": [
+      0.334,
+      0.329,
+      1.051
+    ],
+    "triangles": 120,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_melted.gltf",
+    "filename": "candle_melted.gltf",
+    "dimensions": [
+      0.334,
+      0.329,
+      0.702
+    ],
+    "triangles": 66,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_thin.gltf",
+    "filename": "candle_thin.gltf",
+    "dimensions": [
+      0.193,
+      0.19,
+      0.873
+    ],
+    "triangles": 66,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_thin_lit.gltf",
+    "filename": "candle_thin_lit.gltf",
+    "dimensions": [
+      0.193,
+      0.19,
+      1.051
+    ],
+    "triangles": 120,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_triple.gltf",
+    "filename": "candle_triple.gltf",
+    "dimensions": [
+      0.501,
+      0.39,
+      0.873
+    ],
+    "triangles": 198,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/ceiling_tile.gltf",
+    "filename": "ceiling_tile.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.35
+    ],
+    "triangles": 60,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/chair.gltf",
+    "filename": "chair.gltf",
+    "dimensions": [
+      0.75,
+      0.75,
+      1.227
+    ],
+    "triangles": 294,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/chest.gltf",
+    "filename": "chest.gltf",
+    "dimensions": [
+      1.7,
+      1.446,
+      1.3
+    ],
+    "triangles": 728,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/chest_gold.gltf",
+    "filename": "chest_gold.gltf",
+    "dimensions": [
+      1.7,
+      1.446,
+      1.3
+    ],
+    "triangles": 1568,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin.gltf",
+    "filename": "coin.gltf",
+    "dimensions": [
+      0.36,
+      0.36,
+      0.125
+    ],
+    "triangles": 80,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin_stack_large.gltf",
+    "filename": "coin_stack_large.gltf",
+    "dimensions": [
+      1.436,
+      1.659,
+      1.157
+    ],
+    "triangles": 1776,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin_stack_medium.gltf",
+    "filename": "coin_stack_medium.gltf",
+    "dimensions": [
+      0.993,
+      1.034,
+      0.641
+    ],
+    "triangles": 968,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin_stack_small.gltf",
+    "filename": "coin_stack_small.gltf",
+    "dimensions": [
+      0.959,
+      0.896,
+      0.478
+    ],
+    "triangles": 416,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/column.gltf",
+    "filename": "column.gltf",
+    "dimensions": [
+      0.7,
+      0.7,
+      1.4
+    ],
+    "triangles": 44,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/crates_stacked.gltf",
+    "filename": "crates_stacked.gltf",
+    "dimensions": [
+      2.089,
+      2.249,
+      2.142
+    ],
+    "triangles": 1331,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_large.gltf",
+    "filename": "floor_dirt_large.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.209
+    ],
+    "triangles": 104,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_large_rocky.gltf",
+    "filename": "floor_dirt_large_rocky.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.393
+    ],
+    "triangles": 187,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_A.gltf",
+    "filename": "floor_dirt_small_A.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.186
+    ],
+    "triangles": 45,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_B.gltf",
+    "filename": "floor_dirt_small_B.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.189
+    ],
+    "triangles": 36,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_C.gltf",
+    "filename": "floor_dirt_small_C.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.209
+    ],
+    "triangles": 33,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_corner.gltf",
+    "filename": "floor_dirt_small_corner.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.154
+    ],
+    "triangles": 56,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_D.gltf",
+    "filename": "floor_dirt_small_D.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.138
+    ],
+    "triangles": 20,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_weeds.gltf",
+    "filename": "floor_dirt_small_weeds.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.295
+    ],
+    "triangles": 416,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_allsides.gltf",
+    "filename": "floor_foundation_allsides.gltf",
+    "dimensions": [
+      2.2,
+      2.2,
+      2.0
+    ],
+    "triangles": 360,
+    "candidates": [
+      "roads",
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_corner.gltf",
+    "filename": "floor_foundation_corner.gltf",
+    "dimensions": [
+      2.1,
+      2.1,
+      2.0
+    ],
+    "triangles": 202,
+    "candidates": [
+      "roads",
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_diagonal_corner.gltf",
+    "filename": "floor_foundation_diagonal_corner.gltf",
+    "dimensions": [
+      2.1,
+      2.1,
+      2.0
+    ],
+    "triangles": 111,
+    "candidates": [
+      "roads",
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_front.gltf",
+    "filename": "floor_foundation_front.gltf",
+    "dimensions": [
+      2.0,
+      2.1,
+      2.0
+    ],
+    "triangles": 123,
+    "candidates": [
+      "roads",
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_front_and_back.gltf",
+    "filename": "floor_foundation_front_and_back.gltf",
+    "dimensions": [
+      2.0,
+      2.2,
+      2.0
+    ],
+    "triangles": 202,
+    "candidates": [
+      "roads",
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_front_and_sides.gltf",
+    "filename": "floor_foundation_front_and_sides.gltf",
+    "dimensions": [
+      2.2,
+      2.1,
+      2.0
+    ],
+    "triangles": 281,
+    "candidates": [
+      "roads",
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_big_grate.gltf",
+    "filename": "floor_tile_big_grate.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      1.05
+    ],
+    "triangles": 292,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_big_grate_open.gltf",
+    "filename": "floor_tile_big_grate_open.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      1.05
+    ],
+    "triangles": 284,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_big_spikes.gltf",
+    "filename": "floor_tile_big_spikes.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      2.1
+    ],
+    "triangles": 638,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_extralarge_grates.gltf",
+    "filename": "floor_tile_extralarge_grates.gltf",
+    "dimensions": [
+      8.0,
+      8.0,
+      1.13
+    ],
+    "triangles": 772,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_extralarge_grates_open.gltf",
+    "filename": "floor_tile_extralarge_grates_open.gltf",
+    "dimensions": [
+      8.0,
+      8.0,
+      1.13
+    ],
+    "triangles": 764,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_grate.gltf",
+    "filename": "floor_tile_grate.gltf",
+    "dimensions": [
+      4.0,
+      2.0,
+      1.03
+    ],
+    "triangles": 142,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_grate_open.gltf",
+    "filename": "floor_tile_grate_open.gltf",
+    "dimensions": [
+      4.0,
+      2.0,
+      1.03
+    ],
+    "triangles": 140,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_large.gltf",
+    "filename": "floor_tile_large.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.15
+    ],
+    "triangles": 188,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_large_rocks.gltf",
+    "filename": "floor_tile_large_rocks.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.636
+    ],
+    "triangles": 338,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small.gltf",
+    "filename": "floor_tile_small.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.15
+    ],
+    "triangles": 66,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_broken_A.gltf",
+    "filename": "floor_tile_small_broken_A.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.15
+    ],
+    "triangles": 94,
+    "candidates": [
+      "roads",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_broken_B.gltf",
+    "filename": "floor_tile_small_broken_B.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.15
+    ],
+    "triangles": 76,
+    "candidates": [
+      "roads",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_corner.gltf",
+    "filename": "floor_tile_small_corner.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.15
+    ],
+    "triangles": 31,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_decorated.gltf",
+    "filename": "floor_tile_small_decorated.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.773
+    ],
+    "triangles": 390,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_weeds_A.gltf",
+    "filename": "floor_tile_small_weeds_A.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.295
+    ],
+    "triangles": 589,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_weeds_B.gltf",
+    "filename": "floor_tile_small_weeds_B.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.295
+    ],
+    "triangles": 447,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_large.gltf",
+    "filename": "floor_wood_large.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.15
+    ],
+    "triangles": 272,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_large_dark.gltf",
+    "filename": "floor_wood_large_dark.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      0.15
+    ],
+    "triangles": 272,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_small.gltf",
+    "filename": "floor_wood_small.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.15
+    ],
+    "triangles": 78,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_small_dark.gltf",
+    "filename": "floor_wood_small_dark.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.15
+    ],
+    "triangles": 78,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keg.gltf",
+    "filename": "keg.gltf",
+    "dimensions": [
+      1.8,
+      2.0,
+      2.051
+    ],
+    "triangles": 807,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keg_decorated.gltf",
+    "filename": "keg_decorated.gltf",
+    "dimensions": [
+      3.519,
+      2.0,
+      2.051
+    ],
+    "triangles": 2058,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/key.gltf",
+    "filename": "key.gltf",
+    "dimensions": [
+      0.896,
+      0.142,
+      0.403
+    ],
+    "triangles": 160,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keyring.gltf",
+    "filename": "keyring.gltf",
+    "dimensions": [
+      1.031,
+      1.209,
+      0.261
+    ],
+    "triangles": 728,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keyring_hanging.gltf",
+    "filename": "keyring_hanging.gltf",
+    "dimensions": [
+      0.68,
+      0.383,
+      1.22
+    ],
+    "triangles": 728,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/pillar.gltf",
+    "filename": "pillar.gltf",
+    "dimensions": [
+      1.5,
+      1.5,
+      4.0
+    ],
+    "triangles": 136,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/pillar_decorated.gltf",
+    "filename": "pillar_decorated.gltf",
+    "dimensions": [
+      2.232,
+      1.71,
+      4.0
+    ],
+    "triangles": 761,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate.gltf",
+    "filename": "plate.gltf",
+    "dimensions": [
+      0.971,
+      0.971,
+      0.129
+    ],
+    "triangles": 120,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_food_A.gltf",
+    "filename": "plate_food_A.gltf",
+    "dimensions": [
+      1.025,
+      0.971,
+      0.788
+    ],
+    "triangles": 547,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_food_B.gltf",
+    "filename": "plate_food_B.gltf",
+    "dimensions": [
+      0.971,
+      0.971,
+      0.236
+    ],
+    "triangles": 306,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_small.gltf",
+    "filename": "plate_small.gltf",
+    "dimensions": [
+      0.485,
+      0.485,
+      0.129
+    ],
+    "triangles": 120,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_stack.gltf",
+    "filename": "plate_stack.gltf",
+    "dimensions": [
+      0.997,
+      1.002,
+      0.564
+    ],
+    "triangles": 360,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/rubble_half.gltf",
+    "filename": "rubble_half.gltf",
+    "dimensions": [
+      4.0,
+      3.0,
+      3.5
+    ],
+    "triangles": 390,
+    "candidates": [
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/rubble_large.gltf",
+    "filename": "rubble_large.gltf",
+    "dimensions": [
+      8.129,
+      3.183,
+      3.496
+    ],
+    "triangles": 788,
+    "candidates": [
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelf_large.gltf",
+    "filename": "shelf_large.gltf",
+    "dimensions": [
+      2.0,
+      0.5,
+      0.45
+    ],
+    "triangles": 76,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelf_small.gltf",
+    "filename": "shelf_small.gltf",
+    "dimensions": [
+      1.0,
+      0.5,
+      0.4
+    ],
+    "triangles": 60,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelf_small_candles.gltf",
+    "filename": "shelf_small_candles.gltf",
+    "dimensions": [
+      1.0,
+      0.5,
+      0.994
+    ],
+    "triangles": 231,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelves.gltf",
+    "filename": "shelves.gltf",
+    "dimensions": [
+      2.0,
+      0.5,
+      1.95
+    ],
+    "triangles": 152,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs.gltf",
+    "filename": "stairs.gltf",
+    "dimensions": [
+      5.0,
+      4.0,
+      5.1
+    ],
+    "triangles": 358,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long.gltf",
+    "filename": "stairs_long.gltf",
+    "dimensions": [
+      5.0,
+      8.0,
+      5.1
+    ],
+    "triangles": 442,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long_modular_center.gltf",
+    "filename": "stairs_long_modular_center.gltf",
+    "dimensions": [
+      2.0,
+      8.0,
+      4.0
+    ],
+    "triangles": 54,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long_modular_left.gltf",
+    "filename": "stairs_long_modular_left.gltf",
+    "dimensions": [
+      1.5,
+      8.0,
+      5.1
+    ],
+    "triangles": 248,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long_modular_right.gltf",
+    "filename": "stairs_long_modular_right.gltf",
+    "dimensions": [
+      1.5,
+      8.0,
+      5.1
+    ],
+    "triangles": 248,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_modular_center.gltf",
+    "filename": "stairs_modular_center.gltf",
+    "dimensions": [
+      2.0,
+      4.0,
+      4.0
+    ],
+    "triangles": 54,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_modular_left.gltf",
+    "filename": "stairs_modular_left.gltf",
+    "dimensions": [
+      1.5,
+      4.0,
+      5.1
+    ],
+    "triangles": 206,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_modular_right.gltf",
+    "filename": "stairs_modular_right.gltf",
+    "dimensions": [
+      1.5,
+      4.0,
+      5.1
+    ],
+    "triangles": 206,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_narrow.gltf",
+    "filename": "stairs_narrow.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      5.1
+    ],
+    "triangles": 358,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wall_left.gltf",
+    "filename": "stairs_wall_left.gltf",
+    "dimensions": [
+      4.0,
+      5.0,
+      5.1
+    ],
+    "triangles": 574,
+    "candidates": [
+      "walls",
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wall_right.gltf",
+    "filename": "stairs_wall_right.gltf",
+    "dimensions": [
+      4.0,
+      5.0,
+      5.1
+    ],
+    "triangles": 574,
+    "candidates": [
+      "walls",
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_walled.gltf",
+    "filename": "stairs_walled.gltf",
+    "dimensions": [
+      5.0,
+      4.0,
+      4.0
+    ],
+    "triangles": 790,
+    "candidates": [
+      "walls",
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wide.gltf",
+    "filename": "stairs_wide.gltf",
+    "dimensions": [
+      7.0,
+      4.0,
+      5.1
+    ],
+    "triangles": 358,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wood.gltf",
+    "filename": "stairs_wood.gltf",
+    "dimensions": [
+      3.3,
+      6.0,
+      4.05
+    ],
+    "triangles": 296,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wood_decorated.gltf",
+    "filename": "stairs_wood_decorated.gltf",
+    "dimensions": [
+      3.3,
+      6.0,
+      4.05
+    ],
+    "triangles": 2537,
+    "candidates": [
+      "stairs"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stool.gltf",
+    "filename": "stool.gltf",
+    "dimensions": [
+      0.75,
+      0.75,
+      0.5
+    ],
+    "triangles": 172,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/sword_shield.gltf",
+    "filename": "sword_shield.gltf",
+    "dimensions": [
+      2.232,
+      0.336,
+      1.667
+    ],
+    "triangles": 542,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/sword_shield_broken.gltf",
+    "filename": "sword_shield_broken.gltf",
+    "dimensions": [
+      1.426,
+      0.336,
+      1.962
+    ],
+    "triangles": 396,
+    "candidates": [
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/sword_shield_gold.gltf",
+    "filename": "sword_shield_gold.gltf",
+    "dimensions": [
+      2.232,
+      0.336,
+      1.667
+    ],
+    "triangles": 542,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long.gltf",
+    "filename": "table_long.gltf",
+    "dimensions": [
+      2.0,
+      4.0,
+      1.0
+    ],
+    "triangles": 280,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_broken.gltf",
+    "filename": "table_long_broken.gltf",
+    "dimensions": [
+      2.409,
+      4.405,
+      1.266
+    ],
+    "triangles": 550,
+    "candidates": [
+      "ruins",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_decorated_A.gltf",
+    "filename": "table_long_decorated_A.gltf",
+    "dimensions": [
+      2.059,
+      4.0,
+      1.886
+    ],
+    "triangles": 1961,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_decorated_C.gltf",
+    "filename": "table_long_decorated_C.gltf",
+    "dimensions": [
+      2.0,
+      4.025,
+      2.768
+    ],
+    "triangles": 3499,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_tablecloth.gltf",
+    "filename": "table_long_tablecloth.gltf",
+    "dimensions": [
+      2.0,
+      4.0,
+      1.0
+    ],
+    "triangles": 354,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_tablecloth_decorated_A.gltf",
+    "filename": "table_long_tablecloth_decorated_A.gltf",
+    "dimensions": [
+      2.059,
+      4.0,
+      1.886
+    ],
+    "triangles": 2035,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium.gltf",
+    "filename": "table_medium.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 256,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_broken.gltf",
+    "filename": "table_medium_broken.gltf",
+    "dimensions": [
+      2.277,
+      2.428,
+      0.972
+    ],
+    "triangles": 247,
+    "candidates": [
+      "ruins",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_decorated_A.gltf",
+    "filename": "table_medium_decorated_A.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.886
+    ],
+    "triangles": 1186,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_tablecloth.gltf",
+    "filename": "table_medium_tablecloth.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 270,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_tablecloth_decorated_B.gltf",
+    "filename": "table_medium_tablecloth_decorated_B.gltf",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.886
+    ],
+    "triangles": 1200,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_small.gltf",
+    "filename": "table_small.gltf",
+    "dimensions": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "triangles": 192,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_small_decorated_A.gltf",
+    "filename": "table_small_decorated_A.gltf",
+    "dimensions": [
+      1.039,
+      1.211,
+      1.621
+    ],
+    "triangles": 986,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_small_decorated_B.gltf",
+    "filename": "table_small_decorated_B.gltf",
+    "dimensions": [
+      1.013,
+      1.0,
+      2.157
+    ],
+    "triangles": 1576,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/torch.gltf",
+    "filename": "torch.gltf",
+    "dimensions": [
+      0.55,
+      0.55,
+      1.042
+    ],
+    "triangles": 216,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/torch_lit.gltf",
+    "filename": "torch_lit.gltf",
+    "dimensions": [
+      0.55,
+      0.55,
+      1.126
+    ],
+    "triangles": 270,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/torch_mounted.gltf",
+    "filename": "torch_mounted.gltf",
+    "dimensions": [
+      0.55,
+      0.616,
+      1.062
+    ],
+    "triangles": 278,
+    "candidates": []
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_large_A.gltf",
+    "filename": "trunk_large_A.gltf",
+    "dimensions": [
+      1.5,
+      1.3,
+      1.0
+    ],
+    "triangles": 204,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_large_B.gltf",
+    "filename": "trunk_large_B.gltf",
+    "dimensions": [
+      1.5,
+      1.3,
+      1.0
+    ],
+    "triangles": 204,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_large_C.gltf",
+    "filename": "trunk_large_C.gltf",
+    "dimensions": [
+      1.5,
+      1.3,
+      1.0
+    ],
+    "triangles": 204,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_medium_A.gltf",
+    "filename": "trunk_medium_A.gltf",
+    "dimensions": [
+      0.953,
+      0.875,
+      0.726
+    ],
+    "triangles": 148,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_medium_B.gltf",
+    "filename": "trunk_medium_B.gltf",
+    "dimensions": [
+      0.953,
+      0.875,
+      0.726
+    ],
+    "triangles": 148,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_medium_C.gltf",
+    "filename": "trunk_medium_C.gltf",
+    "dimensions": [
+      0.953,
+      0.875,
+      0.726
+    ],
+    "triangles": 148,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_small_A.gltf",
+    "filename": "trunk_small_A.gltf",
+    "dimensions": [
+      0.675,
+      0.583,
+      0.484
+    ],
+    "triangles": 204,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_small_B.gltf",
+    "filename": "trunk_small_B.gltf",
+    "dimensions": [
+      0.675,
+      0.583,
+      0.484
+    ],
+    "triangles": 204,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_small_C.gltf",
+    "filename": "trunk_small_C.gltf",
+    "dimensions": [
+      0.675,
+      0.583,
+      0.484
+    ],
+    "triangles": 204,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall.gltf",
+    "filename": "wall.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 494,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_arched.gltf",
+    "filename": "wall_arched.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 724,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_archedwindow_gated.gltf",
+    "filename": "wall_archedwindow_gated.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 732,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_archedwindow_gated_scaffold.gltf",
+    "filename": "wall_archedwindow_gated_scaffold.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 674,
+    "candidates": [
+      "walls",
+      "gates",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_archedwindow_open.gltf",
+    "filename": "wall_archedwindow_open.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 635,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_broken.gltf",
+    "filename": "wall_broken.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 784,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner.gltf",
+    "filename": "wall_corner.gltf",
+    "dimensions": [
+      2.5,
+      2.5,
+      4.0
+    ],
+    "triangles": 443,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner_gated.gltf",
+    "filename": "wall_corner_gated.gltf",
+    "dimensions": [
+      2.5,
+      2.5,
+      4.0
+    ],
+    "triangles": 557,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner_scaffold.gltf",
+    "filename": "wall_corner_scaffold.gltf",
+    "dimensions": [
+      2.5,
+      2.5,
+      4.0
+    ],
+    "triangles": 515,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner_small.gltf",
+    "filename": "wall_corner_small.gltf",
+    "dimensions": [
+      1.5,
+      1.5,
+      4.0
+    ],
+    "triangles": 223,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_cracked.gltf",
+    "filename": "wall_cracked.gltf",
+    "dimensions": [
+      4.0,
+      1.259,
+      4.0
+    ],
+    "triangles": 2010,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_crossing.gltf",
+    "filename": "wall_crossing.gltf",
+    "dimensions": [
+      4.0,
+      4.0,
+      4.0
+    ],
+    "triangles": 698,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway.gltf",
+    "filename": "wall_doorway.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 1068,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway_scaffold.gltf",
+    "filename": "wall_doorway_scaffold.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 1150,
+    "candidates": [
+      "walls",
+      "gates",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway_sides.gltf",
+    "filename": "wall_doorway_sides.gltf",
+    "dimensions": [
+      5.0,
+      4.0,
+      4.0
+    ],
+    "triangles": 1160,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway_Tsplit.gltf",
+    "filename": "wall_doorway_Tsplit.gltf",
+    "dimensions": [
+      8.0,
+      2.5,
+      4.0
+    ],
+    "triangles": 1096,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_endcap.gltf",
+    "filename": "wall_endcap.gltf",
+    "dimensions": [
+      1.067,
+      1.0,
+      4.0
+    ],
+    "triangles": 222,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_gated.gltf",
+    "filename": "wall_gated.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 449,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_half.gltf",
+    "filename": "wall_half.gltf",
+    "dimensions": [
+      2.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 272,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_half_endcap.gltf",
+    "filename": "wall_half_endcap.gltf",
+    "dimensions": [
+      2.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 268,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_half_endcap_sloped.gltf",
+    "filename": "wall_half_endcap_sloped.gltf",
+    "dimensions": [
+      2.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 230,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_open_scaffold.gltf",
+    "filename": "wall_open_scaffold.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 196,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_pillar.gltf",
+    "filename": "wall_pillar.gltf",
+    "dimensions": [
+      4.0,
+      1.5,
+      4.0
+    ],
+    "triangles": 540,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_scaffold.gltf",
+    "filename": "wall_scaffold.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 584,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_shelves.gltf",
+    "filename": "wall_shelves.gltf",
+    "dimensions": [
+      4.0,
+      1.368,
+      4.0
+    ],
+    "triangles": 1582,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_sloped.gltf",
+    "filename": "wall_sloped.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 257,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_Tsplit.gltf",
+    "filename": "wall_Tsplit.gltf",
+    "dimensions": [
+      4.0,
+      2.5,
+      4.0
+    ],
+    "triangles": 596,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_Tsplit_sloped.gltf",
+    "filename": "wall_Tsplit_sloped.gltf",
+    "dimensions": [
+      4.0,
+      2.5,
+      4.0
+    ],
+    "triangles": 555,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_closed.gltf",
+    "filename": "wall_window_closed.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 664,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_closed_scaffold.gltf",
+    "filename": "wall_window_closed_scaffold.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 736,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_open.gltf",
+    "filename": "wall_window_open.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 604,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_open_scaffold.gltf",
+    "filename": "wall_window_open_scaffold.gltf",
+    "dimensions": [
+      4.0,
+      1.0,
+      4.0
+    ],
+    "triangles": 676,
+    "candidates": [
+      "walls",
+      "ruins"
+    ]
+  }
+]

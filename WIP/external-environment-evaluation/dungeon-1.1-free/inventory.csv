@@ -1,0 +1,212 @@
+relative_path,filename,dimensions_x_y_z,triangles,candidate_categories
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_blue.gltf,banner_blue.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_brown.gltf,banner_brown.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_green.gltf,banner_green.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_blue.gltf,banner_patternA_blue.gltf,1.5 x 0.312 x 3.196,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_brown.gltf,banner_patternA_brown.gltf,1.5 x 0.312 x 3.196,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_green.gltf,banner_patternA_green.gltf,1.5 x 0.312 x 3.196,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_red.gltf,banner_patternA_red.gltf,1.5 x 0.312 x 3.196,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_white.gltf,banner_patternA_white.gltf,1.5 x 0.312 x 3.196,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternA_yellow.gltf,banner_patternA_yellow.gltf,1.5 x 0.312 x 3.196,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_blue.gltf,banner_patternB_blue.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_brown.gltf,banner_patternB_brown.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_green.gltf,banner_patternB_green.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_red.gltf,banner_patternB_red.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_white.gltf,banner_patternB_white.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternB_yellow.gltf,banner_patternB_yellow.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_blue.gltf,banner_patternC_blue.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_brown.gltf,banner_patternC_brown.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_green.gltf,banner_patternC_green.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_red.gltf,banner_patternC_red.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_white.gltf,banner_patternC_white.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_patternC_yellow.gltf,banner_patternC_yellow.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_red.gltf,banner_red.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_blue.gltf,banner_shield_blue.gltf,2.232 x 0.374 x 3.196,639,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_brown.gltf,banner_shield_brown.gltf,2.232 x 0.374 x 3.196,639,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_green.gltf,banner_shield_green.gltf,2.232 x 0.374 x 3.196,639,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_red.gltf,banner_shield_red.gltf,2.232 x 0.374 x 3.196,639,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_white.gltf,banner_shield_white.gltf,2.232 x 0.374 x 3.196,639,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_shield_yellow.gltf,banner_shield_yellow.gltf,2.232 x 0.374 x 3.196,639,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_blue.gltf,banner_thin_blue.gltf,1.1 x 0.362 x 3.171,83,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_brown.gltf,banner_thin_brown.gltf,1.1 x 0.362 x 3.171,83,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_green.gltf,banner_thin_green.gltf,1.1 x 0.362 x 3.171,83,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_red.gltf,banner_thin_red.gltf,1.1 x 0.362 x 3.171,83,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_white.gltf,banner_thin_white.gltf,1.1 x 0.362 x 3.171,83,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_thin_yellow.gltf,banner_thin_yellow.gltf,1.1 x 0.362 x 3.171,83,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_blue.gltf,banner_triple_blue.gltf,3.7 x 0.362 x 3.196,263,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_brown.gltf,banner_triple_brown.gltf,3.7 x 0.362 x 3.196,263,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_green.gltf,banner_triple_green.gltf,3.7 x 0.362 x 3.196,263,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_red.gltf,banner_triple_red.gltf,3.7 x 0.362 x 3.196,263,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_white.gltf,banner_triple_white.gltf,3.7 x 0.362 x 3.196,263,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_triple_yellow.gltf,banner_triple_yellow.gltf,3.7 x 0.362 x 3.196,263,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_white.gltf,banner_white.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/banner_yellow.gltf,banner_yellow.gltf,1.5 x 0.312 x 3.196,97,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_large.gltf,barrel_large.gltf,1.8 x 1.8 x 2.0,561,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_large_decorated.gltf,barrel_large_decorated.gltf,1.938 x 1.855 x 2.556,1047,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_small.gltf,barrel_small.gltf,1.001 x 1.001 x 1.018,207,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrel_small_stack.gltf,barrel_small_stack.gltf,1.85 x 1.0 x 1.77,1149,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier.gltf,barrier.gltf,4.0 x 0.5 x 1.1,90,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_colum_half.gltf,barrier_colum_half.gltf,2.35 x 0.7 x 1.4,86,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_column.gltf,barrier_column.gltf,4.0 x 0.7 x 1.4,110,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_corner.gltf,barrier_corner.gltf,2.395 x 2.395 x 1.4,128,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/barrier_half.gltf,barrier_half.gltf,2.0 x 0.5 x 1.1,42,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bed_decorated.gltf,bed_decorated.gltf,2.606 x 3.057 x 1.701,1410,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bed_floor.gltf,bed_floor.gltf,1.5 x 3.0 x 0.563,232,roads; props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bed_frame.gltf,bed_frame.gltf,1.5 x 3.0 x 1.063,304,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_brown.gltf,bottle_A_brown.gltf,0.368 x 0.368 x 0.886,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_green.gltf,bottle_A_green.gltf,0.368 x 0.368 x 0.886,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_labeled_brown.gltf,bottle_A_labeled_brown.gltf,0.368 x 0.368 x 0.886,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_A_labeled_green.gltf,bottle_A_labeled_green.gltf,0.368 x 0.368 x 0.886,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_B_brown.gltf,bottle_B_brown.gltf,0.553 x 0.553 x 0.886,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_B_green.gltf,bottle_B_green.gltf,0.553 x 0.553 x 0.886,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_C_brown.gltf,bottle_C_brown.gltf,0.737 x 0.737 x 0.906,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/bottle_C_green.gltf,bottle_C_green.gltf,0.737 x 0.737 x 0.906,144,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_large.gltf,box_large.gltf,1.5 x 1.5 x 1.5,188,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_small.gltf,box_small.gltf,1.0 x 1.0 x 1.0,188,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_small_decorated.gltf,box_small_decorated.gltf,1.49 x 1.487 x 1.483,928,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/box_stacked.gltf,box_stacked.gltf,3.475 x 3.635 x 3.309,2173,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle.gltf,candle.gltf,0.334 x 0.329 x 0.873,66,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_lit.gltf,candle_lit.gltf,0.334 x 0.329 x 1.051,120,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_melted.gltf,candle_melted.gltf,0.334 x 0.329 x 0.702,66,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_thin.gltf,candle_thin.gltf,0.193 x 0.19 x 0.873,66,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_thin_lit.gltf,candle_thin_lit.gltf,0.193 x 0.19 x 1.051,120,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/candle_triple.gltf,candle_triple.gltf,0.501 x 0.39 x 0.873,198,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/ceiling_tile.gltf,ceiling_tile.gltf,4.0 x 4.0 x 0.35,60,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/chair.gltf,chair.gltf,0.75 x 0.75 x 1.227,294,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/chest.gltf,chest.gltf,1.7 x 1.446 x 1.3,728,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/chest_gold.gltf,chest_gold.gltf,1.7 x 1.446 x 1.3,1568,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin.gltf,coin.gltf,0.36 x 0.36 x 0.125,80,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin_stack_large.gltf,coin_stack_large.gltf,1.436 x 1.659 x 1.157,1776,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin_stack_medium.gltf,coin_stack_medium.gltf,0.993 x 1.034 x 0.641,968,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/coin_stack_small.gltf,coin_stack_small.gltf,0.959 x 0.896 x 0.478,416,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/column.gltf,column.gltf,0.7 x 0.7 x 1.4,44,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/crates_stacked.gltf,crates_stacked.gltf,2.089 x 2.249 x 2.142,1331,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_large.gltf,floor_dirt_large.gltf,4.0 x 4.0 x 0.209,104,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_large_rocky.gltf,floor_dirt_large_rocky.gltf,4.0 x 4.0 x 0.393,187,roads; rocks
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_A.gltf,floor_dirt_small_A.gltf,2.0 x 2.0 x 0.186,45,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_B.gltf,floor_dirt_small_B.gltf,2.0 x 2.0 x 0.189,36,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_C.gltf,floor_dirt_small_C.gltf,2.0 x 2.0 x 0.209,33,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_corner.gltf,floor_dirt_small_corner.gltf,2.0 x 2.0 x 0.154,56,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_D.gltf,floor_dirt_small_D.gltf,2.0 x 2.0 x 0.138,20,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_dirt_small_weeds.gltf,floor_dirt_small_weeds.gltf,2.0 x 2.0 x 0.295,416,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_allsides.gltf,floor_foundation_allsides.gltf,2.2 x 2.2 x 2.0,360,roads; cliffs/high ground
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_corner.gltf,floor_foundation_corner.gltf,2.1 x 2.1 x 2.0,202,roads; cliffs/high ground
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_diagonal_corner.gltf,floor_foundation_diagonal_corner.gltf,2.1 x 2.1 x 2.0,111,roads; cliffs/high ground
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_front.gltf,floor_foundation_front.gltf,2.0 x 2.1 x 2.0,123,roads; cliffs/high ground
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_front_and_back.gltf,floor_foundation_front_and_back.gltf,2.0 x 2.2 x 2.0,202,roads; cliffs/high ground
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_foundation_front_and_sides.gltf,floor_foundation_front_and_sides.gltf,2.2 x 2.1 x 2.0,281,roads; cliffs/high ground
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_big_grate.gltf,floor_tile_big_grate.gltf,4.0 x 4.0 x 1.05,292,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_big_grate_open.gltf,floor_tile_big_grate_open.gltf,4.0 x 4.0 x 1.05,284,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_big_spikes.gltf,floor_tile_big_spikes.gltf,4.0 x 4.0 x 2.1,638,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_extralarge_grates.gltf,floor_tile_extralarge_grates.gltf,8.0 x 8.0 x 1.13,772,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_extralarge_grates_open.gltf,floor_tile_extralarge_grates_open.gltf,8.0 x 8.0 x 1.13,764,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_grate.gltf,floor_tile_grate.gltf,4.0 x 2.0 x 1.03,142,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_grate_open.gltf,floor_tile_grate_open.gltf,4.0 x 2.0 x 1.03,140,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_large.gltf,floor_tile_large.gltf,4.0 x 4.0 x 0.15,188,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_large_rocks.gltf,floor_tile_large_rocks.gltf,4.0 x 4.0 x 0.636,338,roads; rocks
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small.gltf,floor_tile_small.gltf,2.0 x 2.0 x 0.15,66,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_broken_A.gltf,floor_tile_small_broken_A.gltf,2.0 x 2.0 x 0.15,94,roads; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_broken_B.gltf,floor_tile_small_broken_B.gltf,2.0 x 2.0 x 0.15,76,roads; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_corner.gltf,floor_tile_small_corner.gltf,2.0 x 2.0 x 0.15,31,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_decorated.gltf,floor_tile_small_decorated.gltf,2.0 x 2.0 x 0.773,390,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_weeds_A.gltf,floor_tile_small_weeds_A.gltf,2.0 x 2.0 x 0.295,589,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_tile_small_weeds_B.gltf,floor_tile_small_weeds_B.gltf,2.0 x 2.0 x 0.295,447,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_large.gltf,floor_wood_large.gltf,4.0 x 4.0 x 0.15,272,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_large_dark.gltf,floor_wood_large_dark.gltf,4.0 x 4.0 x 0.15,272,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_small.gltf,floor_wood_small.gltf,2.0 x 2.0 x 0.15,78,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/floor_wood_small_dark.gltf,floor_wood_small_dark.gltf,2.0 x 2.0 x 0.15,78,roads
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keg.gltf,keg.gltf,1.8 x 2.0 x 2.051,807,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keg_decorated.gltf,keg_decorated.gltf,3.519 x 2.0 x 2.051,2058,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/key.gltf,key.gltf,0.896 x 0.142 x 0.403,160,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keyring.gltf,keyring.gltf,1.031 x 1.209 x 0.261,728,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/keyring_hanging.gltf,keyring_hanging.gltf,0.68 x 0.383 x 1.22,728,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/pillar.gltf,pillar.gltf,1.5 x 1.5 x 4.0,136,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/pillar_decorated.gltf,pillar_decorated.gltf,2.232 x 1.71 x 4.0,761,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate.gltf,plate.gltf,0.971 x 0.971 x 0.129,120,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_food_A.gltf,plate_food_A.gltf,1.025 x 0.971 x 0.788,547,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_food_B.gltf,plate_food_B.gltf,0.971 x 0.971 x 0.236,306,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_small.gltf,plate_small.gltf,0.485 x 0.485 x 0.129,120,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/plate_stack.gltf,plate_stack.gltf,0.997 x 1.002 x 0.564,360,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/rubble_half.gltf,rubble_half.gltf,4.0 x 3.0 x 3.5,390,ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/rubble_large.gltf,rubble_large.gltf,8.129 x 3.183 x 3.496,788,ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelf_large.gltf,shelf_large.gltf,2.0 x 0.5 x 0.45,76,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelf_small.gltf,shelf_small.gltf,1.0 x 0.5 x 0.4,60,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelf_small_candles.gltf,shelf_small_candles.gltf,1.0 x 0.5 x 0.994,231,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/shelves.gltf,shelves.gltf,2.0 x 0.5 x 1.95,152,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs.gltf,stairs.gltf,5.0 x 4.0 x 5.1,358,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long.gltf,stairs_long.gltf,5.0 x 8.0 x 5.1,442,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long_modular_center.gltf,stairs_long_modular_center.gltf,2.0 x 8.0 x 4.0,54,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long_modular_left.gltf,stairs_long_modular_left.gltf,1.5 x 8.0 x 5.1,248,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_long_modular_right.gltf,stairs_long_modular_right.gltf,1.5 x 8.0 x 5.1,248,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_modular_center.gltf,stairs_modular_center.gltf,2.0 x 4.0 x 4.0,54,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_modular_left.gltf,stairs_modular_left.gltf,1.5 x 4.0 x 5.1,206,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_modular_right.gltf,stairs_modular_right.gltf,1.5 x 4.0 x 5.1,206,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_narrow.gltf,stairs_narrow.gltf,4.0 x 4.0 x 5.1,358,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wall_left.gltf,stairs_wall_left.gltf,4.0 x 5.0 x 5.1,574,walls; stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wall_right.gltf,stairs_wall_right.gltf,4.0 x 5.0 x 5.1,574,walls; stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_walled.gltf,stairs_walled.gltf,5.0 x 4.0 x 4.0,790,walls; stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wide.gltf,stairs_wide.gltf,7.0 x 4.0 x 5.1,358,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wood.gltf,stairs_wood.gltf,3.3 x 6.0 x 4.05,296,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stairs_wood_decorated.gltf,stairs_wood_decorated.gltf,3.3 x 6.0 x 4.05,2537,stairs
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/stool.gltf,stool.gltf,0.75 x 0.75 x 0.5,172,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/sword_shield.gltf,sword_shield.gltf,2.232 x 0.336 x 1.667,542,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/sword_shield_broken.gltf,sword_shield_broken.gltf,1.426 x 0.336 x 1.962,396,ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/sword_shield_gold.gltf,sword_shield_gold.gltf,2.232 x 0.336 x 1.667,542,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long.gltf,table_long.gltf,2.0 x 4.0 x 1.0,280,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_broken.gltf,table_long_broken.gltf,2.409 x 4.405 x 1.266,550,ruins; props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_decorated_A.gltf,table_long_decorated_A.gltf,2.059 x 4.0 x 1.886,1961,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_decorated_C.gltf,table_long_decorated_C.gltf,2.0 x 4.025 x 2.768,3499,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_tablecloth.gltf,table_long_tablecloth.gltf,2.0 x 4.0 x 1.0,354,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_long_tablecloth_decorated_A.gltf,table_long_tablecloth_decorated_A.gltf,2.059 x 4.0 x 1.886,2035,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium.gltf,table_medium.gltf,2.0 x 2.0 x 1.0,256,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_broken.gltf,table_medium_broken.gltf,2.277 x 2.428 x 0.972,247,ruins; props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_decorated_A.gltf,table_medium_decorated_A.gltf,2.0 x 2.0 x 1.886,1186,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_tablecloth.gltf,table_medium_tablecloth.gltf,2.0 x 2.0 x 1.0,270,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_medium_tablecloth_decorated_B.gltf,table_medium_tablecloth_decorated_B.gltf,2.0 x 2.0 x 1.886,1200,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_small.gltf,table_small.gltf,1.0 x 1.0 x 1.0,192,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_small_decorated_A.gltf,table_small_decorated_A.gltf,1.039 x 1.211 x 1.621,986,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/table_small_decorated_B.gltf,table_small_decorated_B.gltf,1.013 x 1.0 x 2.157,1576,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/torch.gltf,torch.gltf,0.55 x 0.55 x 1.042,216,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/torch_lit.gltf,torch_lit.gltf,0.55 x 0.55 x 1.126,270,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/torch_mounted.gltf,torch_mounted.gltf,0.55 x 0.616 x 1.062,278,
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_large_A.gltf,trunk_large_A.gltf,1.5 x 1.3 x 1.0,204,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_large_B.gltf,trunk_large_B.gltf,1.5 x 1.3 x 1.0,204,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_large_C.gltf,trunk_large_C.gltf,1.5 x 1.3 x 1.0,204,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_medium_A.gltf,trunk_medium_A.gltf,0.953 x 0.875 x 0.726,148,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_medium_B.gltf,trunk_medium_B.gltf,0.953 x 0.875 x 0.726,148,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_medium_C.gltf,trunk_medium_C.gltf,0.953 x 0.875 x 0.726,148,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_small_A.gltf,trunk_small_A.gltf,0.675 x 0.583 x 0.484,204,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_small_B.gltf,trunk_small_B.gltf,0.675 x 0.583 x 0.484,204,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/trunk_small_C.gltf,trunk_small_C.gltf,0.675 x 0.583 x 0.484,204,props
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall.gltf,wall.gltf,4.0 x 1.0 x 4.0,494,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_arched.gltf,wall_arched.gltf,4.0 x 1.0 x 4.0,724,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_archedwindow_gated.gltf,wall_archedwindow_gated.gltf,4.0 x 1.0 x 4.0,732,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_archedwindow_gated_scaffold.gltf,wall_archedwindow_gated_scaffold.gltf,4.0 x 1.0 x 4.0,674,walls; gates; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_archedwindow_open.gltf,wall_archedwindow_open.gltf,4.0 x 1.0 x 4.0,635,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_broken.gltf,wall_broken.gltf,4.0 x 1.0 x 4.0,784,walls; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner.gltf,wall_corner.gltf,2.5 x 2.5 x 4.0,443,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner_gated.gltf,wall_corner_gated.gltf,2.5 x 2.5 x 4.0,557,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner_scaffold.gltf,wall_corner_scaffold.gltf,2.5 x 2.5 x 4.0,515,walls; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_corner_small.gltf,wall_corner_small.gltf,1.5 x 1.5 x 4.0,223,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_cracked.gltf,wall_cracked.gltf,4.0 x 1.259 x 4.0,2010,walls; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_crossing.gltf,wall_crossing.gltf,4.0 x 4.0 x 4.0,698,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway.gltf,wall_doorway.gltf,4.0 x 1.0 x 4.0,1068,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway_scaffold.gltf,wall_doorway_scaffold.gltf,4.0 x 1.0 x 4.0,1150,walls; gates; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway_sides.gltf,wall_doorway_sides.gltf,5.0 x 4.0 x 4.0,1160,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_doorway_Tsplit.gltf,wall_doorway_Tsplit.gltf,8.0 x 2.5 x 4.0,1096,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_endcap.gltf,wall_endcap.gltf,1.067 x 1.0 x 4.0,222,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_gated.gltf,wall_gated.gltf,4.0 x 1.0 x 4.0,449,walls; gates
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_half.gltf,wall_half.gltf,2.0 x 1.0 x 4.0,272,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_half_endcap.gltf,wall_half_endcap.gltf,2.0 x 1.0 x 4.0,268,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_half_endcap_sloped.gltf,wall_half_endcap_sloped.gltf,2.0 x 1.0 x 4.0,230,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_open_scaffold.gltf,wall_open_scaffold.gltf,4.0 x 1.0 x 4.0,196,walls; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_pillar.gltf,wall_pillar.gltf,4.0 x 1.5 x 4.0,540,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_scaffold.gltf,wall_scaffold.gltf,4.0 x 1.0 x 4.0,584,walls; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_shelves.gltf,wall_shelves.gltf,4.0 x 1.368 x 4.0,1582,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_sloped.gltf,wall_sloped.gltf,4.0 x 1.0 x 4.0,257,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_Tsplit.gltf,wall_Tsplit.gltf,4.0 x 2.5 x 4.0,596,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_Tsplit_sloped.gltf,wall_Tsplit_sloped.gltf,4.0 x 2.5 x 4.0,555,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_closed.gltf,wall_window_closed.gltf,4.0 x 1.0 x 4.0,664,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_closed_scaffold.gltf,wall_window_closed_scaffold.gltf,4.0 x 1.0 x 4.0,736,walls; ruins
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_open.gltf,wall_window_open.gltf,4.0 x 1.0 x 4.0,604,walls
+KayKit_Dungeon_Pack_1.1_FREE/Assets/gltf/wall_window_open_scaffold.gltf,wall_window_open_scaffold.gltf,4.0 x 1.0 x 4.0,676,walls; ruins
