@@ -15,7 +15,7 @@ export class EnvironmentView {
   private readonly fallbackDetailsRoot = new THREE.Group();
 
   constructor(readonly area: AreaDefinition, private readonly assets: AssetLoader = quaterniusAssets) {
-    this.root.position.set(area.originX, 0, area.originZ);
+    this.root.position.set(area.originX, 0, area.originZ); this.root.name = `Area ${area.id} environment`;
     this.root.add(this.terrainRoot, this.macroRoot, this.assetDetailsRoot, this.fallbackDetailsRoot);
     if (area.environmentTheme === 'sunlit-meadow') this.buildMeadow();
     else if (area.environmentTheme === 'ashwood') this.buildBorderlands();
@@ -27,96 +27,61 @@ export class EnvironmentView {
     const ground = mesh(new THREE.PlaneGeometry(this.area.size.width, this.area.size.depth), new THREE.MeshStandardMaterial({ color, roughness: 1 }), 0, 0, 0);
     ground.rotation.x = -Math.PI / 2; this.terrainRoot.add(ground);
   }
-
   private road(points: readonly [number, number][], width = 3.4): void {
     const material = new THREE.MeshStandardMaterial({ color: 0xa58b5d, roughness: 1 });
-    for (let i = 1; i < points.length; i++) {
-      const [ax, az] = points[i - 1], [bx, bz] = points[i];
-      const length = Math.hypot(bx - ax, bz - az);
-      const piece = mesh(new THREE.PlaneGeometry(width, length), material, (ax + bx) / 2, .025, (az + bz) / 2);
-      piece.rotation.x = -Math.PI / 2; piece.rotation.z = -Math.atan2(bx - ax, bz - az); this.macroRoot.add(piece);
-    }
+    for (let i = 1; i < points.length; i++) { const [ax,az]=points[i-1], [bx,bz]=points[i]; const length=Math.hypot(bx-ax,bz-az);
+      const piece=mesh(new THREE.CapsuleGeometry(width/2, Math.max(.1,length-width),4,8),material,(ax+bx)/2,.02,(az+bz)/2);
+      piece.scale.y=.03; piece.rotation.y=Math.atan2(bx-ax,bz-az); this.macroRoot.add(piece); }
+  }
+  private irregularRock(x:number,y:number,z:number,sx:number,sy:number,sz:number,color=0x626556): THREE.Mesh {
+    const rock=mesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({color,roughness:1}),x,y,z); rock.scale.set(sx,sy,sz); rock.rotation.set(.08*z,.17*x,.04*x); return rock;
   }
 
   private buildMeadow(): void {
-    this.ground(0x79a957);
-    this.road([[0, 4], [3, -10], [8, -28]]);
-    this.road([[0, 4], [10, 3], [18, 0]]);
-    this.road([[0, 4], [-10, 7], [-18, 7]]);
-    this.road([[0, 4], [-1, 16], [0, 28]]);
-    const water = mesh(new THREE.PlaneGeometry(30, 8.2, 12, 3), new THREE.MeshStandardMaterial({ color: 0x277e9e, roughness: .28, metalness: .05, transparent: true, opacity: .94 }), -3, .06, -27.8);
-    water.rotation.x = -Math.PI / 2; this.macroRoot.add(water);
-    const rock = new THREE.MeshStandardMaterial({ color: 0x555b4e, roughness: 1 });
-    const cliffRock = new THREE.MeshStandardMaterial({ color: 0x626556, roughness: 1 });
-    for (let z = -25; z <= 25; z += 4.2) for (const [x, offset] of [[-18.8, 0], [-20.2, 2.1]] as const) {
-      const height = 1.5 + Math.sin(z * 1.7 + offset) * .35;
-      const cliff = mesh(new THREE.DodecahedronGeometry(1.45, 0), cliffRock, x, height * .62, z + offset); cliff.scale.set(1.35, height, 1.2); cliff.rotation.y = z; this.macroRoot.add(cliff);
-    }
-    for (const x of [-15, -10, -4, 2, 14]) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(.8, 0), rock, x, .35, -24.4 + Math.sin(x) * .75));
-    const chasmShape = new THREE.Shape();
-    chasmShape.moveTo(-22, 0); chasmShape.lineTo(-22, 8); chasmShape.lineTo(-17, 7.2); chasmShape.lineTo(-12, 8.5);
-    chasmShape.lineTo(-7, 7.4); chasmShape.lineTo(-2, 8.2); chasmShape.lineTo(4, 7.1); chasmShape.lineTo(10, 8.4);
-    chasmShape.lineTo(16, 7.3); chasmShape.lineTo(22, 8); chasmShape.lineTo(22, 0); chasmShape.closePath();
-    const chasm = mesh(new THREE.ShapeGeometry(chasmShape), new THREE.MeshStandardMaterial({ color: 0x242720, roughness: 1 }), 0, -.32, 26.3);
-    chasm.rotation.x = Math.PI / 2; this.macroRoot.add(chasm);
-    for (let x = -17; x <= 17; x += 2.5) {
-      if (Math.abs(x) < 2.8) continue;
-      const edge = mesh(new THREE.DodecahedronGeometry(.82, 0), rock, x, .18, 27.2 + Math.sin(x * 1.6) * .55); edge.scale.set(1.3, .7, 1); this.macroRoot.add(edge);
-    }
-    const blockedBridge = mesh(new THREE.BoxGeometry(4, .35, 6), new THREE.MeshStandardMaterial({ color: 0x65452d, roughness: 1 }), 0, .1, 29);
-    this.macroRoot.add(blockedBridge, mesh(new THREE.BoxGeometry(4.5, 1.2, .55), rock, 0, .65, 27.5));
+    this.ground(0x79a957); this.road([[0,4],[3,-10],[8,-28]]); this.road([[0,4],[10,3],[18,0]]); this.road([[0,4],[-10,7],[-18,7]]); this.road([[0,4],[-1,16],[0,28]]);
+    // Water is deliberately oversized; an irregular rock/vegetation shoreline hides its rectangular mesh edge.
+    const water=mesh(new THREE.PlaneGeometry(62,22),new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93}),0,.04,-34); water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
+    for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-26.1+Math.sin(x*.72)*.8+Math.sin(x*1.8)*.3; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
+    for(const [x,z,s] of [[-10,-31,1.8],[1,-33,1.4],[16,-31,1.2]] as const) this.macroRoot.add(this.irregularRock(x,.15,z,s,.5,s*.8));
+    // Layered west ridge: human-scale foreground rocks, larger masses pushed outside play.
+    const ridge=new THREE.Group(); ridge.name='west layered ridge'; ridge.userData.cameraOccluder=true;
+    for(let z=-31;z<=32;z+=4.1){ const wave=Math.sin(z*.5); ridge.add(this.irregularRock(-19.1,.55,z,1.5,1.1,1.7),this.irregularRock(-22.3,1.5,z+1.5,2.5,2.8+wave*.4,2.3),this.irregularRock(-26,2.8,z-.8,4,4.7,3.5)); } this.macroRoot.add(ridge);
+    // A real depression: vertical cliff faces and a bottom 2.2m below the grass, with a reserved sealed crossing.
+    const bottom=mesh(new THREE.PlaneGeometry(54,16),new THREE.MeshStandardMaterial({color:0x292821,roughness:1}),0,-2.2,34); bottom.rotation.x=-Math.PI/2; this.macroRoot.add(bottom);
+    const cliffMat=new THREE.MeshStandardMaterial({color:0x50483c,roughness:1});
+    for(let x=-22;x<=22;x+=2.5){ const z=27.2+Math.sin(x*.8)*.65; const face=mesh(new THREE.BoxGeometry(2.7,2.2,1.2),cliffMat,x,-.95,z); face.rotation.z=Math.sin(x)*.08; this.macroRoot.add(face); if(Math.abs(x)>3)this.macroRoot.add(this.irregularRock(x,.18,z-.3,1.25,.55,1)); }
+    const bridge=mesh(new THREE.BoxGeometry(4.2,.35,7),new THREE.MeshStandardMaterial({color:0x65452d,roughness:1}),0,.1,30); this.macroRoot.add(bridge,mesh(new THREE.BoxGeometry(5,1,.55),cliffMat,0,.5,27.2));
   }
 
-  private buildBorderlands(): void {
-    this.ground(0x465b42);
-    this.road([[-12, 28], [-10, 8], [0, -4]], 3.5);
-    this.road([[0, -4], [15, 5], [18, 28]], 3.5);
-    const stone = new THREE.MeshStandardMaterial({ color: 0x555850, roughness: 1 });
-    for (const [x,z,s] of [[-34,-18,2],[32,-20,2.4],[27,4,1.6],[-30,12,1.8],[12,-22,1.4]] as const) {
-      const rock = mesh(new THREE.DodecahedronGeometry(s), stone, x, s * .55, z); rock.scale.y=.7; this.macroRoot.add(rock);
-    }
-  }
+  private buildBorderlands(): void { this.ground(0x465b42); this.road([[-12,28],[-10,8],[0,-4]],3.5); this.road([[0,-4],[15,5],[18,28]],3.5);
+    for(const [x,z,s] of [[-34,-18,2],[32,-20,2.4],[27,4,1.6],[-30,12,1.8],[12,-22,1.4]] as const)this.macroRoot.add(this.irregularRock(x,s*.5,z,s,s*.7,s)); }
 
-  private wall(x: number, z: number, width: number, depth: number, height = 7): void {
-    const stone = new THREE.MeshStandardMaterial({ color: 0x686b62, roughness: 1 });
-    const mortar = new THREE.MeshStandardMaterial({ color: 0x4e534f, roughness: 1 });
-    const horizontal = width > depth;
-    const length = Math.max(width, depth);
-    const count = Math.ceil(length / 2.35);
-    for (let level = 0; level < Math.ceil(height / 1.05); level++) for (let i = 0; i < count; i++) {
-      const along = -length / 2 + (i + .5) * length / count + (level % 2 ? length / count / 2 : 0);
-      if (Math.abs(along) > length / 2) continue;
-      this.macroRoot.add(mesh(new THREE.BoxGeometry(horizontal ? length / count - .07 : depth, 1, horizontal ? depth : length / count - .07), level % 2 ? stone : mortar,
-        x + (horizontal ? along : 0), .5 + level * 1.02, z + (horizontal ? 0 : along)));
-    }
-    for (let i = 0; i < count; i += 2) {
-      const along = -length / 2 + (i + .5) * length / count;
-      this.macroRoot.add(mesh(new THREE.BoxGeometry(horizontal ? 1.05 : depth + .25, .75, horizontal ? depth + .25 : 1.05), stone,
-        x + (horizontal ? along : 0), height + .25, z + (horizontal ? 0 : along)));
-    }
+  private ruinSegment(name:string,x:number,z:number,width:number,depth:number,height:number): void {
+    const group=new THREE.Group(); group.name=name; group.userData.cameraOccluder=height>2; const horizontal=width>depth, length=Math.max(width,depth), stone=new THREE.MeshStandardMaterial({color:0x666a62,roughness:1});
+    for(let p=-length/2;p<length/2;p+=2.1){ const broken=height*(.58+.4*Math.abs(Math.sin(p*1.37))); const block=mesh(new THREE.BoxGeometry(horizontal?1.95:depth,broken,horizontal?depth:1.95),stone,x+(horizontal?p:0),broken/2,z+(horizontal?0:p)); block.rotation.y=Math.sin(p)*.035; group.add(block); }
+    this.macroRoot.add(group);
   }
-
   private buildRuinedFortress(): void {
-    this.ground(0x686b61);
-    this.road([[-20, 0], [-8, 0], [0, -5], [0, -28]], 4.2);
-    this.wall(-20, -15.5, 2.2, 25, 5.2); this.wall(-20, 15.5, 2.2, 25, 5.2);
-    this.wall(20, 0, 2.2, 56, 5.8); this.wall(0, 28, 40, 2.2, 5.8);
-    this.wall(-11, -28, 17, 2.2, 5.2); this.wall(11, -28, 17, 2.2, 5.2);
-    // Slice 11A only establishes the fortress perimeter. Interior walls here used
-    // to sit between the follow camera and the hero without matching collision,
-    // appearing as giant horizontal bands that the hero could walk through.
-    const rubble = new THREE.MeshStandardMaterial({ color: 0x777972, roughness: 1 });
-    for (const [x,z] of [[-14,8],[-12,-8],[14,14],[8,20],[15,-18],[-5,-19]] as const) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(1.4), rubble, x, .65, z));
+    this.ground(0x686b61); this.road([[-20,0],[-8,0],[0,-5],[0,-28]],4.2);
+    // Broken set-back masses replace uniform stacked rows. The south foreground is a 0.5–1.2m cutaway.
+    this.ruinSegment('west north ruin',-20,-16,2.2,22,4.8); this.ruinSegment('west south ruin',-20,17,2.2,19,2.5);
+    this.ruinSegment('north back ruin west',-11,-28,16,2.2,5.5); this.ruinSegment('north back ruin east',11,-28,16,2.2,4.7);
+    this.ruinSegment('east fortress wall',20,0,2.2,55,5.7);
+    const south=new THREE.Group(); south.name='south cutaway foundations';
+    for(let x=-19;x<=19;x+=2.4){ const h=.5+(Math.sin(x*1.2)+1)*.3; south.add(mesh(new THREE.BoxGeometry(2.25,h,2),new THREE.MeshStandardMaterial({color:0x666a62,roughness:1}),x,h/2,28)); } this.macroRoot.add(south);
+    const tower=new THREE.Group(); tower.name='north-east ruined tower'; tower.userData.cameraOccluder=true;
+    for(let y=.6;y<7;y+=1.2) tower.add(this.irregularRock(14,y,-21,3.7,.72,3.5,0x5c6059)); this.macroRoot.add(tower);
+    for(const [x,z,s] of [[-16,9,1.3],[-13,-8,1],[14,15,1.5],[8,20,1.2],[15,-18,1.4],[-5,-19,1]] as const)this.macroRoot.add(this.irregularRock(x,.45,z,s,.65,s));
   }
 
+  private async addAsset(path:string,x:number,z:number,scale:number,rotation=0): Promise<void> { const object=await this.assets.cloneScene(path); object.position.set(x,0,z); object.scale.setScalar(scale); object.rotation.y=rotation; this.assetDetailsRoot.add(object); }
   private async loadDetails(): Promise<void> {
-    const path = this.area.id === 2 ? 'nature/models/CommonTree_3.gltf' : 'nature/models/CommonTree_1.gltf';
-    const positions = this.area.id === 3 ? [[-13,16],[12,18]] : [[-14,-17],[14,15],[-13,20],[13,-12]];
-    try {
-      const objects = await Promise.all(positions.map(async ([x,z], index) => {
-        const object = await this.assets.cloneScene(path); object.position.set(x, 0, z); object.scale.setScalar(.75 + index * .04); return object;
-      }));
-      this.assetDetailsRoot.add(...objects); this.fallbackDetailsRoot.visible = false;
-    } catch (error) { console.warn(`Area ${this.area.id} details unavailable; macro terrain remains playable.`, error); }
+    const jobs: Promise<void>[]=[];
+    if(this.area.id===1){
+      for(const [x,z,s] of [[-17,-24,.75],[-12,-25,.55],[-5,-25,.6],[14,-25,.65],[-16,25,.7],[-15,-5,.75]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_1.gltf',x,z,s,x));
+      for(const [x,z,s] of [[-16,-21,.65],[-13,-24,.5],[13,-23,.55],[-16,17,.7],[-20,3,.75]] as const) jobs.push(this.addAsset('nature/models/Bush_Common_Flowers.gltf',x,z,s));
+      for(const [x,z,s] of [[-22,-12,.8],[-23,13,.9],[-25,24,.85]] as const) jobs.push(this.addAsset('nature/models/CommonTree_1.gltf',x,z,s));
+    } else { for(const [x,z,s] of [[-13,16,.75],[12,18,.8],[-12,-17,.72]] as const) jobs.push(this.addAsset(this.area.id===2?'nature/models/CommonTree_3.gltf':'nature/models/Rock_Medium_2.gltf',x,z,s)); }
+    try { await Promise.all(jobs); this.fallbackDetailsRoot.visible=false; } catch(error){ console.warn(`Area ${this.area.id} Quaternius details unavailable; procedural macro terrain remains playable.`,error); }
   }
 }

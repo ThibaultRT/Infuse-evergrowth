@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { AssetLoader } from './AssetLoader';
+import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
 export class GateView {
   readonly root = new THREE.Group();
@@ -8,7 +8,7 @@ export class GateView {
   private openAmount = 0;
   private openTarget = 0;
 
-  constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', _assets?: AssetLoader) {
+  constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', assets: AssetLoader = quaterniusAssets) {
     const stone = new THREE.MeshStandardMaterial({ color: style === 'lake-gate' ? 0x8b846d : 0x686d68, roughness: 1 });
     const darkStone = new THREE.MeshStandardMaterial({ color: 0x454b47, roughness: 1 });
     const wood = new THREE.MeshStandardMaterial({ color: 0x704527, roughness: .92 });
@@ -35,6 +35,22 @@ export class GateView {
     }
     this.root.add(this.fallback);
     this.root.rotation.y = axis === 'x' ? Math.PI / 2 : 0;
+    void this.loadAssetGate(assets, style);
+  }
+
+  private async loadAssetGate(assets: AssetLoader, style: 'lake-gate' | 'ruined-fortress-gate'): Promise<void> {
+    try {
+      const [frame, door] = await Promise.all([assets.cloneScene('village/models/DoorFrame_Round_Brick.gltf'), assets.cloneScene('village/models/Door_4_Round.gltf')]);
+      const fit = (object: THREE.Object3D, height: number): void => {
+        const box = new THREE.Box3().setFromObject(object); const size = box.getSize(new THREE.Vector3());
+        object.scale.setScalar(height / Math.max(size.y, .001)); box.setFromObject(object);
+        const center = box.getCenter(new THREE.Vector3()); object.position.sub(center); object.position.y += box.getSize(new THREE.Vector3()).y / 2;
+      };
+      fit(frame, style === 'lake-gate' ? 4.5 : 5.2); fit(door, style === 'lake-gate' ? 3.35 : 3.9);
+      frame.name = 'Quaternius round brick gate frame'; door.name = 'Quaternius round wooden door';
+      this.root.add(frame); this.doorPivot.clear(); this.doorPivot.position.set(-1.65, 0, 0); door.position.x += 1.65; this.doorPivot.add(door); this.root.add(this.doorPivot);
+      this.fallback.visible = false;
+    } catch (error) { console.warn('Quaternius gate unavailable; using procedural safety fallback.', error); }
   }
 
   setOpen(open: boolean): void { this.openTarget = open ? 1 : 0; }
