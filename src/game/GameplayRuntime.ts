@@ -183,8 +183,11 @@ export class GameplayRuntime {
     const heroRadius = .45;
     const halfWidth = area.size.width / 2;
     const halfDepth = area.size.depth / 2;
-    const outsideX = Math.abs(candidate.x - area.originX) > halfWidth;
-    const outsideZ = Math.abs(candidate.z - area.originZ) > halfDepth;
+    // Start resolving a boundary crossing when the hero's collision circle reaches
+    // the edge. Waiting for the centre to leave the area made the normal clamp put
+    // the hero back half a metre on every frame, so no gate could ever be crossed.
+    const outsideX = Math.abs(candidate.x - area.originX) > halfWidth - heroRadius;
+    const outsideZ = Math.abs(candidate.z - area.originZ) > halfDepth - heroRadius;
     if (outsideX || outsideZ) {
       const connection = this.options.connections.find((item) => {
         if (item.areaAId !== area.id && item.areaBId !== area.id) return false;
@@ -197,8 +200,11 @@ export class GameplayRuntime {
       if (connection) {
         const target = connection.areaAId === area.id ? connection.areaBId : connection.areaAId;
         const targetArea = this.area(target);
-        const targetHalfWidth = targetArea.size.width / 2 + .05;
-        const targetHalfDepth = targetArea.size.depth / 2 + .05;
+        // Adjacent chunks meet at the authored boundary. Accept the hero while its
+        // circle straddles that shared edge, then let the destination clamp move it
+        // fully inside on the following update.
+        const targetHalfWidth = targetArea.size.width / 2 + heroRadius;
+        const targetHalfDepth = targetArea.size.depth / 2 + heroRadius;
         if (Math.abs(candidate.x - targetArea.originX) <= targetHalfWidth && Math.abs(candidate.z - targetArea.originZ) <= targetHalfDepth) {
           this.hero.position = candidate;
           this.currentAreaId = target;
