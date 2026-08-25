@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { WORLD_CONNECTIONS } from '../config';
-import { lakeBarrierSegments } from '../domain/world/LakeBoundary';
+import { AREAS, WORLD_CONNECTIONS } from '../config';
+import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import type { AreaDefinition } from '../types';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
@@ -38,6 +38,18 @@ export class EnvironmentView {
   private irregularRock(x:number,y:number,z:number,sx:number,sy:number,sz:number,color=0x626556): THREE.Mesh {
     const rock=mesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({color,roughness:1}),x,y,z); rock.scale.set(sx,sy,sz); rock.rotation.set(.08*z,.17*x,.04*x); return rock;
   }
+  private groundPatch(x:number,z:number,sx:number,sz:number,color:number,rotation=0): void {
+    const patch=mesh(new THREE.CircleGeometry(1,16),new THREE.MeshStandardMaterial({color,roughness:1}),x,.025,z);
+    patch.rotation.x=-Math.PI/2; patch.rotation.z=rotation; patch.scale.set(sx,sz,1); this.macroRoot.add(patch);
+  }
+  private lowWall(name:string,x:number,z:number,width:number,depth:number,height:number): void {
+    const group=new THREE.Group(); group.name=name; group.userData.cameraOccluder=height>2.2;
+    const material=new THREE.MeshStandardMaterial({color:0x686960,roughness:1});
+    const horizontal=width>depth, length=Math.max(width,depth), pieces=Math.max(1,Math.floor(length/2));
+    for(let i=0;i<pieces;i++){ if((i+name.length)%5===2)continue; const offset=-length/2+(i+.5)*length/pieces; const h=height*(.68+.3*Math.abs(Math.sin(i*2.17)));
+      const block=mesh(new THREE.BoxGeometry(horizontal?length/pieces+.12:width,h,horizontal?depth:length/pieces+.12),material,x+(horizontal?offset:0),h/2,z+(horizontal?0:offset)); block.rotation.y=Math.sin(i*1.7)*.035; group.add(block); }
+    this.macroRoot.add(group);
+  }
 
   private buildMeadow(): void {
     this.ground(0x79a957); this.road([[0,4],[3,-10],[8,-28]]); this.road([[0,4],[10,3],[18,0]]); this.road([[0,4],[-10,7],[-18,7]]); this.road([[0,4],[-1,16],[0,28]]);
@@ -46,7 +58,8 @@ export class EnvironmentView {
     const lakeConnection=WORLD_CONNECTIONS.find((connection)=>connection.visualStyle==='lake-gate');
     if(lakeConnection){
       const waterMaterial=new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93});
-      for(const lake of lakeBarrierSegments(lakeConnection,-31,31)){
+      const lakeBounds=lakeBarrierBounds(lakeConnection,AREAS);
+      for(const lake of lakeBarrierSegments(lakeConnection,lakeBounds.minX,lakeBounds.maxX)){
         const water=mesh(new THREE.PlaneGeometry(lake.maxX-lake.minX,lake.maxZ-lake.minZ),waterMaterial,(lake.minX+lake.maxX)/2-this.area.originX,.04,(lake.minZ+lake.maxZ)/2-this.area.originZ);
         water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
       }
@@ -65,10 +78,21 @@ export class EnvironmentView {
     const cliffMat=new THREE.MeshStandardMaterial({color:0x50483c,roughness:1});
     for(let x=-22;x<=22;x+=2.5){ const z=27.2+Math.sin(x*.8)*.65; const face=mesh(new THREE.BoxGeometry(2.7,2.2,1.2),cliffMat,x,-.95,z); face.rotation.z=Math.sin(x)*.08; this.macroRoot.add(face); if(Math.abs(x)>3)this.macroRoot.add(this.irregularRock(x,.18,z-.3,1.25,.55,1)); }
     const bridge=mesh(new THREE.BoxGeometry(4.2,.35,7),new THREE.MeshStandardMaterial({color:0x65452d,roughness:1}),0,.1,30); this.macroRoot.add(bridge,mesh(new THREE.BoxGeometry(5,1,.55),cliffMat,0,.5,27.2));
+    // Broad, softly overlapping soil/grass shapes anchor the village and encounter clearings.
+    this.groundPatch(0,5,7,5,0x83ad5a,.2); this.groundPatch(-10,17,5,4,0x70964d,-.35); this.groundPatch(10,-13,5.5,4.5,0x719c50,.25);
+    const shrineStone=new THREE.MeshStandardMaterial({color:0x8a8878,roughness:1});
+    const plaza=mesh(new THREE.CylinderGeometry(3.1,3.3,.18,12),shrineStone,0,.1,5); this.macroRoot.add(plaza);
+    for(const [x,z] of [[-2.2,3.2],[2.2,3.2],[-2.2,6.8],[2.2,6.8]] as const) this.macroRoot.add(mesh(new THREE.CylinderGeometry(.28,.38,1.25,8),shrineStone,x,.63,z));
+    this.macroRoot.add(mesh(new THREE.CylinderGeometry(.75,1,.65,10),shrineStone,0,.42,5),mesh(new THREE.ConeGeometry(.7,1.8,6),new THREE.MeshStandardMaterial({color:0x829d91,roughness:.65}),0,1.55,5));
   }
 
   private buildBorderlands(): void { this.ground(0x465b42); this.road([[-12,28],[-10,8],[0,-4]],3.5); this.road([[0,-4],[15,5],[18,28]],3.5);
-    for(const [x,z,s] of [[-34,-18,2],[32,-20,2.4],[27,4,1.6],[-30,12,1.8],[12,-22,1.4]] as const)this.macroRoot.add(this.irregularRock(x,s*.5,z,s,s*.7,s)); }
+    for(const [x,z,s] of [[-34,-18,2],[32,-20,2.4],[27,4,1.6],[-30,12,1.8],[12,-22,1.4]] as const)this.macroRoot.add(this.irregularRock(x,s*.5,z,s,s*.7,s));
+    this.groundPatch(-13,13,8,6,0x3d503b,.2); this.groundPatch(19,11,10,7,0x515744,-.15); this.groundPatch(12,-17,9,6,0x3f493b,.4);
+    // Sparse border watches make the wide eastern extension feel deliberately occupied.
+    for(const [x,z] of [[-26,8],[25,-7],[29,17]] as const){ const post=new THREE.Group(); post.name='border watch'; post.userData.cameraOccluder=true;
+      post.add(mesh(new THREE.CylinderGeometry(.45,.65,4.2,7),new THREE.MeshStandardMaterial({color:0x554937,roughness:1}),x,2.1,z),mesh(new THREE.ConeGeometry(2,1.5,5),new THREE.MeshStandardMaterial({color:0x343a31,roughness:1}),x,4.65,z)); this.macroRoot.add(post); }
+  }
 
   private ruinSegment(name:string,x:number,z:number,width:number,depth:number,height:number): void {
     const group=new THREE.Group(); group.name=name; group.userData.cameraOccluder=height>2; const horizontal=width>depth, length=Math.max(width,depth), stone=new THREE.MeshStandardMaterial({color:0x666a62,roughness:1});
@@ -86,6 +110,19 @@ export class EnvironmentView {
     const tower=new THREE.Group(); tower.name='north-east ruined tower'; tower.userData.cameraOccluder=true;
     for(let y=.6;y<7;y+=1.2) tower.add(this.irregularRock(14,y,-21,3.7,.72,3.5,0x5c6059)); this.macroRoot.add(tower);
     for(const [x,z,s] of [[-16,9,1.3],[-13,-8,1],[14,15,1.5],[8,20,1.2],[15,-18,1.4],[-5,-19,1]] as const)this.macroRoot.add(this.irregularRock(x,.45,z,s,.65,s));
+    // Camera-aware interior sets: open/cut-away on the south, taller backdrops to the north.
+    // Three connected courtyards retain generous combat floors and obvious broken entrances.
+    this.groundPatch(-10,14,7.2,6.2,0x77766b,.1); this.groundPatch(9,12,7.3,6.5,0x74746a,-.18); this.groundPatch(0,-15,9,7,0x747268,.06);
+    this.lowWall('west guard court back',-10,8,14,1.1,2.8); this.lowWall('west guard court side',-17,14,1.1,12,1.8);
+    this.lowWall('east crystal court back',9,5.5,14,1.1,3.4); this.lowWall('east crystal court side',16,12,1.1,13,2.1);
+    this.lowWall('boss court back',0,-22,18,1.25,4.2); this.lowWall('boss court west',-9,-15,1.15,13,2.5); this.lowWall('boss court east',9,-15,1.15,13,2.5);
+    // Smaller alcoves and broken corridor shoulders guide the route without enclosing it.
+    this.lowWall('west alcove back',-13,-3,7,1,2.4); this.lowWall('east alcove back',13,-4,7,1,3.1);
+    this.lowWall('central corridor west',-4,-5,1,8,1.35); this.lowWall('central corridor east',4,-5,1,8,1.35);
+    for(const [x,z,s] of [[-6,7,.8],[-2,7,.65],[6,5,.8],[12,5,.65],[-9,-8,.85],[8,-9,.9],[-7,-22,.75],[7,-22,.75]] as const)this.macroRoot.add(this.irregularRock(x,.25,z,s,.45,s,0x5d5e58));
+    // A distant broken arch/tower is readable from every courtyard and safe behind combat.
+    const landmark=new THREE.Group(); landmark.name='boss court broken keep'; landmark.userData.cameraOccluder=true;
+    landmark.add(mesh(new THREE.BoxGeometry(3.2,7,3.2),new THREE.MeshStandardMaterial({color:0x595d58,roughness:1}),-7,3.5,-25),mesh(new THREE.BoxGeometry(3.2,5.3,3.2),new THREE.MeshStandardMaterial({color:0x595d58,roughness:1}),7,2.65,-25)); this.macroRoot.add(landmark);
   }
 
   private async addAsset(path:string,x:number,z:number,scale:number,rotation=0): Promise<void> { const object=await this.assets.cloneScene(path); object.position.set(x,0,z); object.scale.setScalar(scale); object.rotation.y=rotation; this.assetDetailsRoot.add(object); }
@@ -95,7 +132,18 @@ export class EnvironmentView {
       for(const [x,z,s] of [[-17,-24,.75],[-12,-25,.55],[-5,-25,.6],[14,-25,.65],[-16,25,.7],[-15,-5,.75]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_1.gltf',x,z,s,x));
       for(const [x,z,s] of [[-16,-21,.65],[-13,-24,.5],[13,-23,.55],[-16,17,.7],[-20,3,.75]] as const) jobs.push(this.addAsset('nature/models/Bush_Common_Flowers.gltf',x,z,s));
       for(const [x,z,s] of [[-22,-12,.8],[-23,13,.9],[-25,24,.85]] as const) jobs.push(this.addAsset('nature/models/CommonTree_1.gltf',x,z,s));
-    } else { for(const [x,z,s] of [[-13,16,.75],[12,18,.8],[-12,-17,.72]] as const) jobs.push(this.addAsset(this.area.id===2?'nature/models/CommonTree_3.gltf':'nature/models/Rock_Medium_2.gltf',x,z,s)); }
+      for(const [x,z,r] of [[-14,10,0],[-14,14,0],[-14,18,0],[13,12,Math.PI],[13,16,Math.PI]] as const) jobs.push(this.addAsset('village/models/Prop_WoodenFence_Extension1.gltf',x,z,.85,r));
+      for(const [x,z,s] of [[-12,20,.75],[12,19,.7],[14,-10,.65],[-13,-9,.7]] as const) jobs.push(this.addAsset('nature/models/CommonTree_1.gltf',x,z,s,x));
+      for(const [x,z,s] of [[-8,20,.6],[-11,9,.55],[10,19,.55],[14,9,.6],[-12,-10,.55]] as const) jobs.push(this.addAsset('nature/models/Bush_Common_Flowers.gltf',x,z,s));
+    } else if(this.area.id===2){
+      for(const [x,z,s] of [[-31,-18,.85],[-27,13,.9],[-17,-20,.75],[-5,20,.8],[10,-20,.7],[24,-16,.85],[30,8,.8],[18,17,.75]] as const) jobs.push(this.addAsset('nature/models/CommonTree_3.gltf',x,z,s,x));
+      for(const [x,z,s] of [[-22,7,.7],[-12,-18,.65],[5,18,.7],[17,-8,.8],[28,19,.75],[31,-19,.7]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_2.gltf',x,z,s,x));
+      for(const [x,z,r] of [[-17,7,.3],[-14,9,.3],[19,-2,-.4],[22,0,-.4],[26,14,.8]] as const) jobs.push(this.addAsset('village/models/Prop_WoodenFence_Extension1.gltf',x,z,.85,r));
+    } else {
+      for(const [x,z,s] of [[-16,7,.8],[-7,7,.65],[16,5,.75],[9,5,.7],[-9,-8,.75],[9,-9,.8],[-7,-22,.7],[7,-22,.72]] as const) jobs.push(this.addAsset('village/models/Prop_Brick1.gltf',x,z,s,x));
+      for(const [x,z,s,r] of [[-10,14,1.35,0],[9,12,1.3,.3],[0,-15,1.45,-.2],[-13,-3,.9,.2],[13,-4,.9,-.2]] as const) jobs.push(this.addAsset('village/models/Floor_UnevenBrick.gltf',x,z,s,r));
+      for(const [x,z,s] of [[-15,19,.6],[15,18,.65],[-15,-10,.6],[14,-12,.65]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_2.gltf',x,z,s,x));
+    }
     try { await Promise.all(jobs); this.fallbackDetailsRoot.visible=false; } catch(error){ console.warn(`Area ${this.area.id} Quaternius details unavailable; procedural macro terrain remains playable.`,error); }
   }
 }
