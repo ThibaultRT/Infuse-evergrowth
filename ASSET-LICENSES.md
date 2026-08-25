@@ -24,3 +24,10 @@ Each supplied Standard archive contains its own Quaternius license file declarin
 The original source archives are intentionally not intended for the shipped web application. Keep only the selected runtime subset needed by implemented areas/features.
 
 See `WIP/quaternius-assets.md` for the inspected source contents, exact runtime candidates, model/animation measurements, known free-tier gaps and implementation guidance.
+
+## Inventory weapon rarity icons
+
+- Files: `src/assets/ui/equipment/*.svg`
+- Source: three weapon-rarity strips supplied directly by the project owner in the feature request (hammer, sword, and spear; common through legendary).
+- Processing: each source strip was divided into five square tiles and resized to 256×256 and wrapped as text-based SVG data images so the assets remain reviewable by text-only pull-request tooling.
+- Usage: project-owned/user-supplied artwork; included with permission for Infuse: Evergrowth.
