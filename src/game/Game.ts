@@ -38,6 +38,7 @@ import { RespawnSystem } from '../systems/RespawnSystem';
 import { WorldUiManager } from '../rendering/WorldUiManager';
 import { AreaFlowSystem } from '../systems/AreaFlowSystem';
 import { GameplayRuntime, type RuntimeSpawn } from './GameplayRuntime';
+import { EnvironmentOcclusionManager } from '../rendering/EnvironmentOcclusionManager';
 
 export class Game {
   private started = false;
@@ -139,6 +140,7 @@ scene.add(hero);
 let heroDeathHidden = false;
 
 const cameraController = new CameraController(camera, hero.position);
+const environmentOcclusion = new EnvironmentOcclusionManager(camera, environmentViews.map((view) => view.root));
 
 function syncLighting(): void {
   const area = areaById(currentAreaId);
@@ -813,6 +815,7 @@ function frame(now: number): void {
   entities.forEach((entity) => entity.updateView(dt));
   if (!gameplay.hero.dead) gameplay.hero.hp = Math.min(maxHeroHp(), gameplay.hero.hp + heroRegen() * dt);
   cameraController.update(dt, now);
+  environmentOcclusion.update(hero.position, dt);
   updateHud();
   worldUi.update(dt);
   effects.update(dt);
@@ -823,7 +826,7 @@ function frame(now: number): void {
     if (elapsed >= 500) {
       const info = renderer.info.render;
       const activeMixers = entities.filter((entity) => entity.alive && entity.def.areaId === currentAreaId && entity.enemyView?.animationReady).length + (heroView.animationReady ? 1 : 0);
-      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\n${activeMixers} active character mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
+      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\n${activeMixers} active character mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${environmentOcclusion.diagnostic}\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
       statsFrames = 0;
       statsStartedAt = now;
     }
