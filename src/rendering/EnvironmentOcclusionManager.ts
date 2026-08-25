@@ -15,9 +15,15 @@ export class EnvironmentOcclusionManager {
       const meshes: THREE.Mesh[] = [];
       object.traverse((child) => {
         if (!(child instanceof THREE.Mesh)) return;
-        child.material = (Array.isArray(child.material) ? child.material : [child.material]).map((source) => {
+        const wasMaterialArray = Array.isArray(child.material);
+        const sourceMaterials: THREE.Material[] = wasMaterialArray ? child.material : [child.material];
+        const materials = sourceMaterials.map((source) => {
           const material = source.clone(); material.transparent = true; material.depthWrite = true; return material;
         });
+        // A material array is meaningful only for geometry groups. Turning a
+        // single material into an array makes Three's raycaster look up a
+        // nonexistent group material and abort the frame before it is rendered.
+        child.material = wasMaterialArray ? materials : materials[0];
         meshes.push(child);
       });
       if (meshes.length) this.entries.push({ object, meshes, amount: 0, name: object.name || `occluder-${this.entries.length + 1}` });
