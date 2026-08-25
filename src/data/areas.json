@@ -2471,6 +2471,7 @@
       "z": -28,
       "axis": "z",
       "width": 5,
+      "barrierDepth": 8,
       "requiredUnlockedAreaId": 2,
       "unlockOnBossOfAreaId": 1,
       "visualStyle": "lake-gate"
