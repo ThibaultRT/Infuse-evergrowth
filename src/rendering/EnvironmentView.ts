@@ -39,9 +39,13 @@ export class EnvironmentView {
 
   private buildMeadow(): void {
     this.ground(0x79a957); this.road([[0,4],[3,-10],[8,-28]]); this.road([[0,4],[10,3],[18,0]]); this.road([[0,4],[-10,7],[-18,7]]); this.road([[0,4],[-1,16],[0,28]]);
-    // Water is deliberately oversized; an irregular rock/vegetation shoreline hides its rectangular mesh edge.
-    const water=mesh(new THREE.PlaneGeometry(62,22),new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93}),0,.04,-34); water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
-    for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-26.1+Math.sin(x*.72)*.8+Math.sin(x*1.8)*.3; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
+    // Keep most of the lake beyond the playable chunk. An irregular shore masks
+    // the plane edge while the raised causeway makes the only crossing explicit.
+    const water=mesh(new THREE.PlaneGeometry(62,18),new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93}),0,.04,-34); water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
+    for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-25.4+Math.sin(x*.72)*.55+Math.sin(x*1.8)*.2; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
+    const causewayMaterial=new THREE.MeshStandardMaterial({color:0x8b846d,roughness:1});
+    const causeway=mesh(new THREE.BoxGeometry(4.6,.3,9),causewayMaterial,8,.14,-28); this.macroRoot.add(causeway);
+    for(const x of [5.85,10.15]) for(let z=-31.5;z<=-24.5;z+=2.25) this.macroRoot.add(this.irregularRock(x,.35,z,.45,.55,.65,0x626556));
     for(const [x,z,s] of [[-10,-31,1.8],[1,-33,1.4],[16,-31,1.2]] as const) this.macroRoot.add(this.irregularRock(x,.15,z,s,.5,s*.8));
     // Layered west ridge: human-scale foreground rocks, larger masses pushed outside play.
     const ridge=new THREE.Group(); ridge.name='west layered ridge'; ridge.userData.cameraOccluder=true;
@@ -58,7 +62,7 @@ export class EnvironmentView {
 
   private ruinSegment(name:string,x:number,z:number,width:number,depth:number,height:number): void {
     const group=new THREE.Group(); group.name=name; group.userData.cameraOccluder=height>2; const horizontal=width>depth, length=Math.max(width,depth), stone=new THREE.MeshStandardMaterial({color:0x666a62,roughness:1});
-    for(let p=-length/2;p<length/2;p+=2.1){ const broken=height*(.58+.4*Math.abs(Math.sin(p*1.37))); const block=mesh(new THREE.BoxGeometry(horizontal?1.95:depth,broken,horizontal?depth:1.95),stone,x+(horizontal?p:0),broken/2,z+(horizontal?0:p)); block.rotation.y=Math.sin(p)*.035; group.add(block); }
+    for(let p=-length/2;p<length/2;p+=2.1){ const broken=height*(.58+.4*Math.abs(Math.sin(p*1.37))); const block=mesh(new THREE.BoxGeometry(horizontal?1.95:width,broken,horizontal?depth:1.95),stone,x+(horizontal?p:0),broken/2,z+(horizontal?0:p)); block.rotation.y=Math.sin(p)*.035; group.add(block); }
     this.macroRoot.add(group);
   }
   private buildRuinedFortress(): void {
@@ -66,7 +70,7 @@ export class EnvironmentView {
     // Broken set-back masses replace uniform stacked rows. The south foreground is a 0.5–1.2m cutaway.
     this.ruinSegment('west north ruin',-20,-16,2.2,22,4.8); this.ruinSegment('west south ruin',-20,17,2.2,19,2.5);
     this.ruinSegment('north back ruin west',-11,-28,16,2.2,5.5); this.ruinSegment('north back ruin east',11,-28,16,2.2,4.7);
-    this.ruinSegment('east fortress wall',20,0,2.2,55,5.7);
+    this.ruinSegment('east fortress wall',20.2,0,1.35,52,5.7);
     const south=new THREE.Group(); south.name='south cutaway foundations';
     for(let x=-19;x<=19;x+=2.4){ const h=.5+(Math.sin(x*1.2)+1)*.3; south.add(mesh(new THREE.BoxGeometry(2.25,h,2),new THREE.MeshStandardMaterial({color:0x666a62,roughness:1}),x,h/2,28)); } this.macroRoot.add(south);
     const tower=new THREE.Group(); tower.name='north-east ruined tower'; tower.userData.cameraOccluder=true;
