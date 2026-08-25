@@ -1,73 +1,80 @@
-# Environment Asset Catalogue
+# Environment Asset Catalogue — Curated Runtime Subset
 
-## Status
+## Scope and status
 
-**12A is started but not complete.**
+This Slice 12A catalogue covers **all 14 environment models currently present in the curated browser runtime subset**. It does not claim to represent the full Quaternius Standard archives: the repository currently holds 8 models from Stylized Nature MegaKit Standard, 6 from Medieval Village MegaKit Standard, and no environment models from Fantasy Props MegaKit Standard.
 
-The current repository contains only a deliberately curated runtime subset of the three Quaternius environment packs. The full source archives are not present in `main`, and they were not recoverable from the current File Library search. Therefore this document records only assets already verified from the earlier source-pack inspection and the current runtime subset.
+Every pictured thumbnail below is a Blender 4.0.2 render of the named `.gltf` file in `public/assets/quaternius/`; no substitute geometry or generated asset is shown. The fixed orthographic isometric camera, transparent render, neutral two-light rig, filename labelling, and contact-sheet assembly are reproducible with:
 
-Do not treat this as the final catalogue. The next 12A task is to inspect the actual full Standard archives again and expand this list before the Blender beauty pass.
+```bash
+blender --background --python scripts/render-environment-catalog.py
+```
 
-## Verified source-pack scale
+Dimensions and triangle counts were measured from the imported source meshes by that script. Dimension order is width × depth × height in metres after Blender's glTF coordinate conversion. The machine-readable results are retained in [`environment-catalog/catalog-metadata.json`](environment-catalog/catalog-metadata.json).
 
-| Pack | Verified Standard glTF count | Main relevance |
-| --- | ---: | --- |
-| Medieval Village MegaKit | 176 | modular village structures, walls, floors, doors, fences |
-| Stylized Nature MegaKit | 68 | trees, rocks, bushes, flowers, grass, rock paths |
-| Fantasy Props MegaKit | 94 | furniture and environmental props |
+## Visual contact sheets
 
-## Current verified runtime candidates
+| Requested group | Contact sheet | Curated models |
+| --- | --- | ---: |
+| Cliffs / rocks | [View sheet](environment-catalog/cliffs-rocks.png) | 2 |
+| Trees / vegetation | [View sheet](environment-catalog/trees-vegetation.png) | 5 |
+| Roads / paths | [View sheet](environment-catalog/roads-paths.png) | 2 |
+| Fences / palisades | [View sheet](environment-catalog/fences-palisades.png) | 2 |
+| Houses / village structures | [View empty-category sheet](environment-catalog/houses-village-structures.png) | 0 |
+| Walls / broken walls | [View sheet](environment-catalog/walls-broken-walls.png) | 1 |
+| Gates / arches | [View sheet](environment-catalog/gates-arches.png) | 2 |
+| Towers / ruins | [View empty-category sheet](environment-catalog/towers-ruins.png) | 0 |
+| Bridges | [View empty-category sheet](environment-catalog/bridges.png) | 0 |
+| Rubble / props | [View sheet](environment-catalog/rubble-props.png) | 1 |
 
-### Nature
+`Prop_Brick1.gltf` appears on both the walls/broken-walls and rubble/props sheets because it is the subset's only masonry fragment and is relevant to both requested views. Empty-category sheets are intentional: they make gaps in the curated subset visible rather than implying that an asset was overlooked.
 
-| Asset | Approx. size / cost | Use | Runtime status |
-| --- | --- | --- | --- |
-| `CommonTree_1.gltf` | ~6,265 tris, ~7.26 m tall | bright deciduous tree, Area 1 clusters | present |
-| `CommonTree_3.gltf` | ~3,505 tris, ~9.43 m tall | taller tree / Area 1-2 silhouette | present |
-| `Rock_Medium_1.gltf` | ~342 tris | medium boulder / shoreline / ridge accents | present |
-| `Rock_Medium_2.gltf` | ~244 tris | medium boulder variation | present |
-| `Bush_Common_Flowers.gltf` | ~1,368 tris | village/road vegetation | present |
-| `Flower_3_Group.gltf` | ~755 tris | small ground dressing | present |
-| `Grass_Common_Short.gltf` | ~155 tris | small grass clumps | present |
-| `RockPath_Round_Wide.gltf` | ~3,500 tris, ~2.1 m tile | authored path detail | present |
+## Complete curated model inventory
 
-### Village / gate
+All proposed runtime paths equal the current runtime paths because these files are already selected and shipped. “Base-oriented” means the imported object origin is suitable for placement on a ground surface; placement still needs visual validation in Blender before authored-world use.
 
-| Asset | Approx. size / cost | Use | Runtime status |
-| --- | --- | --- | --- |
-| `Prop_WoodenFence_Single.gltf` | ~40 tris, ~2.06 m span | road/village fence | present |
-| `Prop_WoodenFence_Extension1.gltf` | ~32 tris | fence continuation | present |
-| `Prop_Brick1.gltf` | ~108 tris | rubble / broken wall scatter | present |
-| `Floor_UnevenBrick.gltf` | 2×2 m tiled plane | small paved patches, not whole-area ground | present |
-| `DoorFrame_Round_Brick.gltf` | ~2,046 tris, ~1.6×2.59 m | physical gate/arch prototype | present |
-| `Door_4_Round.gltf` | ~1,228 tris, ~1.11×2.32 m | dynamic gate door | present |
+| Source pack | Exact source filename | Category | Dimensions (m) | Triangles | Likely Infuse use | In runtime subset | Proposed runtime path | Pivot / orientation / shared textures |
+| --- | --- | --- | ---: | ---: | --- | --- | --- | --- |
+| Stylized Nature MegaKit Standard | `Rock_Medium_1.gltf` | medium rock | 3.225 × 2.989 × 2.260 | 342 | ridge, shoreline, and border boulder | Yes | `nature/models/Rock_Medium_1.gltf` | Base-oriented, Z-up after import; shares `Rocks_Diffuse.png` with Rock 2. |
+| Stylized Nature MegaKit Standard | `Rock_Medium_2.gltf` | medium rock | 3.049 × 2.479 × 1.899 | 244 | lower boulder variation and scatter | Yes | `nature/models/Rock_Medium_2.gltf` | Base-oriented, Z-up after import; shares `Rocks_Diffuse.png` with Rock 1. |
+| Stylized Nature MegaKit Standard | `CommonTree_1.gltf` | deciduous tree | 4.311 × 4.578 × 7.265 | 6,265 | broad Area 1 tree clusters | Yes | `nature/models/CommonTree_1.gltf` | Trunk base placement, Z-up; shares normal-tree bark/leaf maps with Tree 3. |
+| Stylized Nature MegaKit Standard | `CommonTree_3.gltf` | deciduous tree | 4.063 × 4.241 × 9.425 | 3,505 | tall canopy and skyline variation | Yes | `nature/models/CommonTree_3.gltf` | Trunk base placement, Z-up; shares normal-tree bark/leaf maps with Tree 1. |
+| Stylized Nature MegaKit Standard | `Bush_Common_Flowers.gltf` | bush / flowers | 1.915 × 1.965 × 1.582 | 1,368 | flowering roadside and village greenery | Yes | `nature/models/Bush_Common_Flowers.gltf` | Base-oriented, Z-up; uses normal-tree leaves plus shared `Flowers.png`. |
+| Stylized Nature MegaKit Standard | `Flower_3_Group.gltf` | flowers | 1.488 × 1.591 × 2.055 | 755 | conspicuous flower cluster and verge accent | Yes | `nature/models/Flower_3_Group.gltf` | Base-oriented, Z-up; uses shared leaf and flower maps. Note the unexpectedly tall 2.055 m source scale. |
+| Stylized Nature MegaKit Standard | `Grass_Common_Short.gltf` | grass | 0.639 × 0.737 × 1.334 | 155 | sparse grass clump dressing | Yes | `nature/models/Grass_Common_Short.gltf` | Base-oriented, Z-up; uses `Grass.png`. Source height should be checked against intended world scale. |
+| Stylized Nature MegaKit Standard | `RockPath_Round_Wide.gltf` | ground / path piece | 2.111 × 2.129 × 0.113 | 3,500 | individual stepping/path-rock accent | Yes | `nature/models/RockPath_Round_Wide.gltf` | Flat, centered tile; uses `PathRocks_Diffuse.png`. High triangle count for a small repeated tile. |
+| Medieval Village MegaKit Standard | `Floor_UnevenBrick.gltf` | stone surface / path piece | 2.000 × 2.000 × 0.020 | 4 | small paved patch or modular floor tile | Yes | `village/models/Floor_UnevenBrick.gltf` | Flat 2 m tile, Z-up after import; shares the uneven-brick material maps. |
+| Medieval Village MegaKit Standard | `Prop_WoodenFence_Single.gltf` | fence | 2.064 × 0.120 × 0.838 | 40 | short roadside or village boundary | Yes | `village/models/Prop_WoodenFence_Single.gltf` | Long axis X, base-oriented; shares wood-trim maps with fence extension and door. |
+| Medieval Village MegaKit Standard | `Prop_WoodenFence_Extension1.gltf` | fence extension | 2.045 × 0.110 × 0.838 | 32 | continuous fence run without duplicate end detail | Yes | `village/models/Prop_WoodenFence_Extension1.gltf` | Long axis X, base-oriented; shares wood-trim maps with fence single and door. |
+| Medieval Village MegaKit Standard | `Prop_Brick1.gltf` | rubble / masonry fragment | 0.346 × 0.250 × 0.208 | 108 | loose brick scatter; insufficient alone as a broken wall | Yes | `village/models/Prop_Brick1.gltf` | Small centered prop; shares rock-trim maps with the round brick frame. |
+| Medieval Village MegaKit Standard | `DoorFrame_Round_Brick.gltf` | gate / arch | 1.603 × 0.477 × 2.586 | 2,046 | pedestrian-scale arch or compact physical gate | Yes | `village/models/DoorFrame_Round_Brick.gltf` | Opening faces depth axis; base-oriented; shares rock-trim maps with brick prop. |
+| Medieval Village MegaKit Standard | `Door_4_Round.gltf` | gate door | 1.115 × 0.209 × 2.323 | 1,228 | moving door inside the compact round frame | Yes | `village/models/Door_4_Round.gltf` | Thin door plane; hinge behavior must be authored by a parent pivot; shares wood/metal trim maps. |
 
-## Known gaps that must be resolved from the full source packs
+## Coverage assessment
 
-The approved world cannot be built convincingly from the current runtime subset alone. Before 12D, the full source audit must find and visually verify candidates for at least:
+### Present in the curated subset
 
-- large cliff/high-ground pieces suitable for Area 1 west border;
-- bridge/causeway parts;
-- village houses/landmarks;
-- additional fence/palisade variants;
-- wall straight/corner/end pieces;
-- broken/ruined wall pieces;
-- towers and ruined towers;
-- arches/gates wider than the current small brick door frame;
-- stairs/platforms;
-- rubble/debris variants;
-- carts, barrels, crates, signs and wells;
-- dead/darker vegetation for Area 2;
-- any existing ruined-building modules suitable for Area 3 rooms/corridors.
+- medium rocks, but no cliff or high-ground modules;
+- two deciduous trees, a flower bush, flowers, and grass;
+- one rock-path accent and one modular brick floor;
+- two compatible wooden fence pieces;
+- one loose brick;
+- one pedestrian-scale brick arch and one matching round door.
 
-## Contact-sheet requirement
+### Absent from the curated subset
 
-For the completed 12A catalogue, every selected candidate above must be shown on labelled contact sheets rendered from the **actual source model** at a fixed Infuse-like isometric camera. AI-generated stand-ins are not acceptable for asset selection.
+- small and large rock families, cliffs, ledges, and high-ground pieces;
+- conifers and dead/dark trees;
+- dirt/soil/grass ground surfaces and road systems;
+- palisades;
+- bridges and causeways;
+- houses, wells, carts, barrels, crates, and signs;
+- modular wall straights, corners, ends, and true broken-wall pieces;
+- wide gates and freestanding arches;
+- towers, ruins, ruined buildings, stairs, and platforms;
+- rubble/debris sets beyond a single loose brick;
+- every environment prop from Fantasy Props MegaKit Standard.
 
-Preferred renderer/editor: **Blender**.
+## Selection conclusion
 
-## Import rule
-
-Only selected assets should be copied into `public/assets/quaternius/` for runtime use. Do not dump all original pack ZIPs or every source model into the browser payload.
-
-The runtime subset should expand deliberately from the contact-sheet selections, while preserving the existing asset-provenance/license records.
+The curated subset is visually usable for **vegetation dressing, medium boulders, light fencing, small paved accents, and the existing compact gate prototype**. It is not sufficient for a non-procedural redesign of Areas 1–3: every major architectural, cliff, bridge, ruin, and prop category remains empty. The full source archives should be re-uploaded before making the next environment selection pass.
