@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { WORLD_CONNECTIONS } from '../config';
-import { lakeBarrierSegments } from '../domain/world/LakeBoundary';
+import { AREAS, WORLD_CONNECTIONS } from '../config';
+import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import type { AreaDefinition } from '../types';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
@@ -58,7 +58,8 @@ export class EnvironmentView {
     const lakeConnection=WORLD_CONNECTIONS.find((connection)=>connection.visualStyle==='lake-gate');
     if(lakeConnection){
       const waterMaterial=new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93});
-      for(const lake of lakeBarrierSegments(lakeConnection,-31,31)){
+      const lakeBounds=lakeBarrierBounds(lakeConnection,AREAS);
+      for(const lake of lakeBarrierSegments(lakeConnection,lakeBounds.minX,lakeBounds.maxX)){
         const water=mesh(new THREE.PlaneGeometry(lake.maxX-lake.minX,lake.maxZ-lake.minZ),waterMaterial,(lake.minX+lake.maxX)/2-this.area.originX,.04,(lake.minZ+lake.maxZ)/2-this.area.originZ);
         water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
       }
