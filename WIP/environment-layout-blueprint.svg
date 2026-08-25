@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <rect width="900" height="900" fill="#111820"/>
+  <style>
+    .label{font:700 20px Arial,sans-serif;fill:#fff}.small{font:600 13px Arial,sans-serif;fill:#dce5eb}.tiny{font:500 11px Arial,sans-serif;fill:#c7d1d8}.road{fill:none;stroke:#c99a5a;stroke-width:18;stroke-linecap:round;stroke-linejoin:round}.wall{fill:none;stroke:#646a70;stroke-width:22;stroke-linecap:square}.room{fill:none;stroke:#7f858a;stroke-width:7;stroke-dasharray:12 8}.clear{fill:none;stroke:#e9eadf;stroke-width:3;stroke-dasharray:7 7}.gate{fill:#f0c52d;stroke:#fff2a6;stroke-width:2}.future{fill:#d77b31;stroke:#ffd2a7;stroke-width:2}.ridge{fill:#525b55;stroke:#7f8a80;stroke-width:3}.rift{fill:#2f241f;stroke:#6b5140;stroke-width:3}.water{fill:#2f7fa5;stroke:#67b4d6;stroke-width:2}.a1{fill:#86b95f}.a2{fill:#566b48}.a3{fill:#6a6e6a}
+  </style>
+
+  <!-- title / legend -->
+  <text x="60" y="42" class="label">INFUSE — AREAS 1–3 CONSTRUCTION BLUEPRINT</text>
+  <text x="60" y="65" class="tiny">Top-down, layout-only reference. 1 world metre = 6 px. Decorative assets intentionally omitted.</text>
+
+  <!-- exact area rectangles: origin world mapping x=-18..58, z=-84..28 -->
+  <rect x="80" y="100" width="456" height="336" rx="4" class="a2"/>
+  <rect x="80" y="436" width="216" height="336" rx="4" class="a1"/>
+  <rect x="296" y="436" width="240" height="336" rx="4" class="a3"/>
+
+  <!-- Area labels -->
+  <text x="270" y="132" class="label">AREA 2</text>
+  <text x="145" y="470" class="label">AREA 1</text>
+  <text x="365" y="470" class="label">AREA 3</text>
+
+  <!-- north lake frontier across A1/A2 boundary, broken at A1-A2 causeway -->
+  <path d="M80 412 L220 412 L220 458 L80 458 Z" class="water"/>
+  <path d="M252 412 L536 412 L536 458 L252 458 Z" class="water"/>
+  <!-- irregular shore hints -->
+  <path d="M80 412 Q105 394 132 407 T186 409 T220 412" fill="none" stroke="#8ea16f" stroke-width="8"/>
+  <path d="M252 412 Q280 396 312 411 T365 408 T420 414 T476 405 T536 412" fill="none" stroke="#7d8f69" stroke-width="8"/>
+
+  <!-- west high terrain / mountains -->
+  <path d="M44 436 L80 436 L80 772 L42 772 Q58 742 42 712 Q61 680 44 648 Q62 615 42 579 Q63 547 44 514 Q61 478 44 436 Z" class="ridge"/>
+  <path d="M22 448 L50 458 L38 492 L58 522 L37 556 L57 590 L36 625 L54 659 L35 695 L54 732 L36 768 L20 758 Z" fill="#3f4742"/>
+
+  <!-- south rift -->
+  <path d="M78 754 L296 754 L296 814 L78 814 Q96 794 116 807 Q142 786 165 803 Q192 782 217 806 Q243 786 268 802 Q286 791 296 814 L78 814 Z" class="rift"/>
+
+  <!-- fortress wall footprint between Area1 and Area3, plus Area3 outer north/east; south is cutaway -->
+  <path d="M296 436 L296 565 M296 603 L296 772" class="wall"/>
+  <path d="M296 436 L392 436 M430 436 L536 436" class="wall"/>
+  <path d="M536 436 L536 772" class="wall"/>
+  <path d="M320 772 L356 772 M475 772 L536 772" fill="none" stroke="#646a70" stroke-width="10" stroke-dasharray="18 10"/>
+
+  <!-- active gates -->
+  <rect x="220" y="425" width="32" height="22" rx="4" class="gate"/>
+  <text x="206" y="398" class="tiny">A1 ↔ A2 gate</text>
+  <rect x="408" y="425" width="22" height="22" rx="4" class="gate"/>
+  <text x="384" y="397" class="tiny">A2 ↔ A3 gate</text>
+  <rect x="285" y="565" width="22" height="38" rx="4" class="gate"/>
+  <text x="196" y="586" class="tiny">A1 ↔ A3 gate</text>
+
+  <!-- future west/south exits -->
+  <rect x="68" y="602" width="22" height="34" rx="4" class="future"/>
+  <text x="94" y="623" class="tiny">future Area 4 pass</text>
+  <rect x="173" y="746" width="30" height="22" rx="4" class="future"/>
+  <text x="120" y="838" class="tiny">future south crossing</text>
+
+  <!-- Area 1 roads -->
+  <path d="M188 604 C187 560 197 516 236 444" class="road"/>
+  <path d="M188 604 C226 602 259 594 296 584" class="road"/>
+  <path d="M188 604 C151 602 120 612 80 619" class="road"/>
+  <path d="M188 604 C188 648 187 704 188 754" class="road"/>
+  <circle cx="188" cy="604" r="63" class="clear"/>
+  <text x="129" y="684" class="small">central combat / village clearing</text>
+
+  <!-- Area 2 roads / broad spaces -->
+  <path d="M236 436 C245 375 262 309 300 244 C337 181 381 155 430 144" class="road"/>
+  <path d="M419 436 C418 368 426 298 430 144" class="road"/>
+  <path d="M300 244 C235 227 181 224 132 241" class="road"/>
+  <circle cx="300" cy="244" r="62" class="clear"/>
+  <circle cx="430" cy="214" r="55" class="clear"/>
+
+  <!-- Area 3 circulation and room/courtyard zones -->
+  <path d="M296 584 C342 583 375 569 397 548 C416 526 420 483 419 447" class="road"/>
+  <path d="M397 548 C404 607 407 665 415 724" class="road"/>
+  <rect x="318" y="472" width="84" height="90" rx="7" class="room"/>
+  <rect x="421" y="472" width="90" height="92" rx="7" class="room"/>
+  <rect x="320" y="592" width="76" height="71" rx="7" class="room"/>
+  <rect x="412" y="590" width="96" height="82" rx="7" class="room"/>
+  <rect x="349" y="687" width="116" height="61" rx="7" class="room"/>
+  <circle cx="360" cy="518" r="36" class="clear"/>
+  <circle cx="466" cy="520" r="36" class="clear"/>
+  <circle cx="408" cy="716" r="42" class="clear"/>
+  <text x="330" y="756" class="small">ruined rooms / corridors / courtyards</text>
+
+  <!-- coordinate notes -->
+  <text x="585" y="125" class="small">WORLD BOUNDS</text>
+  <text x="585" y="150" class="tiny">Area 1: x -18..+18, z -28..+28</text>
+  <text x="585" y="170" class="tiny">Area 2: x -18..+58, z -84..-28</text>
+  <text x="585" y="190" class="tiny">Area 3: x +18..+58, z -28..+28</text>
+  <text x="585" y="225" class="small">LEGEND</text>
+  <rect x="585" y="240" width="20" height="14" class="a1"/><text x="615" y="252" class="tiny">Area 1 grass</text>
+  <rect x="585" y="264" width="20" height="14" class="a2"/><text x="615" y="276" class="tiny">Area 2 darker ground</text>
+  <rect x="585" y="288" width="20" height="14" class="a3"/><text x="615" y="300" class="tiny">Area 3 fortress ground</text>
+  <rect x="585" y="312" width="20" height="14" class="water"/><text x="615" y="324" class="tiny">water / lake</text>
+  <line x1="585" y1="347" x2="607" y2="347" class="road"/><text x="615" y="352" class="tiny">main road</text>
+  <line x1="585" y1="377" x2="607" y2="377" class="wall"/><text x="615" y="382" class="tiny">fortress wall footprint</text>
+  <rect x="585" y="400" width="20" height="14" class="ridge"/><text x="615" y="412" class="tiny">mountain / high terrain</text>
+  <rect x="585" y="424" width="20" height="14" class="rift"/><text x="615" y="436" class="tiny">rift / chasm</text>
+  <rect x="585" y="448" width="20" height="14" class="gate"/><text x="615" y="460" class="tiny">active gate</text>
+  <rect x="585" y="472" width="20" height="14" class="future"/><text x="615" y="484" class="tiny">future locked exit</text>
+  <circle cx="595" cy="514" r="10" class="clear"/><text x="615" y="519" class="tiny">combat clearing</text>
+  <rect x="585" y="538" width="20" height="14" fill="none" stroke="#7f858a" stroke-width="3" stroke-dasharray="5 4"/><text x="615" y="550" class="tiny">Area 3 room/corridor zone</text>
+
+  <text x="585" y="605" class="small">AUTHORING RULE</text>
+  <text x="585" y="630" class="tiny">This SVG decides geometry placement.</text>
+  <text x="585" y="650" class="tiny">The detailed concept decides mood/richness.</text>
+  <text x="585" y="670" class="tiny">Actual Quaternius contact sheets decide</text>
+  <text x="585" y="690" class="tiny">which visible assets may be used.</text>
+  <text x="585" y="730" class="tiny">Do not infer decorative geometry from this</text>
+  <text x="585" y="750" class="tiny">map. It is intentionally asset-free.</text>
+</svg>
