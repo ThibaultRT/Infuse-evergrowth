@@ -1,133 +1,30 @@
 # Slice 11 — Continuous Multi-Area World Layout
 
-## Purpose
+## Current status
 
-This document is the implementation hand-off for the next environment pass after the approved high-level world concept.
+Slice **11A is implemented and accepted only as a topology/navigation proof**.
 
-The goal is **not** to reproduce every prop/detail from the concept art in one pass. The goal is to make the real Three.js world obey the same macro composition so it can be judged on an iPhone before we spend time on detailed dressing.
+The phone playtest confirms the intended world arrangement now exists:
 
-The approved visual target is a continuous stylized medieval-fantasy world with:
+- Area 1 remains the bright starting area;
+- Area 2 is north of Area 1 and extends east over Area 3;
+- Area 3 is east of Area 1;
+- Area 1 ↔ Area 2 is represented by a northern water frontier;
+- Area 1 ↔ Area 3 is represented by the ruined-fortress boundary;
+- Area 2 ↔ Area 3 has its own southern connection;
+- Area 1 west is reserved for a mountain/pass boundary and future Area 4;
+- Area 1 south is reserved for a rift/chasm boundary and future progression;
+- traversal is continuous through physical world connections rather than a visible teleport.
 
-- **Area 1**: bright, green, sunlit meadow / village outskirts. Grass is the main ground. Roads are visual navigation and connect every exit. Do not pave the whole area.
-- **Area 2**: north of Area 1 and Area 3, similar visual family to Area 1 but slightly darker/harsher. It extends substantially farther east than Area 1.
-- **Area 3**: east of Area 1, medieval ruined-fortress biome. Huge ruined castle walls form its outer identity. The east boundary of Area 1 is therefore the western outer wall of Area 3.
-- **Area 1 ↔ Area 2**: mostly separated by a large lake/water frontier, with one controlled fortified crossing near the north-east side of Area 1.
-- **Area 1 ↔ Area 3**: large fortified opening through the ruined castle wall.
-- **Area 2 ↔ Area 3**: a south gate from the eastern extension of Area 2 into the north side of Area 3.
-- **Area 1 west border**: natural high terrain / mountains / stacked rocks, not a castle wall. A future Area 4 passage is visible as a sealed mountain pass.
-- **Area 1 south border**: a large ground rift/chasm, not a castle wall. A future progression route is visible as a sealed/blocked crossing over the rift.
-- No visible void around normal gameplay. Borders must read as believable terrain or structures.
-- Gates are physical openings in those borders. The player walks through them; they must not feel like teleporters.
+The current 11A visuals are **not approved as production-quality macro environment art**. They are blocking geometry only.
 
-Devour Idle is only a reference for environment richness, readable paths, sturdy gates, and believable borders. Do not copy its assets or map.
-
----
-
-## Why this should be implemented in Codex Cloud rather than directly through GitHub MCP
-
-This slice is intentionally a coordinated runtime + authored-data + rendering change. It needs:
-
-- TypeScript edits across several files;
-- authored JSON changes;
-- `npm run build`;
-- ideally `npm run validate:release`;
-- a running browser/mobile-size visual inspection;
-- screenshots from the real game;
-- iterative correction if the camera reveals gaps or occlusion.
-
-The GitHub MCP is suitable for this plan/documentation, but committing the implementation directly to `main` without a local build and visual run is unnecessarily risky. Implement Slice 11A on a fresh Codex branch from current `origin/main`, validate it, then open a PR.
+Do not interpret this as permission to add small props around the current blocks. The next pass must first rebuild the macro visuals themselves.
 
 ---
 
-## Current implementation facts that Slice 11A must address
+## Approved topology — do not redesign in 11A.5
 
-At the time this plan was authored (`package.json` 0.50.8):
-
-1. `GameplayRuntime.updateHero()` hard-clamps every area to approximately `originX ± 17.2` and `originZ ± 27.2`. All areas therefore behave as the same 36 × 56-ish rectangle.
-2. `AreaFlowSystem.crossesAdjacentBoundary()` only considers areas adjacent when their `originX` is identical and their Z origins are within 60 m. That supports a vertical chain but not east/west branching.
-3. `GameplayRuntime.enterArea()` shifts the hero by 2.8 m on Z for an adjacent transition, otherwise resets to the destination origin.
-4. `Game.enterArea()` explicitly resets camera position to the destination area after crossing.
-5. `Game.syncAreaVisibility()` only shows the current `EnvironmentView`. The destination terrain can therefore disappear/appear at a transition rather than existing as one continuous world.
-6. Current authored origins are linear: Area 1 `(0, 0)`, Area 2 `(0, -56)`, Area 3 `(0, -112)`.
-7. Current gates are directional per-area definitions and `GateView` has no authored orientation/style metadata. This is insufficient for one physical gate shared by two areas and for east/west gates.
-8. `EnvironmentView` currently uses a nearly full-area brick pavement for Area 1 and a relatively small decoration set. The permanent macro terrain must not be placed in a fallback group that gets hidden when Quaternius assets finish loading.
-
-Do not paper over these issues with a visual fake followed by a position teleport. Slice 11A should establish the correct 2D world topology first.
-
----
-
-# Slice 11A — World skeleton (implement now)
-
-## 11A scope
-
-Implement only:
-
-- global Area 1 / 2 / 3 topology;
-- per-area dimensions;
-- continuous north/south/east/west traversal through real shared gates;
-- no camera snap/teleport on an adjacent gate crossing;
-- macro terrain and border silhouettes;
-- main road network;
-- lake frontier;
-- Area 3 giant wall silhouette;
-- west mountains/high rocks;
-- south rift/chasm;
-- large physical active gates;
-- sealed visual future west/south exits;
-- collision at the macro boundary level;
-- preservation of existing progression, enemies, loot, saves, combat and equipment.
-
-Do **not** yet spend time on detailed ruined rooms/corridors, dozens of props, dense vegetation, final gate ornament, new enemy placement, or new downloadable asset packs. Those are Slice 11B after the phone review.
-
----
-
-## Target global coordinates
-
-Use the existing coordinate convention where north is decreasing Z.
-
-### Area 1
-
-Keep its center/origin unchanged:
-
-```text
-origin = (0, 0)
-width  = 36 m
- depth = 56 m
-X range = -18 .. +18
-Z range = -28 .. +28
-```
-
-### Area 2
-
-Move and widen Area 2 so it forms the whole northern row above both Area 1 and Area 3:
-
-```text
-origin = (20, -56)
-width  = 76 m
- depth = 56 m
-X range = -18 .. +58
-Z range = -84 .. -28
-```
-
-This is deliberate. Area 2 must extend much farther east than Area 1 so its south edge can connect independently to Area 1 and Area 3.
-
-Keep the existing Area 2 spawn **local coordinates** for 11A. Changing its origin will move the current encounter cluster globally without changing its relative gameplay layout. The new eastern extension may feel sparse in 11A; that is acceptable until 11B.
-
-### Area 3
-
-Move Area 3 directly east of Area 1:
-
-```text
-origin = (38, 0)
-width  = 40 m
- depth = 56 m
-X range = +18 .. +58
-Z range = -28 .. +28
-```
-
-Keep existing Area 3 spawn local coordinates for 11A. Its room/corridor encounter layout will be authored later in 11B.
-
-### Resulting topology
+Keep the current authored topology unless the phone playtest exposes a very small dimensional correction:
 
 ```text
         NORTH / decreasing Z
@@ -148,519 +45,477 @@ Keep existing Area 3 spawn local coordinates for 11A. Its room/corridor encounte
 X=-18             X=+18                       X=+58
 ```
 
-This layout is the key architectural change. Do not keep Area 3 at Z = -112.
-
----
-
-## Active physical connections
-
-The exact X/Z numbers below can be nudged by up to ~2 m during visual testing, but preserve the topology and road logic.
-
-### Connection A1 ↔ A2
-
-Suggested world position:
-
-```text
-(x: +8, z: -28)
-axis: Z boundary
-opening width: ~4.5–5.5 m
-```
-
-- Place it toward Area 1's north-east side rather than dead center.
-- The surrounding north border is predominantly water/lake shoreline.
-- A road from the Area 1 interior must clearly curve toward this crossing and continue into Area 2.
-- Use a large fortified crossing/gate presentation. Existing Quaternius brick-frame/door assets may be reused for 11A, enlarged and supported with procedural structures/rocks as necessary.
-
-### Connection A1 ↔ A3
-
-Suggested world position:
-
-```text
-(x: +18, z: 0)
-axis: X boundary
-opening width: ~4.5–5.5 m
-```
-
-- Rotate the physical gate 90° relative to a north/south gate.
-- It is an opening in Area 3's gigantic ruined western fortress wall.
-- The road from Area 1 must visibly terminate at/continue through this gate.
-
-### Connection A2 ↔ A3
-
-Suggested world position:
-
-```text
-(x: +38, z: -28)
-axis: Z boundary
-opening width: ~4.5–5.5 m
-```
-
-- This is the requested south gate from the eastern extension of Area 2 into Area 3.
-- It should visually belong to the same ruined-fortress defensive system as Area 3.
-
----
-
-## Progression semantics to preserve
-
-Do not let the new topology allow Area 2 or Area 3 to be skipped.
-
-Preserve the current progression sequence:
+Preserve the progression semantics established by 11A:
 
 1. Area 1 starts unlocked.
-2. Defeating the Area 1 boss unlocks Area 2.
-3. Defeating the Area 2 boss unlocks Area 3.
-4. The new Area 1 ↔ Area 3 physical gate exists from the start but remains closed/non-traversable until **Area 3 is unlocked**.
-5. Once Area 3 is unlocked, both A2 ↔ A3 and A1 ↔ A3 connections become usable in both directions.
+2. Area 1 boss unlocks Area 2.
+3. Area 2 boss unlocks Area 3.
+4. A1 ↔ A3 exists physically from the start but remains closed until Area 3 is unlocked.
+5. Once Area 3 is unlocked, A1 ↔ A3 and A2 ↔ A3 are bidirectional.
 
-This means the Area 1 east gate is a useful visible promise of future content, but it must not bypass Area 2 progression.
-
-Keep `save.unlockedAreas` as the progression source of truth. This slice should **not require a save schema/version migration** just to represent geometry/topology.
+Do not change save semantics, combat rules, spawn rolls, equipment, or progression while rebuilding the environment.
 
 ---
 
-## Canonical world-connection model
+# Why the current visuals fail
 
-The existing directional gate model becomes awkward when a single physical gate must be visible continuously from both sides. Refactor authored gate topology into a canonical physical connection concept rather than rendering duplicate directional gates.
+The problem is not just missing decoration. Several visible macro objects are currently primitive placeholders:
 
-A suitable TypeScript/domain shape is conceptually:
+- the lake is essentially a flat blue plane;
+- the west mountains are repeated/scaled dodecahedrons;
+- the rift is primarily a dark flat polygon;
+- the Area 3 fortress is rows of `BoxGeometry` blocks;
+- the current `GateView` is also built from boxes and no longer uses the actual Quaternius round brick frame + wooden door as its primary model.
 
-```ts
-type WorldConnection = {
-  id: string;
-  areaAId: number;
-  areaBId: number;
-  x: number;
-  z: number;
-  axis: 'x' | 'z';
-  width: number;
-  requiredUnlockedAreaId: number;
-  unlockOnBossOfAreaId?: number;
-  visualStyle: 'lake-gate' | 'ruined-fortress-gate';
-};
-```
+These are acceptable as geometry blockers, but they are not an acceptable base for the visual-detail pass.
 
-Exact naming is up to the implementation, but preserve these semantics:
+## Critical diagnosis: the Area 3 occlusion is understood
 
-- one stable ID per **physical** connection;
-- one renderable gate per connection, not one overlapping model per travel direction;
-- bidirectional traversal once open;
-- `requiredUnlockedAreaId` controls whether the physical connection is open;
-- `unlockOnBossOfAreaId` identifies which current boss progression event grants a new area;
-- the Area 1 ↔ Area 3 connection has `requiredUnlockedAreaId: 3` but no boss-unlock responsibility of its own;
-- gate visual orientation derives from `axis` or equivalent authored facing.
+Do **not** ask Codex to “find why the east wall occludes the hero” again. The likely dominant cause is explicit in the current geometry and camera relationship.
 
-Recommended connections:
+The normal camera follows from approximately:
 
 ```text
-area1-area2: requiredUnlockedAreaId 2, unlockOnBossOfAreaId 1
-area2-area3: requiredUnlockedAreaId 3, unlockOnBossOfAreaId 2
-area1-area3: requiredUnlockedAreaId 3, no unlockOnBossOfAreaId
+camera = (hero.x, 19, hero.z + 16.5)
+lookAt = (hero.x, 0.9, hero.z - 2.5)
 ```
 
-The authored representation may live top-level in `areas.json` or in another authored world JSON if that produces a cleaner parser. Do not put this state in rendering code.
+The camera therefore sits **south of the hero and looks north**.
 
-If Codex finds a substantially smaller safe refactor that still guarantees one physical gate, bidirectional continuous traversal, branching topology and correct progression, that is acceptable. Do not retain a Z-only adjacency assumption.
-
----
-
-## Per-area dimensions
-
-Make area dimensions authored data rather than hard-coded constants in `GameplayRuntime`.
-
-A minimal shape is:
+`EnvironmentView.buildRuinedFortress()` currently creates a full-width, full-height wall on Area 3's **south / foreground edge**:
 
 ```ts
-size: {
-  width: number;
-  depth: number;
-}
+this.wall(0, 28, 40, 2.2, 5.8)
 ```
 
-Expose calculated bounds in the runtime/domain layer. Rendering may consume the same authored dimensions, but rendering must not become the source of truth for movement.
+That wall is directly between the fixed portrait camera and large portions of Area 3. Because `wall()` builds many stacked opaque boxes, it becomes the horizontal bands that fill the phone screenshots.
 
-Remove the hard-coded `±17.2 / ±27.2` assumptions from hero movement.
+There are also tall west-boundary/interior wall pieces that can obstruct the hero near the A1 ↔ A3 entrance.
 
----
+This is a **camera-foreground architecture problem**, not a texture problem and not primarily a camera-bug problem.
 
-## Continuous traversal: required behavior
-
-The hero must not be repositioned by a visible 2.8 m nudge and must not be reset to an area origin when crossing a valid adjacent connection.
-
-Implement boundary crossing in renderer-independent world/navigation logic.
-
-A simple robust solution for 11A is:
-
-1. Calculate the candidate hero position from input.
-2. If it remains inside the current area's bounds, accept it.
-3. If it exits a boundary, test whether the movement segment crosses an **open physical connection** attached to that area and whether the crossing coordinate is within that connection's opening width.
-4. If yes, accept the candidate global position and change `currentAreaId` to the connected area. Do not teleport the hero.
-5. If no open connection exists there, clamp/reject movement at the boundary.
-6. Locked gates therefore behave as closed boundaries.
-7. Future west/south exits remain closed boundaries because no destination area exists yet.
-
-Use a small hero radius/margin so the hero cannot scrape through the very edge of a closed wall. Do not introduce a heavyweight physics engine for this.
-
-For 11A, area-edge blocking plus gate openings is sufficient. Free-form collision inside Area 3 ruins belongs to 11B.
-
-`AreaFlowSystem.crossesAdjacentBoundary()` in its current Z-only form should become unnecessary.
-
-On an accepted crossing:
-
-- update `currentAreaId` and `save.currentAreaId`;
-- emit the existing/appropriate area-entered event;
-- reset enemy provocation as today;
-- update affinity/HUD state;
-- persist;
-- **do not** reset camera world position;
-- **do not** reset hero world position;
-- the normal camera follow should simply continue following the same global point.
-
-A tiny epsilon used only to avoid repeatedly detecting the same plane is acceptable; a visible movement snap is not.
+Do not attempt another blind fix by changing random wall scale, near/far clipping planes, or camera height. Solve it deterministically as specified below.
 
 ---
 
-## Environment visibility and streaming for 11A
+# Slice 11A.5 — Macro visual reconstruction
 
-The three static environment chunks must visually form one world.
+## Goal
 
-Do not hide every non-current `EnvironmentView` as the current code does.
+Keep the working 11A world topology/navigation, but rebuild the visible border language so that **Area 1 already looks like a credible game environment before 11B adds density**.
 
-For only three macro areas, the safest 11A behavior is:
+11A.5 is successful when a phone screenshot of any Area 1 border reads as a stylized authored environment rather than a level-editor blockout.
 
-- keep Area 1, Area 2 and Area 3 **static environment roots visible**;
-- continue restricting enemy AI/combat/UI to the current area as today;
-- keep costly animated entities scoped to the active area;
-- render one physical gate per world connection;
-- profile before inventing a streaming system.
+This slice is not about filling the world with barrels/flowers/ruined rooms. It is about replacing the macro placeholders themselves.
 
-If profiling later shows that all static environments are too expensive, implement neighborhood streaming only after the playable world is visually correct. Do not reintroduce visible pop/void at gates as an optimization.
+## Mandatory implementation order
 
----
+Implement in this order so failures are easy to diagnose:
 
-# Macro environment specification
+1. camera-occlusion fix;
+2. real gate reconstruction;
+3. east fortress boundary reconstruction;
+4. north lake/shore reconstruction;
+5. west mountain/ridge reconstruction;
+6. south rift reconstruction;
+7. phone validation from predefined positions.
 
-## Area 1 — sunlit meadow / village outskirts
-
-### Ground
-
-- Main ground = grass/green terrain.
-- Remove the current full-area uneven-brick pavement treatment.
-- Stone/dirt/rock path surfaces should occupy only roads/plazas.
-
-### Roads
-
-Create a readable main path network:
-
-- central/open combat area around the current Area 1 interior;
-- branch north-east to A1 ↔ A2 gate;
-- branch east to A1 ↔ A3 gate;
-- branch west toward the sealed mountain pass / future Area 4;
-- branch south toward the sealed rift crossing / future higher areas.
-
-Roads do not need to be perfectly straight or symmetrical. Gentle curves are preferable.
-
-For 11A, use either repeated Quaternius `RockPath_Round_Wide` pieces or a simple procedural road mesh plus a small number of rock-path accents. Avoid hundreds of unique draw calls.
-
-### North border / lake
-
-Build a large blue lake across most of Area 1's northern frontier.
-
-Important visual behavior:
-
-- water should clearly explain why the hero cannot simply walk north anywhere;
-- shoreline should be irregular enough not to look like a rectangle;
-- use rocks, small islands/shore clusters, bushes and trees to break the edge;
-- the only practical Area 1 → Area 2 crossing is the A1 ↔ A2 gate/causeway;
-- the destination Area 2 terrain must already be visible beyond the water/gate.
-
-A simple Three.js water surface is sufficient for 11A. No complex water shader is required.
-
-### East border / Area 3 wall
-
-Build a **gigantic ruined fortress wall** along the X = +18 boundary, except for the A1 ↔ A3 opening.
-
-For 11A, silhouette matters more than bespoke assets:
-
-- tall stone masses/towers;
-- crenellation/broken upper silhouette where easy;
-- damaged sections and rubble at the base;
-- gate opening integrated into the wall;
-- enough height that it unmistakably reads as a fortress boundary from the gameplay camera.
-
-The current curated Quaternius runtime subset does not contain a complete final castle-wall kit. Do not block 11A waiting for new binary assets. Procedural stone geometry using the current art palette plus the existing Quaternius gate/brick assets is acceptable for the macro prototype.
-
-### West border / mountains
-
-No castle wall.
-
-Create a high natural border using:
-
-- raised/dark rock masses;
-- stacked Quaternius rocks;
-- cliffs/high terrain silhouette;
-- pine/tree clusters;
-- one visually obvious sealed pass roughly around the west-road endpoint.
-
-The future west exit should read as **a pass through mountains**, not a medieval gatehouse through a stone city wall.
-
-Because portrait camera occlusion can be severe, keep the tallest west-border geometry near the outer edge and validate that it does not hide the hero or central encounters.
-
-### South border / rift
-
-No castle wall.
-
-Create a rift/chasm visual using a cheap layered technique rather than requiring deformable terrain:
-
-- dark/deep surface below ground level;
-- rocky/cliff edge strips on the Area 1 side;
-- broken stone/earth variation;
-- one narrow bridge/crossing aligned with the south road;
-- crossing remains sealed/non-traversable because the destination area does not exist yet.
-
-The rift should look fundamentally different from the west mountains and east fortress wall.
+Do not jump to small environmental dressing before steps 1–6 are visually accepted.
 
 ---
 
-## Area 2 — darker borderlands
+## 11A.5.1 — Fix fortress occlusion deterministically
 
-Area 2 should remain related to Area 1 but visibly harsher:
+### A. Remove the known foreground wall failure
 
-- darker/desaturated grass and earth;
-- more rocks;
-- some dead/dry trees mixed with healthy vegetation;
-- fewer friendly village details;
-- sparse watch posts / frontier props if cheap;
-- enough open combat terrain for existing spawns.
+The current full-height Area 3 south wall at local `z = +28` must **not remain as an opaque 5.8 m wall across the full width**.
 
-Its south-west portion visually meets the lake frontier above Area 1.
+Replace it with a camera-aware ruined/cutaway treatment:
 
-Its south-east portion reaches the A2 ↔ A3 ruined-fortress gate.
+- low surviving wall foundations/rubble on the camera-facing south edge, approximately 0.5–1.3 m tall;
+- occasional taller tower fragments only near corners or significantly outside the normal camera-to-hero corridor;
+- visible ruins must still communicate that Area 3 was enclosed by a gigantic fortress, but the foreground edge behaves like a cutaway game set;
+- the north/east/back portions may remain much taller because they do not sit between the standard camera and the hero in the same way.
 
-Do not fill the large new eastern extension with dozens of assets yet. A convincing ground/vegetation gradient and a few macro landmarks are enough for 11A.
+The concept-art requirement “Area 3 is enclosed by gigantic ruined castle walls” describes the world fiction and silhouette. It does **not** require an opaque six-metre wall between the player and camera.
 
----
+### B. Add a generic static-environment occlusion safety net
 
-## Area 3 — ruined fortress macro silhouette
+Do not rely only on hand-tuned wall height. Add a small rendering-only occlusion system for tall static scenery.
 
-Set the environment theme to an explicit ruined-fortress theme; do not leave it as generic `flat`.
+Recommended design:
 
-For 11A:
+- tag only tall static environment objects/groups that are allowed to fade, e.g. `userData.cameraOccluder = true`;
+- each render frame, cast a small number of rays from the camera toward representative hero points (torso/head, not hundreds of rays);
+- if a tagged static environment mesh intersects those rays before the hero, smoothly fade that occluder to a low opacity or hide its camera-facing section;
+- restore it smoothly when it is no longer between camera and hero;
+- this is presentation-only: collision and gameplay geometry remain unchanged;
+- do not fade enemies, loot, gates currently being crossed, UI, or the hero;
+- avoid cloning materials every frame; prepare fade-capable material instances once for tagged occluders.
 
-- giant outer stone wall on west/east/south sides and the appropriate north sections;
-- active gate to Area 1 on west side;
-- active gate to Area 2 on north side;
-- several large ruined blocks / partial structures inside to establish scale;
-- stone/rubble ground variation;
-- a few open courtyards reserved for combat.
+A simple dedicated rendering helper such as `EnvironmentOcclusionManager` is preferable to putting more branches in `Game.ts`.
 
-Do **not** yet construct the final room/corridor maze or move every spawn to rooms. That is 11B.
+### C. Add a development diagnostic
 
-The long-term Area 3 intent for 11B is:
+When the existing renderer statistics/debug mode is enabled, expose enough information to identify future occlusion rather than guessing again. At minimum, show the number/names or IDs of currently faded environment occluders.
 
-- ruins forming rooms of different sizes;
-- corridors between damaged walls;
-- spawn groups placed inside rooms/courtyards;
-- guards/spawns in corridor chokepoints;
-- readable paths and no frustrating camera occlusion.
+### D. Occlusion acceptance test
 
----
+Capture portrait screenshots with the hero:
 
-## Gate presentation for 11A
+1. immediately west of A1 ↔ A3 gate;
+2. immediately east of A1 ↔ A3 gate;
+3. 8–10 m inside Area 3;
+4. near Area 3 south half;
+5. near an Area 3 interior wall once 11B adds one.
 
-`GateView` currently assumes one north/south orientation and one brick-frame/door style.
+At every position:
 
-Extend presentation enough to support:
+- the hero's full body must remain readable;
+- no opaque wall may cover most of the central gameplay viewport;
+- the environment may frame the screen edges, but it must not turn the camera into a view from behind masonry.
 
-- authored X/Z axis/facing;
-- larger scale than the current small isolated door;
-- integration with boundary geometry;
-- one physical gate instance per connection;
-- open/closed state driven by progression, never by rendering.
-
-Do not create unique downloadable gate art for every connection in 11A.
-
-Suggested visual family:
-
-- A1 ↔ A2: sturdy frontier/lake crossing; wood + stone works.
-- A1 ↔ A3 and A2 ↔ A3: fortress-wall gate; heavier stone treatment.
-
-The gate model can be reused with different surrounding macro structures for now.
+Do not declare the issue fixed from code inspection alone.
 
 ---
 
-## EnvironmentView structure
+## 11A.5.2 — Rebuild physical gates as real landmarks
 
-Avoid one group serving simultaneously as permanent macro geometry and a cosmetic fallback.
+The current all-box `GateView` is a placeholder and should not be polished further.
 
-A useful internal split is conceptually:
+Restore **asset-first gate construction**:
 
-```text
-EnvironmentView.root
-├── terrainRoot          permanent ground/water/chasm base
-├── macroRoot            permanent walls/mountains/major roads
-├── assetDetailsRoot     loaded Quaternius objects
-└── fallbackDetailsRoot  only the objects that can be hidden after successful asset load
-```
+- use the already shipped Quaternius `DoorFrame_Round_Brick.gltf` and `Door_4_Round.gltf` as the primary visible gate components where appropriate;
+- support both X and Z orientations;
+- preserve gameplay-owned locked/open state;
+- preserve the existing opening animation through a parent pivot;
+- build the A1 ↔ A2 gate into a real short causeway/bridge transition across the shoreline;
+- integrate `Prop_WoodenFence_*`, rocks and vegetation around the gate rather than adding giant primitive cylinders/towers;
+- A1 ↔ A3 and A2 ↔ A3 gates should visually belong to the ruined fortress system and feel heavier/older than the lake gate.
 
-Exact names are optional. The key rule is that successful Quaternius loading must never accidentally hide lake/walls/rift/roads/terrain that define gameplay readability.
+Procedural geometry may still be used for invisible collision, foundations, or subtle support pieces. It must not be the dominant visible gate art.
 
----
+If the current curated runtime subset does not contain the required architectural pieces, do **not** silently substitute another giant block structure. Prefer one of these options, in order:
 
-## Assets: 11A must stay within the current runtime catalogue
+1. curate additional models from the already-approved Quaternius Medieval Village / Nature source packs if those source files are available in the Codex workspace;
+2. if they are not available, document the exact missing model families and continue with the best existing Quaternius gate as a temporary but visually coherent landmark;
+3. only then consider a new CC0 source as a separate, explicit asset decision.
 
-Prefer the already curated assets, including:
-
-- `CommonTree_1`
-- `CommonTree_3`
-- `Rock_Medium_1`
-- `Rock_Medium_2`
-- `Bush_Common_Flowers`
-- `Flower_3_Group`
-- `Grass_Common_Short`
-- `RockPath_Round_Wide`
-- `Prop_WoodenFence_Single`
-- `Prop_WoodenFence_Extension1`
-- `Prop_Brick1`
-- `Floor_UnevenBrick` only where stone flooring is intentional
-- `DoorFrame_Round_Brick`
-- `Door_4_Round`
-
-Do not add the original Quaternius ZIPs.
-
-Do not search for a new external asset pack during 11A. After the macro prototype is approved on-device, 11B can decide which additional CC0/Quaternius models are genuinely missing.
+Do not download arbitrary third-party assets without recording provenance/license.
 
 ---
 
-## Future west/south exits
+## 11A.5.3 — Rebuild the Area 3 west/east fortress silhouette
 
-Do not add fake destination areas or target IDs that resolve to non-existent areas.
+The A1 east boundary must feel like the exterior of a ruined fortress, not stacked Minecraft-like rows.
 
-For 11A these are **environment landmarks + blocked boundaries only**:
+Target visual structure:
 
-- west: sealed mountain pass representing future Area 4;
-- south: sealed bridge/crossing over the rift representing a future higher area.
+- 2–4 major wall segments rather than one perfectly uniform wall;
+- broken height profile;
+- collapsed sections/rubble slopes;
+- at least one taller tower mass set back from the playable edge;
+- the A1 ↔ A3 gate should be the strongest opening in this silhouette;
+- use real Quaternius architecture wherever possible;
+- use repeated props/materials intelligently rather than hundreds of unique objects.
 
-They should look intentional and progression-ready, but they are not entries in the traversable world-connection set until their destination areas exist.
+For the fixed portrait camera:
 
----
+- keep tall masses mostly on the **far/north/east** side of Area 3;
+- camera-facing/south fragments should be low or fadeable;
+- near the A1 ↔ A3 gate, do not create a tall continuous piece close enough to fill the right half of the screen when the hero stands at the threshold.
 
-## Existing gameplay that must not change
-
-Slice 11A is an environment/topology pass. Preserve:
-
-- all current spawn IDs;
-- current per-spawn HP/reward authored ranges;
-- persisted spawn rolls;
-- enemy rarities and boss identity;
-- combat formulas;
-- aggro/attack logic;
-- equipment progression and drops;
-- permanent stats;
-- respawn behavior;
-- daily reset behavior;
-- save progression;
-- hero/weapon animations;
-- orbit weapon behavior;
-- HUD/inventory behavior.
-
-Changing global Area 2/3 origins is expected to move their spawns with their area. Do not rebalance them in 11A.
-
-No save reset is acceptable.
+The wall may look massive because of length, layered depth, towers and distant height. It does not need every meter to be 6 m tall.
 
 ---
 
-## Performance constraints
+## 11A.5.4 — Rebuild the north lake as shoreline + water, not a blue rectangle
 
-The approved concept is visually rich, but 11A is a **macro prototype**, not the final dressing pass.
+Keep the lake in the same macro location, but reconstruct its visual edge.
 
-- Use shared geometry/materials for repeated procedural boundary pieces where practical.
-- Reuse cloned/cached Quaternius assets through the existing `AssetLoader`.
-- Avoid hundreds of unique meshes for paths/rocks when a smaller number establishes the silhouette.
-- Do not add heavy water/post-processing effects.
-- Keep animated character work scoped as today.
-- Preserve Full/Reduced render scale and Smooth/30 FPS modes.
-- iPhone 12 portrait remains the minimum target.
+Requirements:
 
-Do not prematurely optimize away adjacent terrain visibility before measuring.
+- water surface extends beyond the playable border so the player never sees its rectangular end;
+- shoreline is irregular and overlaps the grass boundary;
+- use Quaternius rocks at varied but plausible scale along the shore;
+- add sparse bushes/grass/trees to create a natural transition;
+- add 1–3 small rock/island shapes if they improve depth;
+- road clearly narrows into the fortified crossing/causeway;
+- Area 2 terrain is visible beyond the crossing;
+- water remains a visual/collision boundary except at the gate opening.
 
----
-
-# Slice 11A acceptance criteria
-
-The PR is ready for the user's phone review only if all of the following are true:
-
-### Topology/traversal
-
-- Area 1 is south-west, Area 2 spans the north, Area 3 is east of Area 1.
-- The player can walk continuously A1 ↔ A2 once Area 2 is unlocked.
-- The player can walk continuously A2 ↔ A3 once Area 3 is unlocked.
-- The player can walk continuously A1 ↔ A3 once Area 3 is unlocked.
-- Crossing an active gate does not visibly teleport/nudge the hero.
-- Normal camera follow does not snap/reset on an adjacent area crossing.
-- Closed/locked connections physically block crossing.
-- A1 east gate cannot bypass Area 2 progression before Area 3 is unlocked.
-
-### Environment
-
-- Area 1 is predominantly grass, not full pavement.
-- Main roads visibly connect the active gates and future exits.
-- Lake/water visually blocks most of the Area 1 north frontier.
-- Area 3's huge ruined wall clearly forms Area 1's east frontier.
-- Area 1 west frontier reads as mountains/high rocks, not castle wall.
-- Area 1 south frontier reads as a rift/chasm, not castle wall.
-- No obvious sky/void strip is visible around the normal Area 1 gameplay camera.
-- Destination terrain is visible through/across active gate approaches before crossing.
-- Area 2 looks related to Area 1 but slightly darker/harsher.
-- Area 3 clearly reads as a ruined-fortress biome even before 11B interior detailing.
-
-### Regression / validation
-
-- Existing save loads without reset/migration loss.
-- Existing boss unlock sequence still works: A1 boss → Area 2, A2 boss → Area 3.
-- Combat/enemy/loot/equipment behavior remains unchanged.
-- `npm run build` passes.
-- `npm run validate:release` passes if available/appropriate.
-- Test at a portrait mobile viewport and attach at least screenshots of:
-  - Area 1 center showing roads/borders;
-  - A1 north lake/gate with Area 2 visible beyond;
-  - A1 east wall/gate into Area 3;
-  - A1 west mountains;
-  - A1 south rift;
-  - one continuous gate crossing before and after transition.
-
-Do not declare the slice complete from a desktop build alone if the environment has not been visually inspected at phone-like portrait size.
+A simple water material is still acceptable. The priority is shoreline composition and believable depth, not a complex shader.
 
 ---
 
-# Slice 11B — after user approves 11A (do not implement yet)
+## 11A.5.5 — Rebuild the west boundary as a layered mountain/ridge
 
-11B is the environment-composition/detail pass:
+Remove the giant repeated dodecahedron columns that currently dominate the portrait viewport.
 
-1. Tune macro dimensions based on actual phone playtest.
-2. Build Area 3 interior ruined rooms/corridors/courtyards.
-3. Re-author Area 3 spawn positions so encounters occupy those spaces intentionally.
-4. Add large landmark structures to Areas 1/2.
-5. Add medium-scale tree/rock/fence/ruin clusters.
-6. Add small dressing: rubble, barrels, carts, flowers, grass, broken beams, signposts, etc.
-7. Inspect the broader Quaternius/CC0 catalogue only for assets that the approved layout actually needs.
-8. Profile draw calls/triangles and instance repeated static details only where measured.
+Use a layered natural ridge:
 
-The user must review Slice 11A in the real game before 11B begins.
+- playable boundary remains near Area 1 west edge;
+- small/medium rocks closest to the playable edge;
+- larger elevation and rock masses are progressively farther outside the walkable area;
+- use the available Quaternius rock models as the visible surface language;
+- mix trees/bushes into the rock formations;
+- leave a readable future Area 4 mountain pass;
+- avoid any single rock mass occupying roughly more than 20–25% of the normal gameplay viewport at once;
+- never expose blue/sky void behind the ridge in normal play.
+
+If additional larger Quaternius rock/cliff models are available from the already-approved Nature pack, curate them rather than scaling tiny rocks to absurd size.
+
+---
+
+## 11A.5.6 — Rebuild the south rift with actual depth
+
+The current dark polygon must stop reading as missing ground.
+
+Build the rift as a depressed world feature:
+
+- irregular top rim in the terrain;
+- visible inner cliff faces dropping below the grass plane;
+- dark rock/earth bottom at least ~1.5–2.5 m below the playable surface;
+- scattered rim rocks and vegetation;
+- a clearly authored future crossing/bridge location aligned with the south road;
+- the crossing remains sealed/non-traversable until a future area exists;
+- extend geometry far enough beyond the camera view that no blue/void background appears behind it.
+
+Use procedural geometry for the actual cut/depth if necessary, but dress its visible surfaces with the same stylized rock language as the rest of the environment. The rift should read as terrain, not a black overlay.
+
+---
+
+## 11A.5.7 — Road/path cleanup
+
+Keep the existing road topology, but improve the macro appearance while rebuilding borders:
+
+- roads should visibly lead to each real/future exit;
+- avoid hard rectangular path intersections where practical;
+- prefer Quaternius path tiles/accents or softly overlapping path segments;
+- do not repave the entire Area 1 floor;
+- keep enough open grass for combat readability.
+
+This is still macro composition, not detailed prop dressing.
+
+---
+
+## 11A.5 exit criteria
+
+11A.5 is approved only when the user can play it on a phone and all of the following are true:
+
+- no normal Area 1 border view exposes obvious sky/void holes;
+- west border reads as elevated natural terrain rather than giant primitive blobs;
+- north border reads as a lake with a shoreline rather than a blue rectangle;
+- south border reads as a deep rift/chasm rather than a dark plane;
+- east boundary reads as a ruined fortress rather than stacked box rows;
+- gates look like authored 3D structures, not primitive block assemblies;
+- hero remains readable around/inside Area 3 and the known foreground wall occlusion is demonstrably fixed;
+- continuous traversal/progression from 11A still works;
+- existing gameplay/save behavior is preserved;
+- `npm run build` succeeds;
+- `npm run validate:release` succeeds;
+- portrait screenshots are provided from each border and from both sides of A1 ↔ A3.
+
+Do **not** start 11B until these criteria are met.
+
+---
+
+# Slice 11B — Environmental composition and authored encounters
+
+## Goal
+
+Once 11A.5 makes the macro world credible, 11B adds the **richness, landmarks and intentional encounter spaces** visible in the approved concept art.
+
+11B should move the game from “good macro environment” to “authored RPG level”.
+
+The target is not a pixel-perfect recreation of concept art. Preserve gameplay readability, portrait-camera visibility and mobile performance.
+
+---
+
+## 11B.1 — Area 3 ruined-fortress interior
+
+Area 3 should become the strongest authored level of the first three areas.
+
+Build several recognizable spaces using ruined walls, broken rooms and corridors:
+
+- 2–3 larger ruined courtyards/rooms suitable for groups/boss-like encounters;
+- 2–4 smaller rooms/alcoves;
+- broken corridors connecting them;
+- partial walls that guide movement without creating a maze of invisible collision;
+- collapsed openings/rubble that explain inaccessible gaps;
+- one or two visual landmarks visible from multiple parts of the area.
+
+Design all interior walls for the fixed portrait camera:
+
+- foreground/south-facing walls are low, broken, cut away, or fadeable;
+- back/north walls may be taller;
+- tall towers/arches should usually sit behind combat spaces from the camera's perspective;
+- tag appropriate tall pieces for the 11A.5 occlusion system.
+
+Do not repeat the 11A mistake of building a complete opaque rectangle around every “room”. Treat rooms like isometric game sets with camera-facing walls removed/broken.
+
+---
+
+## 11B.2 — Re-author Area 3 spawns around rooms and corridors
+
+Do not leave Area 3 enemies in their old generic grid just because the coordinates still work.
+
+Move existing authored spawns so encounters tell the level story:
+
+- guards in corridors/doorways;
+- groups inside courtyards/rooms;
+- crystals in visible but spatially intentional locations;
+- stronger enemies protecting landmark spaces;
+- boss arena with enough maneuvering room and a strong visual backdrop.
+
+Preserve each existing spawn's stable ID, progression meaning, HP/reward definitions and persistence identity unless there is a separate gameplay-design reason to change them.
+
+Only change authored positions/grouping needed for the new environment.
+
+---
+
+## 11B.3 — Area 1 large landmarks
+
+Add a small number of memorable structures rather than uniform clutter.
+
+Candidate composition matching the concept direction:
+
+- a modest village/outskirts cluster rather than a dense town;
+- one central visual landmark/plaza/well/shrine-like object;
+- one or two small buildings/ruined structures near roads;
+- fences that organize space without becoming hard maze walls;
+- a few work/camp/garden areas.
+
+Keep large combat clearings around the existing major spawn clusters.
+
+Paths should remain the strongest navigation cue.
+
+---
+
+## 11B.4 — Area 2 environmental identity
+
+Area 2 should remain related to Area 1 but slightly darker/harsher, not merely a darker flat rectangle.
+
+Use:
+
+- denser/darker tree groups;
+- more exposed rocks/dead vegetation;
+- less maintained paths/fences;
+- a few watch/camp/border structures;
+- visual transition toward the fortress zone over its eastern half;
+- readable south gate into Area 3.
+
+The eastern extension of Area 2 must feel intentionally occupied rather than unused padding created only to connect Area 3.
+
+---
+
+## 11B.5 — Medium-scale composition pass
+
+For all three areas, add clusters rather than random scatter:
+
+- tree groups;
+- rock groups;
+- fence runs;
+- ruined wall fragments;
+- bushes/grass patches;
+- carts/crates/barrels where contextually appropriate;
+- broken beams/rubble around ruins;
+- signposts and small road markers.
+
+Use three visual scales:
+
+1. large landmarks/boundaries;
+2. medium clusters that shape spaces;
+3. small dressing that removes emptiness.
+
+Do not solve emptiness by uniformly sprinkling props over every square meter.
+
+---
+
+## 11B.6 — Ground variation and transitions
+
+Improve the large flat-color floors without sacrificing readability:
+
+- subtle grass/soil variation in Areas 1/2;
+- worn ground around paths/gates/spawn spaces;
+- stone/rubble surface changes inside Area 3;
+- natural transitions at lake shore, mountain base and rift rim;
+- no obvious rectangular area seam visible during continuous traversal.
+
+Prefer a small number of reusable materials/textures and geometry sharing over many unique materials.
+
+---
+
+## 11B.7 — Asset strategy
+
+Quaternius remains the primary art family.
+
+Before sourcing anything new:
+
+1. inspect what is already shipped under `public/assets/quaternius/`;
+2. if the original approved Medieval Village / Stylized Nature / Fantasy Props source models are available to the Codex workspace, curate only the additional models actually required by the approved level composition;
+3. resize/prepare textures consistently with the current mobile pipeline;
+4. update `manifest.json`, README/provenance and license tracking;
+5. do not commit source ZIP archives.
+
+If an essential visual family genuinely does not exist in the approved packs, document that gap before introducing another CC0 family. Keep art style coherence more important than raw asset quantity.
+
+---
+
+## 11B.8 — Performance discipline
+
+11B will increase static object count substantially, so preserve the existing mobile-first constraints:
+
+- reuse loaded assets and materials;
+- share geometry where practical;
+- use instancing for genuinely repeated static props when profiling shows draw-call pressure;
+- keep animated characters scoped to the active area;
+- avoid excessive transparent overdraw from the occlusion system;
+- preserve Full/Reduced render modes and Smooth/30 FPS modes;
+- measure on representative phone hardware rather than assuming desktop performance.
+
+Do not prematurely reduce environmental quality before measuring where the actual bottleneck is.
+
+---
+
+## 11B exit criteria
+
+- Area 1 no longer feels empty at normal phone scale;
+- Area 2 has a distinct but related darker-borderlands identity and uses its eastern extension intentionally;
+- Area 3 visibly reads as a ruined fortress with rooms/corridors/courtyards rather than a flat arena inside perimeter walls;
+- paths naturally connect all gates and important spaces;
+- spawn placement in Area 3 matches the architecture;
+- hero/enemies remain readable in every combat space;
+- no tall scenery recreates the foreground occlusion failure;
+- no normal camera angle exposes obvious void at world edges;
+- transitions between Areas 1/2/3 remain visually continuous;
+- environment richness is substantially closer to the approved concept-art composition;
+- iPhone portrait playtest remains smooth/usable;
+- initial load/payload stay within project budgets;
+- `npm run build` and `npm run validate:release` pass;
+- provide portrait screenshots from representative positions in all three areas before declaring the slice complete.
 
 ---
 
 # Codex Cloud hand-off
 
-Start from the latest `origin/main`; do not work from a stale branch.
+Always start from the latest `origin/main` on a fresh branch. Read `AGENTS.md` and this document fully.
 
-Read `AGENTS.md` and this file completely. Implement **Slice 11A only**. Preserve all gameplay/save behavior except the renderer-independent world-navigation/topology changes required for continuous 2D area connections. Do not implement Slice 11B and do not source new asset packs.
+## Next task: implement 11A.5 only
+
+Do not implement 11B in the same PR.
+
+Most importantly: **do not spend another attempt trying to infer the Area 3 occlusion cause.** Treat the camera/south-wall diagnosis in this document as the starting point. Remove/rebuild the full-height foreground south wall and add the rendering-only occlusion safety net, then validate it from the listed hero positions.
+
+Preserve the working Slice 11A topology/navigation/progression. Replace the macro visual placeholders, do not redesign gameplay.
 
 Before opening the PR:
 
-1. review the diff against current `origin/main`;
-2. bump `package.json` version according to repository convention;
+1. update from latest `origin/main` and ensure the diff contains only this slice;
+2. increment the package version according to repository convention;
 3. run `npm run build`;
-4. run `npm run validate:release` if applicable;
-5. run the app at a portrait mobile viewport and capture the acceptance screenshots listed above;
-6. verify old saves/progression do not require reset;
-7. open a PR containing only Slice 11A.
+4. run `npm run validate:release`;
+5. visually inspect at a phone-like portrait viewport;
+6. capture screenshots of north lake, west ridge, south rift, A1 side of fortress gate, A3 side of fortress gate, and at least one point deeper inside Area 3;
+7. explicitly report which visible pieces use Quaternius assets and which remain procedural;
+8. explicitly report whether any additional source asset is needed for 11B rather than silently substituting giant primitive geometry.
