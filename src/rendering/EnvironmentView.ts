@@ -102,7 +102,9 @@ export class EnvironmentView {
     this.wall(-20, -15.5, 2.2, 25, 5.2); this.wall(-20, 15.5, 2.2, 25, 5.2);
     this.wall(20, 0, 2.2, 56, 5.8); this.wall(0, 28, 40, 2.2, 5.8);
     this.wall(-11, -28, 17, 2.2, 5.2); this.wall(11, -28, 17, 2.2, 5.2);
-    this.wall(4, 8, 10, 2, 4.5); this.wall(10, -11, 2, 12, 5.5);
+    // Slice 11A only establishes the fortress perimeter. Interior walls here used
+    // to sit between the follow camera and the hero without matching collision,
+    // appearing as giant horizontal bands that the hero could walk through.
     const rubble = new THREE.MeshStandardMaterial({ color: 0x777972, roughness: 1 });
     for (const [x,z] of [[-14,8],[-12,-8],[14,14],[8,20],[15,-18],[-5,-19]] as const) this.macroRoot.add(mesh(new THREE.DodecahedronGeometry(1.4), rubble, x, .65, z));
   }
