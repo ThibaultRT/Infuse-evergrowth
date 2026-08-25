@@ -1,6 +1,6 @@
 import type { Position } from '../domain/world/Position';
 import { copyPosition, distanceBetween } from '../domain/world/Position';
-import { lakeBarrierSegments } from '../domain/world/LakeBoundary';
+import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import { EnemyAISystem, type EnemyAIState } from '../systems/EnemyAISystem';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 
@@ -251,9 +251,8 @@ export class GameplayRuntime {
       item.visualStyle === 'lake-gate' && item.axis === 'z' && (item.areaAId === area.id || item.areaBId === area.id)
     );
     if (!connection) return;
-    const worldMinX = Math.min(...this.options.areas.map((candidate) => candidate.originX - candidate.size.width / 2)) - radius;
-    const worldMaxX = Math.max(...this.options.areas.map((candidate) => candidate.originX + candidate.size.width / 2)) + radius;
-    const segments = lakeBarrierSegments(connection, worldMinX, worldMaxX);
+    const bounds = lakeBarrierBounds(connection, this.options.areas);
+    const segments = lakeBarrierSegments(connection, bounds.minX, bounds.maxX);
     for (const segment of segments) {
       const overlapsX = position.x + radius > segment.minX && position.x - radius < segment.maxX;
       const overlapsZ = position.z + radius > segment.minZ && position.z - radius < segment.maxZ;
