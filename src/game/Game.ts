@@ -17,7 +17,7 @@ import {
   enemyAttack
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
-import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, resetHeroProgress, resetPermanentStats, save } from '../save';
+import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeTierRing } from '../visuals';
@@ -25,8 +25,7 @@ import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
-import { EQUIPMENT_BY_ID, applyEquipmentCopies, ascend, attackProfile, equip, equipmentSlot, equippedDefense, unequip } from '../systems/EquipmentSystem';
-import { rollEquipmentDrop } from '../systems/EquipmentDropSystem';
+import { EQUIPMENT_BY_ID, attackProfile, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView } from '../rendering/EnvironmentView';
 import { GateView } from '../rendering/GateView';
@@ -36,9 +35,11 @@ import { EffectManager } from '../rendering/EffectManager';
 import { CombatSystem } from '../systems/CombatSystem';
 import { RespawnSystem } from '../systems/RespawnSystem';
 import { WorldUiManager } from '../rendering/WorldUiManager';
-import { AreaFlowSystem } from '../systems/AreaFlowSystem';
 import { GameplayRuntime, type RuntimeSpawn } from './GameplayRuntime';
 import { EnvironmentOcclusionManager } from '../rendering/EnvironmentOcclusionManager';
+import { ProgressionSystem } from '../systems/ProgressionSystem';
+import { GameCommands } from './GameCommands';
+import { browserClock } from './PlatformAdapters';
 
 export class Game {
   private started = false;
@@ -74,11 +75,10 @@ const combat = new CombatSystem({
   orbit2: cooldown('orbit2') * .75
 });
 const respawns = new RespawnSystem();
-const areaFlow = new AreaFlowSystem();
 let normalizedExpiredSpawn = false;
 for (const definition of SPAWNS) {
   const state = save.spawns[definition.id];
-  if (state.respawnAt && state.respawnAt <= Date.now()) {
+  if (state.respawnAt && state.respawnAt <= browserClock.now()) {
     respawns.reroll(state, definition);
     normalizedExpiredSpawn = true;
   }
@@ -97,7 +97,7 @@ const gameplay = new GameplayRuntime({
     damageType: areaById(definition.areaId).enemyWeapon
   })),
   currentAreaId: save.currentAreaId,
-  heroHp: maxHeroHp(),
+  heroHp: Math.min(save.heroHp, maxHeroHp()),
   heroSpeed: heroSpeed(),
   heroRespawnSeconds: HERO_RESPAWN_DELAY_MS / 1000,
   enemyAggroRadius: ENEMY_AGGRO_RADIUS_METERS,
@@ -106,6 +106,9 @@ const gameplay = new GameplayRuntime({
   enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS,
   enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN
 });
+const persistGame = (): void => { save.heroHp = gameplay.hero.hp; persist(); };
+const commands = new GameCommands(save, gameplay, events, persistGame);
+const progression = new ProgressionSystem(save, events, persistGame);
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -279,46 +282,25 @@ class SpawnEntity {
     this.enemyView?.playDeath();
     this.crystalView?.playDeath();
     this.deathPresentationRemaining = this.crystalView ? .45 : 1.1;
-    const state = save.spawns[this.def.id];
-    const now = Date.now();
-    respawns.defeat(state, this.config, now, BASE_RESPAWN_MS, nextLocalMidnightMs());
-
-    const { stat, amount } = state.roll.reward;
-    events.emit('enemyDefeated', { enemyId: this.def.id });
-    if (stat === 'hp') {
-      const oldMax = maxHeroHp();
-      save.stats.maxHp.additive.kills = (save.stats.maxHp.additive.kills ?? 0) + amount;
-      gameplay.hero.hp = Math.min(maxHeroHp(), gameplay.hero.hp + maxHeroHp() - oldMax);
-    } else if (stat === 'regen') {
-      save.stats.regen.additive.kills = (save.stats.regen.additive.kills ?? 0) + amount;
-    } else {
-      const attack = save.stats.attack[stat];
-      attack.additive.kills = (attack.additive.kills ?? 0) + amount;
-    }
-
+    const result = progression.defeat(this.def, this.config, gameplay.hero, AREAS, WORLD_CONNECTIONS, browserClock.now(), BASE_RESPAWN_MS, nextLocalMidnightMs(browserClock.date()));
+    const { stat, amount } = result.reward;
     this.syncAreaVisibility();
-    events.emit('statGained', { sourceId: this.def.id, stat, amount });
     showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase());
-    handleBossDefeat(this.def.areaId, this.def.id);
-    const itemId = rollEquipmentDrop(this.def.areaId, this.def.tier);
-    if (itemId) {
-      const result = applyEquipmentCopies(itemId, 1);
-      const drop = { sourceId: this.def.id, areaId: this.def.areaId, itemId, quantity: 1, previousLevel: result.previousLevel, newLevel: result.owned.level, ascend: result.owned.ascend };
-      events.emit('equipmentDropped', drop);
-      showEquipmentDrop(drop);
+    if (result.boss) presentBossDefeat(result.boss);
+    if (result.drop) {
+      showEquipmentDrop(result.drop);
       renderInventory(save.inventory);
     }
-    persist();
     renderStats(save.stats);
   }
 
   update(): void {
     if (!this.alive) {
       const state = save.spawns[this.def.id];
-      if (respawns.reviveIfDue(state, this.def, Date.now())) {
+      if (respawns.reviveIfDue(state, this.def, browserClock.now())) {
         this.setAlive(true);
         events.emit('enemyRespawned', { enemyId: this.def.id });
-        persist();
+        persistGame();
       }
       return;
     }
@@ -384,27 +366,20 @@ function startGateCinematic(gate: GateEntity): void {
   cameraController.focus(gate.root.position, 2600);
 }
 
-function handleBossDefeat(areaId: number, spawnId: string): void {
-  const area = areaById(areaId);
-  const bossEntity = entities.find((entity) => entity.def.id === spawnId && entity.def.isBoss);
-  if (!bossEntity || spawnId !== area.bossSpawnId || save.defeatedBosses.includes(spawnId)) return;
-  save.defeatedBosses.push(spawnId);
-  events.emit('bossDefeated', { bossId: spawnId, areaId });
+function presentBossDefeat(result: { bossId: string; areaId: number; openedGateIds: string[] }): void {
+  const bossEntity = entities.find((entity) => entity.def.id === result.bossId)!;
   effects.bossDefeat(bossEntity.spawnPosition);
-
-  const openedDefinitions = areaFlow.unlockBossGates(areaId, WORLD_CONNECTIONS, save.unlockedAreas);
-  const openedGates = gateEntities.filter((gate) => openedDefinitions.includes(gate.def));
+  const openedGates = gateEntities.filter((gate) => result.openedGateIds.includes(gate.def.id));
   for (const gate of openedGates) {
     gate.setOpen(true);
-    events.emit('gateUnlocked', { gateId: gate.def.id });
   }
   if (openedGates[0]) {
     startGateCinematic(openedGates[0]);
     const destination = areaById(openedGates[0].def.requiredUnlockedAreaId).name;
     effects.gateOpening(openedGates[0].root.position);
-    showBossProgression(`${bossEntity?.config.label ?? 'Area'} guardian`, destination);
+    showBossProgression(`${bossEntity.config.label} guardian`, destination);
   } else {
-    showBossProgression(`${bossEntity?.config.label ?? 'Area'} guardian`);
+    showBossProgression(`${bossEntity.config.label} guardian`);
   }
 }
 
@@ -441,12 +416,12 @@ const respawnIndicators: RespawnIndicator[] = respawnSpawnerMembers.map((members
 });
 
 function resetAtMidnightIfNeeded(): void {
-  const key = localDailyKey();
+  const key = localDailyKey(browserClock.date());
   if (save.dailyKey === key) return;
   save.dailyKey = key;
   save.spawns = emptySpawnState();
   entities.forEach((entity) => entity.forceRespawn());
-  persist();
+  persistGame();
   showToast('Daily reset · all spawns restored');
 }
 
@@ -460,7 +435,7 @@ function resetSpawnCooldowns(): void {
     events.emit('enemyRespawned', { enemyId: entity.def.id });
     resetCount += 1;
   });
-  persist();
+  persistGame();
   showToast(resetCount === 0 ? 'No spawn cooldowns active' : `Spawned ${resetCount} target${resetCount === 1 ? '' : 's'}`);
 }
 
@@ -472,6 +447,7 @@ function damageHero(amount: number, type: CombatAffinity): void {
   events.emit('heroDamaged', { amount: reducedAmount, damageType: type, blocked });
   showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true, blocked);
   const defeated = gameplay.damageHero(reducedAmount);
+  persistGame();
   updateHud();
   if (!defeated) return;
   heroDeathHidden = false;
@@ -561,19 +537,15 @@ ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
 ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
 ui.resetAttributesButton.addEventListener('click', () => {
   if (!window.confirm('Reset all permanent hero attributes? Your equipment and its progress will be kept.')) return;
-  resetPermanentStats();
-  gameplay.hero.hp = Math.min(gameplay.hero.hp, maxHeroHp());
-  persist();
+  commands.execute({ type: 'resetHero', equipment: false });
   renderStats(save.stats);
   updateHud();
   showToast('Permanent attributes reset · equipment kept');
 });
 ui.resetHeroButton.addEventListener('click', () => {
   if (!window.confirm('Reset all permanent hero attributes and equipment drops? World progression will be kept.')) return;
-  resetHeroProgress();
-  gameplay.hero.hp = Math.min(gameplay.hero.hp, maxHeroHp());
+  commands.execute({ type: 'resetHero', equipment: true });
   heroView.syncEquipment(save.inventory);
-  persist();
   renderStats(save.stats);
   renderInventory(save.inventory);
   updateHud();
@@ -603,11 +575,11 @@ ui.weaponDetail.addEventListener('click', (event) => {
     const armorSlot = equipmentSlot(itemId);
     const hand = armorSlot ?? (['hand1', 'hand2'] as const).find((slot) => save.inventory.equipped[slot] === null);
     if (!hand) { showToast('no free slots!'); return; }
-    equip(itemId, hand); events.emit('equipmentEquipped', { itemId, hand });
+    commands.execute({ type: 'equip', itemId, slot: hand });
   }
-  if (button.dataset.unequip) { const hand = button.dataset.unequip as EquipmentSlotId; if (unequip(hand)) events.emit('equipmentUnequipped', { itemId, hand }); }
-  if (button.hasAttribute('data-ascend')) { const previousAscend = save.inventory.items[itemId].ascend; if (ascend(itemId)) events.emit('weaponAscended', { itemId, previousAscend, newAscend: previousAscend + 1 }); }
-  persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
+  if (button.dataset.unequip) commands.execute({ type: 'unequip', slot: button.dataset.unequip as EquipmentSlotId });
+  if (button.hasAttribute('data-ascend')) commands.execute({ type: 'ascend', itemId });
+  persistGame(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
 });
 
 type EquipmentDrag = { itemId: string; sourceHand: EquipmentSlotId | null };
@@ -621,13 +593,11 @@ function completeEquipmentDrag(drag: EquipmentDrag, target: Element | null): voi
   const slot = target?.closest<HTMLElement>('.inventory-equip-slot:not(.locked)')?.dataset.slot;
   if (slot && ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs'].includes(slot)) {
     const equipmentSlotId = slot as EquipmentSlotId;
-    equip(drag.itemId, equipmentSlotId);
-    events.emit('equipmentEquipped', { itemId: drag.itemId, hand: equipmentSlotId });
+    commands.execute({ type: 'equip', itemId: drag.itemId, slot: equipmentSlotId });
   } else if (target?.closest('#inventory-bag') && drag.sourceHand) {
-    unequip(drag.sourceHand);
-    events.emit('equipmentUnequipped', { itemId: drag.itemId, hand: drag.sourceHand });
+    commands.execute({ type: 'unequip', slot: drag.sourceHand });
   } else return;
-  persist(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[drag.itemId]); updateHud();
+  persistGame(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[drag.itemId]); updateHud();
 }
 
 ui.inventoryPanel.addEventListener('dragstart', (event) => {
@@ -691,12 +661,10 @@ function updateHero(dt: number): void {
 
 function completeContinuousAreaEntry(targetAreaId: number, connectionId: string): void {
   currentAreaId = targetAreaId;
-  save.currentAreaId = targetAreaId;
-  events.emit('gateCrossed', { gateId: connectionId, destinationAreaId: targetAreaId });
-  events.emit('areaEntered', { areaId: targetAreaId });
+  commands.execute({ type: 'enterArea', areaId: targetAreaId, connectionId });
   renderEnemyAffinities(areaById(targetAreaId));
   syncAreaVisibility();
-  persist();
+  persistGame();
   showToast(areaById(targetAreaId).name);
 }
 
@@ -722,7 +690,7 @@ function formatCountdown(ms: number): string {
 }
 
 function updateRespawnIndicators(): void {
-  const now = Date.now();
+  const now = browserClock.now();
   for (const indicator of respawnIndicators) {
     if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.every((member) => !member.alive && member.deathPresentationRemaining === 0)) {
       indicator.element.classList.add('hidden');
@@ -783,6 +751,7 @@ let lastRenderedAt = 0;
 let statsStartedAt = performance.now();
 let statsFrames = 0;
 let midnightAccumulator = 0;
+let healthPersistAccumulator = 0;
 function frame(now: number): void {
   requestAnimationFrame(frame);
   const minimumFrameMs = 1000 / renderingQuality.frameRateLimit;
@@ -793,12 +762,14 @@ function frame(now: number): void {
   previous = now;
   combat.update(dt);
   midnightAccumulator += dt;
+  healthPersistAccumulator += dt;
   if (midnightAccumulator >= 1) {
     midnightAccumulator = 0;
     resetAtMidnightIfNeeded();
   }
+  if (healthPersistAccumulator >= 1) { healthPersistAccumulator = 0; persistGame(); }
 
-  const runtimeEvents = gameplay.update(dt, input.movement, !cameraController.isScripted, elapsedSeconds);
+  const runtimeEvents = gameplay.update(dt, commands.movement({ type: 'move', ...input.movement }), !cameraController.isScripted, elapsedSeconds);
   for (const event of runtimeEvents) {
     if (event.type === 'enemyAttack') damageHero(event.amount, event.damageType);
     else if (event.type === 'areaEntered') completeContinuousAreaEntry(event.areaId, event.connectionId);
@@ -841,7 +812,7 @@ renderStats(save.stats);
 renderInventory(save.inventory);
 renderEnemyAffinities(areaById(currentAreaId));
 updateHud();
-persist();
+persistGame();
 requestAnimationFrame(frame);
 
   }

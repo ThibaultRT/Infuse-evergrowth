@@ -651,7 +651,33 @@
       "size": {
         "width": 36,
         "depth": 56
-      }
+      },
+      "collision": [
+        {
+          "id": "meadow-shrine",
+          "kind": "rectangle",
+          "x": 0,
+          "z": 5,
+          "width": 2.2,
+          "depth": 2.2
+        },
+        {
+          "id": "north-rift-west",
+          "kind": "rectangle",
+          "x": -7,
+          "z": 27.4,
+          "width": 10,
+          "depth": 1.5
+        },
+        {
+          "id": "north-rift-east",
+          "kind": "rectangle",
+          "x": 7,
+          "z": 27.4,
+          "width": 10,
+          "depth": 1.5
+        }
+      ]
     },
     {
       "id": 2,
@@ -1410,7 +1436,33 @@
       "size": {
         "width": 76,
         "depth": 56
-      }
+      },
+      "collision": [
+        {
+          "id": "west-watch",
+          "kind": "rectangle",
+          "x": -26,
+          "z": 8,
+          "width": 1.5,
+          "depth": 1.5
+        },
+        {
+          "id": "east-watch",
+          "kind": "rectangle",
+          "x": 25,
+          "z": -7,
+          "width": 1.5,
+          "depth": 1.5
+        },
+        {
+          "id": "north-east-watch",
+          "kind": "rectangle",
+          "x": 29,
+          "z": 17,
+          "width": 1.5,
+          "depth": 1.5
+        }
+      ]
     },
     {
       "id": 3,
@@ -2459,7 +2511,33 @@
       "size": {
         "width": 40,
         "depth": 56
-      }
+      },
+      "collision": [
+        {
+          "id": "east-fortress-wall",
+          "kind": "rectangle",
+          "x": 20.2,
+          "z": 0,
+          "width": 1.35,
+          "depth": 52
+        },
+        {
+          "id": "west-south-ruin",
+          "kind": "rectangle",
+          "x": -20,
+          "z": 17,
+          "width": 2.2,
+          "depth": 19
+        },
+        {
+          "id": "boss-court-back",
+          "kind": "rectangle",
+          "x": 0,
+          "z": -22,
+          "width": 18,
+          "depth": 1.25
+        }
+      ]
     }
   ],
   "connections": [

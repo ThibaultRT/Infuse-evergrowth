@@ -32,7 +32,10 @@ export type AreaDefinition = {
   enemyWeakness: CombatAffinity;
   environmentTheme: string;
   size: { width: number; depth: number };
+  collision: CollisionShape[];
 };
+
+export type CollisionShape = { id: string; kind: 'rectangle'; x: number; z: number; width: number; depth: number };
 
 export type WorldConnection = {
   id: string;
@@ -87,11 +90,12 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 11;
+  version: 12;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
   defeatedBosses: string[];
+  heroHp: number;
   stats: PlayerStats;
   inventory: InventoryState;
   spawns: Record<string, SavedSpawnState>;

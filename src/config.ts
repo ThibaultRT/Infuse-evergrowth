@@ -33,7 +33,8 @@ export const AREAS: AreaDefinition[] = areaData.areas.map((area) => ({
   enemyWeapon: area.enemyWeapon as CombatAffinity,
   enemyWeakness: area.enemyWeakness as CombatAffinity,
   environmentTheme: area.environmentTheme,
-  size: area.size
+  size: area.size,
+  collision: (('collision' in area ? area.collision : []) as AreaDefinition['collision']).map((shape) => ({ ...shape, x: area.worldOrigin.x + shape.x, z: area.worldOrigin.z + shape.z }))
 }));
 
 export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>

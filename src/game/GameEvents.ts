@@ -17,6 +17,7 @@ export type GameEventMap = {
   equipmentEquipped: { itemId: string; hand: EquipmentSlotId };
   equipmentUnequipped: { itemId: string; hand: EquipmentSlotId };
   weaponAscended: { itemId: string; previousAscend: number; newAscend: number };
+  heroProgressReset: { equipment: boolean };
 };
 
 type Listener<T> = (event: T) => void;
