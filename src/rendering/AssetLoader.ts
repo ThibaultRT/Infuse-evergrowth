@@ -1,4 +1,4 @@
-import { LoadingManager, Object3D } from 'three';
+import { Box3, LoadingManager, Object3D, Vector3 } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
@@ -48,6 +48,20 @@ export class AssetLoader {
 
 export const quaterniusAssets = new AssetLoader();
 export const kaykitAssets = new AssetLoader(undefined, 'assets/kaykit/');
+export const gameModelAssets = new AssetLoader(undefined, 'assets/models/');
+
+/** Centers a model on the ground and scales it to a predictable world-space height. */
+export function fitModelToHeight(model: Object3D, height: number): void {
+  const bounds = new Box3().setFromObject(model);
+  const size = bounds.getSize(new Vector3());
+  if (size.y <= 0) return;
+  model.scale.multiplyScalar(height / size.y);
+  bounds.setFromObject(model);
+  const center = bounds.getCenter(new Vector3());
+  model.position.x -= center.x;
+  model.position.y -= bounds.min.y;
+  model.position.z -= center.z;
+}
 
 export const BOOT_ASSETS = [
   'animations/UAL1_Standard.glb',

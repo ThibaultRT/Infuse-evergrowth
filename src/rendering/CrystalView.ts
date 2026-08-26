@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { fitModelToHeight, gameModelAssets } from './AssetLoader';
 
 const SHATTER_DURATION = .45;
 
@@ -10,7 +11,7 @@ export class CrystalView {
   private readonly shardMaterials: THREE.MeshStandardMaterial[] = [];
   private deathRemaining = 0;
 
-  constructor(color: number) {
+  constructor(color: number, areaId: number) {
     const crystalMaterial = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: .25, roughness: .35, metalness: .15 });
     const core = new THREE.Mesh(new THREE.OctahedronGeometry(.62, 0), crystalMaterial);
     core.scale.y = 1.55;
@@ -31,6 +32,22 @@ export class CrystalView {
     }
     this.shards.visible = false;
     this.root.add(this.intact, this.shards);
+    void this.loadModel(areaId);
+  }
+
+  private async loadModel(areaId: number): Promise<void> {
+    const colorByArea: Record<number, string> = { 1: 'green', 2: 'purple', 3: 'red' };
+    const color = colorByArea[areaId];
+    if (!color) return;
+    try {
+      const model = await gameModelAssets.cloneScene(`crystals/crystal_${color}.glb`);
+      fitModelToHeight(model, 1.75);
+      model.traverse((child) => { if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; } });
+      this.intact.clear();
+      this.intact.add(model);
+    } catch (error) {
+      console.warn(`Area ${areaId} crystal model unavailable; keeping procedural fallback.`, error);
+    }
   }
 
   playDeath(): void {
