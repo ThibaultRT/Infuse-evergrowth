@@ -1,22 +1,22 @@
-.weapon-equipment-icon {
+.equipment-icon {
   position: relative;
   display: inline-block;
   flex: 0 0 auto;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 15%;
-  background-image: var(--weapon-icon);
+  background-image: var(--equipment-icon);
   background-repeat: no-repeat;
   background-size: cover;
   box-shadow: 0 2px 6px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.16);
   opacity: 1 !important;
 }
 
-.weapon-icon-bag { width: 100%; max-width: 88px; }
-.weapon-icon-slot { width: min(62px,100%); }
-.weapon-icon-detail { width: 88px; }
+.equipment-icon-bag { width: 100%; max-width: 88px; }
+.equipment-icon-slot { width: min(62px,100%); }
+.equipment-icon-detail { width: 88px; }
 
-.weapon-progress-number {
+.equipment-progress-number {
   position: absolute;
   right: 3px;
   bottom: 2px;
@@ -39,7 +39,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,.55);
 }
 
-.inventory-item.weapon-item {
+.inventory-item.equipment-item {
   min-height: 0;
   aspect-ratio: 1;
   padding: 3px;
@@ -49,15 +49,15 @@
   background: color-mix(in srgb,currentColor 8%,rgba(255,255,255,.035));
 }
 
-.inventory-item.weapon-item .weapon-equipment-icon,
-.inventory-equip-slot .weapon-equipment-icon,
-.weapon-art .weapon-equipment-icon { opacity: 1; }
+.inventory-item.equipment-item .equipment-icon,
+.inventory-equip-slot .equipment-icon,
+.weapon-art .equipment-icon { opacity: 1; }
 
-.inventory-equip-slot .weapon-progress-number { font-size: 11px !important; }
-.weapon-art .weapon-progress-number { font-size: 13px !important; }
+.inventory-equip-slot .equipment-progress-number { font-size: 11px !important; }
+.weapon-art .equipment-progress-number { font-size: 13px !important; }
 
 @media (max-width: 500px) {
-  .weapon-icon-slot { width: min(56px,100%); }
-  .weapon-progress-number { min-width: 17px; height: 18px; font-size: 12px !important; }
-  .inventory-equip-slot .weapon-progress-number { font-size: 10px !important; }
+  .equipment-icon-slot { width: min(56px,100%); }
+  .equipment-progress-number { min-width: 17px; height: 18px; font-size: 12px !important; }
+  .inventory-equip-slot .equipment-progress-number { font-size: 10px !important; }
 }
