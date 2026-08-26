@@ -1,176 +1,59 @@
-# Infuse: Evergrowth — Agent Context
+# Infuse: Evergrowth — contributor guide
 
-## Project overview
+## Project and checks
 
-- This repository is an iOS-friendly, browser-based active incremental RPG/PWA built with TypeScript, Three.js, and Vite.
-- The current vertical slice has two authored adjacent areas and automatic proximity combat. See `README.md` for current player-facing behavior.
-- Graphical roadmap slices 1–9 are implemented. `WIP/graphical.md` tracks durable visual direction plus remaining optimization/release validation work.
-- The architecture deliberately borrows proven concepts observed in Devour Idle RPG: domain models, systems, events, first-class spawners, separate item definitions/owned state, declarative abilities, and versioned persistence. Do not copy Unity-specific implementation details or introduce Unity/Morpeh merely to imitate Devour.
-- There is no test runner configured. The required baseline check after code changes is `npm run build`, which runs `tsc --noEmit` and then the Vite production build.
-
-## Common commands
+Infuse is an iOS-friendly browser incremental RPG/PWA built with strict TypeScript, Three.js, and Vite. The authored world currently has three continuously connected areas, proximity combat, persistent progression, and data-driven spawns/equipment.
 
 ```bash
-npm install       # install dependencies
-npm run dev       # start Vite's development server
-npm run build     # type-check and create dist/
-npm run preview   # serve the production build
+npm install
+npm run dev
+npm run build          # required after code changes: tsc --noEmit + Vite build
+npm run preview
+npm run validate:release
 ```
 
-The Vite production base is `/Infuse-evergrowth/` for GitHub Pages. Deployment is defined in `.github/workflows/deploy-pages.yml`.
+There is no test runner yet. Do not edit `dist/` or dependencies. Before committing, review `git diff` and `git status`, increment `package.json` with appropriate semantic versioning, and commit on the current branch. The Vite production base is `/Infuse-evergrowth/`.
 
-## Architectural direction
+## Architecture
 
-Infuse uses a lightweight entity/domain/system architecture rather than a full ECS framework.
+Use the existing lightweight layers; do not add a generic ECS without measured need.
 
-```text
-Game bootstrap / coordinator
-├── domain/                 pure game concepts and rules
-│   ├── combat/             affinity and combat-domain rules
-│   ├── items/              static definitions + owned-item progression
-│   ├── abilities/          declarative triggers/conditions/effects
-│   └── spawning/           stable spawner identity + per-life roll/lifecycle rules
-├── systems/                runtime orchestration over domain/save state
-│   ├── combat / enemy AI   still partly embedded in Game.ts; extract incrementally
-│   ├── equipment
-│   ├── drops
-│   ├── respawn             still partly embedded in Game.ts; extract incrementally
-│   └── progression
-├── game/                   loop/coordinator + typed game events
-├── rendering               Three.js views/models/materials/effects
-├── application UI          HTML/CSS HUD, inventory, dialogs
-└── persistence/data        versioned save + authored JSON configuration
-```
+- `src/domain/`: pure rules and engine-neutral values. No Three.js, DOM, UI, controllers, or `Game.ts`.
+- `src/systems/`: focused orchestration over domain, runtime, and save state. No meshes or DOM.
+- `src/game/`: authoritative runtime, typed events, composition, lifecycle, and update order.
+- `src/rendering/` and `src/controllers/`: Three.js views, effects, assets, camera, and input.
+- `src/ui.ts` and CSS: HTML projection and explicit user commands; never gameplay calculations.
+- `src/data/`: authored content and global balance. `src/save.ts`: versioned persistent state/migrations.
 
-The key rule is **model/domain state first, systems operate on it, views render it**. Rendering objects and DOM elements must not become the source of truth for gameplay.
+Model state is authoritative; systems change it; views project it. Cross-system consequences use `GameEvents`. New boundaries use plain values and stable IDs, never Three.js/DOM/animation objects. See `ARCHITECTURE.md` for the stable dependency map and `roadmap.md` for planned improvements.
 
-### Devour-derived patterns to preserve
+## Gameplay invariants
 
-- Separate **static definition/config** from **owned/runtime state**. Example: `EquipmentDefinition` describes an item; `OwnedEquipment` stores level/ascend/player ownership.
-- Treat spawners as first-class persistent identities. Enemy views are transient occupants of a spawner; respawn timers and the current per-life HP/reward roll belong to the stable spawn ID.
-- Prefer small systems that perform one gameplay responsibility instead of adding branches to `Game.ts` or entity/view classes.
-- Route meaningful cross-system consequences through `GameEvents` instead of direct system-to-system/UI coupling.
-- Keep abilities/effects declarative: trigger -> condition -> effect(s). Future poison, stun, crit, lifesteal, AoE, chain attacks, elemental effects, etc. belong in the ability/effect layer rather than item-specific branches in combat code.
-- Persist progression as domain state and reconstruct views/world state from it. Do not persist transient Three.js/DOM state.
-- Keep authored content data-driven so later areas can expose new spawn difficulty/rewards/equipment without changing core systems.
-- Do not introduce a generic ECS library until entity counts/behavior complexity justify it; the current lightweight architecture is intentional.
+- Static equipment definitions are separate from owned Level/Ascend state. Ascend scales both the new base and per-level growth as configured.
+- Spawners have stable authored IDs. Their save state owns daily kills, defeat/respawn deadlines, and the persisted per-life HP/reward roll. Reroll only on revival, explicit reset, or local-midnight reset.
+- Spawn HP/rewards are authored per spawn, not calculated globally. Enemy attack alone uses the configured area/tier formula.
+- Bosses use explicit `isBoss`; gate requirements must match `bossSpawnId`. Use “gate,” never legacy “portal” terminology.
+- Source-aware stats use `(base + additive sources) × multiplicative sources`. Damage types are explicit.
+- Both hands are independently scheduled. Empty hands use persistent Blunt attack. Equipped weapons use weapon damage plus the persistent stat of the same type—no extra bare-hand term.
+- Hero affinity modifies outgoing hero damage. Enemy damage ignores affinity and is reduced by matching equipped defense.
+- All progression is persisted. Save-shape changes require type, normalization, migration, version, and storage-key updates without discarding supported progression.
+- Authored collision and gameplay positions stay renderer-independent. DOM world labels must track life and visibility.
 
-## Source map
+## Feature workflow
 
-- `src/main.ts`: application entry point; loads global CSS, applies the package version, and starts the game.
-- `src/game/Game.ts`: top-level runtime/coordinator for composition, lifecycle, update ordering, and high-level commands.
-- `src/game/GameEvents.ts`: typed event bus for gameplay events and cross-system reactions.
-- `src/game/GameplayRuntime.ts`: renderer-independent authoritative hero/spawn live state, spatial simulation, enemy intents, hero death timing, and area transitions.
-- `src/domain/world/Position.ts`: plain engine-neutral world-coordinate value and operations.
-- `src/domain/combat/Affinity.ts`: cyclic hero-vs-enemy affinity rules.
-- `src/domain/items/EquipmentCatalog.ts`: authored equipment definitions/catalog lookup.
-- `src/domain/items/EquipmentProgression.ts`: pure equipment level/ascend/damage/defense calculations.
-- `src/domain/abilities/Ability.ts`: declarative ability trigger/condition/effect domain types for future special effects.
-- `src/domain/spawning/SpawnRoll.ts`: pure per-life spawn HP/reward rolling from authored ranges.
-- `src/domain/spawning/SpawnerModel.ts`: first-class spawner state/lifecycle rules; stable spawn IDs own persistent respawn state and per-life rolls.
-- `src/systems/EquipmentSystem.ts`: coordinates equipment domain rules with persistent inventory/equipment slots.
-- `src/systems/EquipmentDropSystem.ts`: area/tier equipment drop resolution.
-- `src/systems/CombatSystem.ts`: attack scheduling, target selection, and renderer-independent damage resolution.
-- `src/systems/EnemyAISystem.ts`: hostile aggro, leash, movement, and attack-intent resolution.
-- `src/systems/RespawnSystem.ts`: persistent spawn death/revival transitions and per-life rerolls.
-- `src/systems/AreaFlowSystem.ts`: area-entry and gate-progression decisions.
-- `src/rendering/WorldUiManager.ts`: world-to-screen DOM projection and floating combat-text lifetime.
-- `src/rendering/`: Three.js asset loading, environment, hero, enemy, gate, and effect presentation.
-- `src/ui.ts`: HUD/modal HTML, cached DOM references, toasts, stat rendering, reward feedback, and inventory rendering.
-- `src/style.css` and `src/reward-popups.css`: application and reward-popup presentation.
-- `src/data/balance.json`: source of tunable global gameplay numbers such as hero values, enemy attack scaling, respawn, equipment drops, affinities, and equipment progression.
-- `src/data/equipment.json`: static authored equipment definitions.
-- `src/data/equipment-loot-tables.json`: area-specific equipment pools/unlocks.
-- `src/data/areas.json`: authored area origins, fixed spawn points/groups, explicit bosses, gates, affinities, environment data, and per-spawn HP/reward ranges.
-- `src/config.ts`: converts JSON data into typed runtime configuration and calculates enemy attack values; HP/reward values come from each spawn's persisted roll rather than a global HP/reward formula.
-- `src/save.ts`: local-storage schema/loading/migration, daily spawn state, per-life spawn rolls, permanent stats, inventory/equipment, and progression persistence.
-- `src/types.ts`: shared compatibility/gameplay/save types. Prefer new domain-specific types in their domain module when practical.
-- `src/controllers/`: camera and input handling.
-- `src/visuals.ts` and `src/icons.ts`: remaining shared Three.js helpers/materials and inline UI icon markup.
-- `src/version.ts`: reads the app version injected from `package.json`; `package.json` is the version source of truth.
-- `ARCHITECTURE.md`: current architecture review, renderer-migration risks, target headless-runtime boundary, and incremental separation plan.
-- `WIP/graphical.md`: durable graphical direction and the remaining graphical validation/optimization slice.
+1. Add authored data and pure rules.
+2. Add persistent state and migration if needed.
+3. Implement a focused system/command.
+4. Emit/consume typed events.
+5. Project state in rendering/UI.
+6. Keep `Game.ts` limited to composition and ordering.
 
-## Dependency rules
+Use compact strict TypeScript, ES modules, and explicit return types on exported functions. Never wrap imports in `try`/`catch`. Put global tuning in `balance.json` and world/spawn content in `areas.json`. Add every queried UI element to exported `ui`; HUD controls need `pointer-events: auto`.
 
-To keep domain logic testable and portable:
+## Graphics and assets
 
-1. `domain/` may depend on authored data and shared TypeScript types, but **must not depend on Three.js, DOM/UI, controllers, or `Game.ts`**.
-2. `systems/` may depend on domain modules and persistence/runtime state, but should not own Three.js meshes or DOM elements.
-3. Rendering/view code may read domain/runtime state and react to events, but must not define gameplay rules.
-4. UI may invoke explicit commands/actions and render state; it must not calculate combat, spawn rolls, loot, progression, respawn, or unlock rules.
-5. `Game.ts` coordinates lifecycle/update order. New feature-specific logic should normally be implemented in a domain module/system and called from the coordinator.
-6. Static authored definitions belong in JSON or definition catalogs; per-player/per-life mutable state belongs in the save model.
-7. New gameplay/runtime boundaries must use plain domain values and stable IDs, not `THREE.Vector3`, scene objects, DOM nodes, animation objects, or other presentation-engine types. See `ARCHITECTURE.md` for the migration target.
+Three.js renders the world; HTML/CSS renders normal UI. iPhone 12 portrait (390×844 CSS) is the minimum reference. Preserve Full/Reduced scale, Smooth/30 FPS, saved preferences, DPR caps (Full 2; Reduced 70%), dev renderer statistics, <=20-second representative initial load, and <500 MB payload. Profile real constrained/mobile hardware; emulation is not proof. Cosmetic failures need playable fallbacks, URLs must be Vite-base-aware, and third-party provenance belongs in `ASSET-LICENSES.md`. For visible changes, inspect a mobile viewport and capture a screenshot when tooling permits.
 
-## Gameplay/data conventions
+## Successive merged PRs
 
-- Distances in balance data are meters. Cooldowns in balance data are seconds; runtime respawn deadlines are milliseconds since epoch.
-- Enemy **attack** is derived from the Common attack baseline, area scaling, and tier multiplier in `src/config.ts`.
-- Enemy **Max HP and permanent reward are authored per spawn** in `src/data/areas.json`. Each new life rolls Max HP, selects one allowed reward definition, rolls its amount, and persists that complete `SpawnRoll` until revival. Do not reintroduce a global area/tier HP or permanent-reward formula.
-- Allowed permanent reward types are `hp`, `regen`, `blunt`, `slash`, and `piercing`. Rewards add to the matching source-aware permanent stat.
-- Player source-aware stats use `total = (base + sum(additive sources)) × product(multiplicative sources)`; keep this renderer-independent.
-- Damage types are explicit (`DamageType`). Do not introduce an untracked generic weapon-damage type.
-- Both hero hand slots are independent attack sources. Bare-hand and equipped-weapon attacks must remain independently schedulable.
-- An empty hand attacks using the hero's Blunt attack stat alone. An equipped weapon attacks for **that weapon's calculated equipment damage + the hero's persistent attack stat of the same damage type**. Do not add a separate bare-hand damage term on top of an equipped weapon. Accumulated permanent Blunt growth therefore continues to benefit any equipped hammer, and switching hammer rarity replaces only the weapon contribution.
-- Equipment Ascend intentionally scales both dimensions of weapon progression: a new Ascend base starts from the configured multiple of the previous Ascend's Level-50 damage, and per-level growth is also multiplied by `perLevelMultiplierPerAscend` for each Ascend. The current configured per-level multiplier is `2`, so per-level growth doubles on every Ascend; do not revert this to constant per-level growth as an alleged cleanup.
-- Spawns have stable authored IDs. Runtime save state is stored per spawn with `killsToday`, `defeatedAt`, `respawnAt`, and the persisted per-life `roll` containing Max HP plus reward type/amount.
-- A spawn receives a fresh roll on revival, explicit respawn reset, or local-midnight daily reset. Permanent player stats, boss progression, inventory, and unlocked areas persist across the daily reset.
-- Boss identity is explicit authored data (`isBoss`) and must not be inferred from rarity. `bossSpawnId`/gate requirements must remain consistent with the explicitly marked boss.
-- Equipment loot tables are area-specific and may inherit/extend prior-area pools so early areas cannot drop end-game equipment.
-- Equipment progression terminology is `level` and `ascend`; do not reintroduce `upgrade` for the ascend mechanic.
-- Physical **gates** connect adjacent areas. Historical `portal` terminology is obsolete for new code/data/docs; progression owns gate lock state and rendering only presents it.
-- When changing the save shape, update the types, normalization/loading logic, save version, and storage key together. Existing supported older saves should migrate or fall back safely without losing permanent progression.
-- All player progression must be persisted. Whenever a save-shape change is necessary, add an explicit migration helper so existing progression is preserved.
-- UI is rendered as a template in `src/ui.ts`; add every interactively queried element to the exported `ui` object. HUD controls need `pointer-events: auto` because the HUD container itself ignores pointer events.
-- World-attached labels are DOM elements projected from Three.js positions. Keep their visibility synchronized with entity life and the active area until that responsibility is extracted into a dedicated manager.
-
-## Graphical/performance conventions
-
-- Keep Three.js as the world renderer and HTML/CSS for normal application UI.
-- iPhone 12 portrait (390×844 CSS viewport) is the minimum first-class phone reference. Tablet/desktop are adaptations; portrait remains the primary mobile orientation.
-- Preserve Full/Reduced render scale, Smooth/30 FPS modes, persisted graphical preferences, and the development renderer-statistics toggle.
-- Full mode caps device pixel ratio at 2; Reduced mode uses 70% of that value.
-- Initial-load target is <=20 seconds on representative supported hardware/network conditions.
-- Total downloadable payload must remain below 500 MB and materially smaller where practical.
-- Measure performance on representative constrained/mobile hardware; desktop arithmetic or emulation alone is not proof of mobile GPU performance.
-- Cosmetic asset failures must leave gameplay playable through safe fallbacks.
-- Asset URLs must remain Vite-base-aware for `/Infuse-evergrowth/`, and third-party asset provenance/licensing must stay recorded.
-
-## Feature implementation workflow
-
-When adding a gameplay feature, prefer this order:
-
-1. Define/extend authored data and pure domain types/rules.
-2. Define persistent state/migration if player progression is involved.
-3. Implement the runtime system/command that operates on that state.
-4. Emit or consume typed gameplay events for cross-system consequences.
-5. Add/update Three.js views and UI as projections of the resulting state.
-6. Keep `Game.ts` changes limited to composition, update ordering, and lifecycle wiring.
-
-This order is intentional: do not start a gameplay feature by editing the renderer/UI and then back-fill game state afterward.
-
-## Code style and workflow
-
-- Use strict TypeScript and ES modules. Follow the existing compact style and explicit return types on exported functions.
-- Never wrap imports in `try`/`catch`.
-- Keep global tunable numbers in `src/data/balance.json` and authored world/spawn content in `src/data/areas.json`.
-- Do not edit generated `dist/` output or dependency contents.
-- Run `npm run build` after code changes. For visible web-app changes, also inspect the running app at a mobile-sized viewport and capture a screenshot when tooling permits.
-- Before committing, review `git diff` and `git status`. Commit changes on the current branch.
-- Systematically increment the package version before creating a pull request. Use `package.json` as the single source of truth and apply semantic versioning appropriate to the change.
-
-## Consecutive pull requests from one agent session
-
-When a task is delivered as several successive pull requests from the same Codex/agent session, **never start the next slice from the previous slice's stale checkout after that PR has been merged**.
-
-Before starting each new slice after a previous PR was merged:
-
-1. Fetch the latest remote state.
-2. Reset/switch the working base to the latest `origin/main` so it includes the just-merged PR.
-3. Create a fresh branch for the new slice from that updated `origin/main`; do not keep building on the already-merged slice branch.
-4. Implement only the new slice.
-5. Before opening the PR, verify `git log origin/main..HEAD` and `git diff origin/main...HEAD` (or equivalent) show only the new slice and do not reintroduce files/commits already merged into `main`.
-6. If the new PR unexpectedly contains changes from an earlier merged slice, stop and rebase/recreate the branch from current `origin/main` before opening or updating the PR.
-
-This rule applies even when the user continues in the same Codex Cloud conversation or task window: conversational continuity does not guarantee that the underlying checkout automatically refreshed after a GitHub merge.
+Before a new slice after a prior PR is merged: fetch, branch from current `origin/main`, and verify `git log origin/main..HEAD` plus `git diff origin/main...HEAD` contain only the new slice. Never continue from a stale merged branch.

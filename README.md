@@ -2,9 +2,9 @@
 
 An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 
-## v0.48.0 vertical slice
+## Current vertical slice
 
-- Two authored adjacent areas with **29 fixed targets each** and per-revival HP/reward rolls
+- Three authored, continuously connected areas with **101 fixed targets total** and per-revival HP/reward rolls
 - Area 1 population: 10 Crystals, 15 Commons, 3 Uncommons, 1 Rare; `area1-uncommon-03` is the gate boss
 - Area 2 population: 17 Crystals, 7 Commons, 3 Uncommons, 1 Rare, 1 Epic; `area2-rare-01` is its boss
 - Area 1 and the darker ashwood Area 2 meet at a shared, boss-gated physical passage
@@ -23,7 +23,7 @@ An iOS-friendly active incremental RPG delivered as a Progressive Web App.
 - Stat gains and equipment drops use restrained reward feedback suited to portrait play
 - Fully defeated Common/Uncommon packs show a circular countdown until the first member respawns
 - Per-spawn escalating respawn timers reset at local midnight
-- Save schema **v10** preserves permanent stats, area unlocks, boss progression, inventory/equipment progression, daily spawn state, and each spawn's current per-life roll
+- Save schema **v11** preserves permanent stats, area unlocks, boss progression, inventory/equipment progression, daily spawn state, and each spawn's current per-life roll
 - Installable PWA shell deployed through GitHub Pages
 - Renderer-independent live-world simulation; Three.js views mirror plain gameplay positions and life state
 
@@ -91,8 +91,8 @@ Ascend intentionally increases both the weapon's starting power and its growth r
 
 Long-lived contributor/agent rules are in [`AGENTS.md`](AGENTS.md).
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) reviews the current dependency boundaries, explains why a Three.js replacement is not yet isolated from gameplay wiring, and defines an incremental path toward a headless runtime and replaceable presentation adapters.
-- [`WIP/graphical.md`](WIP/graphical.md) records the durable visual direction; slices 1–9 are complete and slice 10 is the remaining optimization/release-validation pass.
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) defines the stable dependency boundaries and renderer-portability constraints.
+- [`roadmap.md`](roadmap.md) indexes the remaining improvements and their focused documents.
 
 ## Run locally
 
