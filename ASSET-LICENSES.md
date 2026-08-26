@@ -25,6 +25,22 @@ The original source archives are intentionally not intended for the shipped web 
 
 See `WIP/quaternius-assets.md` for the inspected source contents, exact runtime candidates, model/animation measurements, known free-tier gaps and implementation guidance.
 
+## KayKit environment proof subset
+
+The curated runtime files under `public/assets/kaykit/` come from these original, unmodified archives retained under `WIP/external-environment-source-archives/`:
+
+- KayKit Medieval Builder Pack 1.0 (Legacy), downloaded from <https://kaylousberg.itch.io/kaykit-medieval-builder-pack>;
+- KayKit Dungeon Pack 1.1 FREE, downloaded from <https://kaylousberg.itch.io/kaykit-dungeon-pack>;
+- KayKit Forest Nature Pack 1.0 FREE, downloaded from <https://kaylousberg.itch.io/kaykit-forest>.
+
+**Creator:** Kay Lousberg
+
+**License:** CC0 1.0 Universal / Public Domain Dedication
+
+**License reference:** https://creativecommons.org/publicdomain/zero/1.0/
+
+Only the models used by the constrained Slice 12D1 proof and their shared Dungeon/Forest texture atlases are copied into the runtime hierarchy. The source ZIPs and documentation/contact sheets are not part of the deployed asset tree.
+
 ## Inventory weapon rarity icons
 
 - Files: `src/assets/ui/equipment/*.svg`
