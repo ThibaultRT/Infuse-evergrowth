@@ -1,10 +1,18 @@
-import { BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPAWNS } from './config';
+import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPAWNS } from './config';
+import { EQUIPMENT_BY_ID } from './domain/items/EquipmentCatalog';
 import { logarithmicChance, logarithmicStat } from './domain/combat/HeroStats';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import type { DamageType, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v11';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const SAVE_KEY = 'infuse-evergrowth-save-v12';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+
+export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
+const volatileValues = new Map<string, string>();
+export const browserSaveStorage: SaveStorage = typeof localStorage === 'undefined' ? {
+  getItem: (key) => volatileValues.get(key) ?? null,
+  setItem: (key, value) => { volatileValues.set(key, value); }
+} : localStorage;
 
 export function localDailyKey(now = new Date()): string {
   const y = now.getFullYear();
@@ -71,17 +79,24 @@ function migrateInventory(value: unknown): InventoryState {
     for (const raw of source.items) {
       if (!raw || typeof raw !== 'object') continue;
       const itemId = String((raw as { id?: unknown }).id ?? '');
-      if (itemId) fresh.items[itemId] = { itemId, level: 1, ascend: 0 };
+      if (EQUIPMENT_BY_ID.has(itemId)) fresh.items[itemId] = { itemId, level: 1, ascend: 0 };
     }
   }
   if (source.items && !Array.isArray(source.items) && typeof source.items === 'object') {
     for (const [itemId, raw] of Object.entries(source.items as Record<string, unknown>)) {
-      if (!raw || typeof raw !== 'object') continue;
+      if (!raw || typeof raw !== 'object' || !EQUIPMENT_BY_ID.has(itemId)) continue;
       const item = raw as { level?: unknown; ascend?: unknown };
       fresh.items[itemId] = { itemId, level: Math.max(1, Number(item.level) || 1), ascend: Math.max(0, Number(item.ascend) || 0) };
     }
   }
-  fresh.equipped = { ...fresh.equipped, ...(source.equipped ?? {}) };
+  for (const slot of Object.keys(fresh.equipped) as (keyof InventoryState['equipped'])[]) {
+    const itemId = source.equipped?.[slot];
+    const item = typeof itemId === 'string' ? EQUIPMENT_BY_ID.get(itemId) : undefined;
+    const compatible = item?.kind === 'weapon'
+      ? ['hand1', 'hand2', 'orbit1', 'orbit2'].includes(slot)
+      : item?.kind === 'armor' && ({ helmet: 'helmet', armor: 'armor', boots: 'legs' } as const)[item.armorClass] === slot;
+    if (compatible && fresh.items[itemId!]) fresh.equipped[slot] = itemId!;
+  }
   return fresh;
 }
 
@@ -94,41 +109,47 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
   };
 }
 
-function loadSave(): SaveData {
+export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Date()): SaveData {
   const fresh: SaveData = {
-    version: 11,
-    dailyKey: localDailyKey(),
+    version: 12,
+    dailyKey: localDailyKey(now),
     currentAreaId: 1,
     unlockedAreas: [1],
     defeatedBosses: [],
+    heroHp: BASE_HERO_MAX_HP,
     stats: freshStats(),
     inventory: freshInventory(),
     spawns: emptySpawnState()
   };
   try {
-    const raw = localStorage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
+    const raw = storage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => storage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (![7, 8, 9, 10, 11].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
-    const unlockedAreas = Array.from(new Set([1, ...(parsed.unlockedAreas ?? [])]));
+    if (![7, 8, 9, 10, 11, 12].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    const areaIds = new Set(AREAS.map((area) => area.id));
+    const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
+    const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
     const requestedArea = parsed.currentAreaId ?? 1;
+    const stats: PlayerStats = {
+      maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
+      attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK), slash: normalizeStat(parsed.stats.attack?.slash, 0), piercing: normalizeStat(parsed.stats.attack?.piercing, 0) },
+      regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN),
+      speed: normalizeStat(parsed.stats.speed, BASE_HERO_SPEED_RAW),
+      criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
+      criticalDamage: normalizeStat(parsed.stats.criticalDamage, BASE_HERO_CRITICAL_DAMAGE_RAW),
+      blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW)
+    };
+    const maxHp = statTotal(stats.maxHp);
     return {
-      version: 11,
-      dailyKey: localDailyKey(),
-      currentAreaId: unlockedAreas.includes(requestedArea) ? requestedArea : 1,
+      version: 12,
+      dailyKey: localDailyKey(now),
+      currentAreaId: typeof requestedArea === 'number' && areaIds.has(requestedArea) && unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
-      defeatedBosses: parsed.defeatedBosses ?? [],
-      stats: {
-        maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
-        attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK), slash: normalizeStat(parsed.stats.attack?.slash, 0), piercing: normalizeStat(parsed.stats.attack?.piercing, 0) },
-        regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN),
-        speed: normalizeStat(parsed.stats.speed, BASE_HERO_SPEED_RAW),
-        criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
-        criticalDamage: normalizeStat(parsed.stats.criticalDamage, BASE_HERO_CRITICAL_DAMAGE_RAW),
-        blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW)
-      },
+      defeatedBosses: Array.isArray(parsed.defeatedBosses) ? parsed.defeatedBosses.filter((id): id is string => typeof id === 'string' && spawnIds.has(id)) : [],
+      heroHp: parsed.version === 12 && Number.isFinite(parsed.heroHp) ? Math.max(0, Math.min(Number(parsed.heroHp), maxHp)) : maxHp,
+      stats,
       inventory: migrateInventory(parsed.inventory),
-      spawns: parsed.dailyKey === localDailyKey() ? migrateSpawns(parsed.spawns) : emptySpawnState()
+      spawns: parsed.dailyKey === localDailyKey(now) ? migrateSpawns(parsed.spawns) : emptySpawnState()
     };
   } catch {
     return fresh;
@@ -136,7 +157,7 @@ function loadSave(): SaveData {
 }
 
 export const save = loadSave();
-export function persist(): void { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
+export function persist(): void { browserSaveStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 export function resetPermanentStats(): void { save.stats = freshStats(); }
 export function resetHeroProgress(): void {
   save.stats = freshStats();

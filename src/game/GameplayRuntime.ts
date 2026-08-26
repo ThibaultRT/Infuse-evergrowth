@@ -33,6 +33,12 @@ export type GameplayRuntimeEvent =
   | { type: 'heroRespawned'; areaId: number }
   | { type: 'areaEntered'; areaId: number; connectionId: string };
 
+export type GameplaySnapshot = {
+  areaId: number;
+  hero: Readonly<RuntimeHero>;
+  spawns: ReadonlyArray<Readonly<Pick<RuntimeSpawn, 'id' | 'position' | 'hp' | 'maxHp' | 'alive'>>>;
+};
+
 type SpawnRuntimeDefinition = {
   definition: SpawnDefinition;
   tier: TierConfig;
@@ -120,8 +126,8 @@ export class GameplayRuntime {
       const distanceToHero = distanceBetween(spawn.position, this.hero.position);
       const distanceFromSpawn = distanceBetween(spawn.position, spawn.spawnPosition);
       const intent = this.enemyAI.update(spawn, distanceToHero, distanceFromSpawn, dt);
-      if (intent === 'chase') { this.moveTowards(spawn, this.hero.position, spawn.speed * dt); this.constrainSpawn(spawn); }
-      else if (intent === 'return') { this.moveTowards(spawn, spawn.spawnPosition, 3 * dt); this.constrainSpawn(spawn); }
+      if (intent === 'chase') { const previous = { ...spawn.position }; this.moveTowards(spawn, this.hero.position, spawn.speed * dt); this.constrainSpawn(spawn, previous); }
+      else if (intent === 'return') { const previous = { ...spawn.position }; this.moveTowards(spawn, spawn.spawnPosition, 3 * dt); this.constrainSpawn(spawn, previous); }
       else if (intent === 'attack') {
         spawn.attackCooldown = this.options.enemyAttackCooldown;
         events.push({ type: 'enemyAttack', spawnId: spawn.id, amount: spawn.damage, damageType: spawn.damageType });
@@ -175,6 +181,14 @@ export class GameplayRuntime {
 
   distanceFromHero(position: Position): number { return distanceBetween(this.hero.position, position); }
 
+  snapshot(): GameplaySnapshot {
+    return {
+      areaId: this.currentAreaId,
+      hero: { ...this.hero, position: { ...this.hero.position } },
+      spawns: this.spawns.map(({ id, position, hp, maxHp, alive }) => ({ id, position: { ...position }, hp, maxHp, alive }))
+    };
+  }
+
   private updateHero(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean): GameplayRuntimeEvent | null {
     this.hero.moving = controlsEnabled && (movement.x !== 0 || movement.y !== 0);
     if (!this.hero.moving) return null;
@@ -219,6 +233,7 @@ export class GameplayRuntime {
       }
     }
     this.constrainToLakeBank(candidate, area, heroRadius, previous);
+    this.constrainToAuthoredCollision(candidate, previous, area, heroRadius);
     this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
     this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
     this.hero.facing = Math.atan2(movement.x, -movement.y);
@@ -237,12 +252,25 @@ export class GameplayRuntime {
   }
 
   /** Keep enemy simulation inside its authored walkable land, independent of scenery meshes. */
-  private constrainSpawn(spawn: RuntimeSpawn): void {
+  private constrainSpawn(spawn: RuntimeSpawn, previous: Position): void {
     const area = this.area(spawn.definition.areaId);
     const radius = .45;
     spawn.position.x = Math.min(area.originX + area.size.width / 2 - radius, Math.max(area.originX - area.size.width / 2 + radius, spawn.position.x));
     spawn.position.z = Math.min(area.originZ + area.size.depth / 2 - radius, Math.max(area.originZ - area.size.depth / 2 + radius, spawn.position.z));
     this.constrainToLakeBank(spawn.position, area, radius);
+    this.constrainToAuthoredCollision(spawn.position, previous, area, radius);
+  }
+
+  private constrainToAuthoredCollision(position: Position, previous: Position, area: AreaDefinition, radius: number): void {
+    for (const shape of area.collision) {
+      const overlaps = (point: Position): boolean => Math.abs(point.x - shape.x) < shape.width / 2 + radius && Math.abs(point.z - shape.z) < shape.depth / 2 + radius;
+      if (!overlaps(position)) continue;
+      const xOnly = { ...position, z: previous.z };
+      const zOnly = { ...position, x: previous.x };
+      if (!overlaps(xOnly)) position.z = previous.z;
+      else if (!overlaps(zOnly)) position.x = previous.x;
+      else copyPosition(position, previous);
+    }
   }
 
   /** Keep both lakes solid while allowing movement along and across the causeway. */
