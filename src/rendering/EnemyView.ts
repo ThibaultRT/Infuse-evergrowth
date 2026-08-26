@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { Tier } from '../types';
 import { makeHumanoid } from '../visuals';
 import { AnimatedHumanoidView } from './AnimatedHumanoidView';
+import { fitModelToHeight, gameModelAssets } from './AssetLoader';
 
 const OUTFIT_BY_TIER: Record<Exclude<Tier, 'crystal'>, string> = {
   common: 'Male_Peasant',
@@ -20,7 +21,20 @@ export class EnemyView extends AnimatedHumanoidView {
   constructor(readonly tier: Exclude<Tier, 'crystal'>, accent: number) {
     super(makeHumanoid(accent));
     this.root.scale.setScalar(SCALE_BY_TIER[tier]);
-    void this.loadModel(`characters/models/${OUTFIT_BY_TIER[tier]}.gltf`);
+    if (tier === 'rare') void this.loadRareModel();
+    else void this.loadModel(`characters/models/${OUTFIT_BY_TIER[tier]}.gltf`);
+  }
+
+  private async loadRareModel(): Promise<void> {
+    try {
+      const model = await gameModelAssets.cloneScene('enemies/enemy-rare.glb');
+      fitModelToHeight(model, 2.7 / SCALE_BY_TIER.rare);
+      model.traverse((child) => { if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; } });
+      this.root.clear();
+      this.root.add(model);
+    } catch (error) {
+      console.warn('Rare enemy model unavailable; keeping procedural fallback.', error);
+    }
   }
 
   update(dt: number, moving: boolean, active: boolean): void {

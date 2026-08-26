@@ -204,7 +204,7 @@ class SpawnEntity {
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
     this.enemyView = def.tier === 'crystal' ? null : new EnemyView(def.tier, this.config.color);
-    this.crystalView = def.tier === 'crystal' ? new CrystalView(this.config.color) : null;
+    this.crystalView = def.tier === 'crystal' ? new CrystalView(this.config.color, def.areaId) : null;
     this.root.add(this.enemyView?.root ?? this.crystalView!.root, makeTierRing(this.config.color));
     scene.add(this.root);
 

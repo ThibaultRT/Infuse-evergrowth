@@ -47,3 +47,10 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Source: three weapon-rarity strips supplied directly by the project owner in the feature request (hammer, sword, and spear; common through legendary).
 - Processing: each source strip was divided into five square tiles and resized to 256×256 and wrapped as text-based SVG data images so the assets remain reviewable by text-only pull-request tooling.
 - Usage: project-owned/user-supplied artwork; included with permission for Infuse: Evergrowth.
+
+## Project-supplied world models
+
+- Files: `public/assets/models/**/*.glb`
+- Source: crystal, fountain, and rare-enemy models supplied directly by the project owner.
+- Processing: files were organized into the runtime asset hierarchy; their displayed scale and placement are normalized at runtime.
+- Usage: project-owned/user-supplied artwork; included with permission for Infuse: Evergrowth.
