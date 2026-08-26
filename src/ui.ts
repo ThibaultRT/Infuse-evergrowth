@@ -4,7 +4,7 @@ import { save, statAdditiveTotal, statTotal } from './save';
 import { logarithmicStat } from './domain/combat/HeroStats';
 import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED } from './config';
 import { EQUIPMENT_BY_ID, equipmentDamage, equipmentDefense } from './systems/EquipmentSystem';
-import { weaponEquipmentIcon } from './equipment-icons';
+import { equipmentIcon } from './equipment-icons';
 import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, PlayerStats, StatSources } from './types';
 
 const app = document.querySelector<HTMLDivElement>('#app');
@@ -193,14 +193,16 @@ const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2'];
 export function renderInventory(inventory: InventoryState): void {
   const armorPreview = (['helmet', 'armor', 'legs'] as const).map((slot) => {
     const itemId = inventory.equipped[slot]; const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
-    return `<div class="inventory-equip-slot" data-slot="${slot}"${itemId ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span>${item ? damageTypeIcon(item.damageType, 25) : '<strong>EMPTY</strong>'}</div>`;
+    const owned = itemId ? inventory.items[itemId] : undefined;
+    const itemArt = item && owned ? equipmentIcon(item, owned, 'slot') ?? damageTypeIcon(item.damageType, 25) : item ? damageTypeIcon(item.damageType, 25) : '<strong>EMPTY</strong>';
+    return `<div class="inventory-equip-slot" data-slot="${slot}"${itemId ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span>${itemArt}</div>`;
   }).join('');
   const weapons = SLOT_ORDER.map((slot) => {
     const locked = false;
     const itemId = inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
     const owned = itemId ? inventory.items[itemId] : undefined;
-    const itemArt = item && owned ? weaponEquipmentIcon(item, owned, 'slot') ?? damageTypeIcon(item.damageType, 25) : item ? damageTypeIcon(item.damageType, 25) : '';
+    const itemArt = item && owned ? equipmentIcon(item, owned, 'slot') ?? damageTypeIcon(item.damageType, 25) : item ? damageTypeIcon(item.damageType, 25) : '';
     const value = locked ? '<strong>LOCKED</strong>' : item ? itemArt : '<strong>EMPTY</strong>';
     return `<div class="inventory-equip-slot${locked ? ' locked' : ''}" data-slot="${slot}"${itemId && !locked ? ` data-item-id="${itemId}" draggable="true"` : ''}><span>${SLOT_LABELS[slot]}</span>${value}</div>`;
   }).join('');
@@ -216,13 +218,17 @@ export function renderInventory(inventory: InventoryState): void {
   const items = Object.values(inventory.items).filter((owned) => !equippedItemIds.has(owned.itemId));
   const section = (title: string, sectionItems: OwnedEquipment[]): string => sectionItems.length ? `<div class="inventory-bag-title">${title}</div>${sectionItems.map((owned) => {
     const item = EQUIPMENT_BY_ID.get(owned.itemId);
-    const weaponArt = item ? weaponEquipmentIcon(item, owned, 'bag') : null;
-    const itemContent = weaponArt ?? `${item ? damageTypeIcon(item.damageType, 27) : ''}<span>Lv ${owned.level} · A${owned.ascend}</span>`;
-    return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}${weaponArt ? ' weapon-item' : ''}" type="button" data-item-id="${owned.itemId}" draggable="true" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}, ascend ${owned.ascend}">${itemContent}</button>`;
+    const itemArt = item ? equipmentIcon(item, owned, 'bag') : null;
+    const itemContent = itemArt ?? `${item ? damageTypeIcon(item.damageType, 27) : ''}<span>Lv ${owned.level} · A${owned.ascend}</span>`;
+    return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}${itemArt ? ' equipment-item' : ''}" type="button" data-item-id="${owned.itemId}" draggable="true" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}, ascend ${owned.ascend}">${itemContent}</button>`;
   }).join('')}` : '';
   const weaponsInBag = items.filter((owned) => EQUIPMENT_BY_ID.get(owned.itemId)?.kind === 'weapon');
-  const armorInBag = items.filter((owned) => EQUIPMENT_BY_ID.get(owned.itemId)?.kind === 'armor');
-  ui.inventoryBag.innerHTML = items.length ? section('Weapons', weaponsInBag) + section('Armor · Helmets · Legs', armorInBag) : '<div class="inventory-empty">No equipment found yet.</div>';
+  const armorItems = items.filter((owned) => EQUIPMENT_BY_ID.get(owned.itemId)?.kind === 'armor');
+  const armorSection = (armorClass: 'helmet' | 'armor' | 'boots'): OwnedEquipment[] => armorItems.filter((owned) => {
+    const item = EQUIPMENT_BY_ID.get(owned.itemId);
+    return item?.kind === 'armor' && item.armorClass === armorClass;
+  });
+  ui.inventoryBag.innerHTML = items.length ? section('Weapons', weaponsInBag) + section('Helmets', armorSection('helmet')) + section('Armor', armorSection('armor')) + section('Legs', armorSection('boots')) : '<div class="inventory-empty">No equipment found yet.</div>';
 }
 
 let progressionTimer: number | null = null;
@@ -239,8 +245,8 @@ export function renderWeaponDetail(owned: OwnedEquipment | null): void {
   const value = item.kind === 'weapon' ? equipmentDamage(item, owned) : equipmentDefense(item, owned);
   const perLevel = (item.kind === 'weapon' ? item.baseDamagePerLevel : item.baseDefensePerLevel) * 2 ** owned.ascend;
   const label = item.kind === 'weapon' ? 'Damage' : 'Defense';
-  const itemClass = item.kind === 'weapon' ? item.weaponClass : item.armorClass;
-  const itemArt = weaponEquipmentIcon(item, owned, 'detail') ?? damageTypeIcon(item.damageType, 52);
+  const itemClass = item.kind === 'weapon' ? item.weaponClass : item.armorClass === 'boots' ? 'legs' : item.armorClass;
+  const itemArt = equipmentIcon(item, owned, 'detail') ?? damageTypeIcon(item.damageType, 52);
   ui.weaponDetail.innerHTML = `<div class="weapon-art rarity-${item.rarity}">${itemArt}</div><h3>${item.name}</h3><div class="weapon-meta">${item.rarity} · ${itemClass}</div><div class="weapon-values"><span>Level <strong>${owned.level}</strong></span><span>Ascend <strong>${owned.ascend}</strong></span><span>${label} <strong>${Math.round(value)} ${damageTypeIcon(item.damageType, 12)}</strong></span><span>Per level <strong>+${perLevel}</strong></span></div><div class="weapon-actions">${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : `<button data-equip data-item-id="${item.id}">Equip</button>`}<button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div><p>${item.kind === 'armor' ? `Flat ${item.damageType} damage reduction.` : owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p>${equipped ? `<small>Equipped ${equipped.toUpperCase()}</small>` : ''}`;
 }
 
@@ -254,7 +260,7 @@ export function showEquipmentDrop(drop: typeof dropQueue[number]): void {
     if (!next) { showingDrop = false; return; }
     showingDrop = true;
     const item = EQUIPMENT_BY_ID.get(next.itemId)!;
-    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}">${damageTypeIcon(item.damageType, 58)}<b>${item.name}</b><span>${item.rarity} ${item.kind === 'weapon' ? item.weaponClass : item.armorClass} · x${next.quantity}</span><strong>${next.previousLevel === null ? 'NEW · ' : `Level ${next.previousLevel} → `}Level ${next.newLevel} · Ascend ${next.ascend}</strong></div>`;
+    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}">${equipmentIcon(item, { itemId: item.id, level: next.newLevel, ascend: next.ascend }, 'detail') ?? damageTypeIcon(item.damageType, 58)}<b>${item.name}</b><span>${item.rarity} ${item.kind === 'weapon' ? item.weaponClass : item.armorClass === 'boots' ? 'legs' : item.armorClass} · x${next.quantity}</span><strong>${next.previousLevel === null ? 'NEW · ' : `Level ${next.previousLevel} → `}Level ${next.newLevel} · Ascend ${next.ascend}</strong></div>`;
     window.setTimeout(() => { ui.equipmentDropLayer.innerHTML = ''; showingDrop = false; showNext(); }, 1800);
   };
   showNext();
