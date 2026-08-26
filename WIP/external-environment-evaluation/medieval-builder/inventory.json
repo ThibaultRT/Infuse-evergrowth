@@ -1,0 +1,3129 @@
+[
+  {
+    "relativePath": "Models/objects/gltf/archeryrange.gltf.glb",
+    "filename": "archeryrange.gltf.glb",
+    "dimensions": [
+      1.802,
+      1.551,
+      1.538
+    ],
+    "triangles": 1668,
+    "candidates": [
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/barracks.gltf.glb",
+    "filename": "barracks.gltf.glb",
+    "dimensions": [
+      1.989,
+      1.61,
+      1.299
+    ],
+    "triangles": 1960,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/bridge.gltf.glb",
+    "filename": "bridge.gltf.glb",
+    "dimensions": [
+      2.0,
+      0.744,
+      0.777
+    ],
+    "triangles": 252,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/bridge_roofed.gltf.glb",
+    "filename": "bridge_roofed.gltf.glb",
+    "dimensions": [
+      2.091,
+      0.744,
+      1.326
+    ],
+    "triangles": 480,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/castle.gltf.glb",
+    "filename": "castle.gltf.glb",
+    "dimensions": [
+      1.805,
+      1.852,
+      2.533
+    ],
+    "triangles": 2231,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_forestA.gltf.glb",
+    "filename": "detail_forestA.gltf.glb",
+    "dimensions": [
+      1.841,
+      1.183,
+      0.734
+    ],
+    "triangles": 2900,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_forestB.gltf.glb",
+    "filename": "detail_forestB.gltf.glb",
+    "dimensions": [
+      1.853,
+      1.359,
+      0.739
+    ],
+    "triangles": 1878,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_hill.gltf.glb",
+    "filename": "detail_hill.gltf.glb",
+    "dimensions": [
+      1.819,
+      1.589,
+      1.101
+    ],
+    "triangles": 1677,
+    "candidates": [
+      "cliffs/high ground",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_rocks.gltf.glb",
+    "filename": "detail_rocks.gltf.glb",
+    "dimensions": [
+      1.892,
+      1.33,
+      0.564
+    ],
+    "triangles": 1102,
+    "candidates": [
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_rocks_small.gltf.glb",
+    "filename": "detail_rocks_small.gltf.glb",
+    "dimensions": [
+      0.646,
+      0.529,
+      0.212
+    ],
+    "triangles": 552,
+    "candidates": [
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_treeA.gltf.glb",
+    "filename": "detail_treeA.gltf.glb",
+    "dimensions": [
+      0.594,
+      0.392,
+      0.78
+    ],
+    "triangles": 287,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_treeB.gltf.glb",
+    "filename": "detail_treeB.gltf.glb",
+    "dimensions": [
+      0.487,
+      0.344,
+      0.727
+    ],
+    "triangles": 579,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/detail_treeC.gltf.glb",
+    "filename": "detail_treeC.gltf.glb",
+    "dimensions": [
+      0.536,
+      0.422,
+      0.757
+    ],
+    "triangles": 337,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/farm_plot.gltf.glb",
+    "filename": "farm_plot.gltf.glb",
+    "dimensions": [
+      1.473,
+      1.283,
+      0.457
+    ],
+    "triangles": 906,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/forest.gltf.glb",
+    "filename": "forest.gltf.glb",
+    "dimensions": [
+      1.93,
+      1.896,
+      1.36
+    ],
+    "triangles": 2328,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/house.gltf.glb",
+    "filename": "house.gltf.glb",
+    "dimensions": [
+      1.687,
+      1.656,
+      0.914
+    ],
+    "triangles": 1666,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/lumbermill.gltf.glb",
+    "filename": "lumbermill.gltf.glb",
+    "dimensions": [
+      1.824,
+      1.657,
+      1.47
+    ],
+    "triangles": 1698,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/market.gltf.glb",
+    "filename": "market.gltf.glb",
+    "dimensions": [
+      1.47,
+      1.674,
+      0.864
+    ],
+    "triangles": 1924,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/mill.gltf.glb",
+    "filename": "mill.gltf.glb",
+    "dimensions": [
+      1.687,
+      1.668,
+      1.982
+    ],
+    "triangles": 2270,
+    "candidates": [
+      "houses"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/mine.gltf.glb",
+    "filename": "mine.gltf.glb",
+    "dimensions": [
+      1.615,
+      1.883,
+      0.829
+    ],
+    "triangles": 1735,
+    "candidates": []
+  },
+  {
+    "relativePath": "Models/objects/gltf/mountain.gltf.glb",
+    "filename": "mountain.gltf.glb",
+    "dimensions": [
+      1.788,
+      1.907,
+      1.217
+    ],
+    "triangles": 986,
+    "candidates": [
+      "cliffs/high ground"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/wall_corner.gltf.glb",
+    "filename": "wall_corner.gltf.glb",
+    "dimensions": [
+      1.378,
+      1.378,
+      1.152
+    ],
+    "triangles": 456,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/wall_gate.gltf.glb",
+    "filename": "wall_gate.gltf.glb",
+    "dimensions": [
+      2.0,
+      0.534,
+      1.152
+    ],
+    "triangles": 972,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/wall_gate_closed.gltf.glb",
+    "filename": "wall_gate_closed.gltf.glb",
+    "dimensions": [
+      2.0,
+      0.534,
+      1.152
+    ],
+    "triangles": 996,
+    "candidates": [
+      "walls",
+      "gates"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/wall_hexCornerA.gltf.glb",
+    "filename": "wall_hexCornerA.gltf.glb",
+    "dimensions": [
+      1.581,
+      1.278,
+      1.152
+    ],
+    "triangles": 482,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/wall_hexCornerB.gltf.glb",
+    "filename": "wall_hexCornerB.gltf.glb",
+    "dimensions": [
+      1.365,
+      1.278,
+      1.152
+    ],
+    "triangles": 350,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/wall_straight.gltf.glb",
+    "filename": "wall_straight.gltf.glb",
+    "dimensions": [
+      2.0,
+      0.534,
+      1.152
+    ],
+    "triangles": 478,
+    "candidates": [
+      "walls"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/watchtower.gltf.glb",
+    "filename": "watchtower.gltf.glb",
+    "dimensions": [
+      0.971,
+      1.713,
+      1.978
+    ],
+    "triangles": 1871,
+    "candidates": []
+  },
+  {
+    "relativePath": "Models/objects/gltf/watermill.gltf.glb",
+    "filename": "watermill.gltf.glb",
+    "dimensions": [
+      1.534,
+      1.42,
+      1.597
+    ],
+    "triangles": 1605,
+    "candidates": [
+      "houses",
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/objects/gltf/well.gltf.glb",
+    "filename": "well.gltf.glb",
+    "dimensions": [
+      1.018,
+      1.018,
+      0.737
+    ],
+    "triangles": 1252,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest.gltf.glb",
+    "filename": "hex_forest.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_detail.gltf.glb",
+    "filename": "hex_forest_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 92,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadA.gltf.glb",
+    "filename": "hex_forest_roadA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 286,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadA_detail.gltf.glb",
+    "filename": "hex_forest_roadA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 322,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadB.gltf.glb",
+    "filename": "hex_forest_roadB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 204,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadB_detail.gltf.glb",
+    "filename": "hex_forest_roadB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 240,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadC.gltf.glb",
+    "filename": "hex_forest_roadC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 202,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadC_detail.gltf.glb",
+    "filename": "hex_forest_roadC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 238,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadD.gltf.glb",
+    "filename": "hex_forest_roadD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 222,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadD_detail.gltf.glb",
+    "filename": "hex_forest_roadD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 258,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadE.gltf.glb",
+    "filename": "hex_forest_roadE.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 294,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadE_detail.gltf.glb",
+    "filename": "hex_forest_roadE_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 330,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadF.gltf.glb",
+    "filename": "hex_forest_roadF.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 318,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadF_detail.gltf.glb",
+    "filename": "hex_forest_roadF_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 354,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadG.gltf.glb",
+    "filename": "hex_forest_roadG.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 292,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadG_detail.gltf.glb",
+    "filename": "hex_forest_roadG_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 328,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadH.gltf.glb",
+    "filename": "hex_forest_roadH.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 334,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadH_detail.gltf.glb",
+    "filename": "hex_forest_roadH_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 370,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadI.gltf.glb",
+    "filename": "hex_forest_roadI.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 384,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadI_detail.gltf.glb",
+    "filename": "hex_forest_roadI_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 420,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadJ.gltf.glb",
+    "filename": "hex_forest_roadJ.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 404,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadJ_detail.gltf.glb",
+    "filename": "hex_forest_roadJ_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 440,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadK.gltf.glb",
+    "filename": "hex_forest_roadK.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 444,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadK_detail.gltf.glb",
+    "filename": "hex_forest_roadK_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 480,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadL.gltf.glb",
+    "filename": "hex_forest_roadL.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 610,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadL_detail.gltf.glb",
+    "filename": "hex_forest_roadL_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 646,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadM.gltf.glb",
+    "filename": "hex_forest_roadM.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 628,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_roadM_detail.gltf.glb",
+    "filename": "hex_forest_roadM_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 664,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_transitionA.gltf.glb",
+    "filename": "hex_forest_transitionA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.069
+    ],
+    "triangles": 206,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_transitionB.gltf.glb",
+    "filename": "hex_forest_transitionB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.069
+    ],
+    "triangles": 206,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterA.gltf.glb",
+    "filename": "hex_forest_waterA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 80,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterA_detail.gltf.glb",
+    "filename": "hex_forest_waterA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 118,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterA_empty.gltf.glb",
+    "filename": "hex_forest_waterA_empty.gltf.glb",
+    "dimensions": [
+      1.0,
+      1.732,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterB.gltf.glb",
+    "filename": "hex_forest_waterB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 54,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterB_detail.gltf.glb",
+    "filename": "hex_forest_waterB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 96,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterB_empty.gltf.glb",
+    "filename": "hex_forest_waterB_empty.gltf.glb",
+    "dimensions": [
+      1.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 44,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterC.gltf.glb",
+    "filename": "hex_forest_waterC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 178,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterC_detail.gltf.glb",
+    "filename": "hex_forest_waterC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 228,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterC_empty.gltf.glb",
+    "filename": "hex_forest_waterC_empty.gltf.glb",
+    "dimensions": [
+      1.022,
+      2.309,
+      1.001
+    ],
+    "triangles": 138,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterD.gltf.glb",
+    "filename": "hex_forest_waterD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 110,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterD_detail.gltf.glb",
+    "filename": "hex_forest_waterD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 154,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_forest_waterD_empty.gltf.glb",
+    "filename": "hex_forest_waterD_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 98,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock.gltf.glb",
+    "filename": "hex_rock.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_detail.gltf.glb",
+    "filename": "hex_rock_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 92,
+    "candidates": [
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadA.gltf.glb",
+    "filename": "hex_rock_roadA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 286,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadA_detail.gltf.glb",
+    "filename": "hex_rock_roadA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 322,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadB.gltf.glb",
+    "filename": "hex_rock_roadB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 204,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadB_detail.gltf.glb",
+    "filename": "hex_rock_roadB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 240,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadC.gltf.glb",
+    "filename": "hex_rock_roadC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 202,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadC_detail.gltf.glb",
+    "filename": "hex_rock_roadC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 238,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadD.gltf.glb",
+    "filename": "hex_rock_roadD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 222,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadD_detail.gltf.glb",
+    "filename": "hex_rock_roadD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 258,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadE.gltf.glb",
+    "filename": "hex_rock_roadE.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 294,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadE_detail.gltf.glb",
+    "filename": "hex_rock_roadE_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 330,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadF.gltf.glb",
+    "filename": "hex_rock_roadF.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 318,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadF_detail.gltf.glb",
+    "filename": "hex_rock_roadF_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 354,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadG.gltf.glb",
+    "filename": "hex_rock_roadG.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 292,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadG_detail.gltf.glb",
+    "filename": "hex_rock_roadG_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 328,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadH.gltf.glb",
+    "filename": "hex_rock_roadH.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 334,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadH_detail.gltf.glb",
+    "filename": "hex_rock_roadH_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 370,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadI.gltf.glb",
+    "filename": "hex_rock_roadI.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 384,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadI_detail.gltf.glb",
+    "filename": "hex_rock_roadI_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 420,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadJ.gltf.glb",
+    "filename": "hex_rock_roadJ.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 404,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadJ_detail.gltf.glb",
+    "filename": "hex_rock_roadJ_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 440,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadK.gltf.glb",
+    "filename": "hex_rock_roadK.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 444,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadK_detail.gltf.glb",
+    "filename": "hex_rock_roadK_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 480,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadL.gltf.glb",
+    "filename": "hex_rock_roadL.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 610,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadL_detail.gltf.glb",
+    "filename": "hex_rock_roadL_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 646,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadM.gltf.glb",
+    "filename": "hex_rock_roadM.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 628,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_roadM_detail.gltf.glb",
+    "filename": "hex_rock_roadM_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 664,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_transitionA.gltf.glb",
+    "filename": "hex_rock_transitionA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.069
+    ],
+    "triangles": 206,
+    "candidates": [
+      "cliffs/high ground",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_transitionB.gltf.glb",
+    "filename": "hex_rock_transitionB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.069
+    ],
+    "triangles": 206,
+    "candidates": [
+      "cliffs/high ground",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterA.gltf.glb",
+    "filename": "hex_rock_waterA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 80,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterA_detail.gltf.glb",
+    "filename": "hex_rock_waterA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 118,
+    "candidates": [
+      "water/coasts",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterA_empty.gltf.glb",
+    "filename": "hex_rock_waterA_empty.gltf.glb",
+    "dimensions": [
+      1.0,
+      1.732,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterB.gltf.glb",
+    "filename": "hex_rock_waterB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 54,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterB_detail.gltf.glb",
+    "filename": "hex_rock_waterB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 96,
+    "candidates": [
+      "water/coasts",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterB_empty.gltf.glb",
+    "filename": "hex_rock_waterB_empty.gltf.glb",
+    "dimensions": [
+      1.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 44,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterC.gltf.glb",
+    "filename": "hex_rock_waterC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 178,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterC_detail.gltf.glb",
+    "filename": "hex_rock_waterC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 228,
+    "candidates": [
+      "water/coasts",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterC_empty.gltf.glb",
+    "filename": "hex_rock_waterC_empty.gltf.glb",
+    "dimensions": [
+      1.022,
+      2.309,
+      1.001
+    ],
+    "triangles": 138,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterD.gltf.glb",
+    "filename": "hex_rock_waterD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 110,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterD_detail.gltf.glb",
+    "filename": "hex_rock_waterD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 154,
+    "candidates": [
+      "water/coasts",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_rock_waterD_empty.gltf.glb",
+    "filename": "hex_rock_waterD_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 98,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand.gltf.glb",
+    "filename": "hex_sand.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": []
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_detail.gltf.glb",
+    "filename": "hex_sand_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 92,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadA.gltf.glb",
+    "filename": "hex_sand_roadA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 286,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadA_detail.gltf.glb",
+    "filename": "hex_sand_roadA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 322,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadB.gltf.glb",
+    "filename": "hex_sand_roadB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 204,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadB_detail.gltf.glb",
+    "filename": "hex_sand_roadB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 240,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadC.gltf.glb",
+    "filename": "hex_sand_roadC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 202,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadC_detail.gltf.glb",
+    "filename": "hex_sand_roadC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 238,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadD.gltf.glb",
+    "filename": "hex_sand_roadD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 222,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadD_detail.gltf.glb",
+    "filename": "hex_sand_roadD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 258,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadE.gltf.glb",
+    "filename": "hex_sand_roadE.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 294,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadE_detail.gltf.glb",
+    "filename": "hex_sand_roadE_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 330,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadF.gltf.glb",
+    "filename": "hex_sand_roadF.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 318,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadF_detail.gltf.glb",
+    "filename": "hex_sand_roadF_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 354,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadG.gltf.glb",
+    "filename": "hex_sand_roadG.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 292,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadG_detail.gltf.glb",
+    "filename": "hex_sand_roadG_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 328,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadH.gltf.glb",
+    "filename": "hex_sand_roadH.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 334,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadH_detail.gltf.glb",
+    "filename": "hex_sand_roadH_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 370,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadI.gltf.glb",
+    "filename": "hex_sand_roadI.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 384,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadI_detail.gltf.glb",
+    "filename": "hex_sand_roadI_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 420,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadJ.gltf.glb",
+    "filename": "hex_sand_roadJ.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 404,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadJ_detail.gltf.glb",
+    "filename": "hex_sand_roadJ_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 440,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadK.gltf.glb",
+    "filename": "hex_sand_roadK.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 444,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadK_detail.gltf.glb",
+    "filename": "hex_sand_roadK_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 480,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadL.gltf.glb",
+    "filename": "hex_sand_roadL.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 610,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadL_detail.gltf.glb",
+    "filename": "hex_sand_roadL_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 646,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadM.gltf.glb",
+    "filename": "hex_sand_roadM.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 628,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_roadM_detail.gltf.glb",
+    "filename": "hex_sand_roadM_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 664,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_transitionA.gltf.glb",
+    "filename": "hex_sand_transitionA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.069
+    ],
+    "triangles": 206,
+    "candidates": []
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_transitionB.gltf.glb",
+    "filename": "hex_sand_transitionB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.069
+    ],
+    "triangles": 206,
+    "candidates": []
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterA.gltf.glb",
+    "filename": "hex_sand_waterA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 80,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterA_detail.gltf.glb",
+    "filename": "hex_sand_waterA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 118,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterA_empty.gltf.glb",
+    "filename": "hex_sand_waterA_empty.gltf.glb",
+    "dimensions": [
+      1.0,
+      1.732,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterB.gltf.glb",
+    "filename": "hex_sand_waterB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 54,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterB_detail.gltf.glb",
+    "filename": "hex_sand_waterB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 96,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterB_empty.gltf.glb",
+    "filename": "hex_sand_waterB_empty.gltf.glb",
+    "dimensions": [
+      1.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 44,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterC.gltf.glb",
+    "filename": "hex_sand_waterC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 178,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterC_detail.gltf.glb",
+    "filename": "hex_sand_waterC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 228,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterC_empty.gltf.glb",
+    "filename": "hex_sand_waterC_empty.gltf.glb",
+    "dimensions": [
+      1.022,
+      2.309,
+      1.001
+    ],
+    "triangles": 138,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterD.gltf.glb",
+    "filename": "hex_sand_waterD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 110,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterD_detail.gltf.glb",
+    "filename": "hex_sand_waterD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 154,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_sand_waterD_empty.gltf.glb",
+    "filename": "hex_sand_waterD_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.001
+    ],
+    "triangles": 98,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_water.gltf.glb",
+    "filename": "hex_water.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/hex/gltf/hex_water_detail.gltf.glb",
+    "filename": "hex_water_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.309,
+      0.9
+    ],
+    "triangles": 62,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest.gltf.glb",
+    "filename": "square_forest.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 12,
+    "candidates": [
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_detail.gltf.glb",
+    "filename": "square_forest_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 36,
+    "candidates": [
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadA.gltf.glb",
+    "filename": "square_forest_roadA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 150,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadA_detail.gltf.glb",
+    "filename": "square_forest_roadA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 198,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadB.gltf.glb",
+    "filename": "square_forest_roadB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadB_detail.gltf.glb",
+    "filename": "square_forest_roadB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 92,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadC.gltf.glb",
+    "filename": "square_forest_roadC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 172,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadC_detail.gltf.glb",
+    "filename": "square_forest_roadC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 220,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadD.gltf.glb",
+    "filename": "square_forest_roadD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.003,
+      1.0
+    ],
+    "triangles": 184,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadD_detail.gltf.glb",
+    "filename": "square_forest_roadD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.003,
+      1.0
+    ],
+    "triangles": 232,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadE.gltf.glb",
+    "filename": "square_forest_roadE.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 280,
+    "candidates": [
+      "roads",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_roadE_detail.gltf.glb",
+    "filename": "square_forest_roadE_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 328,
+    "candidates": [
+      "roads",
+      "trees/vegetation",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterInnerCorner.gltf.glb",
+    "filename": "square_forest_waterInnerCorner.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 146,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterInnerCorner_empty.gltf.glb",
+    "filename": "square_forest_waterInnerCorner_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 136,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterInnerCorner_noSides.gltf.glb",
+    "filename": "square_forest_waterInnerCorner_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 138,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterOuterCorner.gltf.glb",
+    "filename": "square_forest_waterOuterCorner.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 154,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterOuterCorner_empty.gltf.glb",
+    "filename": "square_forest_waterOuterCorner_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 124,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterOuterCorner_noSides.gltf.glb",
+    "filename": "square_forest_waterOuterCorner_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 130,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterStraight.gltf.glb",
+    "filename": "square_forest_waterStraight.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 70,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterStraight_empty.gltf.glb",
+    "filename": "square_forest_waterStraight_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_forest_waterStraight_noSides.gltf.glb",
+    "filename": "square_forest_waterStraight_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 58,
+    "candidates": [
+      "water/coasts",
+      "trees/vegetation"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock.gltf.glb",
+    "filename": "square_rock.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 12,
+    "candidates": [
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_detail.gltf.glb",
+    "filename": "square_rock_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 36,
+    "candidates": [
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadA.gltf.glb",
+    "filename": "square_rock_roadA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 150,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadA_detail.gltf.glb",
+    "filename": "square_rock_roadA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 198,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadB.gltf.glb",
+    "filename": "square_rock_roadB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadB_detail.gltf.glb",
+    "filename": "square_rock_roadB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 92,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadC.gltf.glb",
+    "filename": "square_rock_roadC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 172,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadC_detail.gltf.glb",
+    "filename": "square_rock_roadC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 220,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadD.gltf.glb",
+    "filename": "square_rock_roadD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.003,
+      1.0
+    ],
+    "triangles": 184,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadD_detail.gltf.glb",
+    "filename": "square_rock_roadD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.003,
+      1.0
+    ],
+    "triangles": 232,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadE.gltf.glb",
+    "filename": "square_rock_roadE.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 280,
+    "candidates": [
+      "roads",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_roadE_detail.gltf.glb",
+    "filename": "square_rock_roadE_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 328,
+    "candidates": [
+      "roads",
+      "rocks",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterInnerCorner.gltf.glb",
+    "filename": "square_rock_waterInnerCorner.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 146,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterInnerCorner_empty.gltf.glb",
+    "filename": "square_rock_waterInnerCorner_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 136,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterInnerCorner_noSides.gltf.glb",
+    "filename": "square_rock_waterInnerCorner_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 138,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterOuterCorner.gltf.glb",
+    "filename": "square_rock_waterOuterCorner.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 154,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterOuterCorner_empty.gltf.glb",
+    "filename": "square_rock_waterOuterCorner_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 124,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterOuterCorner_noSides.gltf.glb",
+    "filename": "square_rock_waterOuterCorner_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 130,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterStraight.gltf.glb",
+    "filename": "square_rock_waterStraight.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 70,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterStraight_empty.gltf.glb",
+    "filename": "square_rock_waterStraight_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_rock_waterStraight_noSides.gltf.glb",
+    "filename": "square_rock_waterStraight_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 58,
+    "candidates": [
+      "water/coasts",
+      "rocks"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand.gltf.glb",
+    "filename": "square_sand.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 12,
+    "candidates": []
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_detail.gltf.glb",
+    "filename": "square_sand_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 36,
+    "candidates": [
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadA.gltf.glb",
+    "filename": "square_sand_roadA.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 150,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadA_detail.gltf.glb",
+    "filename": "square_sand_roadA_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 198,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadB.gltf.glb",
+    "filename": "square_sand_roadB.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadB_detail.gltf.glb",
+    "filename": "square_sand_roadB_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 92,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadC.gltf.glb",
+    "filename": "square_sand_roadC.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 172,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadC_detail.gltf.glb",
+    "filename": "square_sand_roadC_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 220,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadD.gltf.glb",
+    "filename": "square_sand_roadD.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.003,
+      1.0
+    ],
+    "triangles": 184,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadD_detail.gltf.glb",
+    "filename": "square_sand_roadD_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.003,
+      1.0
+    ],
+    "triangles": 232,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadE.gltf.glb",
+    "filename": "square_sand_roadE.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 280,
+    "candidates": [
+      "roads"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_roadE_detail.gltf.glb",
+    "filename": "square_sand_roadE_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 328,
+    "candidates": [
+      "roads",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterInnerCorner.gltf.glb",
+    "filename": "square_sand_waterInnerCorner.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 146,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterInnerCorner_empty.gltf.glb",
+    "filename": "square_sand_waterInnerCorner_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 136,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterInnerCorner_noSides.gltf.glb",
+    "filename": "square_sand_waterInnerCorner_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 138,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterOuterCorner.gltf.glb",
+    "filename": "square_sand_waterOuterCorner.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 154,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterOuterCorner_empty.gltf.glb",
+    "filename": "square_sand_waterOuterCorner_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 124,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterOuterCorner_noSides.gltf.glb",
+    "filename": "square_sand_waterOuterCorner_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 130,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterStraight.gltf.glb",
+    "filename": "square_sand_waterStraight.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 70,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterStraight_empty.gltf.glb",
+    "filename": "square_sand_waterStraight_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 56,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_sand_waterStraight_noSides.gltf.glb",
+    "filename": "square_sand_waterStraight_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 58,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_water.gltf.glb",
+    "filename": "square_water.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      1.0
+    ],
+    "triangles": 12,
+    "candidates": [
+      "water/coasts"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_water_detail.gltf.glb",
+    "filename": "square_water_detail.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.9
+    ],
+    "triangles": 38,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_water_detail_empty.gltf.glb",
+    "filename": "square_water_detail_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.5
+    ],
+    "triangles": 20,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_water_detail_noSides.gltf.glb",
+    "filename": "square_water_detail_noSides.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.9
+    ],
+    "triangles": 22,
+    "candidates": [
+      "water/coasts",
+      "props"
+    ]
+  },
+  {
+    "relativePath": "Models/tiles/square/gltf/square_water_empty.gltf.glb",
+    "filename": "square_water_empty.gltf.glb",
+    "dimensions": [
+      2.0,
+      2.0,
+      0.0
+    ],
+    "triangles": 2,
+    "candidates": [
+      "water/coasts"
+    ]
+  }
+]
