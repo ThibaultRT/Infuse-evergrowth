@@ -2,18 +2,16 @@ import { LoadingManager, Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
-const ASSET_ROOT = 'assets/quaternius/';
-
 export class AssetLoader {
   private readonly loader: GLTFLoader;
   private readonly cache = new Map<string, Promise<GLTF>>();
 
-  constructor(manager?: LoadingManager) {
+  constructor(manager?: LoadingManager, private readonly assetRoot = 'assets/quaternius/') {
     this.loader = new GLTFLoader(manager);
   }
 
   url(path: string): string {
-    return `${import.meta.env.BASE_URL}${ASSET_ROOT}${path}`;
+    return `${import.meta.env.BASE_URL}${this.assetRoot}${path}`;
   }
 
   load(path: string): Promise<GLTF> {
@@ -49,6 +47,7 @@ export class AssetLoader {
 }
 
 export const quaterniusAssets = new AssetLoader();
+export const kaykitAssets = new AssetLoader(undefined, 'assets/kaykit/');
 
 export const BOOT_ASSETS = [
   'animations/UAL1_Standard.glb',

@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import { AREAS, WORLD_CONNECTIONS } from '../config';
+import { AREAS, SPAWNS, WORLD_CONNECTIONS } from '../config';
 import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import type { AreaDefinition } from '../types';
-import { quaterniusAssets, type AssetLoader } from './AssetLoader';
+import { kaykitAssets, quaterniusAssets, type AssetLoader } from './AssetLoader';
+import { AREA_ONE_KAYKIT_PLACEMENTS, AREA_THREE_WALL_PLACEMENTS, areaOneVegetation, type KaykitPlacement, WEST_BORDER_KAYKIT_PLACEMENTS } from './KaykitEnvironmentPlacements';
 
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, x: number, y: number, z: number): THREE.Mesh {
   const value = new THREE.Mesh(geometry, material); value.position.set(x, y, z); return value;
@@ -66,13 +67,12 @@ export class EnvironmentView {
     }
     for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-25.4+Math.sin(x*.72)*.55+Math.sin(x*1.8)*.2; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
     for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-30.6+Math.sin(x*.61)*.4+Math.sin(x*1.55)*.16; this.macroRoot.add(this.irregularRock(x,.18,z,1.15,.4,.82)); }
-    const causewayMaterial=new THREE.MeshStandardMaterial({color:0x8b846d,roughness:1});
-    const causeway=mesh(new THREE.BoxGeometry(4.6,.3,9),causewayMaterial,8,.14,-28); this.macroRoot.add(causeway);
+    // Gameplay authority still treats this as the same crossing; its presentation is KayKit.
     for(const x of [5.85,10.15]) for(let z=-31.5;z<=-24.5;z+=2.25) this.macroRoot.add(this.irregularRock(x,.35,z,.45,.55,.65,0x626556));
     for(const [x,z,s] of [[-10,-28.4,1.35],[1,-29,1.05],[16,-28.2,.9]] as const) this.macroRoot.add(this.irregularRock(x,.15,z,s,.45,s*.75));
     // Layered west ridge: human-scale foreground rocks, larger masses pushed outside play.
     const ridge=new THREE.Group(); ridge.name='west layered ridge'; ridge.userData.cameraOccluder=true;
-    for(let z=-31;z<=32;z+=4.1){ const wave=Math.sin(z*.5); ridge.add(this.irregularRock(-19.1,.55,z,1.5,1.1,1.7),this.irregularRock(-22.3,1.5,z+1.5,2.5,2.8+wave*.4,2.3),this.irregularRock(-26,2.8,z-.8,4,4.7,3.5)); } this.macroRoot.add(ridge);
+    for(let z=-31;z<=32;z+=4.1){ if(z>-10&&z<10)continue; const wave=Math.sin(z*.5); ridge.add(this.irregularRock(-19.1,.55,z,1.5,1.1,1.7),this.irregularRock(-22.3,1.5,z+1.5,2.5,2.8+wave*.4,2.3),this.irregularRock(-26,2.8,z-.8,4,4.7,3.5)); } this.macroRoot.add(ridge);
     // A real depression: vertical cliff faces and a bottom 2.2m below the grass, with a reserved sealed crossing.
     const bottom=mesh(new THREE.PlaneGeometry(54,16),new THREE.MeshStandardMaterial({color:0x292821,roughness:1}),0,-2.2,34); bottom.rotation.x=-Math.PI/2; this.macroRoot.add(bottom);
     const cliffMat=new THREE.MeshStandardMaterial({color:0x50483c,roughness:1});
@@ -102,7 +102,7 @@ export class EnvironmentView {
   private buildRuinedFortress(): void {
     this.ground(0x686b61); this.road([[-20,0],[-8,0],[0,-5],[0,-28]],4.2);
     // Broken set-back masses replace uniform stacked rows. The south foreground is a 0.5–1.2m cutaway.
-    this.ruinSegment('west north ruin',-20,-16,2.2,22,4.8); this.ruinSegment('west south ruin',-20,17,2.2,19,2.5);
+    this.ruinSegment('west south ruin',-20,17,2.2,19,2.5);
     this.ruinSegment('north back ruin west',-11,-28,16,2.2,5.5); this.ruinSegment('north back ruin east',11,-28,16,2.2,4.7);
     this.ruinSegment('east fortress wall',20.2,0,1.35,52,5.7);
     const south=new THREE.Group(); south.name='south cutaway foundations';
@@ -126,24 +126,29 @@ export class EnvironmentView {
   }
 
   private async addAsset(path:string,x:number,z:number,scale:number,rotation=0): Promise<void> { const object=await this.assets.cloneScene(path); object.position.set(x,0,z); object.scale.setScalar(scale); object.rotation.y=rotation; this.assetDetailsRoot.add(object); }
+  private async addKaykitAsset(placement: KaykitPlacement): Promise<void> {
+    const object=await kaykitAssets.cloneScene(placement.path);
+    object.position.set(placement.x,0,placement.z); object.scale.setScalar(placement.scale); object.rotation.y=placement.rotation ?? 0;
+    object.traverse((child)=>{ if(child instanceof THREE.Mesh){ child.castShadow=true; child.receiveShadow=true; } });
+    this.assetDetailsRoot.add(object);
+  }
   private async loadDetails(): Promise<void> {
     const jobs: Promise<void>[]=[];
     if(this.area.id===1){
-      for(const [x,z,s] of [[-17,-24,.75],[-12,-25,.55],[-5,-25,.6],[14,-25,.65],[-16,25,.7],[-15,-5,.75]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_1.gltf',x,z,s,x));
-      for(const [x,z,s] of [[-16,-21,.65],[-13,-24,.5],[13,-23,.55],[-16,17,.7],[-20,3,.75]] as const) jobs.push(this.addAsset('nature/models/Bush_Common_Flowers.gltf',x,z,s));
-      for(const [x,z,s] of [[-22,-12,.8],[-23,13,.9],[-25,24,.85]] as const) jobs.push(this.addAsset('nature/models/CommonTree_1.gltf',x,z,s));
-      for(const [x,z,r] of [[-14,10,0],[-14,14,0],[-14,18,0],[13,12,Math.PI],[13,16,Math.PI]] as const) jobs.push(this.addAsset('village/models/Prop_WoodenFence_Extension1.gltf',x,z,.85,r));
-      for(const [x,z,s] of [[-12,20,.75],[12,19,.7],[14,-10,.65],[-13,-9,.7]] as const) jobs.push(this.addAsset('nature/models/CommonTree_1.gltf',x,z,s,x));
-      for(const [x,z,s] of [[-8,20,.6],[-11,9,.55],[10,19,.55],[14,9,.6],[-12,-10,.55]] as const) jobs.push(this.addAsset('nature/models/Bush_Common_Flowers.gltf',x,z,s));
+      const spawnPoints=SPAWNS.filter((spawn)=>spawn.areaId===1).map((spawn)=>({ x:spawn.x-this.area.originX,z:spawn.z-this.area.originZ }));
+      for(const placement of [...AREA_ONE_KAYKIT_PLACEMENTS,...WEST_BORDER_KAYKIT_PLACEMENTS,...areaOneVegetation(spawnPoints)]) jobs.push(this.addKaykitAsset(placement));
     } else if(this.area.id===2){
       for(const [x,z,s] of [[-31,-18,.85],[-27,13,.9],[-17,-20,.75],[-5,20,.8],[10,-20,.7],[24,-16,.85],[30,8,.8],[18,17,.75]] as const) jobs.push(this.addAsset('nature/models/CommonTree_3.gltf',x,z,s,x));
       for(const [x,z,s] of [[-22,7,.7],[-12,-18,.65],[5,18,.7],[17,-8,.8],[28,19,.75],[31,-19,.7]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_2.gltf',x,z,s,x));
       for(const [x,z,r] of [[-17,7,.3],[-14,9,.3],[19,-2,-.4],[22,0,-.4],[26,14,.8]] as const) jobs.push(this.addAsset('village/models/Prop_WoodenFence_Extension1.gltf',x,z,.85,r));
     } else {
+      for(const placement of AREA_THREE_WALL_PLACEMENTS) jobs.push(this.addKaykitAsset(placement));
       for(const [x,z,s] of [[-16,7,.8],[-7,7,.65],[16,5,.75],[9,5,.7],[-9,-8,.75],[9,-9,.8],[-7,-22,.7],[7,-22,.72]] as const) jobs.push(this.addAsset('village/models/Prop_Brick1.gltf',x,z,s,x));
       for(const [x,z,s,r] of [[-10,14,1.35,0],[9,12,1.3,.3],[0,-15,1.45,-.2],[-13,-3,.9,.2],[13,-4,.9,-.2]] as const) jobs.push(this.addAsset('village/models/Floor_UnevenBrick.gltf',x,z,s,r));
       for(const [x,z,s] of [[-15,19,.6],[15,18,.65],[-15,-10,.6],[14,-12,.65]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_2.gltf',x,z,s,x));
     }
-    try { await Promise.all(jobs); this.fallbackDetailsRoot.visible=false; } catch(error){ console.warn(`Area ${this.area.id} Quaternius details unavailable; procedural macro terrain remains playable.`,error); }
+    const results=await Promise.allSettled(jobs);
+    if(results.every((result)=>result.status==='fulfilled')) this.fallbackDetailsRoot.visible=false;
+    else console.warn(`Area ${this.area.id} cosmetic details partially unavailable; macro terrain remains playable.`,results.filter((result)=>result.status==='rejected'));
   }
 }
