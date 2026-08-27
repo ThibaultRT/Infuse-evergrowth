@@ -8,6 +8,16 @@
   pointer-events: none;
 }
 
+.soul-gain-stack {
+  position: absolute;
+  top: 78%;
+  right: 18px;
+  z-index: 4;
+  width: 128px;
+  height: 1px;
+  pointer-events: none;
+}
+
 .gain-pop {
   position: absolute;
   top: 0;
