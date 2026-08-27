@@ -16,6 +16,12 @@ export class SoulCatcherSystem {
     if (nodeId === 'SC-01' || this.level(nodeId) > 0) return true;
     return SOUL_EDGES.some(([a, b]) => (a === nodeId && this.level(b) > 0) || (b === nodeId && this.level(a) > 0));
   }
+  canPurchase(nodeId: string): boolean {
+    const node = SOUL_NODE_BY_ID.get(nodeId);
+    if (!this.available || !node || !this.revealed(nodeId)) return false;
+    const level = this.level(nodeId);
+    return level < node.maxLevel && this.state.soulCatcher.balances[node.cost.soulType] >= soulCost(node, level + 1);
+  }
   yieldFor(definition: SpawnDefinition): { soulType: SoulType; quantity: number } | null {
     if (!this.available || definition.tier === 'crystal' || !this.isEligible(definition.tier)) return null;
     const soulType = definition.tier as SoulType;
@@ -31,11 +37,9 @@ export class SoulCatcherSystem {
   }
   purchase(nodeId: string): boolean {
     const node = SOUL_NODE_BY_ID.get(nodeId);
-    if (!this.available || !node || !this.revealed(nodeId)) return false;
+    if (!node || !this.canPurchase(nodeId)) return false;
     const previousLevel = this.level(nodeId);
-    if (previousLevel >= node.maxLevel) return false;
     const cost = soulCost(node, previousLevel + 1);
-    if (this.state.soulCatcher.balances[node.cost.soulType] < cost) return false;
     this.state.soulCatcher.balances[node.cost.soulType] -= cost;
     this.state.soulCatcher.nodeLevels[nodeId] = previousLevel + 1;
     this.projectEffects();
