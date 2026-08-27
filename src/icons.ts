@@ -30,6 +30,19 @@ export function damageTypeIcon(type: DamageType, size = 12): string {
   return bluntHammerIcon(size);
 }
 
+/** A damage-type glyph nested in a shield, used for typed defence values. */
+export function damageTypeDefenseIcon(type: DamageType, size = 12): string {
+  const glyph = type === 'slash'
+    ? 'm20.9 2.1-2.1 7.4-8.2 8.2-2.3-2.3 8.2-8.2 4.4-5.1ZM7.2 16.5l1.3 1.3-2 2 1.2 1.2-1 1-4.8-4.8 1-1 1.2 1.2 2-2 .1.1 1-1 1 1-1 1Z'
+    : type === 'piercing'
+      ? 'm21.7 2.3-2.5 6.1-1.6-2-9 9 .9.9-1.4 1.4-.9-.9-2.4 2.4.9.9-1.4 1.4-2.8-2.8 1.4-1.4.9.9 2.4-2.4-.9-.9 1.4-1.4.9.9 9-9-2-1.6 6.1-2.5Z'
+      : 'M4.8 4.7 7.9 1.6l5.2 5.2-2 2-1.1-1.1-7.3 7.3a2 2 0 0 0 2.8 2.8l7.3-7.3-1.1-1.1 2-2 5.2 5.2-3.1 3.1-2.1-2.1-7.2 7.2a4 4 0 0 1-5.7-5.7L8 7.9 4.8 4.7Z';
+  return `<svg class="stat-icon damage-defense-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 1.5 22 4.8v6.4c0 6.2-4.2 10.3-10 11.8C6.2 21.5 2 17.4 2 11.2V4.8l10-3.3Zm0 2.8L4.8 6.7v4.5c0 4.4 2.7 7.5 7.2 8.9 4.5-1.4 7.2-4.5 7.2-8.9V6.7L12 4.3Z" fill="currentColor"/>
+    <path d="${glyph}" fill="currentColor" transform="translate(6 6) scale(.5)"/>
+  </svg>`;
+}
+
 export function weaponClassIcon(weaponClass: WeaponClass, size = 12): string {
   if (weaponClass === 'sword') return slashSwordIcon(size);
   if (weaponClass === 'spear') return pierceSpearIcon(size);

@@ -1,5 +1,5 @@
 import './reward-popups.css';
-import { bluntHammerIcon, combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon } from './icons';
+import { bluntHammerIcon, combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, heartIcon } from './icons';
 import { save, statAdditiveTotal, statTotal } from './save';
 import { logarithmicStat } from './domain/combat/HeroStats';
 import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED } from './config';
@@ -228,8 +228,8 @@ export function showSoulDrop(quantity: number, type: SoulType): void {
   ui.gainStack.append(element); window.setTimeout(() => { element.classList.add('leaving'); window.setTimeout(() => element.remove(), 180); }, 1600);
 }
 
-const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'H1', hand2: 'H2', orbit1: 'O1', orbit2: 'O2', helmet: 'Helmet', armor: 'Armor', legs: 'Legs' };
-const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs'];
+const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'H1', hand2: 'H2', orbit1: 'O1', orbit2: 'O2', helmet: 'Helmet', armor: 'Armor', legs: 'Legs', ring: 'Ring' };
+const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs', 'ring'];
 const formatInventoryValue = (value: number): string => value >= 100 ? Math.round(value).toLocaleString() : value.toFixed(value % 1 ? 1 : 0);
 
 export function renderInventory(inventory: InventoryState, summary: InventoryCombatSummary): void {
@@ -238,11 +238,9 @@ export function renderInventory(inventory: InventoryState, summary: InventoryCom
     ['Max HP', heartIcon(23), summary.maxHp],
     ['HP regeneration', '✦', summary.regenPerSecond]
   ] as const;
-  const affinities = (['blunt', 'slash', 'piercing'] as const).flatMap((type) => [
-    { type, value: summary.attackByType[type], defense: false },
-    { type, value: summary.defenseByType[type], defense: true }
-  ]);
-  ui.inventorySummary.innerHTML = `<div class="inventory-primary-stats">${primary.map(([label, icon, value]) => `<div class="inventory-primary-stat" aria-label="${label}: ${formatInventoryValue(value)}"><span aria-hidden="true">${icon}</span><strong>${formatInventoryValue(value)}</strong><small>${label}</small></div>`).join('')}</div><div class="inventory-affinities">${affinities.map(({ type, value, defense }) => `<div class="inventory-affinity" aria-label="${type} ${defense ? 'defense' : 'attack'}: ${formatInventoryValue(value)}">${defense ? shieldIcon(13) : damageTypeIcon(type, 15)}<strong>${formatInventoryValue(value)}</strong><small>${defense ? 'DEF' : 'ATK'}</small></div>`).join('')}</div>`;
+  const damageTypes = ['blunt', 'slash', 'piercing'] as const;
+  const affinityRow = (defense: boolean): string => damageTypes.map((type) => `<div class="inventory-affinity" aria-label="${type} ${defense ? 'defence' : 'attack'}: ${formatInventoryValue(defense ? summary.defenseByType[type] : summary.attackByType[type])}">${defense ? damageTypeDefenseIcon(type, 17) : damageTypeIcon(type, 15)}<strong>${formatInventoryValue(defense ? summary.defenseByType[type] : summary.attackByType[type])}</strong><small>${defense ? 'DEF' : 'ATK'}</small></div>`).join('');
+  ui.inventorySummary.innerHTML = `<div class="inventory-primary-stats">${primary.map(([label, icon, value]) => `<div class="inventory-primary-stat" aria-label="${label}: ${formatInventoryValue(value)}"><span aria-hidden="true">${icon}</span><strong>${formatInventoryValue(value)}</strong><small>${label}</small></div>`).join('')}</div><div class="inventory-affinities">${affinityRow(false)}${affinityRow(true)}</div>`;
 
   ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
     const itemId = inventory.equipped[slot];

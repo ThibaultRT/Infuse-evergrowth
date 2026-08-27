@@ -142,7 +142,7 @@ canvas { display: block; width: 100%; height: 100%; }
 .inventory-affinity { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 29px; padding: 4px; border-radius: 7px; background: rgba(255,255,255,.045); font-size: 11px; }
 .inventory-affinity strong { font-variant-numeric: tabular-nums; }
 .inventory-affinity small { font-size: 7px; opacity: .45; }
-.inventory-equipped { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; margin-top: 7px; }
+.inventory-equipped { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; margin-top: 7px; }
 .inventory-equip-slot { min-width: 0; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.13); border-radius: 9px; background: rgba(255,255,255,.05); color: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 3px; text-align: center; touch-action: pan-y; }
 .inventory-equip-slot span { order: 2; font-size: 7px; opacity: .55; }
 .inventory-equip-slot strong { font-size: 15px; opacity: .35; }
