@@ -6,6 +6,7 @@ This is the single index for planned work. Completed implementation history belo
 1. [Graphics validation and performance](1-graphics.md) — finish device validation, budgets, and release evidence.
 2. [Environment production](2-environment.md) — turn the accepted three-area topology and asset proofs into an authored, performant environment.
 3. [Physical hand combat](3-physical-hand-combat.md) — replace whole-body attack playback with independent upper-body/hand presentation.
+4. [Soul Catcher progression](4-soul-catcher.md) — add Area 2 unlock, rarity soul drops, radial upgrade tree, and the right-side Soul Catcher / Inventory HUD rail.
 
 ## Maintenance rule
 
