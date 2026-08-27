@@ -1,7 +1,7 @@
 import type { DamageType, SoulType } from '../types';
 
 export type SoulEffect =
-  | { type: 'maxHpAdditive' | 'regenAdditive' | 'speedRawAdditive' | 'criticalChanceRawAdditive' | 'criticalDamageRawAdditive'; amountPerLevel: number }
+  | { type: 'maxHpAdditive' | 'regenAdditive' | 'speedRawAdditive' | 'criticalChanceRawAdditive' | 'criticalDamageRawAdditive' | 'evasionChanceAdditive'; amountPerLevel: number }
   | { type: 'attackAdditive' | 'defenceAdditive'; damageType: DamageType; amountPerLevel: number }
   | { type: 'soulDropAdditive'; soulType: SoulType; amountPerLevel: number }
   | { type: 'unlockSoulDrop'; soulType: SoulType };

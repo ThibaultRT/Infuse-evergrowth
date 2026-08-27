@@ -68,6 +68,7 @@ export class SoulCatcherSystem {
   private projectEffects(): void {
     const clear = (): void => {
       for (const stat of [this.state.stats.maxHp, this.state.stats.regen, this.state.stats.speed, this.state.stats.criticalChance, this.state.stats.criticalDamage, ...Object.values(this.state.stats.attack), ...Object.values(this.state.stats.defense)]) stat.additive.soulCatcher = 0;
+      this.state.stats.evasion.directChance.soulCatcher = 0;
     };
     clear();
     for (const node of SOUL_NODES) for (const effect of node.reward.effects) this.apply(effect, this.level(node.id));
@@ -75,6 +76,7 @@ export class SoulCatcherSystem {
   private apply(effect: SoulEffect, level: number): void {
     if (!('amountPerLevel' in effect)) return;
     const value = effect.amountPerLevel * level;
+    if (effect.type === 'evasionChanceAdditive') { this.state.stats.evasion.directChance.soulCatcher += value; return; }
     const stat = effect.type === 'maxHpAdditive' ? this.state.stats.maxHp : effect.type === 'regenAdditive' ? this.state.stats.regen : effect.type === 'speedRawAdditive' ? this.state.stats.speed : effect.type === 'criticalChanceRawAdditive' ? this.state.stats.criticalChance : effect.type === 'criticalDamageRawAdditive' ? this.state.stats.criticalDamage : effect.type === 'attackAdditive' ? this.state.stats.attack[effect.damageType] : effect.type === 'defenceAdditive' ? this.state.stats.defense[effect.damageType] : null;
     if (stat) stat.additive.soulCatcher += value;
   }

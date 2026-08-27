@@ -15,8 +15,8 @@ import {
   TIER_CONFIG,
   areaById,
 } from '../config';
-import { combatAffinityIcon, damageTypeIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
-import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
+import { combatAffinityIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
+import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 import { renderEnemyAffinities, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeTierRing } from '../visuals';
@@ -176,6 +176,10 @@ function lootIcon(type: LootType, size = 9): string {
 function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false, blocked = false): void {
   const icon = blocked ? shieldIcon(11) : incoming ? combatAffinityIcon(type as CombatAffinity, 10) : damageTypeIcon(type as DamageType, 10);
   worldUi.addCombatText(position, `${blocked ? icon : ''}<span>${incoming ? '-' : ''}${Math.round(amount)}</span>${blocked ? '' : icon}`, incoming);
+}
+
+function showEvadedCombatText(position: THREE.Vector3): void {
+  worldUi.addCombatText(position, `<span>Evaded</span>${evasionIcon(11)}`, true);
 }
 
 function weaponCombatIcon(itemId: string): string {
@@ -452,6 +456,10 @@ function resetSpawnCooldowns(): void {
 
 function damageHero(amount: number, type: CombatAffinity): void {
   if (gameplay.hero.dead) return;
+  if (combat.rollChance(heroEvasionChance())) {
+    showEvadedCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)));
+    return;
+  }
   const defendedAmount = combat.enemyAttackDamage(amount, type, equippedDefense);
   const blocked = combat.rollChance(heroBlockChance());
   const reducedAmount = defendedAmount * (blocked ? BLOCKED_DAMAGE_MULTIPLIER : 1);

@@ -12,6 +12,9 @@
     "baseCriticalDamagePercent": 50,
     "baseBlockChancePercent": 1,
     "blockedDamageMultiplier": 0.2,
+    "evasionRawScale": 709,
+    "evasionRawTarget": 50000,
+    "evasionChanceCap": 0.8,
     "attackRangeMeters": 2.15,
     "respawnDelaySeconds": 5
   },

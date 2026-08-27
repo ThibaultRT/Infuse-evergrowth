@@ -66,6 +66,12 @@ export type StatSources = {
   multiplicative: Record<string, number>;
 };
 
+/** Raw evasion is converted on a curve; direct chances are decimal probabilities added afterwards. */
+export type EvasionSources = {
+  raw: Record<'kills' | 'other', number>;
+  directChance: Record<'equipment' | 'soulCatcher' | 'other', number>;
+};
+
 export type PlayerStats = {
   maxHp: StatSources;
   attack: Record<DamageType, StatSources>;
@@ -75,7 +81,7 @@ export type PlayerStats = {
   criticalChance: StatSources;
   criticalDamage: StatSources;
   blockChance: StatSources;
-  evasion: StatSources;
+  evasion: EvasionSources;
 };
 
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -93,7 +99,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 16;
+  version: 17;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
