@@ -28,6 +28,8 @@ The files are split by visual layer only to keep authored data manageable. **Lay
 - Rare/Epic/Legendary Soul unlocks remain future work.
 - Soul quantity is shown above enemy HP bars and on defeat as quantity + icon, slightly below the existing stat reward popup.
 - Add Soul Drops to the Stats panel, including Base 1 and upgrade contributions.
+- **Hero death never removes unspent Souls and never removes purchased Soul Catcher node levels.**
+- Soul-yield bonuses are **rarity-specific**. A Common Soul yield node affects only Common Souls, an Uncommon yield node affects only Uncommon Souls, and future Rare/Epic/Legendary yield nodes follow the same rule. Do not add generic `+1 to every eligible Soul rarity` effects.
 
 ## Canonical icons
 
@@ -147,6 +149,7 @@ Cost formula for target level `L`:
 5. Exactly five nodes in this first tree spend Uncommon Souls: **SC-21 through SC-25**. Their entry costs intentionally remain low so the newly unlocked currency is immediately useful.
 6. Defence is a first-class Soul Catcher reward. Defence is typed independently as `blunt`, `slash`, or `piercing`.
 7. Defence nodes use **+5 defence per purchased level**, with up to **10 levels**, therefore +5 at level 1 through +50 total at level 10.
+8. Soul-yield effects are always rarity-specific; each authored `soulDropAdditive` includes one explicit `soulType`.
 
 ### Uncommon branch
 
@@ -175,6 +178,20 @@ The authored draft uses:
 
 Codex should map this to the game's typed defence-stat implementation during integration. Keep Blunt, Slash and Piercing defence independently source-aware so Soul Catcher contributions can be shown in Stats.
 
+### Soul-yield effect schema
+
+Every Soul-yield upgrade must target one rarity explicitly:
+
+```json
+{
+  "type": "soulDropAdditive",
+  "soulType": "uncommon",
+  "amountPerLevel": 1
+}
+```
+
+Do not introduce an `all`, `eligible`, wildcard, or cross-rarity Soul yield type.
+
 ## Persistence and reset — decided
 
 Add to the next save version:
@@ -195,6 +212,8 @@ soulCatcher: {
 
 Derive Soul Catcher availability from existing Area 2 boss progression rather than duplicating an unlock boolean. Existing saves that already defeated the Area 2 boss unlock immediately with zero Souls and show the announcement once.
 
+Hero death leaves the entire `soulCatcher` state unchanged: balances, node levels, reveal state and announcement state all persist normally.
+
 Add a dedicated developer/settings action named exactly:
 
 `RESET SOUL CATCHER`
@@ -208,7 +227,7 @@ Its behavior:
 - do not replay the Soul Catcher unlock announcement;
 - do not alter equipment, ordinary permanent stats from other systems, defeated bosses, gates or area progression.
 
-Use an explicit confirmation before applying this destructive reset, consistent with the existing reset controls.
+This reset is a **developer-purpose control**. Reuse the same simple confirmation interaction already used by the existing reset controls; do not add a stronger or bespoke warning modal just for Soul Catcher.
 
 ## Architecture
 
@@ -218,7 +237,7 @@ Responsibilities:
 
 - availability from world progression;
 - rarity eligibility;
-- Soul yield calculation and grant;
+- rarity-specific Soul yield calculation and grant;
 - balances and spending;
 - neighbor-based node reveal/purchase validation;
 - Soul Catcher reset;
@@ -242,18 +261,16 @@ Suggested typed events:
 7. Enemy Soul preview + reward popup.
 8. Stats integration including typed defence and Soul drop stats.
 9. Radial tree UI: mystery/revealed/purchased states, drag + pinch zoom, explicit Purchase.
-10. Dedicated Reset Soul Catcher control and confirmation.
+10. Dedicated Reset Soul Catcher control using existing simple reset confirmation.
 11. iPhone portrait validation.
 
-## Remaining open design questions
+## Open design questions
 
-The earlier questions about existing saves, locked tap behavior, unlock timing, five-currency banner, mystery nodes, progression reveal behavior, purchasing interaction, Buy Max, tree navigation, Soul Catcher reset and Uncommon base yield are now resolved above. The old visual questions 11/12 are obsolete after the latest HUD/icon revision.
+**None for the currently specified v1 scope.**
 
-Only these decisions remain open:
+The previous open questions are resolved: existing-save behavior, locked-button toast, unlock timing, five-currency banner, mystery-node behavior, neighbor-based reveal, explicit one-level purchasing, tree drag/zoom, reset behavior, Uncommon base yield, hero-death behavior, rarity-specific Soul yield and reset confirmation UX are all decided above. Older popup/icon placement questions were superseded by the approved HUD and canonical icon revisions.
 
-1. **Hero death and Soul Catcher progression:** should hero death ever remove unspent Souls? Current recommendation: **no** — death should leave both balances and node levels unchanged.
-2. **Future Soul-yield upgrades:** when Rare/Epic/Legendary currencies arrive, should yield upgrades always be rarity-specific (`+1 Rare Soul`) or can some nodes grant `+1 Soul to every currently eligible rarity`? Current recommendation: **rarity-specific**, which preserves more progression/balance space.
-3. **Reset confirmation UX:** should `RESET SOUL CATCHER` use the same simple confirmation interaction as the existing reset controls, or a stronger modal that explicitly lists `Souls + all Soul Catcher nodes will be lost`? Current recommendation: use the stronger explicit confirmation because spent Souls cannot be reconstructed from current node levels if balance values change later.
+Future Rare/Epic/Legendary branches will require their own balance/design decisions when that scope is added; they are intentionally not blockers for this implementation.
 
 ## Acceptance criteria
 
@@ -264,6 +281,8 @@ Only these decisions remain open:
 - Unlock announcement follows the normal boss/route presentation immediately.
 - The Soul banner always shows all five rarity-colored currencies; unavailable balances show `0` rather than being greyed/hidden.
 - Common non-crystal enemies drop Common Souls after feature unlock; crystals never do.
+- Hero death never removes Soul balances or purchased Soul Catcher progression.
+- Every Soul-yield node modifies exactly one authored rarity.
 - SC-20 is reachable around two-thirds of the numbered tree, costs 250 Common Souls and unlocks base 1 Uncommon Soul from every Uncommon enemy.
 - SC-21..SC-25 spend Uncommon Souls at low entry costs.
 - Every upgrade node grants only one stat/effect.
@@ -275,6 +294,7 @@ Only these decisions remain open:
 - Revealed nodes open a detail view; Souls are spent only through an explicit Purchase button, one level at a time.
 - Tree supports drag and pinch zoom.
 - `RESET SOUL CATCHER` resets all five balances and all node levels to zero while preserving the Area 2 unlock and other game progression.
+- Reset Soul Catcher reuses the existing simple reset confirmation interaction.
 - Soul balances, node levels and unlock presentation persist correctly.
 - Node data remains editable in one JSON file per visual layer while graph connections remain independent from layer boundaries.
 - Canonical committed SVGs are used throughout the implementation.
