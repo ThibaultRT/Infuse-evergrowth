@@ -32,7 +32,9 @@
         "display": "+25 Max HP"
       },
       "neighbors": [
-        "SC-02"
+        "SC-02",
+        "SC-04",
+        "SC-06"
       ]
     }
   ]
