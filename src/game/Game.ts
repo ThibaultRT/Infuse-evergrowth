@@ -19,13 +19,13 @@ import {
 import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
-import { renderEnemyAffinities, renderInventory, renderStats, renderWeaponDetail, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
+import { renderEnemyAffinities, renderInventory, renderItemDetail, renderStats, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
-import { EQUIPMENT_BY_ID, attackProfile, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
+import { EQUIPMENT_BY_ID, attackProfile, equipmentCombatSummary, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView } from '../rendering/EnvironmentView';
 import { GateView } from '../rendering/GateView';
@@ -289,7 +289,7 @@ class SpawnEntity {
     if (result.boss) presentBossDefeat(result.boss);
     if (result.drop) {
       showEquipmentDrop(result.drop);
-      renderInventory(save.inventory);
+      renderInventory(save.inventory, equipmentCombatSummary());
     }
     renderStats(save.stats);
   }
@@ -497,7 +497,7 @@ function setInventoryPanel(open: boolean): void {
   if (open) closeOtherPanels('inventory');
   ui.inventoryPanel.classList.toggle('visible', open);
   ui.inventoryPanel.setAttribute('aria-hidden', String(!open));
-  if (open) renderInventory(save.inventory);
+  if (open) { showInventoryOverview(0); renderInventory(save.inventory, equipmentCombatSummary()); }
 }
 function renderQualityControls(): void {
   const scale = ui.settingsPanel.querySelector<HTMLInputElement>(`input[name="render-scale"][value="${renderingQuality.renderScale}"]`);
@@ -547,7 +547,7 @@ ui.resetHeroButton.addEventListener('click', () => {
   commands.execute({ type: 'resetHero', equipment: true });
   heroView.syncEquipment(save.inventory);
   renderStats(save.stats);
-  renderInventory(save.inventory);
+  renderInventory(save.inventory, equipmentCombatSummary());
   updateHud();
   showToast('Hero reset · attributes and equipment drops removed');
 });
@@ -557,90 +557,63 @@ ui.settingsPanel.addEventListener('change', (event) => {
   if (input.name === 'frame-rate') applyRenderingQuality({ ...renderingQuality, frameRateLimit: input.value === '30' ? 30 : 60 });
   if (input === ui.rendererStatsToggle) applyRenderingQuality({ ...renderingQuality, showStats: input.checked });
 });
-let suppressInventoryClick = false;
+type InventoryViewState =
+  | { view: 'overview'; scrollTop: number }
+  | { view: 'detail'; itemId: string; overviewScrollTop: number };
+let inventoryView: InventoryViewState = { view: 'overview', scrollTop: 0 };
+const inventoryScroller = ui.inventoryOverview.closest<HTMLElement>('.inventory-sheet')!;
+
+function showInventoryOverview(scrollTop: number): void {
+  inventoryView = { view: 'overview', scrollTop };
+  ui.inventoryOverview.hidden = false;
+  ui.inventoryDetail.hidden = true;
+  requestAnimationFrame(() => { inventoryScroller.scrollTop = scrollTop; });
+}
+function showInventoryDetail(itemId: string): void {
+  const overviewScrollTop = inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : inventoryScroller.scrollTop;
+  inventoryView = { view: 'detail', itemId, overviewScrollTop };
+  renderItemDetail(save.inventory.items[itemId] ?? null);
+  ui.inventoryOverview.hidden = true;
+  ui.inventoryDetail.hidden = false;
+  inventoryScroller.scrollTop = 0;
+}
+function refreshInventory(itemId?: string): void {
+  renderInventory(save.inventory, equipmentCombatSummary());
+  if (itemId) renderItemDetail(save.inventory.items[itemId] ?? null);
+  updateHud();
+}
+
 ui.inventoryBag.addEventListener('click', (event) => {
-  if (suppressInventoryClick) { suppressInventoryClick = false; return; }
-  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
-  if (button?.dataset.itemId) renderWeaponDetail(save.inventory.items[button.dataset.itemId] ?? null);
+  const item = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
+  if (item?.dataset.itemId) showInventoryDetail(item.dataset.itemId);
 });
 ui.inventoryEquipped.addEventListener('click', (event) => {
-  const slot = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
-  if (slot?.dataset.itemId) renderWeaponDetail(save.inventory.items[slot.dataset.itemId] ?? null);
+  const item = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
+  if (item?.dataset.itemId) showInventoryDetail(item.dataset.itemId);
 });
-ui.weaponDetail.addEventListener('click', (event) => {
+ui.inventoryDetail.addEventListener('click', (event) => {
   const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
-  const itemId = button?.dataset.itemId;
-  if (!button || !itemId) return;
+  if (!button) return;
+  if (button.hasAttribute('data-inventory-back')) {
+    showInventoryOverview(inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : 0);
+    return;
+  }
+  const itemId = button.dataset.itemId;
+  if (!itemId) return;
   if (button.hasAttribute('data-equip')) {
     const armorSlot = equipmentSlot(itemId);
-    const hand = armorSlot ?? (['hand1', 'hand2'] as const).find((slot) => save.inventory.equipped[slot] === null);
-    if (!hand) { showToast('no free slots!'); return; }
-    commands.execute({ type: 'equip', itemId, slot: hand });
+    if (armorSlot) commands.execute({ type: 'equip', itemId, slot: armorSlot });
+    else {
+      const freeSlots = (['hand1', 'hand2', 'orbit1', 'orbit2'] as const).filter((slot) => save.inventory.equipped[slot] === null);
+      if (freeSlots.length === 1) commands.execute({ type: 'equip', itemId, slot: freeSlots[0] });
+      else { ui.inventoryDetail.querySelector<HTMLElement>('[data-slot-picker]')!.hidden = false; return; }
+    }
   }
+  if (button.dataset.equipSlot) commands.execute({ type: 'equip', itemId, slot: button.dataset.equipSlot as EquipmentSlotId });
   if (button.dataset.unequip) commands.execute({ type: 'unequip', slot: button.dataset.unequip as EquipmentSlotId });
   if (button.hasAttribute('data-ascend')) commands.execute({ type: 'ascend', itemId });
-  persistGame(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[itemId]); updateHud();
+  refreshInventory(itemId);
 });
-
-type EquipmentDrag = { itemId: string; sourceHand: EquipmentSlotId | null };
-function dragFrom(element: HTMLElement): EquipmentDrag | null {
-  const itemId = element.dataset.itemId;
-  if (!itemId) return null;
-  const slot = element.closest<HTMLElement>('[data-slot]')?.dataset.slot;
-  return { itemId, sourceHand: slot && ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs'].includes(slot) ? slot as EquipmentSlotId : null };
-}
-function completeEquipmentDrag(drag: EquipmentDrag, target: Element | null): void {
-  const slot = target?.closest<HTMLElement>('.inventory-equip-slot:not(.locked)')?.dataset.slot;
-  if (slot && ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs'].includes(slot)) {
-    const equipmentSlotId = slot as EquipmentSlotId;
-    commands.execute({ type: 'equip', itemId: drag.itemId, slot: equipmentSlotId });
-  } else if (target?.closest('#inventory-bag') && drag.sourceHand) {
-    commands.execute({ type: 'unequip', slot: drag.sourceHand });
-  } else return;
-  persistGame(); renderInventory(save.inventory); renderWeaponDetail(save.inventory.items[drag.itemId]); updateHud();
-}
-
-ui.inventoryPanel.addEventListener('dragstart', (event) => {
-  const source = (event.target as HTMLElement).closest<HTMLElement>('[draggable="true"]');
-  const drag = source ? dragFrom(source) : null;
-  if (!source || !drag || !event.dataTransfer) { event.preventDefault(); return; }
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('application/x-inventory-equipment', JSON.stringify(drag));
-  source.classList.add('dragging');
-});
-ui.inventoryPanel.addEventListener('dragend', (event) => (event.target as HTMLElement).classList.remove('dragging'));
-ui.inventoryPanel.addEventListener('dragover', (event) => {
-  if ((event.target as Element).closest('.inventory-equip-slot:not(.locked), #inventory-bag')) event.preventDefault();
-});
-ui.inventoryPanel.addEventListener('drop', (event) => {
-  event.preventDefault();
-  const raw = event.dataTransfer?.getData('application/x-inventory-equipment');
-  if (raw) completeEquipmentDrag(JSON.parse(raw) as EquipmentDrag, event.target as Element);
-});
-
-let pointerDrag: (EquipmentDrag & { startX: number; startY: number; active: boolean; source: HTMLElement }) | null = null;
-ui.inventoryPanel.addEventListener('pointerdown', (event) => {
-  if (event.pointerType === 'mouse') return;
-  const source = (event.target as HTMLElement).closest<HTMLElement>('[draggable="true"]');
-  const drag = source ? dragFrom(source) : null;
-  if (source && drag) pointerDrag = { ...drag, startX: event.clientX, startY: event.clientY, active: false, source };
-});
-ui.inventoryPanel.addEventListener('pointermove', (event) => {
-  if (!pointerDrag || pointerDrag.active) return;
-  if (Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY) < 8) return;
-  pointerDrag.active = true;
-  pointerDrag.source.classList.add('dragging');
-});
-ui.inventoryPanel.addEventListener('pointerup', (event) => {
-  if (!pointerDrag) return;
-  const drag = pointerDrag;
-  pointerDrag = null;
-  drag.source.classList.remove('dragging');
-  if (!drag.active) return;
-  suppressInventoryClick = true;
-  completeEquipmentDrag(drag, document.elementFromPoint(event.clientX, event.clientY));
-});
-ui.inventoryPanel.addEventListener('pointercancel', () => { pointerDrag?.source.classList.remove('dragging'); pointerDrag = null; });
 
 function updateHero(dt: number): void {
   hero.position.copy(gameplay.hero.position);
@@ -809,7 +782,7 @@ function frame(now: number): void {
 }
 
 renderStats(save.stats);
-renderInventory(save.inventory);
+renderInventory(save.inventory, equipmentCombatSummary());
 renderEnemyAffinities(areaById(currentAreaId));
 updateHud();
 persistGame();

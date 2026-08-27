@@ -1,11 +1,18 @@
-import { heroDamage, save } from '../save';
+import { heroDamage, heroRegen, maxHeroHp, save } from '../save';
 import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
-import { ascendOwnedEquipment, canAscend, equipmentDamage, equipmentDefense } from '../domain/items/EquipmentProgression';
+import { ascendOwnedEquipment, canAscend, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel } from '../domain/items/EquipmentProgression';
 
-export { EQUIPMENT, EQUIPMENT_BY_ID, equipmentDamage, equipmentDefense };
+export { EQUIPMENT, EQUIPMENT_BY_ID, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel };
 
 export type AttackProfile = { itemId: string; damage: number; damageType: DamageType; cooldownSeconds: number };
+export type InventoryCombatSummary = {
+  totalAttack: number;
+  maxHp: number;
+  regenPerSecond: number;
+  attackByType: Record<DamageType, number>;
+  defenseByType: Record<DamageType, number>;
+};
 
 /**
  * Runtime equipment orchestration. Static definitions and progression math live
@@ -65,4 +72,22 @@ export function equippedDefense(type: DamageType): number {
     const owned = itemId ? save.inventory.items[itemId] : undefined;
     return total + (item?.damageType === type && owned ? equipmentDefense(item, owned) : 0);
   }, 0);
+}
+
+/** Plain-value projection of the authoritative equipment and hero stat rules used by combat. */
+export function equipmentCombatSummary(): InventoryCombatSummary {
+  const damageTypes: DamageType[] = ['blunt', 'slash', 'piercing'];
+  const attackByType: Record<DamageType, number> = { blunt: 0, slash: 0, piercing: 0 };
+  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
+    const profile = attackProfile(slot);
+    if (profile) attackByType[profile.damageType] += profile.damage;
+  }
+  const defenseByType = Object.fromEntries(damageTypes.map((type) => [type, equippedDefense(type)])) as Record<DamageType, number>;
+  return {
+    totalAttack: damageTypes.reduce((total, type) => total + attackByType[type], 0),
+    maxHp: maxHeroHp(),
+    regenPerSecond: heroRegen(),
+    attackByType,
+    defenseByType
+  };
 }

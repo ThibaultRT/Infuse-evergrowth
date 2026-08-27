@@ -26,6 +26,16 @@ export function equipmentDefense(item: EquipmentDefinition, owned: OwnedEquipmen
   return item.kind === 'armor' ? owned.level * item.baseDefensePerLevel * 2 ** owned.ascend : 0;
 }
 
+export function equipmentValuePerLevel(item: EquipmentDefinition, owned: OwnedEquipment): number {
+  return item.kind === 'weapon' ? growthAtAscend(item, owned.ascend) : item.baseDefensePerLevel * 2 ** owned.ascend;
+}
+
+export function equipmentAscendValue(item: EquipmentDefinition, owned: OwnedEquipment): number | null {
+  if (!canAscend(owned)) return null;
+  const ascended = ascendOwnedEquipment(owned);
+  return item.kind === 'weapon' ? equipmentDamage(item, ascended) : equipmentDefense(item, ascended);
+}
+
 export function canAscend(owned: OwnedEquipment): boolean {
   return owned.level >= balance.equipmentProgression.ascendLevel;
 }
