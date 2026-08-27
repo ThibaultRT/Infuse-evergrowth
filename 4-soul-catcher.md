@@ -11,18 +11,20 @@ The editable node definitions are the balance source of truth:
 - `WIP/soul-catcher/nodes/layer-03-middle.json` — SC-08..SC-17
 - `WIP/soul-catcher/nodes/layer-04-outer.json` — SC-18..SC-30
 
-Promote them to `src/data/soul-catcher/` when implementation starts.
+The files are split by visual layer only to keep authored data manageable. **Layers do not impose progression gates.** Promote them to `src/data/soul-catcher/` when implementation starts.
 
-## Unlock and drops
+## Unlock and drops — decided
 
 - Soul Catcher is visible from game start but greyed/barred until the Area 2 boss is defeated.
-- On unlock show `Soul Catcher unlocked!` and `Infuse souls of the defeated enemies and unlock powerful upgrades!` after the normal boss/route presentation.
+- If an existing save already defeated the Area 2 boss before this feature ships, Soul Catcher unlocks immediately on migration and its announcement is shown once.
+- Tapping the locked button shows the exact toast: `Defeat area 2 boss to unlock Soul Catcher`.
+- On first unlock, show `Soul Catcher unlocked!` and `Infuse souls of the defeated enemies and unlock powerful upgrades!` **immediately after** the normal boss/route presentation.
 - Initially only Common enemies drop Souls.
 - Base eligible drop = 1 Soul per enemy.
 - Crystals never display or drop Souls.
-- Locked enemy rarities display no Soul reward at all.
+- Locked enemy rarities display no Soul reward above the enemy HP bar.
 - Uncommon Soul drops are unlocked by SC-20 `Uncommon Resonance`, roughly two-thirds through the 30-node progression.
-- SC-20 costs **250 Common Souls** and unlocks base 1 Uncommon Soul per Uncommon enemy.
+- SC-20 costs **250 Common Souls** and unlocks base **1 Uncommon Soul per Uncommon enemy**.
 - Rare/Epic/Legendary Soul unlocks remain future work.
 - Soul quantity is shown above enemy HP bars and on defeat as quantity + icon, slightly below the existing stat reward popup.
 - Add Soul Drops to the Stats panel, including Base 1 and upgrade contributions.
@@ -45,7 +47,7 @@ Use one `soul-skull.svg` silhouette for all rarities and tint it via CSS/SVG mas
 | Epic | `#bf75ff` |
 | Legendary | `#ffb33d` |
 
-Recommended sizes: 11–14 px in enemy reward labels, 16–20 px in reward popups/stats, 22–28 px in the Soul balance banner. Rare+ may receive a subtle matching glow without changing the silhouette.
+Recommended sizes: 11–14 px in enemy reward labels, 16–20 px in reward popups/stats, 22–28 px in the Soul balance banner.
 
 ## Approved right-edge HUD
 
@@ -62,22 +64,75 @@ The approved portrait mockup is the layout reference.
 - Target ~48 px touch areas, never below 44 px; respect safe areas.
 - Validate at iPhone 12 portrait and modern iPhone portrait sizes without overlap.
 
-Recommended locked tap toast: `Defeat the Area 2 boss to unlock Soul Catcher.`
+The older reward-popup/icon-placement questions are obsolete; use the latest approved HUD revision as the visual reference.
 
-## Skill tree
+## Soul balance banner — decided
+
+The sticky top banner inside Soul Catcher always shows **all five Soul rarities**:
+
+- Common
+- Uncommon
+- Rare
+- Epic
+- Legendary
+
+Do not grey or hide locked currencies. Their normal rarity-colored icon remains visible and their quantity simply reads `0` until that Soul type becomes obtainable.
+
+## Skill tree interaction — decided
 
 Use DOM + SVG/CSS, independent from Three.js.
+
+### Visual layout
 
 - Layer 1: 1 core node.
 - Layer 2: 6 inner nodes.
 - Layer 3: 10 middle nodes.
 - Layer 4: 13 outer nodes.
-- JSON owns node number, ID, description, polar position, max level, cost Soul type, base cost, cost scaling, reward and prerequisites.
-- One purchased level reveals connected children unless JSON explicitly requires a higher level.
-- Unrevealed descendants may appear as dim mystery silhouettes but hide name/cost/reward.
-- Tap a revealed node to open details and an explicit Purchase button.
-- Use one-finger pan + pinch zoom; minimum node hit target 44 px.
-- Sticky top banner shows all five Soul balances, with unavailable rarities visually locked.
+- The layer number/radius describes **where a node is drawn and which JSON file owns it**, not when it becomes available.
+- JSON owns node number, ID, description, polar position, max level, cost Soul type, base cost, cost scaling, reward and graph connections.
+
+### Neighbor-based progression
+
+There is no separate layer-by-layer unlock rule.
+
+- SC-01 is the only node whose details are available initially.
+- Each node should have approximately **1–3 neighboring nodes** connected to it in the authored graph.
+- Purchasing the **first level** of a node immediately reveals **all of that node's neighboring nodes**.
+- A multi-level node does **not** need to be maxed before progression can continue.
+- Once revealed, a neighboring node can be selected regardless of which visual ring/layer contains it.
+- Connections may therefore branch sideways or outward as needed to create a natural dreamcatcher graph rather than strict concentric progression.
+- Author node connections explicitly in JSON; the renderer should derive connection lines and reveal behavior from the same graph data.
+
+Preferred authored representation:
+
+```json
+{
+  "id": "SC-08",
+  "neighbors": ["SC-12", "SC-18"]
+}
+```
+
+The implementation must validate references and keep graph connections visually symmetric even if the JSON stores each edge only once.
+
+### Mystery nodes
+
+Unrevealed connected nodes are visible as **mystery nodes** so the player can see that further progression exists.
+
+- Show the node silhouette/slot and its connection line.
+- Do not reveal its name, level count, cost, reward, Soul type or description.
+- Mystery nodes are **not clickable/selectable** and cannot open a detail panel.
+- When one of their connected purchased nodes reaches level 1, transition them to the normal revealed state.
+
+### Purchase UX
+
+- Tap a **revealed** node to open its detail card.
+- The detail card contains name, description, current level/max, next-level cost, reward and an explicit `Purchase` button.
+- Tapping the node itself never spends Souls.
+- Purchases are **one level at a time only**. Do not add Buy Max for this version.
+- Purchasing level 1 both applies that node's first reward and reveals all neighboring mystery nodes.
+- One-finger drag pans the tree.
+- Pinch zoom is supported.
+- Minimum node hit target: 44 px.
 
 Cost formula for target level `L`:
 
@@ -104,7 +159,7 @@ Cost formula for target level `L`:
 | SC-24 Uncommon Harvest | 10 Uncommon, +10/level | 3 | +1 Uncommon Soul/enemy/level |
 | SC-25 Uncommon Vitality | 15 Uncommon, +10/level | 5 | +200 Max HP/level |
 
-SC-21..25 all require SC-20 level 1. This creates an immediate five-way use for the new currency rather than unlocking Uncommon Souls at the very end of the tree.
+SC-20 must be graph-connected so that purchasing it reveals SC-21..SC-25 through the normal neighbor system. Because each node should generally expose only 1–3 neighbors, the five Uncommon-spending nodes do **not** all need to connect directly to SC-20; they can form a short branching cluster beginning at SC-20 while still becoming available quickly after Uncommon Resonance.
 
 ### Defence effect schema
 
@@ -120,7 +175,7 @@ The authored draft uses:
 
 Codex should map this to the game's typed defence-stat implementation during integration. Keep Blunt, Slash and Piercing defence independently source-aware so Soul Catcher contributions can be shown in Stats.
 
-## Persistence
+## Persistence and reset — decided
 
 Add to the next save version:
 
@@ -138,7 +193,22 @@ soulCatcher: {
 }
 ```
 
-Derive Soul Catcher availability from existing Area 2 boss progression rather than duplicating an unlock boolean. Existing saves that already defeated the Area 2 boss should unlock immediately with zero Souls and show the announcement once. Hero death does not remove Soul currency or node progression.
+Derive Soul Catcher availability from existing Area 2 boss progression rather than duplicating an unlock boolean. Existing saves that already defeated the Area 2 boss unlock immediately with zero Souls and show the announcement once.
+
+Add a dedicated developer/settings action named exactly:
+
+`RESET SOUL CATCHER`
+
+Its behavior:
+
+- reset every Soul balance to `0`;
+- reset every purchased node level to `0`;
+- preserve Area 2 boss progression, therefore Soul Catcher remains unlocked if the boss was already defeated;
+- restore the tree to its initial state with only SC-01 revealed/actionable and all other nodes back to mystery state;
+- do not replay the Soul Catcher unlock announcement;
+- do not alter equipment, ordinary permanent stats from other systems, defeated bosses, gates or area progression.
+
+Use an explicit confirmation before applying this destructive reset, consistent with the existing reset controls.
 
 ## Architecture
 
@@ -150,7 +220,8 @@ Responsibilities:
 - rarity eligibility;
 - Soul yield calculation and grant;
 - balances and spending;
-- node reveal/purchase validation;
+- neighbor-based node reveal/purchase validation;
+- Soul Catcher reset;
 - node effect projection into source-aware hero/Soul stats.
 
 Suggested typed events:
@@ -158,30 +229,52 @@ Suggested typed events:
 - `soulCatcherUnlocked: { areaId: number }`
 - `soulDropped: { sourceId: string; soulType: SoulType; quantity: number }`
 - `soulNodePurchased: { nodeId: string; previousLevel: number; newLevel: number; soulType: SoulType; cost: number }`
+- `soulCatcherReset: undefined`
 
 ## Implementation order
 
-1. Promote and validate authored JSON; define Soul/node/effect types.
+1. Promote and validate authored JSON; define Soul/node/effect types and explicit node-neighbor graph.
 2. Save migration.
-3. SoulCatcherSystem.
+3. SoulCatcherSystem including reveal graph and reset.
 4. Area 2 boss + enemy defeat event integration.
 5. Approved HUD recomposition and committed icons.
-6. Unlock popup.
+6. Unlock popup and locked-button toast.
 7. Enemy Soul preview + reward popup.
 8. Stats integration including typed defence and Soul drop stats.
-9. Radial tree UI.
-10. iPhone portrait validation.
+9. Radial tree UI: mystery/revealed/purchased states, drag + pinch zoom, explicit Purchase.
+10. Dedicated Reset Soul Catcher control and confirmation.
+11. iPhone portrait validation.
+
+## Remaining open design questions
+
+The earlier questions about existing saves, locked tap behavior, unlock timing, five-currency banner, mystery nodes, progression reveal behavior, purchasing interaction, Buy Max, tree navigation, Soul Catcher reset and Uncommon base yield are now resolved above. The old visual questions 11/12 are obsolete after the latest HUD/icon revision.
+
+Only these decisions remain open:
+
+1. **Hero death and Soul Catcher progression:** should hero death ever remove unspent Souls? Current recommendation: **no** — death should leave both balances and node levels unchanged.
+2. **Future Soul-yield upgrades:** when Rare/Epic/Legendary currencies arrive, should yield upgrades always be rarity-specific (`+1 Rare Soul`) or can some nodes grant `+1 Soul to every currently eligible rarity`? Current recommendation: **rarity-specific**, which preserves more progression/balance space.
+3. **Reset confirmation UX:** should `RESET SOUL CATCHER` use the same simple confirmation interaction as the existing reset controls, or a stronger modal that explicitly lists `Souls + all Soul Catcher nodes will be lost`? Current recommendation: use the stronger explicit confirmation because spent Souls cannot be reconstructed from current node levels if balance values change later.
 
 ## Acceptance criteria
 
 - Stats and Spawn retain their approved positions; Settings moves beside the narrowed combat banner.
 - Soul Catcher + Bag fit in the marked open right-side space; bottom Inventory button is removed.
+- Existing saves that defeated the Area 2 boss immediately gain access and see the unlock announcement once.
+- Locked Soul Catcher tap displays exactly `Defeat area 2 boss to unlock Soul Catcher`.
+- Unlock announcement follows the normal boss/route presentation immediately.
+- The Soul banner always shows all five rarity-colored currencies; unavailable balances show `0` rather than being greyed/hidden.
 - Common non-crystal enemies drop Common Souls after feature unlock; crystals never do.
-- SC-20 is reachable around two-thirds of the numbered tree, costs 250 Common Souls and unlocks Uncommon drops.
+- SC-20 is reachable around two-thirds of the numbered tree, costs 250 Common Souls and unlocks base 1 Uncommon Soul from every Uncommon enemy.
 - SC-21..SC-25 spend Uncommon Souls at low entry costs.
 - Every upgrade node grants only one stat/effect.
 - Blunt, Slash and Piercing defence upgrades exist and provide +5 defence per level up to 10 levels.
 - Late Common base costs are generally 250–300 rather than 400–500.
+- Tree progression is neighbor-based, not layer-gated: purchasing level 1 reveals all connected neighboring nodes.
+- Each authored node generally has 1–3 neighboring connections.
+- Mystery nodes are visible but expose no details and cannot be clicked.
+- Revealed nodes open a detail view; Souls are spent only through an explicit Purchase button, one level at a time.
+- Tree supports drag and pinch zoom.
+- `RESET SOUL CATCHER` resets all five balances and all node levels to zero while preserving the Area 2 unlock and other game progression.
 - Soul balances, node levels and unlock presentation persist correctly.
-- Node data remains editable in one JSON file per layer.
+- Node data remains editable in one JSON file per visual layer while graph connections remain independent from layer boundaries.
 - Canonical committed SVGs are used throughout the implementation.
