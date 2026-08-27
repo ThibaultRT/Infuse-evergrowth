@@ -22,6 +22,9 @@ export type GameEventMap = {
   soulDropped: { sourceId: string; soulType: SoulType; quantity: number };
   soulNodePurchased: { nodeId: string; previousLevel: number; newLevel: number; soulType: SoulType; cost: number };
   soulCatcherReset: undefined;
+  soulCatcherXpGained: { amount: number; total: number };
+  soulCatcherLayerUnlocked: { layer: number };
+  heroEvaded: { damageType: CombatAffinity };
 };
 
 type Listener<T> = (event: T) => void;

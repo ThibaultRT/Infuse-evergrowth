@@ -76,6 +76,7 @@ export type PlayerStats = {
   maxHp: StatSources;
   attack: Record<DamageType, StatSources>;
   defense: Record<DamageType, StatSources>;
+  damageResistance: Record<DamageType, StatSources>;
   regen: StatSources;
   speed: StatSources;
   criticalChance: StatSources;
@@ -99,7 +100,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 17;
+  version: 18;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
@@ -108,7 +109,7 @@ export type SaveData = {
   stats: PlayerStats;
   inventory: InventoryState;
   spawns: Record<string, SavedSpawnState>;
-  soulCatcher: { balances: Record<SoulType, number>; nodeLevels: Record<string, number>; unlockAnnouncementSeen: boolean };
+  soulCatcher: { balances: Record<SoulType, number>; nodeLevels: Record<string, number>; unlockAnnouncementSeen: boolean; xp: number; highestUnlockedLayer: number };
 };
 
 export type TierConfig = {
