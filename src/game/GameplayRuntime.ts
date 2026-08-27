@@ -103,6 +103,8 @@ export class GameplayRuntime {
     this.enemyAI = new EnemyAISystem(options.enemyAggroRadius, options.enemyLeashRadius, options.enemyAttackRange, options.enemyPositioningRange);
   }
 
+  setHeroSpeed(heroSpeed: number): void { this.options.heroSpeed = heroSpeed; }
+
   update(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean, elapsedSeconds = dt): GameplayRuntimeEvent[] {
     const events: GameplayRuntimeEvent[] = [];
     if (this.hero.dead) {

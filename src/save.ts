@@ -1,6 +1,7 @@
-import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, EVASION_CHANCE_CAP, EVASION_RAW_SCALE, EVASION_RAW_TARGET, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPAWNS } from './config';
+import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, EVASION_CHANCE_CAP, EVASION_RAW_SCALE, EVASION_RAW_TARGET, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPEED_MAX_MULTIPLIER, SPEED_RAW_SCALE, SPEED_RAW_TARGET, SPAWNS } from './config';
 import { EQUIPMENT_BY_ID } from './domain/items/EquipmentCatalog';
 import { logarithmicChance, logarithmicStat, rawEvasionChance, totalEvasionChance } from './domain/combat/HeroStats';
+import { speedMultiplier } from './domain/stats/Speed';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID } from './data/soul-catcher';
 import { soulCost, soulPurchaseXp } from './domain/soul-catcher';
@@ -222,7 +223,11 @@ export function statTotal(stat: StatSources): number { return statAdditiveTotal(
 export function maxHeroHp(): number { return statTotal(save.stats.maxHp); }
 export function heroDamage(type: DamageType): number { return statTotal(save.stats.attack[type]); }
 export function heroRegen(): number { return statTotal(save.stats.regen); }
-export function heroSpeed(): number { return logarithmicStat(statTotal(save.stats.speed), HERO_SPEED); }
+export function heroSpeedMultiplier(): number {
+  const rawMultiplier = speedMultiplier(statAdditiveTotal(save.stats.speed), SPEED_RAW_SCALE, SPEED_RAW_TARGET, SPEED_MAX_MULTIPLIER);
+  return rawMultiplier * statMultiplierTotal(save.stats.speed);
+}
+export function heroSpeed(): number { return HERO_SPEED * heroSpeedMultiplier(); }
 export function heroCriticalChance(): number { return logarithmicChance(statTotal(save.stats.criticalChance), HERO_CRITICAL_CHANCE_PERCENT); }
 export function heroCriticalDamageMultiplier(): number { return 1 + logarithmicStat(statTotal(save.stats.criticalDamage), HERO_CRITICAL_DAMAGE_PERCENT) / 100; }
 export function heroBlockChance(): number { return logarithmicChance(statTotal(save.stats.blockChance), HERO_BLOCK_CHANCE_PERCENT); }
