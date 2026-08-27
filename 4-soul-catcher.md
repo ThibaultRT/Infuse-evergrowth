@@ -23,9 +23,48 @@ This is a feature specification only. The proposed 30-node balance is stored as 
 11. Opening Soul Catcher shows a full-screen mobile panel. A compact top banner shows soul balances; below it is the radial node tree.
 12. Initially only node SC-01 is actionable. Purchasing a node reveals the cost/reward details of its connected children. One purchased level is enough to reveal children unless a requirement explicitly asks for a higher level.
 
+## Production icon assets — approved
+
+Do not ask implementation tooling to redraw or reinterpret the concept icons. Production-ready SVG assets are committed under `public/icons/` and should be used directly:
+
+- `public/icons/soul-skull.svg` — selected V5 flaming-skull Soul icon. This is the canonical soul silhouette for every rarity.
+- `public/icons/soul-catcher.svg` — compact dreamcatcher icon for the right-edge Soul Catcher button and Soul Catcher panel branding.
+- `public/icons/inventory-bag.svg` — compact bag icon for the new right-edge Inventory button.
+
+The assets are intentionally simple, high-contrast SVG silhouettes designed to remain readable at small HUD sizes. They are project-owned assets and need no external attribution entry.
+
+### Implementation usage
+
+Use the exact SVGs rather than emoji, icon fonts, generated substitutes or a 3D model.
+
+For the soul icon, use `soul-skull.svg` as a CSS mask so one source file can be tinted to the enemy rarity color:
+
+```css
+.soul-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  background: currentColor;
+  -webkit-mask: var(--vite-base-aware-soul-icon-url) center / contain no-repeat;
+  mask: var(--vite-base-aware-soul-icon-url) center / contain no-repeat;
+}
+```
+
+The exact Vite-base-aware URL mechanism may follow the project's existing asset conventions; do not hard-code `/Infuse-evergrowth/` inside feature code. The same SVG must serve Common, Uncommon, Rare, Epic and Legendary; rarity is conveyed through color and optional CSS glow only.
+
+Recommended rendered sizes:
+
+- Soul above enemy HP bar: 11–14 CSS px.
+- Soul defeat popup: 14–18 CSS px.
+- Soul balance banner / Stats: 16–20 CSS px.
+- Soul Catcher right-edge button artwork: approximately 28–34 CSS px inside a >=44 px touch target.
+- Inventory Bag right-edge button artwork: approximately 28–34 CSS px inside a >=44 px touch target.
+
+The locked Soul Catcher diagonal bar/slash should be CSS overlay styling, not another image asset, so it can scale cleanly with the button.
+
 ## Soul rarity and visuals
 
-Reuse the existing enemy rarity palette:
+The **V5 flaming skull** is selected and final. Use `public/icons/soul-skull.svg` for every soul rarity and recolor that one silhouette using the existing enemy rarity palette:
 
 | Soul | Color |
 | --- | --- |
@@ -35,7 +74,7 @@ Reuse the existing enemy rarity palette:
 | Epic | `#bf75ff` |
 | Legendary | `#ffb33d` |
 
-Use one monochrome/vector-friendly soul silhouette tinted by CSS/SVG for each rarity. Crystals (`#8dd9ff`) are excluded entirely.
+Crystals (`#8dd9ff`) are excluded entirely. A subtle rarity-colored glow may be added with CSS, especially for Rare and above, but the underlying shape must remain identical.
 
 ## Right-edge HUD layout — approved direction
 
@@ -53,12 +92,12 @@ The latest portrait mockup is the layout reference. Do **not** build one centere
 
 Use the currently open right-edge space below the upper controls:
 
-- Soul Catcher button first.
-- Bag / Inventory button directly below it.
+- Soul Catcher button first, using `public/icons/soul-catcher.svg`.
+- Bag / Inventory button directly below it, using `public/icons/inventory-bag.svg`.
 - Align both buttons to the same right-edge column used by the upper controls where practical.
 - Do not force the pair to exact `top: 50%`; their position should follow the approved visual mockup and adapt to available portrait height.
 - Keep a clear gap between `SPAWN` and Soul Catcher so this reads as a second functional group rather than a five-button toolbar.
-- Target ~48 px minimum touch areas, with the rendered icon allowed to be smaller inside the button.
+- Target ~48 px minimum touch areas, with the rendered icon smaller inside the button.
 - Respect `env(safe-area-inset-right)`.
 - Locked Soul Catcher: desaturated/grey, reduced opacity, diagonal slash/bar overlay, `aria-disabled=true`.
 - Bag remains available independently of Soul Catcher progression.
@@ -85,13 +124,13 @@ Recommended locked Soul Catcher tap behavior: show `Defeat the Area 2 boss to un
 
 Extend the existing enemy target UI rather than creating a second independent world label.
 
-- Add a soul reward element beside the existing reward information above the HP bar.
+- Add a soul reward element beside the existing reward information above the HP bar using `public/icons/soul-skull.svg`.
 - Common enemies show `1 + Common Soul icon` after Soul Catcher unlock.
 - Quantity updates live when a soul-drop upgrade is purchased.
 - Uncommon enemies show nothing until SC-28 is purchased, then show their Uncommon soul icon and quantity.
 - Future Rare/Epic/Legendary unlock nodes use the same rule.
 - Crystals never visibly create or grant soul currency.
-- Death reward: emit a typed soul event, update/persist balance through Soul Catcher system, then render a soul gain popup from UI code.
+- Death reward: emit a typed soul event, update/persist balance through Soul Catcher system, then render a soul gain popup from UI code using the same skull asset.
 
 ## Soul drop stat
 
@@ -107,7 +146,7 @@ For this slice:
 - Current tree uses flat additive soul-drop rewards; multiplicative sources are reserved for future tuning.
 - Souls always resolve to integers.
 
-Add a Soul Drops section to Stats. At minimum show Common `Base 1`, node additions, and Total. Show Uncommon once unlocked.
+Add a Soul Drops section to Stats. At minimum show Common `Base 1`, node additions, and Total. Show Uncommon once unlocked. Use the canonical skull icon here as well.
 
 ## Skill-tree UI
 
@@ -242,12 +281,12 @@ Use the existing `bossDefeated` event's `areaId`; presentation code should not h
 2. **Save migration** — balances, node levels and announcement state.
 3. **SoulCatcherSystem** — eligibility, yield, grant, purchase and effects.
 4. **Events/progression integration** — consume Area 2 boss and enemy defeat flows.
-5. **HUD recomposition** — preserve Stats/Spawn, shrink HP banner width, move Settings into the freed upper slot, add Soul Catcher + Bag in the open right-edge space, remove bottom Inventory.
+5. **HUD recomposition** — preserve Stats/Spawn, shrink HP banner width, move Settings into the freed upper slot, use the committed Soul Catcher + Bag assets in the open right-edge space, remove bottom Inventory.
 6. **Unlock popup** — queue after boss progression and support existing qualifying saves.
-7. **Enemy soul preview + defeat gain** — rarity icon, quantity and separate gain placement.
-8. **Stats panel** — Soul Drops breakdown including Base 1.
+7. **Enemy soul preview + defeat gain** — use the committed V5 skull asset, rarity tint, quantity and separate gain placement.
+8. **Stats panel** — Soul Drops breakdown including Base 1 and canonical skull icon.
 9. **Skill-tree panel** — balances, radial graph, reveal states, detail and purchase.
-10. **Mobile validation** — iPhone 12 minimum plus modern portrait; verify all five right-side controls, safe areas, bottom dock, reward popups, tree navigation and modal scrolling.
+10. **Mobile validation** — iPhone 12 minimum plus modern portrait; verify icon readability at actual CSS sizes, all five right-side controls, safe areas, bottom dock, reward popups, tree navigation and modal scrolling.
 
 ## Open design questions
 
@@ -261,13 +300,13 @@ Use the existing `bossDefeated` event's `areaId`; presentation code should not h
 8. Multi-level buying: +1 only or Buy Max too? Recommendation: +1 initially.
 9. Tree navigation: pan + pinch zoom acceptable? Recommendation: yes.
 10. Developer resets: should Reset attributes/hero erase Soul Catcher? Recommendation: no.
-11. Soul rarity art: tint only or tint + subtle glow? Recommendation: subtle glow, especially Rare+.
+11. Soul rarity glow: tint only or tint + subtle glow? Recommendation: subtle glow, especially Rare+. The icon silhouette itself is now fixed.
 12. Uncommon base yield after SC-28: exactly 1? Recommendation: yes.
 13. Upgrade scope: existing stats + soul yield only, or new mechanics? Recommendation: existing mechanics for v1.
 14. Hero death: recommendation is no loss of souls or node progress. Confirm.
 15. Future soul-yield bonuses: rarity-specific or `+1 any eligible soul`? Recommendation: rarity-specific.
 
-The right-edge HUD placement itself is no longer an open question: use the approved screenshot/mockup direction described above.
+The right-edge HUD placement and V5 skull icon choice are no longer open questions.
 
 ## Acceptance criteria
 
@@ -275,9 +314,11 @@ The right-edge HUD placement itself is no longer an open question: use the appro
 - `SPAWN` remains in its current position below Stats.
 - The HP/combat banner is narrowed sufficiently to place Settings immediately to its right and left of Stats without overlap.
 - Soul Catcher and Bag occupy the open right-edge space below the upper controls as a distinct second group.
+- Soul Catcher uses `public/icons/soul-catcher.svg`; Bag uses `public/icons/inventory-bag.svg`.
 - Before Area 2 boss defeat, Soul Catcher is visible but barred/disabled.
 - Inventory opens from Bag and no bottom Inventory button remains; H1/H2/O1/O2 remain.
 - Area 2 boss defeat permanently unlocks Soul Catcher and presents the requested message once.
+- All soul displays use `public/icons/soul-skull.svg`; implementations must not substitute a different skull/soul graphic.
 - Common non-crystal enemies show and grant Common Souls; crystals never do.
 - Locked rarities show no soul preview and grant no souls.
 - SC-28 unlocks Uncommon previews and base drop 1.
@@ -286,4 +327,4 @@ The right-edge HUD placement itself is no longer an open question: use the appro
 - Soul balances and purchased node levels survive reloads.
 - JSON owns node number/name/description/layout/cost/scaling/reward/max level/requirements/cost soul type.
 - Tree starts from SC-01 and reveals connected content according to requirements.
-- At iPhone 12 portrait size, HP banner, Settings, Stats, Spawn, Soul Catcher, Bag, reward popups, joystick and bottom quick-slot dock do not overlap.
+- At iPhone 12 portrait size, the committed SVGs remain legible and HP banner, Settings, Stats, Spawn, Soul Catcher, Bag, reward popups, joystick and bottom quick-slot dock do not overlap.
