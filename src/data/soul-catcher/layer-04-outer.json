@@ -32,7 +32,8 @@
         "display": "+250 Max HP per level"
       },
       "neighbors": [
-        "SC-19"
+        "SC-19",
+        "SC-30"
       ]
     },
     {
