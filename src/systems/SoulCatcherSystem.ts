@@ -13,7 +13,7 @@ export class SoulCatcherSystem {
   get available(): boolean { return this.state.defeatedBosses.includes(AREA_TWO_BOSS_ID); }
   level(nodeId: string): number { return this.state.soulCatcher.nodeLevels[nodeId] ?? 0; }
   revealed(nodeId: string): boolean {
-    if (nodeId === 'SC-01') return true;
+    if (nodeId === 'SC-01' || this.level(nodeId) > 0) return true;
     return SOUL_EDGES.some(([a, b]) => (a === nodeId && this.level(b) > 0) || (b === nodeId && this.level(a) > 0));
   }
   yieldFor(definition: SpawnDefinition): { soulType: SoulType; quantity: number } | null {
