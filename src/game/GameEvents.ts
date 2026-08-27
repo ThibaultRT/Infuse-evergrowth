@@ -1,4 +1,4 @@
-import type { CombatAffinity, DamageType, EquipmentSlotId, LootType } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SoulType } from '../types';
 
 export type GameEventMap = {
   enemyDamaged: { enemyId: string; amount: number; damageType: DamageType; itemId: string };
@@ -18,6 +18,10 @@ export type GameEventMap = {
   equipmentUnequipped: { itemId: string; hand: EquipmentSlotId };
   weaponAscended: { itemId: string; previousAscend: number; newAscend: number };
   heroProgressReset: { equipment: boolean };
+  soulCatcherUnlocked: { areaId: number };
+  soulDropped: { sourceId: string; soulType: SoulType; quantity: number };
+  soulNodePurchased: { nodeId: string; previousLevel: number; newLevel: number; soulType: SoulType; cost: number };
+  soulCatcherReset: undefined;
 };
 
 type Listener<T> = (event: T) => void;

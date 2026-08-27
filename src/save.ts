@@ -4,8 +4,8 @@ import { logarithmicChance, logarithmicStat } from './domain/combat/HeroStats';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import type { DamageType, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v12';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const SAVE_KEY = 'infuse-evergrowth-save-v13';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
 const volatileValues = new Map<string, string>();
@@ -52,6 +52,7 @@ function freshStats(): PlayerStats {
   return {
     maxHp: freshStat(BASE_HERO_MAX_HP),
     attack: { blunt: freshStat(BASE_HERO_BLUNT_ATTACK), slash: freshStat(0), piercing: freshStat(0) },
+    defense: { blunt: freshStat(0), slash: freshStat(0), piercing: freshStat(0) },
     regen: freshStat(BASE_HERO_REGEN),
     speed: freshStat(BASE_HERO_SPEED_RAW),
     criticalChance: freshStat(BASE_HERO_CRITICAL_CHANCE_RAW),
@@ -111,7 +112,7 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 
 export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Date()): SaveData {
   const fresh: SaveData = {
-    version: 12,
+    version: 13,
     dailyKey: localDailyKey(now),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -119,13 +120,14 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     heroHp: BASE_HERO_MAX_HP,
     stats: freshStats(),
     inventory: freshInventory(),
-    spawns: emptySpawnState()
+    spawns: emptySpawnState(),
+    soulCatcher: { balances: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 }, nodeLevels: {}, unlockAnnouncementSeen: false }
   };
   try {
     const raw = storage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => storage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (![7, 8, 9, 10, 11, 12].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    if (![7, 8, 9, 10, 11, 12, 13].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
     const areaIds = new Set(AREAS.map((area) => area.id));
     const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
     const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
@@ -133,6 +135,7 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     const stats: PlayerStats = {
       maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
       attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK), slash: normalizeStat(parsed.stats.attack?.slash, 0), piercing: normalizeStat(parsed.stats.attack?.piercing, 0) },
+      defense: { blunt: normalizeStat(parsed.stats.defense?.blunt, 0), slash: normalizeStat(parsed.stats.defense?.slash, 0), piercing: normalizeStat(parsed.stats.defense?.piercing, 0) },
       regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN),
       speed: normalizeStat(parsed.stats.speed, BASE_HERO_SPEED_RAW),
       criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
@@ -141,19 +144,27 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     };
     const maxHp = statTotal(stats.maxHp);
     return {
-      version: 12,
+      version: 13,
       dailyKey: localDailyKey(now),
       currentAreaId: typeof requestedArea === 'number' && areaIds.has(requestedArea) && unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
       defeatedBosses: Array.isArray(parsed.defeatedBosses) ? parsed.defeatedBosses.filter((id): id is string => typeof id === 'string' && spawnIds.has(id)) : [],
-      heroHp: parsed.version === 12 && Number.isFinite(parsed.heroHp) ? Math.max(0, Math.min(Number(parsed.heroHp), maxHp)) : maxHp,
+      heroHp: (parsed.version ?? 0) >= 12 && Number.isFinite(parsed.heroHp) ? Math.max(0, Math.min(Number(parsed.heroHp), maxHp)) : maxHp,
       stats,
       inventory: migrateInventory(parsed.inventory),
-      spawns: parsed.dailyKey === localDailyKey(now) ? migrateSpawns(parsed.spawns) : emptySpawnState()
+      spawns: parsed.dailyKey === localDailyKey(now) ? migrateSpawns(parsed.spawns) : emptySpawnState(),
+      soulCatcher: normalizeSoulCatcher(parsed.soulCatcher)
     };
   } catch {
     return fresh;
   }
+}
+
+function normalizeSoulCatcher(value: unknown): SaveData['soulCatcher'] {
+  const source = value && typeof value === 'object' ? value as Partial<SaveData['soulCatcher']> : {};
+  const balance = (type: keyof SaveData['soulCatcher']['balances']): number => Math.max(0, Math.floor(Number(source.balances?.[type]) || 0));
+  const nodeLevels = Object.fromEntries(Object.entries(source.nodeLevels ?? {}).filter(([id, level]) => /^SC-\d\d$/.test(id) && Number(level) > 0).map(([id, level]) => [id, Math.floor(Number(level))]));
+  return { balances: { common: balance('common'), uncommon: balance('uncommon'), rare: balance('rare'), epic: balance('epic'), legendary: balance('legendary') }, nodeLevels, unlockAnnouncementSeen: source.unlockAnnouncementSeen === true };
 }
 
 export const save = loadSave();

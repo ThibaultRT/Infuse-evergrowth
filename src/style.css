@@ -51,12 +51,22 @@ canvas { display: block; width: 100%; height: 100%; }
 .stats-button { min-width: 44px; min-height: 44px; padding: 7px 10px; }
 .debug-actions { display: flex; flex-direction: column; gap: 6px; }
 .settings-button { position: absolute; top: max(118px, calc(env(safe-area-inset-top) + 106px)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; padding: 0; color: inherit; font-size: 21px; line-height: 1; pointer-events: auto; cursor: pointer; }
+.edge-actions { position:absolute; top:max(172px,calc(env(safe-area-inset-top) + 160px)); right:max(12px,env(safe-area-inset-right)); display:grid; gap:7px; pointer-events:auto; }
+.edge-button { width:48px; min-height:52px; display:grid; place-items:center; gap:1px; padding:4px 2px; border:1px solid #ffffff22; border-radius:11px; background:#0c111ac7; color:#f6f7fb; }
+.edge-button small { font-size:6px; line-height:1.05; font-weight:900; letter-spacing:.04em; }
+.edge-icon { width:25px; height:25px; background:#dfe7e2; mask:center/contain no-repeat; -webkit-mask:center/contain no-repeat; }
+.soul-catcher-icon { mask-image:url('/Infuse-evergrowth/icons/soul-catcher.svg'); -webkit-mask-image:url('/Infuse-evergrowth/icons/soul-catcher.svg'); }
+.bag-icon { mask-image:url('/Infuse-evergrowth/icons/inventory-bag.svg'); -webkit-mask-image:url('/Infuse-evergrowth/icons/inventory-bag.svg'); }
+.edge-button.locked { filter:grayscale(1); opacity:.46; }
 .world-ui { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .world-target-ui { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; transform: translate(-50%,-50%); }
 .world-target-ui.hidden { display: none; }
 .world-loot { display: inline-flex; align-items: center; gap: 2px; min-height: 10px; font-size: 9px; line-height: 1; font-weight: 800; color: rgba(255,255,255,.92); text-shadow: 0 1px 3px rgba(0,0,0,.85); }
 .world-loot.hp { color: #ff9fb0; }
 .world-loot.blunt { color: #f3ead7; }
+.world-soul-reward { display:inline-flex; align-items:center; gap:2px; margin-left:5px; }
+.soul-icon { display:inline-block; width:1em; height:1em; background:currentColor; mask:url('/Infuse-evergrowth/icons/soul-skull.svg') center/contain no-repeat; -webkit-mask:url('/Infuse-evergrowth/icons/soul-skull.svg') center/contain no-repeat; }
+.soul-common { color:#b8bec8 }.soul-uncommon { color:#64dc8c }.soul-rare { color:#5d98ff }.soul-epic { color:#bf75ff }.soul-legendary { color:#ffb33d }
 .world-hp-bar { position: relative; width: 48px; height: 9px; border-radius: 4px; overflow: hidden; background: #08090b; border: 1px solid rgba(255,255,255,.5); box-shadow: 0 1px 4px rgba(0,0,0,.7); }
 .world-hp-bar > span { display: block; height: 100%; width: 100%; background: #ee3f55; transition: width 120ms linear; }
 .world-hp-value { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 8px; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; text-shadow: 0 1px 2px #000, 0 0 2px #000; }
@@ -193,3 +203,18 @@ canvas { display: block; width: 100%; height: 100%; }
   .controls { opacity: .72; }
   .bottom-dock { opacity: .9; }
 }
+.soul-sheet { width:min(760px,100%); overflow:hidden; }
+.soul-balances { position:sticky; top:0; z-index:3; display:grid; grid-template-columns:repeat(5,1fr); gap:4px; padding:7px; border-radius:10px; background:#0b1018ee; }
+.soul-balances div { min-width:0; display:grid; grid-template-columns:auto auto; justify-content:center; align-items:center; gap:2px 4px; }
+.soul-balances .soul-icon { width:22px; height:22px; grid-row:1/3; }
+.soul-balances strong { font-size:12px; }.soul-balances small { font-size:6px; text-transform:uppercase; opacity:.65; }
+.soul-tree-viewport { height:min(54vh,520px); margin-top:8px; overflow:hidden; border:1px solid #ffffff16; border-radius:12px; background:radial-gradient(circle,#29302f,#10151d 65%); touch-action:none; }
+.soul-tree { position:relative; width:720px; height:720px; transform-origin:0 0; }
+#soul-connections { position:absolute; inset:0; width:720px; height:720px; overflow:visible; }
+#soul-connections line { stroke:#637078; stroke-width:2; opacity:.32; } #soul-connections line.revealed { stroke:#7ed8aa; opacity:.75; }
+.soul-node { position:absolute; width:48px; height:48px; transform:translate(-50%,-50%); display:grid; place-items:center; border:2px solid #647079; border-radius:50%; background:#151c26; color:#e7ecf0; font:inherit; }
+.soul-node span { font-size:7px; opacity:.7; }.soul-node.mystery { pointer-events:none; color:#89939b; background:#0b1016; }.soul-node.revealed { border-color:#a7bdc4; }.soul-node.purchased { border-color:#64dc8c; box-shadow:0 0 12px #64dc8c66; }.soul-node.selected { outline:3px solid #fff8; }
+.soul-detail { min-height:112px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 3px 0; }
+.soul-detail h3,.soul-detail p { margin:3px 0; }.soul-detail p { font-size:10px; opacity:.72; }.soul-detail button { min-width:110px; min-height:44px; border:1px solid #64dc8c; border-radius:9px; background:#244b39; color:white; font-weight:800; }.soul-detail button:disabled { opacity:.35; }
+.soul-gain { color:#b8bec8; }
+@media(max-width:430px){.hp-wrap{max-width:245px}.settings-button{top:max(12px,env(safe-area-inset-top));right:118px}.edge-actions{top:max(145px,calc(env(safe-area-inset-top) + 133px));}.soul-detail{align-items:flex-start}.soul-sheet{height:calc(var(--viewport-height,100dvh) - 24px)} }

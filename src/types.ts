@@ -1,5 +1,6 @@
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type DamageType = 'blunt' | 'slash' | 'piercing';
+export type SoulType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type CombatAffinity = 'blunt' | 'slash' | 'pierce';
 export type LootType = 'hp' | 'regen' | DamageType;
 export type NumberRange = { min: number; max: number };
@@ -67,6 +68,7 @@ export type StatSources = {
 export type PlayerStats = {
   maxHp: StatSources;
   attack: Record<DamageType, StatSources>;
+  defense: Record<DamageType, StatSources>;
   regen: StatSources;
   speed: StatSources;
   criticalChance: StatSources;
@@ -90,7 +92,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 12;
+  version: 13;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
@@ -99,6 +101,7 @@ export type SaveData = {
   stats: PlayerStats;
   inventory: InventoryState;
   spawns: Record<string, SavedSpawnState>;
+  soulCatcher: { balances: Record<SoulType, number>; nodeLevels: Record<string, number>; unlockAnnouncementSeen: boolean };
 };
 
 export type TierConfig = {
