@@ -63,6 +63,20 @@ export function fitModelToHeight(model: Object3D, height: number): void {
   model.position.z -= center.z;
 }
 
+/** Centers a model on the ground and scales its widest horizontal axis to a world-space footprint. */
+export function fitModelToFootprint(model: Object3D, footprint: number): void {
+  const bounds = new Box3().setFromObject(model);
+  const size = bounds.getSize(new Vector3());
+  const width = Math.max(size.x, size.z);
+  if (width <= 0) return;
+  model.scale.multiplyScalar(footprint / width);
+  bounds.setFromObject(model);
+  const center = bounds.getCenter(new Vector3());
+  model.position.x -= center.x;
+  model.position.y -= bounds.min.y;
+  model.position.z -= center.z;
+}
+
 export const BOOT_ASSETS = [
   'animations/UAL1_Standard.glb',
   'characters/models/Male_Ranger.gltf',
