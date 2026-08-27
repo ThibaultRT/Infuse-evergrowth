@@ -59,6 +59,7 @@ app.innerHTML = `
       </div>
     </div>
     <div id="gain-stack" class="gain-stack" aria-live="polite"></div>
+    <div id="soul-gain-stack" class="soul-gain-stack" aria-live="polite"></div>
     <div id="equipment-drop-layer" class="equipment-drop-layer" aria-live="polite"></div>
     <div id="progression-layer" class="progression-layer" aria-live="assertive"></div>
     <div id="toast" class="toast"></div>
@@ -69,7 +70,7 @@ app.innerHTML = `
           <button id="stats-close" class="modal-close" type="button">CLOSE</button>
         </div>
         <div id="stats-content"></div>
-        <p class="stats-help">Stats keep decimal precision here. Combat HUD values are rounded to whole numbers.</p>
+        <p class="stats-help">Speed, critical, block, and evasion stats keep decimal precision. Other values are rounded to whole numbers.</p>
       </div>
     </div>
     <div id="inventory-panel" class="modal-panel" aria-hidden="true">
@@ -135,7 +136,7 @@ export const ui = {
   loadingScreen: q<HTMLDivElement>('#loading-screen'), loadingProgress: q<HTMLSpanElement>('#loading-progress'), loadingPercent: q<HTMLDivElement>('#loading-percent'),
   hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), orbit1Stat: q<HTMLSpanElement>('#orbit1-stat'), orbit2Stat: q<HTMLSpanElement>('#orbit2-stat'), orbit3Stat: q<HTMLSpanElement>('#orbit3-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
-  world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
+  world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'), soulGainStack: q<HTMLDivElement>('#soul-gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   spawnButton: q<HTMLButtonElement>('#spawn-button'),
   settingsButton: q<HTMLButtonElement>('#settings-button'), settingsPanel: q<HTMLDivElement>('#settings-panel'),
@@ -180,7 +181,7 @@ function showGain(amount: string, stat: string): void {
   const element = document.createElement('div');
   const healthStat = stat === 'HP' || stat === 'HP/S';
   const evasionStat = stat === 'EVASION';
-  const gainIcon = stat === 'HP/S' ? heartRegenIcon(14) : stat === 'HP' ? heartIcon(13) : evasionStat ? evasionIcon(13) : bluntHammerIcon(13);
+  const gainIcon = stat === 'HP/S' ? heartRegenIcon(13) : stat === 'HP' ? heartIcon(13) : evasionStat ? evasionIcon(13) : bluntHammerIcon(13);
   element.className = `gain-pop ${healthStat ? 'hp' : evasionStat ? 'evasion' : 'blunt'}`;
   element.innerHTML = `<strong>+${amount}</strong>${gainIcon}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
@@ -202,11 +203,13 @@ export function showToast(message: string): void {
 }
 
 function sourceLabel(source: string): string { return source.replace(/[_-]+/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase()); }
-function renderBreakdown(label: string, stat: StatSources, suffix = ''): string {
+function renderBreakdown(label: string, stat: StatSources, suffix = '', decimals = false): string {
   const additiveTotal = statAdditiveTotal(stat), total = statTotal(stat);
-  const adds = Object.entries(stat.additive).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${v.toFixed(2)}${suffix}</span></div>`).join('');
-  const mults = Object.entries(stat.multiplicative).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${v.toFixed(2)}</span></div>`).join('');
-  return `<section class="stat-breakdown"><div class="stat-row"><span>${label}</span><strong>${total.toFixed(2)}${suffix}</strong></div><div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${stat.base.toFixed(2)}${suffix}</span></div><div class="stat-group-title">Additive</div>${adds}<div class="stat-line stat-subtotal"><span>Total</span><span>${additiveTotal.toFixed(2)}${suffix}</span></div><div class="stat-group-title">Multiplicative</div>${mults}<div class="stat-line stat-total"><span>Total</span><strong>${total.toFixed(2)}${suffix}</strong></div></section>`;
+  const format = (value: number): string => decimals ? value.toFixed(2) : Math.round(value).toLocaleString();
+  const adds = Object.entries(stat.additive).filter(([, value]) => value !== 0).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${format(v)}${suffix}</span></div>`).join('');
+  const mults = Object.entries(stat.multiplicative).filter(([, value]) => value !== 1).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${format(v)}</span></div>`).join('');
+  const base = stat.base !== 0 ? `<div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${format(stat.base)}${suffix}</span></div>` : '';
+  return `<section class="stat-breakdown"><div class="stat-row"><span>${label}</span><strong>${format(total)}${suffix}</strong></div>${base}${adds ? `<div class="stat-group-title">Additive</div>${adds}` : ''}<div class="stat-line stat-subtotal"><span>Total</span><span>${format(additiveTotal)}${suffix}</span></div>${mults ? `<div class="stat-group-title">Multiplicative</div>${mults}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${format(total)}${suffix}</strong></div></section>`;
 }
 
 export function renderStats(stats: PlayerStats): void {
@@ -217,15 +220,15 @@ export function renderStats(stats: PlayerStats): void {
   const evasionRawChance = rawEvasionChance(evasionRaw, EVASION_RAW_SCALE, EVASION_RAW_TARGET, EVASION_CHANCE_CAP);
   const evasionTotal = totalEvasionChance(evasionRawChance, Object.values(stats.evasion.directChance), EVASION_CHANCE_CAP);
   const percent = (chance: number): string => `${(chance * 100).toFixed(2)}%`;
-  const rawSources = Object.entries(stats.evasion.raw).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>${value.toFixed(2)}</span></div>`).join('');
-  const directSources = Object.entries(stats.evasion.directChance).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>+${percent(value)}</span></div>`).join('');
-  const evasion = `<section class="stat-breakdown"><div class="stat-row"><span class="stat-title-with-icon">${evasionIcon(14)} Evasion</span><strong>${percent(evasionTotal)}</strong></div><div class="stat-group-title">Raw Evasion</div>${rawSources}<div class="stat-line stat-subtotal"><span>Raw total</span><span>${percent(evasionRawChance)}</span></div><div class="stat-group-title">Direct Evasion</div>${directSources}<div class="stat-line stat-total"><span>Total</span><strong>${percent(evasionTotal)}</strong></div></section>`;
+  const rawSources = Object.entries(stats.evasion.raw).filter(([, value]) => value !== 0).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>${value.toFixed(2)}</span></div>`).join('');
+  const directSources = Object.entries(stats.evasion.directChance).filter(([, value]) => value !== 0).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>+${percent(value)}</span></div>`).join('');
+  const evasion = `<section class="stat-breakdown"><div class="stat-row"><span class="stat-title-with-icon">${evasionIcon(14)} Evasion</span><strong>${percent(evasionTotal)}</strong></div>${rawSources ? `<div class="stat-group-title">Raw Evasion</div>${rawSources}` : ''}<div class="stat-line stat-subtotal"><span>Raw total</span><span>${percent(evasionRawChance)}</span></div>${directSources ? `<div class="stat-group-title">Direct Evasion</div>${directSources}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${percent(evasionTotal)}</strong></div></section>`;
   const percentStat = (stat: StatSources): StatSources => ({ base: stat.base * 100, additive: Object.fromEntries(Object.entries(stat.additive).map(([key, value]) => [key, value * 100])), multiplicative: { ...stat.multiplicative } });
-  const scaled = (label: string, stat: StatSources, baseline: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${logarithmicStat(statTotal(stat), baseline).toFixed(2)}${suffix}</strong></div>`;
+  const scaled = (label: string, stat: StatSources, baseline: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat, '', true)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${logarithmicStat(statTotal(stat), baseline).toFixed(2)}${suffix}</strong></div>`;
   const effectiveSpeedMultiplier = heroSpeedMultiplier();
-  const speed = `${renderBreakdown('Speed (raw)', stats.speed)}<div class="stat-line stat-subtotal"><span>Speed multiplier</span><strong>x${effectiveSpeedMultiplier.toFixed(2)}</strong></div><div class="stat-line stat-total"><span>Effective speed</span><strong>${(HERO_SPEED * effectiveSpeedMultiplier).toFixed(2)} m/s</strong></div>`;
+  const speed = `${renderBreakdown('Speed (raw)', stats.speed, '', true)}<div class="stat-line stat-subtotal"><span>Speed multiplier</span><strong>x${effectiveSpeedMultiplier.toFixed(2)}</strong></div><div class="stat-line stat-total"><span>Effective speed</span><strong>${(HERO_SPEED * effectiveSpeedMultiplier).toFixed(2)} m/s</strong></div>`;
   const soulDrop = (type: SoulType): [number, number] => { const purchased = SOUL_NODES.filter((node) => (save.soulCatcher.nodeLevels[node.id] ?? 0) > 0); const unlocked = type === 'common' || purchased.some((node) => node.reward.effects.some((effect) => effect.type === 'unlockSoulDrop' && effect.soulType === type)); const additions = purchased.reduce((sum, node) => sum + node.reward.effects.reduce((total, effect) => effect.type === 'soulDropAdditive' && effect.soulType === type ? total + effect.amountPerLevel * (save.soulCatcher.nodeLevels[node.id] ?? 0) : total, 0), 0); return [unlocked ? 1 : 0, additions]; };
-  const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => { const [base, additions] = soulDrop(type); return `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${base} base + ${additions} Soul Catcher</strong></div>`; }).join('');
+  const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => { const [base, additions] = soulDrop(type); return base + additions > 0 ? `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${base} base + ${additions} Soul Catcher</strong></div>` : ''; }).join('');
   ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Slash attack', stats.attack.slash), renderBreakdown('Piercing attack', stats.attack.piercing), renderBreakdown('Blunt defence', stats.defense.blunt), renderBreakdown('Slash defence', stats.defense.slash), renderBreakdown('Piercing defence', stats.defense.piercing), renderBreakdown('Blunt resistance', percentStat(stats.damageResistance.blunt), '%'), renderBreakdown('Slash resistance', percentStat(stats.damageResistance.slash), '%'), renderBreakdown('Piercing resistance', percentStat(stats.damageResistance.piercing), '%'), renderBreakdown(regenLabel, stats.regen, ' HP/s'), speed, scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%'), evasion, `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
 }
 
@@ -251,7 +254,7 @@ export function renderSoulCatcher(nodes: SoulNode[], edges: [string, string][], 
 
 export function showSoulDrop(quantity: number, type: SoulType): void {
   const element = document.createElement('div'); element.className = 'gain-pop soul-gain'; element.innerHTML = `<strong>+${quantity}</strong>${soulIcon(type)}`;
-  ui.gainStack.append(element); window.setTimeout(() => { element.classList.add('leaving'); window.setTimeout(() => element.remove(), 180); }, 1600);
+  ui.soulGainStack.append(element); window.setTimeout(() => { element.classList.add('leaving'); window.setTimeout(() => element.remove(), 180); }, 1600);
 }
 
 const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Weapon', orbit1: 'Orbit 1', orbit2: 'Orbit 2', orbit3: 'Orbit 3', helmet: 'Helmet', armor: 'Armor', legs: 'Legs', ring: 'Ring' };

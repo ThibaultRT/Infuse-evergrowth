@@ -67,8 +67,8 @@ export function heartIcon(size = 12): string {
 /** Red healing heart with a white plus, used only for HP regeneration. */
 export function heartRegenIcon(size = 12): string {
   return `<svg class="stat-icon regen-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M12 18.8s-5.7-3.5-7.2-7C3.6 8.9 5.3 6 8.3 6c1.6 0 2.9.8 3.7 2 .8-1.2 2.1-2 3.7-2 3 0 4.7 2.9 3.5 5.8-1.5 3.5-7.2 7-7.2 7Z" fill="#ef4444" stroke="#7f1d1d" stroke-width=".8"/>
-    <path d="M11 9h2v2h2v2h-2v2h-2v-2H9v-2h2V9Z" fill="#fff"/>
+    <path d="M12 21s-7.5-4.7-9.4-9.2C.9 7.9 3.2 4 7.2 4c2.1 0 3.7 1.1 4.8 2.7C13.1 5.1 14.7 4 16.8 4c4 0 6.3 3.9 4.6 7.8C19.5 16.3 12 21 12 21Z" fill="#ef4444" stroke="#7f1d1d" stroke-width=".8"/>
+    <path d="M11 8h2v3h3v2h-3v3h-2v-3H8v-2h3V8Z" fill="#fff"/>
   </svg>`;
 }
 
