@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "layer": 4,
+  "name": "Outer Ring",
+  "layout": {
+    "ringRadius": 3
+  },
+  "nodes": [
+    {
+      "number": 18,
+      "id": "SC-18",
+      "name": "Iron Soul",
+      "description": "Pack captured vitality into a denser, tougher body.",
+      "position": {
+        "angleDeg": 252,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 250,
+        "perLevel": 175,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 250
+          }
+        ],
+        "display": "+250 Max HP per level"
+      },
+      "neighbors": [
+        "SC-19"
+      ]
+    },
+    {
+      "number": 19,
+      "id": "SC-19",
+      "name": "Eternal Pulse",
+      "description": "Keep infused soul energy circulating through every wound.",
+      "position": {
+        "angleDeg": 288,
+        "radius": 3
+      },
+      "maxLevel": 8,
+      "cost": {
+        "soulType": "common",
+        "base": 275,
+        "perLevel": 200,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "regenAdditive",
+            "amountPerLevel": 0.75
+          }
+        ],
+        "display": "+0.75 HP/s regeneration per level"
+      },
+      "neighbors": [
+        "SC-20"
+      ]
+    },
+    {
+      "number": 20,
+      "id": "SC-20",
+      "name": "Uncommon Resonance",
+      "description": "Tune the Soul Catcher to Uncommon enemies. They now display and drop Uncommon Souls.",
+      "position": {
+        "angleDeg": 315,
+        "radius": 3
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "common",
+        "base": 250,
+        "perLevel": 0,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "unlockSoulDrop",
+            "soulType": "uncommon"
+          }
+        ],
+        "display": "Unlock Uncommon Soul drops (base: 1 per Uncommon enemy)"
+      },
+      "neighbors": [
+        "SC-21"
+      ]
+    },
+    {
+      "number": 21,
+      "id": "SC-21",
+      "name": "Uncommon Blunt Ward",
+      "description": "Use uncommon essence to resist crushing attacks.",
+      "position": {
+        "angleDeg": 345,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 5,
+        "perLevel": 5,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 5
+          }
+        ],
+        "display": "+5 Blunt defence per level"
+      },
+      "neighbors": [
+        "SC-22"
+      ]
+    },
+    {
+      "number": 22,
+      "id": "SC-22",
+      "name": "Uncommon Slash Ward",
+      "description": "Use uncommon essence to resist cutting attacks.",
+      "position": {
+        "angleDeg": 15,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 5,
+        "perLevel": 5,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 5
+          }
+        ],
+        "display": "+5 Slash defence per level"
+      },
+      "neighbors": [
+        "SC-23"
+      ]
+    },
+    {
+      "number": 23,
+      "id": "SC-23",
+      "name": "Uncommon Piercing Ward",
+      "description": "Use uncommon essence to resist piercing attacks.",
+      "position": {
+        "angleDeg": 45,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 5,
+        "perLevel": 5,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 5
+          }
+        ],
+        "display": "+5 Piercing defence per level"
+      },
+      "neighbors": [
+        "SC-24"
+      ]
+    },
+    {
+      "number": 24,
+      "id": "SC-24",
+      "name": "Uncommon Harvest",
+      "description": "Refine the catcher to extract more Uncommon Souls from eligible enemies.",
+      "position": {
+        "angleDeg": 72,
+        "radius": 3
+      },
+      "maxLevel": 3,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 10,
+        "perLevel": 10,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "uncommon",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Uncommon Soul per eligible enemy per level"
+      },
+      "neighbors": [
+        "SC-25"
+      ]
+    },
+    {
+      "number": 25,
+      "id": "SC-25",
+      "name": "Uncommon Vitality",
+      "description": "Infuse uncommon essence directly into maximum vitality.",
+      "position": {
+        "angleDeg": 108,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 15,
+        "perLevel": 10,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 200
+          }
+        ],
+        "display": "+200 Max HP per level"
+      },
+      "neighbors": [
+        "SC-26"
+      ]
+    },
+    {
+      "number": 26,
+      "id": "SC-26",
+      "name": "Greedy Catcher",
+      "description": "Pull still more common essence from every eligible defeated enemy.",
+      "position": {
+        "angleDeg": 135,
+        "radius": 3
+      },
+      "maxLevel": 3,
+      "cost": {
+        "soulType": "common",
+        "base": 300,
+        "perLevel": 300,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "common",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Common Soul per eligible enemy per level"
+      },
+      "neighbors": [
+        "SC-27"
+      ]
+    },
+    {
+      "number": 27,
+      "id": "SC-27",
+      "name": "Soul Anchor",
+      "description": "Stabilize captured essence into raw vitality.",
+      "position": {
+        "angleDeg": 165,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 275,
+        "perLevel": 200,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 200
+          }
+        ],
+        "display": "+200 Max HP per level"
+      },
+      "neighbors": [
+        "SC-28"
+      ]
+    },
+    {
+      "number": 28,
+      "id": "SC-28",
+      "name": "Critical Imprint",
+      "description": "Imprint the violence of fallen enemies into critical strikes.",
+      "position": {
+        "angleDeg": 180,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 300,
+        "perLevel": 225,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "criticalDamageRawAdditive",
+            "amountPerLevel": 15
+          }
+        ],
+        "display": "+15 Critical Damage raw per level"
+      },
+      "neighbors": [
+        "SC-29"
+      ]
+    },
+    {
+      "number": 29,
+      "id": "SC-29",
+      "name": "Soulforged Edge",
+      "description": "Condense late-stage soul power into slashing attacks.",
+      "position": {
+        "angleDeg": 195,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 300,
+        "perLevel": 225,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 10
+          }
+        ],
+        "display": "+10 Slash attack per level"
+      },
+      "neighbors": [
+        "SC-30"
+      ]
+    },
+    {
+      "number": 30,
+      "id": "SC-30",
+      "name": "Soulforged Body",
+      "description": "Forge captured essence into a durable soul-bound body.",
+      "position": {
+        "angleDeg": 225,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 300,
+        "perLevel": 250,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 150
+          }
+        ],
+        "display": "+150 Max HP per level"
+      },
+      "neighbors": []
+    }
+  ]
+}

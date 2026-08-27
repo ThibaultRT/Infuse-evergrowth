@@ -66,7 +66,7 @@ export function ascend(itemId: string): boolean {
 }
 
 export function equippedDefense(type: DamageType): number {
-  return (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
+  return save.stats.defense[type].additive.soulCatcher + (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
     const itemId = save.inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
     const owned = itemId ? save.inventory.items[itemId] : undefined;

@@ -6,6 +6,9 @@ import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_
 import { EQUIPMENT_BY_ID, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel, type InventoryCombatSummary } from './systems/EquipmentSystem';
 import { equipmentIcon } from './equipment-icons';
 import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, PlayerStats, StatSources } from './types';
+import type { SoulNode } from './domain/soul-catcher';
+import type { SoulType } from './types';
+import { soulCost } from './domain/soul-catcher';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app');
@@ -39,6 +42,10 @@ app.innerHTML = `
         <button id="spawn-button" class="card stats-button" type="button" title="Reset active respawn cooldowns">SPAWN</button>
       </div>
     </div>
+    <div class="edge-actions">
+      <button id="soul-catcher-button" class="edge-button soul-catcher-button" type="button"><span class="edge-icon soul-catcher-icon"></span><small>SOUL<br>CATCHER</small></button>
+      <button id="inventory-button" class="edge-button" type="button"><span class="edge-icon bag-icon"></span><small>BAG</small></button>
+    </div>
     <button id="settings-button" class="settings-button card" type="button" aria-label="Graphics settings" title="Graphics settings">&#9881;</button>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
@@ -49,7 +56,6 @@ app.innerHTML = `
         <div class="quick-slot" data-slot="orbit1"><span>O1</span></div>
         <div class="quick-slot" data-slot="orbit2"><span>O2</span></div>
       </div>
-      <button id="inventory-button" class="dock-button" type="button">INVENTORY</button>
     </div>
     <div id="gain-stack" class="gain-stack" aria-live="polite"></div>
     <div id="equipment-drop-layer" class="equipment-drop-layer" aria-live="polite"></div>
@@ -81,6 +87,14 @@ app.innerHTML = `
         <div id="inventory-detail" class="inventory-detail" hidden></div>
       </div>
     </div>
+    <div id="soul-catcher-panel" class="modal-panel soul-catcher-panel" aria-hidden="true">
+      <div class="card modal-sheet soul-sheet">
+        <div class="modal-header"><div><div class="brand">Infuse the defeated</div><h2>Soul Catcher</h2></div><button id="soul-catcher-close" class="modal-close" type="button">CLOSE</button></div>
+        <div id="soul-balances" class="soul-balances"></div>
+        <div id="soul-tree-viewport" class="soul-tree-viewport"><div id="soul-tree" class="soul-tree"><svg id="soul-connections" viewBox="0 0 720 720" aria-hidden="true"></svg><div id="soul-nodes"></div></div></div>
+        <div id="soul-detail" class="soul-detail"><p>Select a revealed node to inspect it.</p></div>
+      </div>
+    </div>
     <div id="settings-panel" class="modal-panel" aria-hidden="true">
       <div class="card modal-sheet settings-sheet">
         <div class="modal-header">
@@ -104,6 +118,8 @@ app.innerHTML = `
           <button id="reset-attributes-button" type="button">RESET ATTRIBUTES</button>
           <div><strong>Reset hero</strong><small>Remove all permanent stat gains and equipment drops. World progression is kept.</small></div>
           <button id="reset-hero-button" type="button">RESET HERO</button>
+          <div><strong>Reset Soul Catcher</strong><small>Remove Souls and purchased nodes. World progression is kept.</small></div>
+          <button id="reset-soul-catcher-button" type="button">RESET SOUL CATCHER</button>
         </div>
       </div>
     </div>
@@ -124,9 +140,12 @@ export const ui = {
   rendererStatsToggle: q<HTMLInputElement>('#renderer-stats-toggle'), rendererStats: q<HTMLOutputElement>('#renderer-stats'),
   resetAttributesButton: q<HTMLButtonElement>('#reset-attributes-button'),
   resetHeroButton: q<HTMLButtonElement>('#reset-hero-button'),
+  resetSoulCatcherButton: q<HTMLButtonElement>('#reset-soul-catcher-button'),
   statsPanel: q<HTMLDivElement>('#stats-panel'), statsClose: q<HTMLButtonElement>('#stats-close'),
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
+  soulCatcherButton: q<HTMLButtonElement>('#soul-catcher-button'), soulCatcherPanel: q<HTMLDivElement>('#soul-catcher-panel'), soulCatcherClose: q<HTMLButtonElement>('#soul-catcher-close'),
+  soulBalances: q<HTMLDivElement>('#soul-balances'), soulTreeViewport: q<HTMLDivElement>('#soul-tree-viewport'), soulTree: q<HTMLDivElement>('#soul-tree'), soulConnections: q<SVGElement>('#soul-connections'), soulNodes: q<HTMLDivElement>('#soul-nodes'), soulDetail: q<HTMLDivElement>('#soul-detail'),
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryOverview: q<HTMLDivElement>('#inventory-overview'),
   inventorySummary: q<HTMLDivElement>('#inventory-summary'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
   inventoryBag: q<HTMLDivElement>('#inventory-bag'), inventoryDetail: q<HTMLDivElement>('#inventory-detail'), equipmentDropLayer: q<HTMLDivElement>('#equipment-drop-layer'),
@@ -188,7 +207,25 @@ function renderBreakdown(label: string, stat: StatSources, suffix = ''): string 
 export function renderStats(stats: PlayerStats): void {
   const bluntLabel = `<span class="stat-title-with-icon">${bluntHammerIcon(14)} Blunt attack</span>`;
   const scaled = (label: string, stat: StatSources, baseline: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${logarithmicStat(statTotal(stat), baseline).toFixed(2)}${suffix}</strong></div>`;
-  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Health regeneration', stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%')].join('');
+  const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${type === 'common' ? 1 : type === 'uncommon' && save.soulCatcher.nodeLevels['SC-20'] ? 1 : 0} base + Soul Catcher upgrades</strong></div>`).join('');
+  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Slash attack', stats.attack.slash), renderBreakdown('Piercing attack', stats.attack.piercing), renderBreakdown('Blunt defence', stats.defense.blunt), renderBreakdown('Slash defence', stats.defense.slash), renderBreakdown('Piercing defence', stats.defense.piercing), renderBreakdown('Health regeneration', stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%'), `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
+}
+
+const soulIcon = (type: SoulType): string => `<span class="soul-icon soul-${type}" aria-hidden="true"></span>`;
+export function renderSoulCatcher(nodes: SoulNode[], edges: [string, string][], revealed: (id: string) => boolean, selectedId: string | null): void {
+  const position = (node: SoulNode): [number, number] => { const angle = node.position.angleDeg * Math.PI / 180; const radius = node.position.radius * 92; return [360 + Math.cos(angle) * radius, 360 + Math.sin(angle) * radius]; };
+  ui.soulBalances.innerHTML = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div>${soulIcon(type)}<strong>${save.soulCatcher.balances[type]}</strong><small>${sourceLabel(type)}</small></div>`).join('');
+  ui.soulConnections.innerHTML = edges.map(([a, b]) => { const [x1,y1] = position(nodes.find((n) => n.id === a)!); const [x2,y2] = position(nodes.find((n) => n.id === b)!); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${revealed(a) && revealed(b) ? 'revealed' : ''}"/>`; }).join('');
+  ui.soulNodes.innerHTML = nodes.map((node) => { const [x,y] = position(node), isRevealed = revealed(node.id), level = save.soulCatcher.nodeLevels[node.id] ?? 0; return `<button type="button" class="soul-node ${isRevealed ? 'revealed' : 'mystery'} ${level ? 'purchased' : ''} ${selectedId === node.id ? 'selected' : ''}" style="left:${x}px;top:${y}px" data-soul-node="${isRevealed ? node.id : ''}" aria-label="${isRevealed ? `${node.name}, level ${level}` : 'Mystery node'}">${isRevealed ? `<b>${node.number}</b><span>${level}/${node.maxLevel}</span>` : '?'}</button>`; }).join('');
+  const node = nodes.find((candidate) => candidate.id === selectedId);
+  if (!node || !revealed(node.id)) { ui.soulDetail.innerHTML = '<p>Select a revealed node to inspect it.</p>'; return; }
+  const level = save.soulCatcher.nodeLevels[node.id] ?? 0, maxed = level >= node.maxLevel, cost = soulCost(node, level + 1);
+  ui.soulDetail.innerHTML = `<div><small>${node.id}</small><h3>${node.name}</h3><p>${node.description}</p><strong>Level ${level} / ${node.maxLevel}</strong><p>${node.reward.display}</p></div><button type="button" data-purchase-soul="${node.id}" ${maxed || save.soulCatcher.balances[node.cost.soulType] < cost ? 'disabled' : ''}>${maxed ? 'MAX LEVEL' : `Purchase · ${cost} ${soulIcon(node.cost.soulType)}`}</button>`;
+}
+
+export function showSoulDrop(quantity: number, type: SoulType): void {
+  const element = document.createElement('div'); element.className = 'gain-pop soul-gain'; element.innerHTML = `<strong>+${quantity}</strong>${soulIcon(type)}`;
+  ui.gainStack.append(element); window.setTimeout(() => { element.classList.add('leaving'); window.setTimeout(() => element.remove(), 180); }, 1600);
 }
 
 const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'H1', hand2: 'H2', orbit1: 'O1', orbit2: 'O2', helmet: 'Helmet', armor: 'Armor', legs: 'Legs' };

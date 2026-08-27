@@ -19,7 +19,7 @@ import {
 import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
-import { renderEnemyAffinities, renderInventory, renderItemDetail, renderStats, showBossProgression, showEquipmentDrop, showStatGain, showToast, ui } from '../ui';
+import { renderEnemyAffinities, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
 import { addRock, makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
@@ -40,6 +40,8 @@ import { EnvironmentOcclusionManager } from '../rendering/EnvironmentOcclusionMa
 import { ProgressionSystem } from '../systems/ProgressionSystem';
 import { GameCommands } from './GameCommands';
 import { browserClock } from './PlatformAdapters';
+import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
+import { SOUL_EDGES, SOUL_NODES } from '../data/soul-catcher';
 
 export class Game {
   private started = false;
@@ -109,6 +111,8 @@ const gameplay = new GameplayRuntime({
 const persistGame = (): void => { save.heroHp = gameplay.hero.hp; persist(); };
 const commands = new GameCommands(save, gameplay, events, persistGame);
 const progression = new ProgressionSystem(save, events, persistGame);
+const soulCatcher = new SoulCatcherSystem(save, events, persistGame);
+events.on('heroProgressReset', () => soulCatcher.syncEffects());
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -228,7 +232,8 @@ class SpawnEntity {
     const reward = save.spawns[this.def.id].roll.reward;
     const loot = reward.stat;
     this.lootLabel.className = `world-loot ${loot}`;
-    this.lootLabel.innerHTML = `<span>${formatRewardAmount(reward.amount)}</span>${lootIcon(loot)}`;
+    const soul = soulCatcher.yieldFor(this.def);
+    this.lootLabel.innerHTML = `<span>${formatRewardAmount(reward.amount)}</span>${lootIcon(loot)}${soul ? `<span class="world-soul-reward"><span>${soul.quantity}</span><i class="soul-icon soul-${soul.soulType}"></i></span>` : ''}`;
   }
 
   renderHealth(): void {
@@ -284,8 +289,10 @@ class SpawnEntity {
     this.deathPresentationRemaining = this.crystalView ? .45 : 1.1;
     const result = progression.defeat(this.def, this.config, gameplay.hero, AREAS, WORLD_CONNECTIONS, browserClock.now(), BASE_RESPAWN_MS, nextLocalMidnightMs(browserClock.date()));
     const { stat, amount } = result.reward;
+    const soul = soulCatcher.grant(this.def);
     this.syncAreaVisibility();
     showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase());
+    if (soul) showSoulDrop(soul.quantity, soul.soulType);
     if (result.boss) presentBossDefeat(result.boss);
     if (result.drop) {
       showEquipmentDrop(result.drop);
@@ -381,6 +388,11 @@ function presentBossDefeat(result: { bossId: string; areaId: number; openedGateI
   } else {
     showBossProgression(`${bossEntity.config.label} guardian`);
   }
+  if (result.areaId === 2) window.setTimeout(() => {
+    ui.soulCatcherButton.classList.remove('locked');
+    if (soulCatcher.announceUnlock(2)) { showToast('Soul Catcher unlocked!'); window.setTimeout(() => showToast('Infuse souls of the defeated enemies and unlock powerful upgrades!'), 1600); }
+    entities.forEach((entity) => entity.renderLoot());
+  }, 3300);
 }
 
 type RespawnIndicator = {
@@ -486,8 +498,8 @@ function setStatsPanel(open: boolean): void {
   ui.statsPanel.setAttribute('aria-hidden', String(!open));
   if (open) renderStats(save.stats);
 }
-function closeOtherPanels(except: 'stats' | 'inventory' | 'settings'): void {
-  for (const [name, panel] of [['stats', ui.statsPanel], ['inventory', ui.inventoryPanel], ['settings', ui.settingsPanel]] as const) {
+function closeOtherPanels(except: 'stats' | 'inventory' | 'settings' | 'soul'): void {
+  for (const [name, panel] of [['stats', ui.statsPanel], ['inventory', ui.inventoryPanel], ['settings', ui.settingsPanel], ['soul', ui.soulCatcherPanel]] as const) {
     if (name === except) continue;
     panel.classList.remove('visible');
     panel.setAttribute('aria-hidden', 'true');
@@ -532,6 +544,33 @@ ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === 
 ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
 ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
 ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
+let selectedSoulNode: string | null = null;
+const refreshSoulTree = (): void => renderSoulCatcher(SOUL_NODES, SOUL_EDGES, (id) => soulCatcher.revealed(id), selectedSoulNode);
+function setSoulCatcherPanel(open: boolean): void {
+  if (open && !soulCatcher.available) { showToast('Defeat area 2 boss to unlock Soul Catcher'); return; }
+  if (open) closeOtherPanels('soul');
+  ui.soulCatcherPanel.classList.toggle('visible', open); ui.soulCatcherPanel.setAttribute('aria-hidden', String(!open));
+  if (open) refreshSoulTree();
+}
+ui.soulCatcherButton.classList.toggle('locked', !soulCatcher.available);
+ui.soulCatcherButton.addEventListener('click', () => setSoulCatcherPanel(true));
+ui.soulCatcherClose.addEventListener('click', () => setSoulCatcherPanel(false));
+ui.soulCatcherPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.soulCatcherPanel) setSoulCatcherPanel(false); });
+ui.soulNodes.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLElement>('[data-soul-node]'); if (!button?.dataset.soulNode) return; selectedSoulNode = button.dataset.soulNode; refreshSoulTree(); });
+ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (soulCatcher.purchase(button.dataset.purchaseSoul)) { gameplay.hero.hp = Math.min(gameplay.hero.hp, maxHeroHp()); refreshSoulTree(); renderStats(save.stats); updateHud(); entities.forEach((entity) => entity.renderLoot()); } });
+const treePointers = new Map<number, { x: number; y: number }>();
+let treeX = -170, treeY = -190, treeScale = 1, pinchDistance = 0;
+const transformTree = (): void => { ui.soulTree.style.transform = `translate(${treeX}px,${treeY}px) scale(${treeScale})`; };
+ui.soulTreeViewport.addEventListener('pointerdown', (event) => { treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); ui.soulTreeViewport.setPointerCapture(event.pointerId); });
+ui.soulTreeViewport.addEventListener('pointermove', (event) => {
+  const previous = treePointers.get(event.pointerId); if (!previous) return;
+  treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); const points = [...treePointers.values()];
+  if (points.length === 1) { treeX += event.clientX - previous.x; treeY += event.clientY - previous.y; }
+  else { const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); if (pinchDistance) treeScale = THREE.MathUtils.clamp(treeScale * distance / pinchDistance, .55, 1.6); pinchDistance = distance; }
+  transformTree();
+});
+const endTreePointer = (event: PointerEvent): void => { treePointers.delete(event.pointerId); pinchDistance = 0; };
+ui.soulTreeViewport.addEventListener('pointerup', endTreePointer); ui.soulTreeViewport.addEventListener('pointercancel', endTreePointer); transformTree();
 ui.settingsButton.addEventListener('click', () => setSettingsPanel(true));
 ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
 ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
@@ -551,6 +590,7 @@ ui.resetHeroButton.addEventListener('click', () => {
   updateHud();
   showToast('Hero reset · attributes and equipment drops removed');
 });
+ui.resetSoulCatcherButton.addEventListener('click', () => { if (!window.confirm('Reset all Soul balances and purchased Soul Catcher nodes?')) return; soulCatcher.reset(); selectedSoulNode = null; refreshSoulTree(); renderStats(save.stats); updateHud(); entities.forEach((entity) => entity.renderLoot()); showToast('Soul Catcher reset'); });
 ui.settingsPanel.addEventListener('change', (event) => {
   const input = event.target as HTMLInputElement;
   if (input.name === 'render-scale') applyRenderingQuality({ ...renderingQuality, renderScale: input.value === '0.7' ? 0.7 : 1 });
@@ -786,6 +826,7 @@ renderInventory(save.inventory, equipmentCombatSummary());
 renderEnemyAffinities(areaById(currentAreaId));
 updateHud();
 persistGame();
+if (soulCatcher.available && !save.soulCatcher.unlockAnnouncementSeen) window.setTimeout(() => { if (soulCatcher.announceUnlock(2)) { showToast('Soul Catcher unlocked!'); window.setTimeout(() => showToast('Infuse souls of the defeated enemies and unlock powerful upgrades!'), 1600); } }, 500);
 requestAnimationFrame(frame);
 
   }
