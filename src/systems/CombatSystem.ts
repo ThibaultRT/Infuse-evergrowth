@@ -37,9 +37,9 @@ export class CombatSystem {
     return affinityDamage(amount, type, weakness);
   }
 
-  enemyAttackDamage(amount: number, type: CombatAffinity, defense: (type: DamageType) => number): number {
+  enemyAttackDamage(amount: number, type: CombatAffinity, defense: (type: DamageType) => number, resistance: (type: DamageType) => number = () => 0): number {
     const damageType: DamageType = type === 'pierce' ? 'piercing' : type;
-    return Math.max(0, amount - defense(damageType));
+    return Math.max(0, amount * (1 - Math.max(0, Math.min(1, resistance(damageType)))) - defense(damageType));
   }
 
   rollChance(chance: number, random = Math.random): boolean {

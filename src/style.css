@@ -222,3 +222,12 @@ canvas { display: block; width: 100%; height: 100%; }
 .soul-detail h3,.soul-detail p { margin:3px 0; }.soul-detail p { font-size:10px; opacity:.72; }.soul-detail button { min-width:110px; min-height:44px; border:1px solid #64dc8c; border-radius:9px; background:#244b39; color:white; font-weight:800; }.soul-detail button:disabled { opacity:.35; }
 .soul-gain { top:58px; color:#b8bec8; }
 @media(max-width:430px){.hp-wrap{max-width:210px}.settings-button{top:max(12px,env(safe-area-inset-top));right:118px}.edge-actions{top:max(153px,calc(env(safe-area-inset-top) + 141px));}.soul-detail{align-items:flex-start}.soul-sheet{height:calc(var(--viewport-height,100dvh) - 24px)} }
+.soul-xp { margin-top:7px; font-size:10px; }
+.soul-xp>div:first-child { display:flex; justify-content:space-between; margin-bottom:4px; }
+.soul-xp-track { height:9px; overflow:hidden; border-radius:6px; background:#090d13; }
+.soul-xp-track span { display:block; height:100%; background:linear-gradient(90deg,#7256c8,#64dc8c); }
+.soul-layer-tabs { display:flex; gap:6px; overflow-x:auto; padding:8px 0 2px; scrollbar-width:thin; }
+.soul-layer-tabs button { flex:0 0 auto; min-width:72px; min-height:44px; border:1px solid #60707b; border-radius:8px; background:#17202b; color:#eef; }
+.soul-layer-tabs button.current { border-color:#64dc8c; background:#244b39; }
+.soul-layer-tabs button:disabled { opacity:.45; }
+.soul-placeholder { width:100%; padding:36px 8px; text-align:center; font-size:15px!important; opacity:1!important; }

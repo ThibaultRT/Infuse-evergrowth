@@ -1,0 +1,905 @@
+{
+  "schemaVersion": 2,
+  "layer": 2,
+  "name": "Second Layer",
+  "nodes": [
+    {
+      "number": 31,
+      "id": "SC-31",
+      "name": "Rare Resonance",
+      "description": "Unlock Rare Soul drops (base 1).",
+      "position": {
+        "angleDeg": 0,
+        "radius": 0
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 50,
+        "perLevel": 50,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "unlockSoulDrop",
+            "soulType": "rare"
+          }
+        ],
+        "display": "Unlock Rare Soul drops (base 1)"
+      },
+      "neighbors": [
+        "SC-32",
+        "SC-34",
+        "SC-36"
+      ]
+    },
+    {
+      "number": 32,
+      "id": "SC-32",
+      "name": "Uncommon Pursuit",
+      "description": "Divide Uncommon respawn time by 2 per level.",
+      "position": {
+        "angleDeg": -90,
+        "radius": 1
+      },
+      "maxLevel": 2,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 50,
+        "perLevel": 50,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "enemyRespawnDivisor",
+            "tier": "uncommon",
+            "divisorPerLevel": 2
+          }
+        ],
+        "display": "Divide Uncommon respawn time by 2 per level"
+      },
+      "neighbors": [
+        "SC-38",
+        "SC-39"
+      ]
+    },
+    {
+      "number": 33,
+      "id": "SC-33",
+      "name": "Uncommon Spoils",
+      "description": "+1 Uncommon equipment quantity.",
+      "position": {
+        "angleDeg": -30,
+        "radius": 1
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 100,
+        "perLevel": 100,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "equipmentQuantityAdditive",
+            "equipmentRarity": "uncommon",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Uncommon equipment quantity"
+      },
+      "neighbors": [
+        "SC-39",
+        "SC-40",
+        "SC-41"
+      ]
+    },
+    {
+      "number": 34,
+      "id": "SC-34",
+      "name": "Blunt Mastery",
+      "description": "+1% Blunt damage per level.",
+      "position": {
+        "angleDeg": 30,
+        "radius": 1
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 100,
+        "perLevel": 100,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Blunt damage per level"
+      },
+      "neighbors": [
+        "SC-42",
+        "SC-43"
+      ]
+    },
+    {
+      "number": 35,
+      "id": "SC-35",
+      "name": "Slash Mastery",
+      "description": "+1% Slash damage per level.",
+      "position": {
+        "angleDeg": 90,
+        "radius": 1
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 100,
+        "perLevel": 100,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Slash damage per level"
+      },
+      "neighbors": [
+        "SC-43",
+        "SC-44",
+        "SC-45"
+      ]
+    },
+    {
+      "number": 36,
+      "id": "SC-36",
+      "name": "Piercing Mastery",
+      "description": "+1% Piercing damage per level.",
+      "position": {
+        "angleDeg": 150,
+        "radius": 1
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 100,
+        "perLevel": 100,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Piercing damage per level"
+      },
+      "neighbors": [
+        "SC-45",
+        "SC-46"
+      ]
+    },
+    {
+      "number": 37,
+      "id": "SC-37",
+      "name": "Veilstep",
+      "description": "+1% Evasion per level.",
+      "position": {
+        "angleDeg": 210,
+        "radius": 1
+      },
+      "maxLevel": 3,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 4500,
+        "perLevel": 4500,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "evasionChanceAdditive",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Evasion per level"
+      },
+      "neighbors": [
+        "SC-38",
+        "SC-47"
+      ]
+    },
+    {
+      "number": 38,
+      "id": "SC-38",
+      "name": "Rare Harvest",
+      "description": "+1 Rare Soul.",
+      "position": {
+        "angleDeg": -108,
+        "radius": 2
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 25,
+        "perLevel": 25,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "rare",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Rare Soul"
+      },
+      "neighbors": [
+        "SC-48"
+      ]
+    },
+    {
+      "number": 39,
+      "id": "SC-39",
+      "name": "Common Overflow",
+      "description": "+2 Common Souls.",
+      "position": {
+        "angleDeg": -72,
+        "radius": 2
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 100,
+        "perLevel": 100,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "common",
+            "amountPerLevel": 2
+          }
+        ],
+        "display": "+2 Common Souls"
+      },
+      "neighbors": [
+        "SC-49"
+      ]
+    },
+    {
+      "number": 40,
+      "id": "SC-40",
+      "name": "Uncommon Harvest I",
+      "description": "+1 Uncommon Soul.",
+      "position": {
+        "angleDeg": -45,
+        "radius": 2
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 50,
+        "perLevel": 50,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "uncommon",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Uncommon Soul"
+      },
+      "neighbors": [
+        "SC-50"
+      ]
+    },
+    {
+      "number": 41,
+      "id": "SC-41",
+      "name": "Uncommon Harvest II",
+      "description": "+1 Uncommon Soul.",
+      "position": {
+        "angleDeg": -15,
+        "radius": 2
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 50,
+        "perLevel": 50,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "uncommon",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Uncommon Soul"
+      },
+      "neighbors": [
+        "SC-51"
+      ]
+    },
+    {
+      "number": 42,
+      "id": "SC-42",
+      "name": "Blunt Resistance",
+      "description": "+1% Blunt resistance per level.",
+      "position": {
+        "angleDeg": 15,
+        "radius": 2
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 900,
+        "perLevel": 900,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "damageResistancePercentAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Blunt resistance per level"
+      },
+      "neighbors": [
+        "SC-52"
+      ]
+    },
+    {
+      "number": 43,
+      "id": "SC-43",
+      "name": "Slash Resistance",
+      "description": "+1% Slash resistance per level.",
+      "position": {
+        "angleDeg": 45,
+        "radius": 2
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 900,
+        "perLevel": 900,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "damageResistancePercentAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Slash resistance per level"
+      },
+      "neighbors": [
+        "SC-53"
+      ]
+    },
+    {
+      "number": 44,
+      "id": "SC-44",
+      "name": "Piercing Resistance",
+      "description": "+1% Piercing resistance per level.",
+      "position": {
+        "angleDeg": 72,
+        "radius": 2
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 900,
+        "perLevel": 900,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "damageResistancePercentAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 0.01
+          }
+        ],
+        "display": "+1% Piercing resistance per level"
+      },
+      "neighbors": [
+        "SC-54"
+      ]
+    },
+    {
+      "number": 45,
+      "id": "SC-45",
+      "name": "Greater Vitality I",
+      "description": "+500 Max HP per level.",
+      "position": {
+        "angleDeg": 108,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 500,
+        "perLevel": 500,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 500
+          }
+        ],
+        "display": "+500 Max HP per level"
+      },
+      "neighbors": [
+        "SC-55"
+      ]
+    },
+    {
+      "number": 46,
+      "id": "SC-46",
+      "name": "Greater Vitality II",
+      "description": "+1000 Max HP per level.",
+      "position": {
+        "angleDeg": 150,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 900,
+        "perLevel": 900,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 1000
+          }
+        ],
+        "display": "+1000 Max HP per level"
+      },
+      "neighbors": [
+        "SC-56"
+      ]
+    },
+    {
+      "number": 47,
+      "id": "SC-47",
+      "name": "Uncommon Vitality",
+      "description": "+1500 Max HP per level.",
+      "position": {
+        "angleDeg": 210,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 100,
+        "perLevel": 100,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 1500
+          }
+        ],
+        "display": "+1500 Max HP per level"
+      },
+      "neighbors": [
+        "SC-59",
+        "SC-60"
+      ]
+    },
+    {
+      "number": 48,
+      "id": "SC-48",
+      "name": "Mending Weave I",
+      "description": "+1 HP/s per level.",
+      "position": {
+        "angleDeg": 252,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 450,
+        "perLevel": 450,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "regenAdditive",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 HP/s per level"
+      },
+      "neighbors": [
+        "SC-49",
+        "SC-60"
+      ]
+    },
+    {
+      "number": 49,
+      "id": "SC-49",
+      "name": "Mending Weave II",
+      "description": "+2 HP/s per level.",
+      "position": {
+        "angleDeg": 288,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 750,
+        "perLevel": 750,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "regenAdditive",
+            "amountPerLevel": 2
+          }
+        ],
+        "display": "+2 HP/s per level"
+      },
+      "neighbors": [
+        "SC-50"
+      ]
+    },
+    {
+      "number": 50,
+      "id": "SC-50",
+      "name": "Uncommon Regeneration",
+      "description": "+3 HP/s per level.",
+      "position": {
+        "angleDeg": 315,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "uncommon",
+        "base": 75,
+        "perLevel": 75,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "regenAdditive",
+            "amountPerLevel": 3
+          }
+        ],
+        "display": "+3 HP/s per level"
+      },
+      "neighbors": [
+        "SC-51"
+      ]
+    },
+    {
+      "number": 51,
+      "id": "SC-51",
+      "name": "Soulstep II",
+      "description": "+10 Speed per level.",
+      "position": {
+        "angleDeg": 345,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 450,
+        "perLevel": 450,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "speedRawAdditive",
+            "amountPerLevel": 10
+          }
+        ],
+        "display": "+10 Speed per level"
+      },
+      "neighbors": [
+        "SC-52"
+      ]
+    },
+    {
+      "number": 52,
+      "id": "SC-52",
+      "name": "Critical Focus II",
+      "description": "+15 Critical Chance per level.",
+      "position": {
+        "angleDeg": 15,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 600,
+        "perLevel": 600,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "criticalChanceRawAdditive",
+            "amountPerLevel": 15
+          }
+        ],
+        "display": "+15 Critical Chance per level"
+      },
+      "neighbors": [
+        "SC-53"
+      ]
+    },
+    {
+      "number": 53,
+      "id": "SC-53",
+      "name": "Critical Imprint II",
+      "description": "+25 Critical Damage per level.",
+      "position": {
+        "angleDeg": 45,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 700,
+        "perLevel": 700,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "criticalDamageRawAdditive",
+            "amountPerLevel": 25
+          }
+        ],
+        "display": "+25 Critical Damage per level"
+      },
+      "neighbors": [
+        "SC-54"
+      ]
+    },
+    {
+      "number": 54,
+      "id": "SC-54",
+      "name": "Guarded Soul",
+      "description": "+5 Block Chance per level.",
+      "position": {
+        "angleDeg": 72,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "common",
+        "base": 800,
+        "perLevel": 800,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "blockChanceRawAdditive",
+            "amountPerLevel": 5
+          }
+        ],
+        "display": "+5 Block Chance per level"
+      },
+      "neighbors": [
+        "SC-55"
+      ]
+    },
+    {
+      "number": 55,
+      "id": "SC-55",
+      "name": "Blunt Force",
+      "description": "+12 Blunt attack per level.",
+      "position": {
+        "angleDeg": 108,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 450,
+        "perLevel": 450,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 12
+          }
+        ],
+        "display": "+12 Blunt attack per level"
+      },
+      "neighbors": [
+        "SC-56"
+      ]
+    },
+    {
+      "number": 56,
+      "id": "SC-56",
+      "name": "Slash Force",
+      "description": "+12 Slash attack per level.",
+      "position": {
+        "angleDeg": 135,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 450,
+        "perLevel": 450,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 12
+          }
+        ],
+        "display": "+12 Slash attack per level"
+      },
+      "neighbors": [
+        "SC-57"
+      ]
+    },
+    {
+      "number": 57,
+      "id": "SC-57",
+      "name": "Piercing Force",
+      "description": "+12 Piercing attack per level.",
+      "position": {
+        "angleDeg": 165,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 450,
+        "perLevel": 450,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 12
+          }
+        ],
+        "display": "+12 Piercing attack per level"
+      },
+      "neighbors": [
+        "SC-58"
+      ]
+    },
+    {
+      "number": 58,
+      "id": "SC-58",
+      "name": "Blunt Bulwark",
+      "description": "+10 Blunt defence per level.",
+      "position": {
+        "angleDeg": 180,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 500,
+        "perLevel": 500,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 10
+          }
+        ],
+        "display": "+10 Blunt defence per level"
+      },
+      "neighbors": [
+        "SC-59"
+      ]
+    },
+    {
+      "number": 59,
+      "id": "SC-59",
+      "name": "Slash Bulwark",
+      "description": "+10 Slash defence per level.",
+      "position": {
+        "angleDeg": 195,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 500,
+        "perLevel": 500,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 10
+          }
+        ],
+        "display": "+10 Slash defence per level"
+      },
+      "neighbors": [
+        "SC-60"
+      ]
+    },
+    {
+      "number": 60,
+      "id": "SC-60",
+      "name": "Piercing Bulwark",
+      "description": "+10 Piercing defence per level.",
+      "position": {
+        "angleDeg": 225,
+        "radius": 3
+      },
+      "maxLevel": 10,
+      "cost": {
+        "soulType": "common",
+        "base": 500,
+        "perLevel": 500,
+        "formula": "base + perLevel * (level - 1)"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 10
+          }
+        ],
+        "display": "+10 Piercing defence per level"
+      },
+      "neighbors": []
+    }
+  ]
+}
