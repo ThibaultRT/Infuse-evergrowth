@@ -24,7 +24,16 @@ export function combatAffinityIcon(type: CombatAffinity, size = 12): string {
   return bluntHammerIcon(size);
 }
 
-export function damageTypeIcon(type: DamageType, size = 12): string {
+/** Compact double-chevron dodge mark, based on the selected Evasion concept. */
+export function evasionIcon(size = 12): string {
+  return `<svg class="stat-icon evasion-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M4.5 5.5c3.1 1.6 5.6 3.7 7.4 6.5-1.8 2.8-4.3 4.9-7.4 6.5M9 5.5c3.1 1.6 5.6 3.7 7.4 6.5-1.8 2.8-4.3 4.9-7.4 6.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m16 8.4 4.5 3.6-4.5 3.6Z" fill="#22d3ee"/>
+  </svg>`;
+}
+
+export function damageTypeIcon(type: DamageType | 'evasion', size = 12): string {
+  if (type === 'evasion') return evasionIcon(size);
   if (type === 'slash') return slashSwordIcon(size);
   if (type === 'piercing') return pierceSpearIcon(size);
   return bluntHammerIcon(size);

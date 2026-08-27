@@ -2,7 +2,7 @@ export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legend
 export type DamageType = 'blunt' | 'slash' | 'piercing';
 export type SoulType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type CombatAffinity = 'blunt' | 'slash' | 'pierce';
-export type LootType = 'hp' | 'regen' | DamageType;
+export type LootType = 'hp' | 'regen' | 'evasion' | DamageType;
 export type NumberRange = { min: number; max: number };
 export type SpawnRewardDefinition = NumberRange & { stat: LootType };
 export type SpawnRoll = { maxHp: number; reward: { stat: LootType; amount: number } };
@@ -75,6 +75,7 @@ export type PlayerStats = {
   criticalChance: StatSources;
   criticalDamage: StatSources;
   blockChance: StatSources;
+  evasion: StatSources;
 };
 
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -92,7 +93,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 15;
+  version: 16;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];

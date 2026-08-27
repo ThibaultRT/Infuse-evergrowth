@@ -1,5 +1,5 @@
 import './reward-popups.css';
-import { bluntHammerIcon, combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, heartIcon, heartRegenIcon } from './icons';
+import { bluntHammerIcon, combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon } from './icons';
 import { save, statAdditiveTotal, statTotal } from './save';
 import { logarithmicStat } from './domain/combat/HeroStats';
 import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED } from './config';
@@ -176,8 +176,9 @@ function layoutGainItems(): void { gainItems.forEach((element, index) => { eleme
 function showGain(amount: string, stat: string): void {
   const element = document.createElement('div');
   const healthStat = stat === 'HP' || stat === 'HP/S';
-  const gainIcon = stat === 'HP/S' ? heartRegenIcon(14) : stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13);
-  element.className = `gain-pop ${healthStat ? 'hp' : 'blunt'}`;
+  const evasionStat = stat === 'EVASION';
+  const gainIcon = stat === 'HP/S' ? heartRegenIcon(14) : stat === 'HP' ? heartIcon(13) : evasionStat ? evasionIcon(13) : bluntHammerIcon(13);
+  element.className = `gain-pop ${healthStat ? 'hp' : evasionStat ? 'evasion' : 'blunt'}`;
   element.innerHTML = `<strong>+${amount}</strong>${gainIcon}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
   requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
@@ -209,9 +210,10 @@ export function renderStats(stats: PlayerStats): void {
   const maxHpLabel = `<span class="stat-title-with-icon">${heartIcon(14)} Max HP</span>`;
   const regenLabel = `<span class="stat-title-with-icon">${heartRegenIcon(14)} Health regeneration</span>`;
   const bluntLabel = `<span class="stat-title-with-icon">${bluntHammerIcon(14)} Blunt attack</span>`;
+  const evasionLabel = `<span class="stat-title-with-icon">${evasionIcon(14)} Evasion (raw)</span>`;
   const scaled = (label: string, stat: StatSources, baseline: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${logarithmicStat(statTotal(stat), baseline).toFixed(2)}${suffix}</strong></div>`;
   const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${type === 'common' ? 1 : type === 'uncommon' && save.soulCatcher.nodeLevels['SC-20'] ? 1 : 0} base + Soul Catcher upgrades</strong></div>`).join('');
-  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Slash attack', stats.attack.slash), renderBreakdown('Piercing attack', stats.attack.piercing), renderBreakdown('Blunt defence', stats.defense.blunt), renderBreakdown('Slash defence', stats.defense.slash), renderBreakdown('Piercing defence', stats.defense.piercing), renderBreakdown(regenLabel, stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%'), `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
+  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Slash attack', stats.attack.slash), renderBreakdown('Piercing attack', stats.attack.piercing), renderBreakdown('Blunt defence', stats.defense.blunt), renderBreakdown('Slash defence', stats.defense.slash), renderBreakdown('Piercing defence', stats.defense.piercing), renderBreakdown(regenLabel, stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%'), renderBreakdown(evasionLabel, stats.evasion), `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
 }
 
 const soulIcon = (type: SoulType): string => `<span class="soul-icon soul-${type}" aria-hidden="true"></span>`;

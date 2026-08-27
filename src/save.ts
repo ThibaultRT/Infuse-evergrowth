@@ -4,8 +4,8 @@ import { logarithmicChance, logarithmicStat } from './domain/combat/HeroStats';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import type { DamageType, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v15';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const SAVE_KEY = 'infuse-evergrowth-save-v16';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v15', 'infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
 const volatileValues = new Map<string, string>();
@@ -34,7 +34,10 @@ function migrateSpawns(value: unknown): Record<string, SavedSpawnState> {
   return Object.fromEntries(SPAWNS.map((spawn) => {
     const previous = source[spawn.id];
     const roll = previous?.roll;
-    const validRoll = roll && Number.isFinite(roll.maxHp) && Number.isFinite(roll.reward?.amount);
+    const rewardStillAllowed = roll
+      ? spawn.rewards.some((reward) => reward.stat === roll.reward.stat && roll.reward.amount >= reward.min && roll.reward.amount <= reward.max)
+      : false;
+    const validRoll = roll && Number.isFinite(roll.maxHp) && Number.isFinite(roll.reward?.amount) && rewardStillAllowed;
     return [spawn.id, {
       killsToday: Math.max(0, Number(previous?.killsToday) || 0),
       respawnAt: typeof previous?.respawnAt === 'number' ? previous.respawnAt : null,
@@ -57,7 +60,8 @@ function freshStats(): PlayerStats {
     speed: freshStat(BASE_HERO_SPEED_RAW),
     criticalChance: freshStat(BASE_HERO_CRITICAL_CHANCE_RAW),
     criticalDamage: freshStat(BASE_HERO_CRITICAL_DAMAGE_RAW),
-    blockChance: freshStat(BASE_HERO_BLOCK_CHANCE_RAW)
+    blockChance: freshStat(BASE_HERO_BLOCK_CHANCE_RAW),
+    evasion: freshStat(0)
   };
 }
 
@@ -119,7 +123,7 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
 
 export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Date()): SaveData {
   const fresh: SaveData = {
-    version: 15,
+    version: 16,
     dailyKey: localDailyKey(now),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -134,7 +138,7 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     const raw = storage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => storage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (![7, 8, 9, 10, 11, 12, 13, 14, 15].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    if (![7, 8, 9, 10, 11, 12, 13, 14, 15, 16].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
     const areaIds = new Set(AREAS.map((area) => area.id));
     const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
     const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
@@ -147,11 +151,12 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
       speed: normalizeStat(parsed.stats.speed, BASE_HERO_SPEED_RAW),
       criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
       criticalDamage: normalizeStat(parsed.stats.criticalDamage, BASE_HERO_CRITICAL_DAMAGE_RAW),
-      blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW)
+      blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW),
+      evasion: normalizeStat(parsed.stats.evasion, 0)
     };
     const maxHp = statTotal(stats.maxHp);
     return {
-      version: 15,
+      version: 16,
       dailyKey: localDailyKey(now),
       currentAreaId: typeof requestedArea === 'number' && areaIds.has(requestedArea) && unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,

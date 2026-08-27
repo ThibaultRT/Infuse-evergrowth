@@ -28,4 +28,5 @@
 }
 .gain-pop.hp { color: #ff9fb0; }
 .gain-pop.blunt { color: #fff6d9; }
+.gain-pop.evasion { color: #eefcff; }
 .gain-pop.leaving { opacity: 0 !important; }
