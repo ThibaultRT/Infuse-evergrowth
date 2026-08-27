@@ -640,19 +640,21 @@ ui.inventoryDetail.addEventListener('click', (event) => {
   }
   const itemId = button.dataset.itemId;
   if (!itemId) return;
+  let equipmentChanged = false;
   if (button.hasAttribute('data-equip')) {
     const armorSlot = equipmentSlot(itemId);
-    if (armorSlot) commands.execute({ type: 'equip', itemId, slot: armorSlot });
+    if (armorSlot) { commands.execute({ type: 'equip', itemId, slot: armorSlot }); equipmentChanged = true; }
     else {
       const freeSlots = (['hand1', 'hand2', 'orbit1', 'orbit2'] as const).filter((slot) => save.inventory.equipped[slot] === null);
-      if (freeSlots.length === 1) commands.execute({ type: 'equip', itemId, slot: freeSlots[0] });
+      if (freeSlots.length === 1) { commands.execute({ type: 'equip', itemId, slot: freeSlots[0] }); equipmentChanged = true; }
       else { ui.inventoryDetail.querySelector<HTMLElement>('[data-slot-picker]')!.hidden = false; return; }
     }
   }
-  if (button.dataset.equipSlot) commands.execute({ type: 'equip', itemId, slot: button.dataset.equipSlot as EquipmentSlotId });
-  if (button.dataset.unequip) commands.execute({ type: 'unequip', slot: button.dataset.unequip as EquipmentSlotId });
+  if (button.dataset.equipSlot) { commands.execute({ type: 'equip', itemId, slot: button.dataset.equipSlot as EquipmentSlotId }); equipmentChanged = true; }
+  if (button.dataset.unequip) { commands.execute({ type: 'unequip', slot: button.dataset.unequip as EquipmentSlotId }); equipmentChanged = true; }
   if (button.hasAttribute('data-ascend')) commands.execute({ type: 'ascend', itemId });
-  refreshInventory(itemId);
+  refreshInventory(equipmentChanged ? undefined : itemId);
+  if (equipmentChanged) showInventoryOverview(inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : 0);
 });
 
 function updateHero(dt: number): void {
@@ -728,9 +730,10 @@ function updateHud(): void {
   const maxHp = maxHeroHp();
   ui.hpText.textContent = `${Math.round(gameplay.hero.hp)} / ${Math.round(maxHp)}`;
   ui.hpBar.style.width = `${gameplay.hero.hp / maxHp * 100}%`;
-  for (const hand of ['hand1', 'hand2'] as const) {
-    const profile = attackProfile(hand);
-    ui[hand === 'hand1' ? 'hand1Stat' : 'hand2Stat'].innerHTML = profile
+  const attackHud = { hand1: ui.hand1Stat, hand2: ui.hand2Stat, orbit1: ui.orbit1Stat, orbit2: ui.orbit2Stat };
+  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
+    const profile = attackProfile(slot);
+    attackHud[slot].innerHTML = profile
       ? `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`
       : '—';
   }
