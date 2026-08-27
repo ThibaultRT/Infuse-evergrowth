@@ -32,7 +32,8 @@
         "display": "+50 Max HP per level"
       },
       "neighbors": [
-        "SC-03"
+        "SC-08",
+        "SC-09"
       ]
     },
     {
@@ -62,7 +63,9 @@
         "display": "+2 Blunt attack per level"
       },
       "neighbors": [
-        "SC-04"
+        "SC-09",
+        "SC-10",
+        "SC-11"
       ]
     },
     {
@@ -91,7 +94,8 @@
         "display": "+5 Critical Chance raw per level"
       },
       "neighbors": [
-        "SC-05"
+        "SC-12",
+        "SC-13"
       ]
     },
     {
@@ -120,7 +124,9 @@
         "display": "+5 Speed raw per level"
       },
       "neighbors": [
-        "SC-06"
+        "SC-13",
+        "SC-14",
+        "SC-15"
       ]
     },
     {
@@ -150,7 +156,8 @@
         "display": "+1 Common Soul per eligible enemy per level"
       },
       "neighbors": [
-        "SC-07"
+        "SC-15",
+        "SC-16"
       ]
     },
     {
@@ -180,7 +187,8 @@
         "display": "+5 Slash defence per level"
       },
       "neighbors": [
-        "SC-08"
+        "SC-08",
+        "SC-17"
       ]
     }
   ]
