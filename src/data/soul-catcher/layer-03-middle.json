@@ -32,7 +32,7 @@
         "display": "+100 Max HP per level"
       },
       "neighbors": [
-        "SC-09"
+        "SC-18"
       ]
     },
     {
@@ -61,7 +61,7 @@
         "display": "+0.25 HP/s regeneration per level"
       },
       "neighbors": [
-        "SC-10"
+        "SC-19"
       ]
     },
     {
@@ -91,7 +91,7 @@
         "display": "+4 Blunt attack per level"
       },
       "neighbors": [
-        "SC-11"
+        "SC-20"
       ]
     },
     {
@@ -121,7 +121,7 @@
         "display": "+4 Slash attack per level"
       },
       "neighbors": [
-        "SC-12"
+        "SC-21"
       ]
     },
     {
@@ -151,7 +151,7 @@
         "display": "+4 Piercing attack per level"
       },
       "neighbors": [
-        "SC-13"
+        "SC-22"
       ]
     },
     {
@@ -180,7 +180,7 @@
         "display": "+10 Critical Chance raw per level"
       },
       "neighbors": [
-        "SC-14"
+        "SC-23"
       ]
     },
     {
@@ -210,7 +210,7 @@
         "display": "+5 Blunt defence per level"
       },
       "neighbors": [
-        "SC-15"
+        "SC-24"
       ]
     },
     {
@@ -240,7 +240,7 @@
         "display": "+5 Piercing defence per level"
       },
       "neighbors": [
-        "SC-16"
+        "SC-25"
       ]
     },
     {
@@ -270,7 +270,7 @@
         "display": "+1 Common Soul per eligible enemy per level"
       },
       "neighbors": [
-        "SC-17"
+        "SC-26"
       ]
     },
     {
@@ -300,7 +300,8 @@
         "display": "+5 Slash defence per level"
       },
       "neighbors": [
-        "SC-18"
+        "SC-29",
+        "SC-30"
       ]
     }
   ]
