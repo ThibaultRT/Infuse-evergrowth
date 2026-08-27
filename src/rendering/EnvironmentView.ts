@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { AREAS, SPAWNS, WORLD_CONNECTIONS } from '../config';
 import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
 import type { AreaDefinition } from '../types';
-import { fitModelToHeight, gameModelAssets, kaykitAssets, quaterniusAssets, type AssetLoader } from './AssetLoader';
+import { fitModelToFootprint, gameModelAssets, kaykitAssets, quaterniusAssets, type AssetLoader } from './AssetLoader';
 import { AREA_ONE_KAYKIT_PLACEMENTS, AREA_THREE_WALL_PLACEMENTS, areaOneVegetation, type KaykitPlacement, WEST_BORDER_KAYKIT_PLACEMENTS } from './KaykitEnvironmentPlacements';
 
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, x: number, y: number, z: number): THREE.Mesh {
@@ -80,9 +80,6 @@ export class EnvironmentView {
     const bridge=mesh(new THREE.BoxGeometry(4.2,.35,7),new THREE.MeshStandardMaterial({color:0x65452d,roughness:1}),0,.1,30); this.macroRoot.add(bridge,mesh(new THREE.BoxGeometry(5,1,.55),cliffMat,0,.5,27.2));
     // Broad, softly overlapping soil/grass shapes anchor the village and encounter clearings.
     this.groundPatch(0,5,7,5,0x83ad5a,.2); this.groundPatch(-10,17,5,4,0x70964d,-.35); this.groundPatch(10,-13,5.5,4.5,0x719c50,.25);
-    const shrineStone=new THREE.MeshStandardMaterial({color:0x8a8878,roughness:1});
-    const plaza=mesh(new THREE.CylinderGeometry(3.1,3.3,.18,12),shrineStone,0,.1,5); this.macroRoot.add(plaza);
-    for(const [x,z] of [[-2.2,3.2],[2.2,3.2],[-2.2,6.8],[2.2,6.8]] as const) this.macroRoot.add(mesh(new THREE.CylinderGeometry(.28,.38,1.25,8),shrineStone,x,.63,z));
   }
 
   private buildBorderlands(): void { this.ground(0x465b42); this.road([[-12,28],[-10,8],[0,-4]],3.5); this.road([[0,-4],[15,5],[18,28]],3.5);
@@ -133,7 +130,7 @@ export class EnvironmentView {
   }
   private async addFountain(): Promise<void> {
     const object=await gameModelAssets.cloneScene('props/fountain.glb');
-    fitModelToHeight(object,2.35); object.position.z=5;
+    fitModelToFootprint(object,6.2); object.position.z=5;
     object.traverse((child)=>{ if(child instanceof THREE.Mesh){ child.castShadow=true; child.receiveShadow=true; } });
     this.assetDetailsRoot.add(object);
   }

@@ -22,7 +22,20 @@ export class EnemyView extends AnimatedHumanoidView {
     super(makeHumanoid(accent));
     this.root.scale.setScalar(SCALE_BY_TIER[tier]);
     if (tier === 'rare') void this.loadRareModel();
+    else if (tier === 'epic') void this.loadEpicModel();
     else void this.loadModel(`characters/models/${OUTFIT_BY_TIER[tier]}.gltf`);
+  }
+
+  private async loadEpicModel(): Promise<void> {
+    try {
+      const model = await gameModelAssets.cloneScene('enemies/spider.glb');
+      fitModelToHeight(model, 2.2 / SCALE_BY_TIER.epic);
+      model.traverse((child) => { if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; } });
+      this.root.clear();
+      this.root.add(model);
+    } catch (error) {
+      console.warn('Epic spider model unavailable; keeping procedural fallback.', error);
+    }
   }
 
   private async loadRareModel(): Promise<void> {
