@@ -7,7 +7,7 @@ export type NumberRange = { min: number; max: number };
 export type SpawnRewardDefinition = NumberRange & { stat: LootType };
 export type SpawnRoll = { maxHp: number; reward: { stat: LootType; amount: number } };
 export type WeaponSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
-export type ArmorSlotId = 'helmet' | 'armor' | 'legs';
+export type ArmorSlotId = 'helmet' | 'armor' | 'legs' | 'ring';
 export type EquipmentSlotId = WeaponSlotId | ArmorSlotId;
 
 export type SpawnDefinition = {
@@ -92,7 +92,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 13;
+  version: 14;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
