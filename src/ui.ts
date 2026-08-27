@@ -33,7 +33,7 @@ app.innerHTML = `
             <div class="hp-label"><span>HP</span><span id="hp-text">20 / 20</span></div>
             <div class="bar"><span id="hp-bar"></span></div>
           </div>
-          <div class="hand-hud"><span id="hand1-stat"></span><span id="hand2-stat"></span></div>
+          <div class="hand-hud"><span id="hand1-stat"></span><span id="hand2-stat"></span><span id="orbit1-stat"></span><span id="orbit2-stat"></span></div>
         </div>
         <div id="enemy-affinities" class="enemy-affinities"></div>
       </div>
@@ -130,7 +130,7 @@ app.innerHTML = `
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
   loadingScreen: q<HTMLDivElement>('#loading-screen'), loadingProgress: q<HTMLSpanElement>('#loading-progress'), loadingPercent: q<HTMLDivElement>('#loading-percent'),
-  hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), hand2Stat: q<HTMLSpanElement>('#hand2-stat'),
+  hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), hand2Stat: q<HTMLSpanElement>('#hand2-stat'), orbit1Stat: q<HTMLSpanElement>('#orbit1-stat'), orbit2Stat: q<HTMLSpanElement>('#orbit2-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
@@ -214,7 +214,7 @@ export function renderStats(stats: PlayerStats): void {
 const soulIcon = (type: SoulType): string => `<span class="soul-icon soul-${type}" aria-hidden="true"></span>`;
 export function renderSoulCatcher(nodes: SoulNode[], edges: [string, string][], revealed: (id: string) => boolean, selectedId: string | null): void {
   const position = (node: SoulNode): [number, number] => { const angle = node.position.angleDeg * Math.PI / 180; const radius = node.position.radius * 92; return [360 + Math.cos(angle) * radius, 360 + Math.sin(angle) * radius]; };
-  ui.soulBalances.innerHTML = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div>${soulIcon(type)}<strong>${save.soulCatcher.balances[type]}</strong><small>${sourceLabel(type)}</small></div>`).join('');
+  ui.soulBalances.innerHTML = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div aria-label="${sourceLabel(type)} souls: ${save.soulCatcher.balances[type]}">${soulIcon(type)}<strong>${save.soulCatcher.balances[type]}</strong></div>`).join('');
   ui.soulConnections.innerHTML = edges.map(([a, b]) => { const [x1,y1] = position(nodes.find((n) => n.id === a)!); const [x2,y2] = position(nodes.find((n) => n.id === b)!); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${revealed(a) && revealed(b) ? 'revealed' : ''}"/>`; }).join('');
   ui.soulNodes.innerHTML = nodes.map((node) => { const [x,y] = position(node), isRevealed = revealed(node.id), level = save.soulCatcher.nodeLevels[node.id] ?? 0; return `<button type="button" class="soul-node ${isRevealed ? 'revealed' : 'mystery'} ${level ? 'purchased' : ''} ${selectedId === node.id ? 'selected' : ''}" style="left:${x}px;top:${y}px" data-soul-node="${isRevealed ? node.id : ''}" aria-label="${isRevealed ? `${node.name}, level ${level}` : 'Mystery node'}">${isRevealed ? `<b>${node.number}</b><span>${level}/${node.maxLevel}</span>` : '?'}</button>`; }).join('');
   const node = nodes.find((candidate) => candidate.id === selectedId);
