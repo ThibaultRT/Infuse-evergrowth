@@ -178,7 +178,7 @@ function showGain(amount: string, stat: string): void {
   const healthStat = stat === 'HP' || stat === 'HP/S';
   const gainIcon = stat === 'HP/S' ? heartRegenIcon(14) : stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13);
   element.className = `gain-pop ${healthStat ? 'hp' : 'blunt'}`;
-  element.innerHTML = `<strong>+${amount}${stat === 'HP/S' ? ' HP/s' : ''}</strong>${gainIcon}`;
+  element.innerHTML = `<strong>+${amount}</strong>${gainIcon}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
   requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
   window.setTimeout(() => { const index = gainItems.indexOf(element); if (index >= 0) gainItems.splice(index, 1); element.classList.add('leaving'); layoutGainItems(); window.setTimeout(() => element.remove(), 180); }, 1600);

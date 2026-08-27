@@ -16,7 +16,7 @@ import {
   areaById,
   enemyAttack
 } from '../config';
-import { combatAffinityIcon, damageTypeIcon, heartIcon, shieldIcon, weaponClassIcon } from '../icons';
+import { combatAffinityIcon, damageTypeIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 import { renderEnemyAffinities, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
@@ -171,7 +171,7 @@ function formatRewardAmount(amount: number): string {
 }
 
 function lootIcon(type: LootType, size = 9): string {
-  return type === 'hp' || type === 'regen' ? heartIcon(size) : damageTypeIcon(type, size);
+  return type === 'regen' ? heartRegenIcon(size) : type === 'hp' ? heartIcon(size) : damageTypeIcon(type, size);
 }
 
 function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false, blocked = false): void {
