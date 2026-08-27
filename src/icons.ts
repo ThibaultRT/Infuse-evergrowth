@@ -55,6 +55,18 @@ export function heartIcon(size = 12): string {
   </svg>`;
 }
 
+/** Red healing heart encircled by green renewal arrows, used only for HP regeneration. */
+export function heartRegenIcon(size = 12): string {
+  return `<svg class="stat-icon regen-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M5.2 8.1A7.8 7.8 0 0 1 18.1 5.5" fill="none" stroke="#84cc16" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="m16.5 3.5 2.6 1.8-2.1 2.5" fill="none" stroke="#84cc16" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18.8 15.9A7.8 7.8 0 0 1 5.9 18.5" fill="none" stroke="#84cc16" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="m7.5 20.5-2.6-1.8L7 16.2" fill="none" stroke="#84cc16" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 18.8s-5.7-3.5-7.2-7C3.6 8.9 5.3 6 8.3 6c1.6 0 2.9.8 3.7 2 .8-1.2 2.1-2 3.7-2 3 0 4.7 2.9 3.5 5.8-1.5 3.5-7.2 7-7.2 7Z" fill="#ef4444" stroke="#7f1d1d" stroke-width=".8"/>
+    <path d="M11 9h2v2h2v2h-2v2h-2v-2H9v-2h2V9Z" fill="#fff"/>
+  </svg>`;
+}
+
 export function shieldIcon(size = 12): string {
   return `<svg class="stat-icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <path d="M12 2 21 5v6c0 5.7-3.8 9.4-9 11-5.2-1.6-9-5.3-9-11V5l9-3Zm0 3.1L6 7v4c0 3.9 2.3 6.6 6 8 3.7-1.4 6-4.1 6-8V7l-6-1.9Z" fill="currentColor"/>

@@ -1,5 +1,5 @@
 import './reward-popups.css';
-import { bluntHammerIcon, combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, heartIcon } from './icons';
+import { bluntHammerIcon, combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, heartIcon, heartRegenIcon } from './icons';
 import { save, statAdditiveTotal, statTotal } from './save';
 import { logarithmicStat } from './domain/combat/HeroStats';
 import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED } from './config';
@@ -176,8 +176,9 @@ function layoutGainItems(): void { gainItems.forEach((element, index) => { eleme
 function showGain(amount: string, stat: string): void {
   const element = document.createElement('div');
   const healthStat = stat === 'HP' || stat === 'HP/S';
+  const gainIcon = stat === 'HP/S' ? heartRegenIcon(14) : stat === 'HP' ? heartIcon(13) : bluntHammerIcon(13);
   element.className = `gain-pop ${healthStat ? 'hp' : 'blunt'}`;
-  element.innerHTML = `<strong>+${amount}${stat === 'HP/S' ? ' HP/s' : ''}</strong>${healthStat ? heartIcon(13) : bluntHammerIcon(13)}`;
+  element.innerHTML = `<strong>+${amount}${stat === 'HP/S' ? ' HP/s' : ''}</strong>${gainIcon}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
   requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
   window.setTimeout(() => { const index = gainItems.indexOf(element); if (index >= 0) gainItems.splice(index, 1); element.classList.add('leaving'); layoutGainItems(); window.setTimeout(() => element.remove(), 180); }, 1600);
@@ -205,10 +206,12 @@ function renderBreakdown(label: string, stat: StatSources, suffix = ''): string 
 }
 
 export function renderStats(stats: PlayerStats): void {
+  const maxHpLabel = `<span class="stat-title-with-icon">${heartIcon(14)} Max HP</span>`;
+  const regenLabel = `<span class="stat-title-with-icon">${heartRegenIcon(14)} Health regeneration</span>`;
   const bluntLabel = `<span class="stat-title-with-icon">${bluntHammerIcon(14)} Blunt attack</span>`;
   const scaled = (label: string, stat: StatSources, baseline: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${logarithmicStat(statTotal(stat), baseline).toFixed(2)}${suffix}</strong></div>`;
   const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${type === 'common' ? 1 : type === 'uncommon' && save.soulCatcher.nodeLevels['SC-20'] ? 1 : 0} base + Soul Catcher upgrades</strong></div>`).join('');
-  ui.statsContent.innerHTML = [renderBreakdown('Max HP', stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Slash attack', stats.attack.slash), renderBreakdown('Piercing attack', stats.attack.piercing), renderBreakdown('Blunt defence', stats.defense.blunt), renderBreakdown('Slash defence', stats.defense.slash), renderBreakdown('Piercing defence', stats.defense.piercing), renderBreakdown('Health regeneration', stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%'), `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
+  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), renderBreakdown(bluntLabel, stats.attack.blunt), renderBreakdown('Slash attack', stats.attack.slash), renderBreakdown('Piercing attack', stats.attack.piercing), renderBreakdown('Blunt defence', stats.defense.blunt), renderBreakdown('Slash defence', stats.defense.slash), renderBreakdown('Piercing defence', stats.defense.piercing), renderBreakdown(regenLabel, stats.regen, ' HP/s'), scaled('Speed', stats.speed, HERO_SPEED, ' m/s'), scaled('Critical hit chance', stats.criticalChance, HERO_CRITICAL_CHANCE_PERCENT, '%'), scaled('Critical damage', stats.criticalDamage, HERO_CRITICAL_DAMAGE_PERCENT, '%'), scaled('Block chance', stats.blockChance, HERO_BLOCK_CHANCE_PERCENT, '%'), `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
 }
 
 const soulIcon = (type: SoulType): string => `<span class="soul-icon soul-${type}" aria-hidden="true"></span>`;
@@ -236,7 +239,7 @@ export function renderInventory(inventory: InventoryState, summary: InventoryCom
   const primary = [
     ['Total attack', '⚔', summary.totalAttack],
     ['Max HP', heartIcon(23), summary.maxHp],
-    ['HP regeneration', '✦', summary.regenPerSecond]
+    ['HP regeneration', heartRegenIcon(23), summary.regenPerSecond]
   ] as const;
   const damageTypes = ['blunt', 'slash', 'piercing'] as const;
   const affinityRow = (defense: boolean): string => damageTypes.map((type) => `<div class="inventory-affinity" aria-label="${type} ${defense ? 'defence' : 'attack'}: ${formatInventoryValue(defense ? summary.defenseByType[type] : summary.attackByType[type])}">${defense ? damageTypeDefenseIcon(type, 17) : damageTypeIcon(type, 15)}<strong>${formatInventoryValue(defense ? summary.defenseByType[type] : summary.attackByType[type])}</strong><small>${defense ? 'DEF' : 'ATK'}</small></div>`).join('');
