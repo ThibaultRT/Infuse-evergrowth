@@ -112,6 +112,9 @@ const commands = new GameCommands(save, gameplay, events, persistGame);
 const soulCatcher = new SoulCatcherSystem(save, events, persistGame);
 const progression = new ProgressionSystem(save, events, persistGame, Math.random, (rarity) => soulCatcher.equipmentQuantity(rarity));
 events.on('heroProgressReset', () => soulCatcher.syncEffects());
+const syncHeroSpeed = (): void => gameplay.setHeroSpeed(heroSpeed());
+events.on('statGained', ({ stat }) => { if (stat === 'speed') syncHeroSpeed(); });
+for (const event of ['equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'soulNodePurchased', 'soulCatcherReset', 'heroProgressReset'] as const) events.on(event, syncHeroSpeed);
 events.on('soulCatcherLayerUnlocked', ({ layer }) => showToast(`Soul Catcher Layer ${layer} unlocked!`));
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
@@ -171,7 +174,7 @@ function formatRewardAmount(amount: number): string {
 }
 
 function lootIcon(type: LootType, size = 9): string {
-  return type === 'regen' ? heartRegenIcon(size) : type === 'hp' ? heartIcon(size) : damageTypeIcon(type, size);
+  return type === 'regen' ? heartRegenIcon(size) : type === 'hp' ? heartIcon(size) : type === 'speed' ? '<span aria-label="Speed">SPD</span>' : damageTypeIcon(type, size);
 }
 
 function showCombatText(position: THREE.Vector3, amount: number, type: CombatAffinity | DamageType, incoming = false, blocked = false): void {

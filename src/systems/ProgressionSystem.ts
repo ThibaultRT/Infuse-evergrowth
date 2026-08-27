@@ -33,6 +33,7 @@ export class ProgressionSystem {
       this.state.stats.maxHp.additive.kills = (this.state.stats.maxHp.additive.kills ?? 0) + reward.amount;
       hero.hp = Math.min(statTotal(this.state.stats.maxHp), hero.hp + statTotal(this.state.stats.maxHp) - oldMax);
     } else if (reward.stat === 'regen') this.state.stats.regen.additive.kills = (this.state.stats.regen.additive.kills ?? 0) + reward.amount;
+    else if (reward.stat === 'speed') this.state.stats.speed.additive.kills = (this.state.stats.speed.additive.kills ?? 0) + reward.amount;
     else if (reward.stat === 'evasion') this.state.stats.evasion.raw.kills += reward.amount;
     else this.state.stats.attack[reward.stat].additive.kills = (this.state.stats.attack[reward.stat].additive.kills ?? 0) + reward.amount;
     this.events.emit('enemyDefeated', { enemyId: definition.id });
