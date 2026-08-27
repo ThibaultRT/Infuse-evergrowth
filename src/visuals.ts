@@ -19,9 +19,9 @@ export function makeHumanoid(primary: number, hero = false): THREE.Group {
   return root;
 }
 
-export function makeTierRing(color: number): THREE.Mesh {
-  const ring = new THREE.Mesh(new THREE.RingGeometry(0.72, 0.9, 32), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.72, side: THREE.DoubleSide }));
-  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.025; return ring;
+/** Enemy rarity is now communicated by the enemy asset itself; ground rings are intentionally disabled. */
+export function makeTierRing(_color: number): THREE.Group {
+  return new THREE.Group();
 }
 
 export function makePortal(): { root: THREE.Group; barrier: THREE.Mesh; glow: THREE.MeshStandardMaterial } {
