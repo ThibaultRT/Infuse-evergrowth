@@ -545,7 +545,7 @@ ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
 ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
 ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
 let selectedSoulNode: string | null = null;
-const refreshSoulTree = (): void => renderSoulCatcher(SOUL_NODES, SOUL_EDGES, (id) => soulCatcher.revealed(id), selectedSoulNode);
+const refreshSoulTree = (): void => renderSoulCatcher(SOUL_NODES, SOUL_EDGES, (id) => soulCatcher.revealed(id), (id) => soulCatcher.canPurchase(id), selectedSoulNode);
 function setSoulCatcherPanel(open: boolean): void {
   if (open && !soulCatcher.available) { showToast('Defeat area 2 boss to unlock Soul Catcher'); return; }
   if (open) closeOtherPanels('soul');
