@@ -31,10 +31,10 @@ Model state is authoritative; systems change it; views project it. Cross-system 
 
 - Static equipment definitions are separate from owned Level/Ascend state. Ascend scales both the new base and per-level growth as configured.
 - Spawners have stable authored IDs. Their save state owns daily kills, defeat/respawn deadlines, and the persisted per-life HP/reward roll. Reroll only on revival, explicit reset, or local-midnight reset.
-- Spawn HP/rewards are authored per spawn, not calculated globally. Enemy attack alone uses the configured area/tier formula.
+- Spawn HP, rewards, and attack damage are authored per spawn, not calculated globally.
 - Bosses use explicit `isBoss`; gate requirements must match `bossSpawnId`. Use “gate,” never legacy “portal” terminology.
 - Source-aware stats use `(base + additive sources) × multiplicative sources`. Damage types are explicit.
-- Both hands are independently scheduled. Empty hands use persistent Blunt attack. Equipped weapons use weapon damage plus the persistent stat of the same type—no extra bare-hand term.
+- The held weapon and three orbit weapons are independently scheduled. Equipped weapons use weapon damage plus the persistent stat of the same type—no extra bare-hand term.
 - Hero affinity modifies outgoing hero damage. Enemy damage ignores affinity and is reduced by matching equipped defense.
 - All progression is persisted. Save-shape changes require type, normalization, migration, version, and storage-key updates without discarding supported progression.
 - Authored collision and gameplay positions stay renderer-independent. DOM world labels must track life and visibility.
@@ -48,7 +48,7 @@ Model state is authoritative; systems change it; views project it. Cross-system 
 5. Project state in rendering/UI.
 6. Keep `Game.ts` limited to composition and ordering.
 
-Use compact strict TypeScript, ES modules, and explicit return types on exported functions. Never wrap imports in `try`/`catch`. Put global tuning in `balance.json` and world/spawn content in `areas.json`. Add every queried UI element to exported `ui`; HUD controls need `pointer-events: auto`.
+Use compact strict TypeScript, ES modules, and explicit return types on exported functions. Never wrap imports in `try`/`catch`. Put global tuning in `balance.json` and world/spawn content in one JSON per area under `src/data/areas/`. Add every queried UI element to exported `ui`; HUD controls need `pointer-events: auto`.
 
 ## Graphics and assets
 

@@ -1,9 +1,9 @@
 import { heroDamage, heroRegen, maxHeroHp, save } from '../save';
 import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
-import { ascendOwnedEquipment, canAscend, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel } from '../domain/items/EquipmentProgression';
+import { ascendCopies, ascendOwnedEquipment, canAscend, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel } from '../domain/items/EquipmentProgression';
 
-export { EQUIPMENT, EQUIPMENT_BY_ID, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel };
+export { EQUIPMENT, EQUIPMENT_BY_ID, ascendCopies, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel };
 
 export type AttackProfile = { itemId: string; damage: number; damageType: DamageType; cooldownSeconds: number };
 export type InventoryCombatSummary = {
@@ -43,13 +43,14 @@ export function equipmentSlot(itemId: string): EquipmentSlotId | null {
   return item?.kind === 'armor' ? ARMOR_SLOT[item.armorClass] : null;
 }
 
-export function equip(itemId: string, slot: EquipmentSlotId): void {
+export function equip(itemId: string, slot: EquipmentSlotId): boolean {
   const item = EQUIPMENT_BY_ID.get(itemId);
-  if (!save.inventory.items[itemId] || !item) return;
+  if (!save.inventory.items[itemId] || !item || (slot === 'orbit1' && !save.unlockedAreas.includes(2))) return false;
   const armorSlot = item.kind === 'armor' ? ARMOR_SLOT[item.armorClass] : null;
-  if ((armorSlot && slot !== armorSlot) || (!armorSlot && !['hand1', 'hand2', 'orbit1', 'orbit2'].includes(slot))) return;
+  if ((armorSlot && slot !== armorSlot) || (!armorSlot && !['hand1', 'orbit1', 'orbit2', 'orbit3'].includes(slot))) return false;
   for (const other of Object.keys(save.inventory.equipped) as EquipmentSlotId[]) if (other !== slot && save.inventory.equipped[other] === itemId) save.inventory.equipped[other] = null;
   save.inventory.equipped[slot] = itemId;
+  return true;
 }
 
 export function unequip(hand: EquipmentSlotId): string | null {
@@ -60,8 +61,9 @@ export function unequip(hand: EquipmentSlotId): string | null {
 
 export function ascend(itemId: string): boolean {
   const owned = save.inventory.items[itemId];
-  if (!owned || !canAscend(owned)) return false;
-  save.inventory.items[itemId] = ascendOwnedEquipment(owned);
+  const item = EQUIPMENT_BY_ID.get(itemId);
+  if (!owned || !item || !canAscend(item, owned)) return false;
+  save.inventory.items[itemId] = ascendOwnedEquipment(item, owned);
   return true;
 }
 
@@ -78,7 +80,7 @@ export function equippedDefense(type: DamageType): number {
 export function equipmentCombatSummary(): InventoryCombatSummary {
   const damageTypes: DamageType[] = ['blunt', 'slash', 'piercing'];
   const attackByType: Record<DamageType, number> = { blunt: 0, slash: 0, piercing: 0 };
-  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
+  for (const slot of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
     const profile = attackProfile(slot);
     if (profile) attackByType[profile.damageType] += profile.damage;
   }

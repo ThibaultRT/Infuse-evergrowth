@@ -14,7 +14,6 @@ import {
   SPAWNS,
   TIER_CONFIG,
   areaById,
-  enemyAttack
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
@@ -70,11 +69,11 @@ renderer.domElement.addEventListener('webglcontextrestored', () => {
 });
 const effects = new EffectManager(scene);
 const worldUi = new WorldUiManager(camera, renderer.domElement, ui.world);
-const cooldown = (slot: 'hand1' | 'hand2' | 'orbit1' | 'orbit2'): number => attackProfile(slot)?.cooldownSeconds ?? 0;
+const cooldown = (slot: 'hand1' | 'orbit1' | 'orbit2' | 'orbit3'): number => attackProfile(slot)?.cooldownSeconds ?? 0;
 const combat = new CombatSystem({
-  hand2: cooldown('hand2') * .5,
   orbit1: cooldown('orbit1') * .25,
-  orbit2: cooldown('orbit2') * .75
+  orbit2: cooldown('orbit2') * .5,
+  orbit3: cooldown('orbit3') * .75
 });
 const respawns = new RespawnSystem();
 let normalizedExpiredSpawn = false;
@@ -95,7 +94,7 @@ const gameplay = new GameplayRuntime({
     tier: TIER_CONFIG[definition.tier],
     maxHp: save.spawns[definition.id].roll.maxHp,
     alive: !save.spawns[definition.id].respawnAt,
-    damage: enemyAttack(definition.areaId, definition.tier),
+    damage: definition.attackDamage,
     damageType: areaById(definition.areaId).enemyWeapon
   })),
   currentAreaId: save.currentAreaId,
@@ -473,7 +472,7 @@ function damageHero(amount: number, type: CombatAffinity): void {
 
 function autoAttack(): void {
   if (gameplay.hero.dead || cameraController.isScripted) return;
-  for (const hand of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
+  for (const hand of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
     if (!combat.ready(hand)) continue;
     const profile = attackProfile(hand);
     if (!profile) continue;
@@ -645,7 +644,7 @@ ui.inventoryDetail.addEventListener('click', (event) => {
     const armorSlot = equipmentSlot(itemId);
     if (armorSlot) { commands.execute({ type: 'equip', itemId, slot: armorSlot }); equipmentChanged = true; }
     else {
-      const freeSlots = (['hand1', 'hand2', 'orbit1', 'orbit2'] as const).filter((slot) => save.inventory.equipped[slot] === null);
+      const freeSlots = (['hand1', 'orbit1', 'orbit2', 'orbit3'] as const).filter((slot) => save.inventory.equipped[slot] === null && (slot !== 'orbit1' || save.unlockedAreas.includes(2)));
       if (freeSlots.length === 1) { commands.execute({ type: 'equip', itemId, slot: freeSlots[0] }); equipmentChanged = true; }
       else { ui.inventoryDetail.querySelector<HTMLElement>('[data-slot-picker]')!.hidden = false; return; }
     }
@@ -730,8 +729,8 @@ function updateHud(): void {
   const maxHp = maxHeroHp();
   ui.hpText.textContent = `${Math.round(gameplay.hero.hp)} / ${Math.round(maxHp)}`;
   ui.hpBar.style.width = `${gameplay.hero.hp / maxHp * 100}%`;
-  const attackHud = { hand1: ui.hand1Stat, hand2: ui.hand2Stat, orbit1: ui.orbit1Stat, orbit2: ui.orbit2Stat };
-  for (const slot of ['hand1', 'hand2', 'orbit1', 'orbit2'] as const) {
+  const attackHud = { hand1: ui.hand1Stat, orbit1: ui.orbit1Stat, orbit2: ui.orbit2Stat, orbit3: ui.orbit3Stat };
+  for (const slot of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
     const profile = attackProfile(slot);
     attackHud[slot].innerHTML = profile
       ? `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`

@@ -1,0 +1,708 @@
+{
+  "id": 1,
+  "name": "Area 1",
+  "environmentTheme": "sunlit-meadow",
+  "enemyWeapon": "blunt",
+  "enemyWeakness": "slash",
+  "worldOrigin": {
+    "x": 0,
+    "z": 0
+  },
+  "bossSpawnId": "area1-uncommon-03",
+  "spawns": [
+    {
+      "id": "area1-crystal-01",
+      "tier": "crystal",
+      "x": -4,
+      "z": 7,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-02",
+      "tier": "crystal",
+      "x": 4,
+      "z": 8,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-03",
+      "tier": "crystal",
+      "x": -8,
+      "z": 2,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-04",
+      "tier": "crystal",
+      "x": 8,
+      "z": 1,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-05",
+      "tier": "crystal",
+      "x": -10,
+      "z": -6,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-06",
+      "tier": "crystal",
+      "x": 10,
+      "z": -7,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-07",
+      "tier": "crystal",
+      "x": -13,
+      "z": 5,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-08",
+      "tier": "crystal",
+      "x": 13,
+      "z": 5,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-09",
+      "tier": "crystal",
+      "x": -5,
+      "z": -2,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-crystal-10",
+      "tier": "crystal",
+      "x": 5,
+      "z": -3,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "attackDamage": 1
+    },
+    {
+      "id": "area1-common-01",
+      "tier": "common",
+      "x": -8,
+      "z": 14,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-02",
+      "tier": "common",
+      "x": -6,
+      "z": 15,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-03",
+      "tier": "common",
+      "x": -4,
+      "z": 14,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-04",
+      "tier": "common",
+      "x": -7,
+      "z": 12,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-05",
+      "tier": "common",
+      "x": -5,
+      "z": 12,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-06",
+      "tier": "common",
+      "x": -3,
+      "z": 13,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-07",
+      "tier": "common",
+      "x": 5,
+      "z": -13,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-a",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-08",
+      "tier": "common",
+      "x": 7,
+      "z": -14,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-09",
+      "tier": "common",
+      "x": 9,
+      "z": -13,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-10",
+      "tier": "common",
+      "x": 4,
+      "z": -15,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-11",
+      "tier": "common",
+      "x": 6,
+      "z": -16,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-12",
+      "tier": "common",
+      "x": 8,
+      "z": -16,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-13",
+      "tier": "common",
+      "x": 10,
+      "z": -15,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-14",
+      "tier": "common",
+      "x": 11,
+      "z": -12,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-common-15",
+      "tier": "common",
+      "x": 1,
+      "z": 17,
+      "hp": {
+        "min": 35,
+        "max": 80
+      },
+      "rewards": [
+        {
+          "stat": "blunt",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "hp",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "group": "area1-common-b",
+      "attackDamage": 4
+    },
+    {
+      "id": "area1-uncommon-01",
+      "tier": "uncommon",
+      "x": 9,
+      "z": 15,
+      "hp": {
+        "min": 200,
+        "max": 200
+      },
+      "rewards": [
+        {
+          "stat": "hp",
+          "min": 50,
+          "max": 50
+        }
+      ],
+      "attackDamage": 10
+    },
+    {
+      "id": "area1-uncommon-02",
+      "tier": "uncommon",
+      "x": -12,
+      "z": -13,
+      "hp": {
+        "min": 500,
+        "max": 500
+      },
+      "rewards": [
+        {
+          "stat": "hp",
+          "min": 50,
+          "max": 50
+        }
+      ],
+      "attackDamage": 10
+    },
+    {
+      "id": "area1-uncommon-03",
+      "tier": "uncommon",
+      "x": 0,
+      "z": 23,
+      "hp": {
+        "min": 2000,
+        "max": 2000
+      },
+      "rewards": [
+        {
+          "stat": "hp",
+          "min": 50,
+          "max": 50
+        }
+      ],
+      "isBoss": true,
+      "enemyWeakness": null,
+      "attackDamage": 30
+    },
+    {
+      "id": "area1-rare-01",
+      "tier": "rare",
+      "x": -14,
+      "z": 19,
+      "hp": {
+        "min": 4500,
+        "max": 4500
+      },
+      "rewards": [
+        {
+          "stat": "hp",
+          "min": 500,
+          "max": 500
+        }
+      ],
+      "attackDamage": 70
+    }
+  ],
+  "size": {
+    "width": 36,
+    "depth": 56
+  },
+  "collision": [
+    {
+      "id": "meadow-shrine",
+      "kind": "rectangle",
+      "x": 0,
+      "z": 5,
+      "width": 2.2,
+      "depth": 2.2
+    },
+    {
+      "id": "north-rift-west",
+      "kind": "rectangle",
+      "x": -7,
+      "z": 27.4,
+      "width": 10,
+      "depth": 1.5
+    },
+    {
+      "id": "north-rift-east",
+      "kind": "rectangle",
+      "x": 7,
+      "z": 27.4,
+      "width": 10,
+      "depth": 1.5
+    }
+  ]
+}

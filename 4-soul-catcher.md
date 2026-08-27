@@ -6,12 +6,9 @@ Add a persistent Soul Catcher upgrade path unlocked by defeating the Area 2 boss
 
 The editable node definitions are the balance source of truth:
 
-- `WIP/soul-catcher/nodes/layer-01-core.json` — SC-01
-- `WIP/soul-catcher/nodes/layer-02-inner.json` — SC-02..SC-07
-- `WIP/soul-catcher/nodes/layer-03-middle.json` — SC-08..SC-17
-- `WIP/soul-catcher/nodes/layer-04-outer.json` — SC-18..SC-30
+- `WIP/soul-catcher/nodes/layer-01.json` — all 30 nodes in the first Soul Catcher layer
 
-The files are split by visual layer only to keep authored data manageable. **Layers do not impose progression gates.** Promote them to `src/data/soul-catcher/` when implementation starts.
+All current nodes form the first Soul Catcher layer. Later expansions may add new layers, but no additional layers are defined yet. The active aggregate is `src/data/soul-catcher/layer-01.json`.
 
 ## Unlock and drops — decided
 
@@ -296,5 +293,5 @@ Future Rare/Epic/Legendary branches will require their own balance/design decisi
 - `RESET SOUL CATCHER` resets all five balances and all node levels to zero while preserving the Area 2 unlock and other game progression.
 - Reset Soul Catcher reuses the existing simple reset confirmation interaction.
 - Soul balances, node levels and unlock presentation persist correctly.
-- Node data remains editable in one JSON file per visual layer while graph connections remain independent from layer boundaries.
+- Node data remains editable in one JSON file per Soul Catcher layer while graph connections remain independent from layer boundaries.
 - Canonical committed SVGs are used throughout the implementation.

@@ -101,7 +101,7 @@ type InventoryCombatSummary = {
 };
 ```
 
-`attackByType` should sum the effective attack profile of the four weapon slots (`hand1`, `hand2`, `orbit1`, `orbit2`) grouped by damage type.
+`attackByType` should sum the effective attack profile of the four weapon slots (`hand1`, `orbit1`, `orbit2`, `orbit3`) grouped by damage type.
 
 An equipped weapon already combines its equipment damage with the player's permanent stat for that weapon's relevant damage type. The summary must reuse the same rule rather than add permanent stats a second time.
 
@@ -284,9 +284,9 @@ Keep the existing Ascend rule and button.
 When Level < 50:
 
 - Ascend button disabled;
-- show the remaining requirement clearly, e.g. `Ascend at Level 50`.
+- show the rarity-specific remaining copy requirement clearly, e.g. `Ascend at 100 copies`.
 
-When Level 50:
+When the rarity-specific copy requirement is met:
 
 - show the projected post-Ascend base/current value prominently;
 - enable Ascend.

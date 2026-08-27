@@ -6,7 +6,7 @@ export type LootType = 'hp' | 'regen' | DamageType;
 export type NumberRange = { min: number; max: number };
 export type SpawnRewardDefinition = NumberRange & { stat: LootType };
 export type SpawnRoll = { maxHp: number; reward: { stat: LootType; amount: number } };
-export type WeaponSlotId = 'hand1' | 'hand2' | 'orbit1' | 'orbit2';
+export type WeaponSlotId = 'hand1' | 'orbit1' | 'orbit2' | 'orbit3';
 export type ArmorSlotId = 'helmet' | 'armor' | 'legs' | 'ring';
 export type EquipmentSlotId = WeaponSlotId | ArmorSlotId;
 
@@ -19,6 +19,7 @@ export type SpawnDefinition = {
   group?: string;
   hp: NumberRange;
   rewards: SpawnRewardDefinition[];
+  attackDamage: number;
   isBoss?: boolean;
   enemyWeakness?: CombatAffinity | null;
 };
@@ -78,7 +79,6 @@ export type PlayerStats = {
 
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type WeaponClass = 'sword' | 'hammer' | 'spear';
-export type HandSlotId = 'hand1' | 'hand2';
 export type ArmorClass = 'helmet' | 'armor' | 'boots';
 type EquipmentBase = { id: string; name: string; rarity: EquipmentRarity; damageType: DamageType };
 export type WeaponDefinition = EquipmentBase & { kind: 'weapon'; weaponClass: WeaponClass; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
@@ -92,7 +92,7 @@ export type InventoryState = {
 };
 
 export type SaveData = {
-  version: 14;
+  version: 15;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
