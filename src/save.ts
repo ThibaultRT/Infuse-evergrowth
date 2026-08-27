@@ -1,11 +1,11 @@
-import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPAWNS } from './config';
+import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, EVASION_CHANCE_CAP, EVASION_RAW_SCALE, EVASION_RAW_TARGET, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPAWNS } from './config';
 import { EQUIPMENT_BY_ID } from './domain/items/EquipmentCatalog';
-import { logarithmicChance, logarithmicStat } from './domain/combat/HeroStats';
+import { logarithmicChance, logarithmicStat, rawEvasionChance, totalEvasionChance } from './domain/combat/HeroStats';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
-import type { DamageType, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
+import type { DamageType, EvasionSources, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v16';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v15', 'infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const SAVE_KEY = 'infuse-evergrowth-save-v17';
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v16', 'infuse-evergrowth-save-v15', 'infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
 const volatileValues = new Map<string, string>();
@@ -51,6 +51,10 @@ function freshStat(base: number): StatSources {
   return { base, additive: { kills: 0, equipment: 0, other: 0 }, multiplicative: { equipment: 1, other: 1 } };
 }
 
+function freshEvasion(): EvasionSources {
+  return { raw: { kills: 0, other: 0 }, directChance: { equipment: 0, soulCatcher: 0, other: 0 } };
+}
+
 function freshStats(): PlayerStats {
   return {
     maxHp: freshStat(BASE_HERO_MAX_HP),
@@ -61,7 +65,7 @@ function freshStats(): PlayerStats {
     criticalChance: freshStat(BASE_HERO_CRITICAL_CHANCE_RAW),
     criticalDamage: freshStat(BASE_HERO_CRITICAL_DAMAGE_RAW),
     blockChance: freshStat(BASE_HERO_BLOCK_CHANCE_RAW),
-    evasion: freshStat(0)
+    evasion: freshEvasion()
   };
 }
 
@@ -121,9 +125,28 @@ function normalizeStat(stat: Partial<StatSources> | undefined, base: number): St
   };
 }
 
+function normalizeEvasion(value: unknown): EvasionSources {
+  const fresh = freshEvasion();
+  if (!value || typeof value !== 'object') return fresh;
+  const source = value as Partial<EvasionSources> & Partial<StatSources>;
+  // v16 stored raw evasion directly as StatSources; retain every accumulated source.
+  if (!('raw' in source)) {
+    const kills = Math.max(0, Number(source.additive?.kills) || 0);
+    return { raw: { kills, other: Math.max(0, statTotal(normalizeStat(source, 0)) - kills) }, directChance: fresh.directChance };
+  }
+  return {
+    raw: { kills: Math.max(0, Number(source.raw?.kills) || 0), other: Math.max(0, Number(source.raw?.other) || 0) },
+    directChance: {
+      equipment: Math.max(0, Number(source.directChance?.equipment) || 0),
+      soulCatcher: Math.max(0, Number(source.directChance?.soulCatcher) || 0),
+      other: Math.max(0, Number(source.directChance?.other) || 0)
+    }
+  };
+}
+
 export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Date()): SaveData {
   const fresh: SaveData = {
-    version: 16,
+    version: 17,
     dailyKey: localDailyKey(now),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -138,7 +161,7 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     const raw = storage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => storage.getItem(key)).find(Boolean);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (![7, 8, 9, 10, 11, 12, 13, 14, 15, 16].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    if (![7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
     const areaIds = new Set(AREAS.map((area) => area.id));
     const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
     const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
@@ -152,11 +175,11 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
       criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
       criticalDamage: normalizeStat(parsed.stats.criticalDamage, BASE_HERO_CRITICAL_DAMAGE_RAW),
       blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW),
-      evasion: normalizeStat(parsed.stats.evasion, 0)
+      evasion: normalizeEvasion(parsed.stats.evasion)
     };
     const maxHp = statTotal(stats.maxHp);
     return {
-      version: 16,
+      version: 17,
       dailyKey: localDailyKey(now),
       currentAreaId: typeof requestedArea === 'number' && areaIds.has(requestedArea) && unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
@@ -196,3 +219,6 @@ export function heroSpeed(): number { return logarithmicStat(statTotal(save.stat
 export function heroCriticalChance(): number { return logarithmicChance(statTotal(save.stats.criticalChance), HERO_CRITICAL_CHANCE_PERCENT); }
 export function heroCriticalDamageMultiplier(): number { return 1 + logarithmicStat(statTotal(save.stats.criticalDamage), HERO_CRITICAL_DAMAGE_PERCENT) / 100; }
 export function heroBlockChance(): number { return logarithmicChance(statTotal(save.stats.blockChance), HERO_BLOCK_CHANCE_PERCENT); }
+
+export function heroRawEvasionChance(): number { return rawEvasionChance(Object.values(save.stats.evasion.raw).reduce((sum, value) => sum + value, 0), EVASION_RAW_SCALE, EVASION_RAW_TARGET, EVASION_CHANCE_CAP); }
+export function heroEvasionChance(): number { return totalEvasionChance(heroRawEvasionChance(), Object.values(save.stats.evasion.directChance), EVASION_CHANCE_CAP); }
