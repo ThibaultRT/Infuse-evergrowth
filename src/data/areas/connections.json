@@ -1,0 +1,38 @@
+[
+  {
+    "id": "area1-area2",
+    "areaAId": 1,
+    "areaBId": 2,
+    "x": 8,
+    "z": -28,
+    "axis": "z",
+    "width": 5,
+    "barrierDepth": 8,
+    "requiredUnlockedAreaId": 2,
+    "unlockOnBossOfAreaId": 1,
+    "visualStyle": "lake-gate"
+  },
+  {
+    "id": "area2-area3",
+    "areaAId": 2,
+    "areaBId": 3,
+    "x": 38,
+    "z": -28,
+    "axis": "z",
+    "width": 5,
+    "requiredUnlockedAreaId": 3,
+    "unlockOnBossOfAreaId": 2,
+    "visualStyle": "ruined-fortress-gate"
+  },
+  {
+    "id": "area1-area3",
+    "areaAId": 1,
+    "areaBId": 3,
+    "x": 18,
+    "z": 0,
+    "axis": "x",
+    "width": 5,
+    "requiredUnlockedAreaId": 3,
+    "visualStyle": "ruined-fortress-gate"
+  }
+]

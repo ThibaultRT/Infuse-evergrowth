@@ -3,7 +3,7 @@ import { bluntHammerIcon, combatAffinityIcon, damageTypeDefenseIcon, damageTypeI
 import { save, statAdditiveTotal, statTotal } from './save';
 import { logarithmicStat } from './domain/combat/HeroStats';
 import { HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED } from './config';
-import { EQUIPMENT_BY_ID, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel, type InventoryCombatSummary } from './systems/EquipmentSystem';
+import { EQUIPMENT_BY_ID, ascendCopies, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel, type InventoryCombatSummary } from './systems/EquipmentSystem';
 import { equipmentIcon } from './equipment-icons';
 import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, PlayerStats, StatSources } from './types';
 import type { SoulNode } from './domain/soul-catcher';
@@ -33,7 +33,7 @@ app.innerHTML = `
             <div class="hp-label"><span>HP</span><span id="hp-text">20 / 20</span></div>
             <div class="bar"><span id="hp-bar"></span></div>
           </div>
-          <div class="hand-hud"><span id="hand1-stat"></span><span id="hand2-stat"></span><span id="orbit1-stat"></span><span id="orbit2-stat"></span></div>
+          <div class="hand-hud"><span id="hand1-stat"></span><span id="orbit1-stat"></span><span id="orbit2-stat"></span><span id="orbit3-stat"></span></div>
         </div>
         <div id="enemy-affinities" class="enemy-affinities"></div>
       </div>
@@ -52,9 +52,9 @@ app.innerHTML = `
     <div class="bottom-dock card">
       <div class="quick-slots" aria-label="equipped weapon slots">
         <div class="quick-slot" data-slot="hand1"><span>H1</span></div>
-        <div class="quick-slot" data-slot="hand2"><span>H2</span></div>
         <div class="quick-slot" data-slot="orbit1"><span>O1</span></div>
         <div class="quick-slot" data-slot="orbit2"><span>O2</span></div>
+        <div class="quick-slot" data-slot="orbit3"><span>O3</span></div>
       </div>
     </div>
     <div id="gain-stack" class="gain-stack" aria-live="polite"></div>
@@ -130,7 +130,7 @@ app.innerHTML = `
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
   loadingScreen: q<HTMLDivElement>('#loading-screen'), loadingProgress: q<HTMLSpanElement>('#loading-progress'), loadingPercent: q<HTMLDivElement>('#loading-percent'),
-  hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), hand2Stat: q<HTMLSpanElement>('#hand2-stat'), orbit1Stat: q<HTMLSpanElement>('#orbit1-stat'), orbit2Stat: q<HTMLSpanElement>('#orbit2-stat'),
+  hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), orbit1Stat: q<HTMLSpanElement>('#orbit1-stat'), orbit2Stat: q<HTMLSpanElement>('#orbit2-stat'), orbit3Stat: q<HTMLSpanElement>('#orbit3-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
@@ -231,8 +231,8 @@ export function showSoulDrop(quantity: number, type: SoulType): void {
   ui.gainStack.append(element); window.setTimeout(() => { element.classList.add('leaving'); window.setTimeout(() => element.remove(), 180); }, 1600);
 }
 
-const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'H1', hand2: 'H2', orbit1: 'O1', orbit2: 'O2', helmet: 'Helmet', armor: 'Armor', legs: 'Legs', ring: 'Ring' };
-const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'hand2', 'orbit1', 'orbit2', 'helmet', 'armor', 'legs', 'ring'];
+const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Weapon', orbit1: 'Orbit 1', orbit2: 'Orbit 2', orbit3: 'Orbit 3', helmet: 'Helmet', armor: 'Armor', legs: 'Legs', ring: 'Ring' };
+const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'orbit1', 'orbit2', 'orbit3', 'helmet', 'armor', 'legs', 'ring'];
 const formatInventoryValue = (value: number): string => value >= 100 ? Math.round(value).toLocaleString() : value.toFixed(value % 1 ? 1 : 0);
 
 export function renderInventory(inventory: InventoryState, summary: InventoryCombatSummary): void {
@@ -285,11 +285,13 @@ export function renderItemDetail(owned: OwnedEquipment | null): void {
   const value = item.kind === 'weapon' ? equipmentDamage(item, owned) : equipmentDefense(item, owned);
   const perLevel = equipmentValuePerLevel(item, owned);
   const afterAscend = equipmentAscendValue(item, owned);
+  const copiesRequired = ascendCopies(item.rarity);
   const label = item.kind === 'weapon' ? 'Damage' : 'Defense';
   const itemClass = item.kind === 'weapon' ? item.weaponClass : item.armorClass === 'boots' ? 'legs' : item.armorClass;
   const itemArt = equipmentIcon(item, owned, 'detail') ?? damageTypeIcon(item.damageType, 52);
-  const slotPicker = item.kind === 'weapon' && !equipped ? `<div class="inventory-slot-picker" hidden data-slot-picker><span>Choose a weapon slot</span><div>${(['hand1', 'hand2', 'orbit1', 'orbit2'] as const).map((slot) => `<button type="button" data-equip-slot="${slot}" data-item-id="${item.id}"><strong>${SLOT_LABELS[slot]}</strong><small>${save.inventory.equipped[slot] ? 'Replace' : 'Empty'}</small></button>`).join('')}</div></div>` : '';
-  ui.inventoryDetail.innerHTML = `<button class="inventory-back" type="button" data-inventory-back>← Overview</button><div class="item-detail-hero"><div class="weapon-art rarity-${item.rarity}">${itemArt}</div><h3>${item.name}</h3><div class="weapon-meta">${item.rarity} · ${itemClass} · ${damageTypeIcon(item.damageType, 12)} ${item.damageType}</div><strong>Level ${owned.level} · Ascend ${owned.ascend}</strong></div><div class="weapon-values"><span>${label}<strong>${formatInventoryValue(value)}</strong></span><span>Per level<strong>+${formatInventoryValue(perLevel)}</strong></span>${item.kind === 'weapon' ? `<span>Cooldown<strong>${item.attackCooldownSeconds}s</strong></span>` : ''}<span>Type<strong>${damageTypeIcon(item.damageType, 13)} ${item.damageType}</strong></span></div><section class="item-power"><small>Special power</small><p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p></section><section class="ascend-preview"><small>Ascend</small>${afterAscend === null ? `<p>Ascend at Level 50 · ${50 - owned.level} levels remaining</p>` : `<p>${label} <strong>${formatInventoryValue(value)} → ${formatInventoryValue(afterAscend)}</strong></p>`}</section>${slotPicker}<div class="weapon-actions">${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : `<button data-equip data-item-id="${item.id}">Equip</button>`}<button data-ascend data-item-id="${item.id}" ${owned.level < 50 ? 'disabled' : ''}>Ascend</button></div>`;
+  const weaponSlots = (['hand1', 'orbit1', 'orbit2', 'orbit3'] as const).filter((slot) => slot !== 'orbit1' || save.unlockedAreas.includes(2));
+  const slotPicker = item.kind === 'weapon' && !equipped ? `<div class="inventory-slot-picker" hidden data-slot-picker><span>Choose a weapon slot</span><div>${weaponSlots.map((slot) => `<button type="button" data-equip-slot="${slot}" data-item-id="${item.id}"><strong>${SLOT_LABELS[slot]}</strong><small>${save.inventory.equipped[slot] ? 'Replace' : 'Empty'}</small></button>`).join('')}</div></div>` : '';
+  ui.inventoryDetail.innerHTML = `<button class="inventory-back" type="button" data-inventory-back>← Overview</button><div class="item-detail-hero"><div class="weapon-art rarity-${item.rarity}">${itemArt}</div><h3>${item.name}</h3><div class="weapon-meta">${item.rarity} · ${itemClass} · ${damageTypeIcon(item.damageType, 12)} ${item.damageType}</div><strong>Level ${owned.level} · Ascend ${owned.ascend}</strong></div><div class="weapon-values"><span>${label}<strong>${formatInventoryValue(value)}</strong></span><span>Per level<strong>+${formatInventoryValue(perLevel)}</strong></span>${item.kind === 'weapon' ? `<span>Cooldown<strong>${item.attackCooldownSeconds}s</strong></span>` : ''}<span>Type<strong>${damageTypeIcon(item.damageType, 13)} ${item.damageType}</strong></span></div><section class="item-power"><small>Special power</small><p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p></section><section class="ascend-preview"><small>Ascend</small>${afterAscend === null ? `<p>Ascend at ${copiesRequired} copies · ${copiesRequired - owned.level} remaining</p>` : `<p>${label} <strong>${formatInventoryValue(value)} → ${formatInventoryValue(afterAscend)}</strong></p>`}</section>${slotPicker}<div class="weapon-actions">${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : `<button data-equip data-item-id="${item.id}">Equip</button>`}<button data-ascend data-item-id="${item.id}" ${owned.level < copiesRequired ? 'disabled' : ''}>Ascend</button></div>`;
 }
 
 const dropQueue: Array<{ itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number }> = [];

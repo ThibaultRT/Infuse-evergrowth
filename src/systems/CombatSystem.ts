@@ -12,7 +12,7 @@ export class CombatSystem {
   private readonly cooldowns: Record<WeaponSlotId, number>;
 
   constructor(initialCooldowns: Partial<Record<WeaponSlotId, number>> = {}) {
-    this.cooldowns = { hand1: 0, hand2: 0, orbit1: 0, orbit2: 0, ...initialCooldowns };
+    this.cooldowns = { hand1: 0, orbit1: 0, orbit2: 0, orbit3: 0, ...initialCooldowns };
   }
 
   update(dt: number): void {

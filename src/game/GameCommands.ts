@@ -21,7 +21,7 @@ export class GameCommands {
   }
 
   execute(command: Exclude<GameCommand, { type: 'move' }>): boolean {
-    if (command.type === 'equip') { equip(command.itemId, command.slot); this.events.emit('equipmentEquipped', { itemId: command.itemId, hand: command.slot }); }
+    if (command.type === 'equip') { if (!equip(command.itemId, command.slot)) return false; this.events.emit('equipmentEquipped', { itemId: command.itemId, hand: command.slot }); }
     else if (command.type === 'unequip') { const itemId = unequip(command.slot); if (!itemId) return false; this.events.emit('equipmentUnequipped', { itemId, hand: command.slot }); }
     else if (command.type === 'ascend') { const previousAscend = this.state.inventory.items[command.itemId]?.ascend; if (previousAscend === undefined || !ascend(command.itemId)) return false; this.events.emit('weaponAscended', { itemId: command.itemId, previousAscend, newAscend: previousAscend + 1 }); }
     else if (command.type === 'resetHero') { command.equipment ? resetHeroProgress() : resetPermanentStats(); this.runtime.hero.hp = Math.min(this.runtime.hero.hp, statTotal(this.state.stats.maxHp)); this.events.emit('heroProgressReset', { equipment: command.equipment }); }

@@ -18,8 +18,7 @@ function poolForArea(areaId: number, seen = new Set<number>()): string[] {
 export function rollEquipmentDrop(areaId: number, tier: Tier, rng = Math.random): string | null {
   if (tier === 'crystal' || tier === 'common') return null;
   const chances = balance.equipmentDrops.baseChanceByEnemyTier as Partial<Record<Tier, number>>;
-  const multiplier = Math.min(1 + balance.equipmentDrops.areaChanceGrowth * (areaId - 1), balance.equipmentDrops.areaChanceMultiplierCap);
-  if (rng() >= (chances[tier] ?? 0) * multiplier) return null;
+  if (rng() >= (chances[tier] ?? 0)) return null;
   const pool = poolForArea(areaId).filter((id) => EQUIPMENT_BY_ID.has(id));
   const weights = balance.equipmentDrops.rarityWeightsByEnemyTier[tier] as Partial<Record<EquipmentRarity, number>>;
   const available = Object.entries(weights).filter(([rarity]) => pool.some((id) => EQUIPMENT_BY_ID.get(id)?.rarity === rarity));

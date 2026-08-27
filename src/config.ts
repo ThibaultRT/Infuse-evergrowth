@@ -1,8 +1,12 @@
 import balance from './data/balance.json';
-import areaData from './data/areas.json';
+import area1 from './data/areas/area-1.json';
+import area2 from './data/areas/area-2.json';
+import area3 from './data/areas/area-3.json';
+import connections from './data/areas/connections.json';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, Tier, TierConfig, WorldConnection } from './types';
 
 const tierBalance = balance.enemy.tiers;
+const areaData = { areas: [area1, area2, area3], connections };
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
 const tierConfig = (tier: Tier): TierConfig => {
   const source = tierBalance[tier];
@@ -46,6 +50,7 @@ export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>
     z: area.worldOrigin.z + spawn.z,
     hp: spawn.hp,
     rewards: spawn.rewards as SpawnDefinition['rewards'],
+    attackDamage: spawn.attackDamage,
     ...(spawn.isBoss ? { isBoss: true } : {}),
     ...(spawn.group ? { group: spawn.group } : {}),
     ...('enemyWeakness' in spawn ? { enemyWeakness: spawn.enemyWeakness as CombatAffinity | null } : {})
@@ -60,12 +65,6 @@ export const WORLD_CONNECTIONS: WorldConnection[] = areaData.connections.map((co
 
 export function areaById(areaId: number): AreaDefinition {
   return AREAS.find((area) => area.id === areaId) ?? AREAS[0];
-}
-
-export function enemyAttack(areaId: number, tier: Tier): number {
-  const areaMultiplier = balance.areaScaling.attackMultiplierPerArea ** Math.max(0, areaId - 1);
-  const commonAttack = balance.enemy.commonBaseAttack * areaMultiplier;
-  return Math.max(1, Math.round(commonAttack * TIER_CONFIG[tier].statMultiplier));
 }
 
 export const BASE_RESPAWN_MS = balance.respawn.baseSeconds * 1000;

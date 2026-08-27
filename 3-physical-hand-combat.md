@@ -16,4 +16,4 @@ Make each equipped hand read as an independent physical attack without interrupt
 
 ## Acceptance
 
-Walking continues during either-hand attacks; simultaneous hand cooldowns remain independent; left/right attacks affect the correct limb and weapon; rapid attacks blend cleanly; death/resurrection clears layered actions; bare hands, all weapon classes, both hands, orbit slots, and mobile performance are validated.
+Walking continues during held-weapon attacks; held and orbit cooldowns remain independent; the held attack affects the correct limb and weapon; rapid attacks blend cleanly; death/resurrection clears layered actions; all weapon classes, three orbit slots, and mobile performance are validated.

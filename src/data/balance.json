@@ -20,7 +20,6 @@
     "strongDamageMultiplier": 0.5
   },
   "enemy": {
-    "commonBaseAttack": 4,
     "aggroRadiusMeters": 5,
     "leashRadiusMeters": 7,
     "attackRangeMultiplier": 1.2,
@@ -72,13 +71,11 @@
     }
   },
   "equipmentDrops": {
-    "areaChanceGrowth": 0.15,
-    "areaChanceMultiplierCap": 3,
     "baseChanceByEnemyTier": {
-      "uncommon": 0.01,
-      "rare": 0.02,
-      "epic": 0.04,
-      "legendary": 0.08
+      "uncommon": 0.5,
+      "rare": 0.6,
+      "epic": 0.7,
+      "legendary": 0.8
     },
     "rarityWeightsByEnemyTier": {
       "uncommon": {
@@ -106,18 +103,17 @@
     }
   },
   "equipmentProgression": {
-    "ascendLevel": 50,
     "ascendBaseMultiplier": 2,
-    "perLevelMultiplierPerAscend": 2
+    "perLevelMultiplierPerAscend": 2,
+    "ascendCopiesByRarity": {
+      "common": 100,
+      "uncommon": 130,
+      "rare": 150,
+      "epic": 160,
+      "legendary": 200
+    }
   },
   "respawn": {
     "baseSeconds": 300
-  },
-  "areaScaling": {
-    "plannedAreaCount": 15,
-    "attackMultiplierPerArea": 3,
-    "formulaNotes": {
-      "attack": "commonBaseAttack * attackMultiplierPerArea ^ (area - 1)"
-    }
   }
 }
