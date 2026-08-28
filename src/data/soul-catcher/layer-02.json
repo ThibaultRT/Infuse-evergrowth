@@ -7,7 +7,6 @@
       "number": 31,
       "id": "SC-31",
       "name": "Rare Resonance",
-      "description": "Unlock Rare Soul drops (base 1).",
       "position": {
         "angleDeg": 0,
         "radius": 0
@@ -38,7 +37,6 @@
       "number": 32,
       "id": "SC-32",
       "name": "Uncommon Pursuit",
-      "description": "Divide Uncommon respawn time by 2 per level.",
       "position": {
         "angleDeg": -90,
         "radius": 1
@@ -69,7 +67,6 @@
       "number": 33,
       "id": "SC-33",
       "name": "Uncommon Spoils",
-      "description": "+1 Uncommon equipment quantity.",
       "position": {
         "angleDeg": -30,
         "radius": 1
@@ -101,7 +98,6 @@
       "number": 34,
       "id": "SC-34",
       "name": "Blunt Mastery",
-      "description": "+1% Blunt damage per level.",
       "position": {
         "angleDeg": 30,
         "radius": 1
@@ -132,7 +128,6 @@
       "number": 35,
       "id": "SC-35",
       "name": "Slash Mastery",
-      "description": "+1% Slash damage per level.",
       "position": {
         "angleDeg": 90,
         "radius": 1
@@ -164,7 +159,6 @@
       "number": 36,
       "id": "SC-36",
       "name": "Piercing Mastery",
-      "description": "+1% Piercing damage per level.",
       "position": {
         "angleDeg": 150,
         "radius": 1
@@ -195,7 +189,6 @@
       "number": 37,
       "id": "SC-37",
       "name": "Veilstep",
-      "description": "+1% Evasion per level.",
       "position": {
         "angleDeg": 210,
         "radius": 1
@@ -225,7 +218,6 @@
       "number": 38,
       "id": "SC-38",
       "name": "Rare Harvest",
-      "description": "+1 Rare Soul.",
       "position": {
         "angleDeg": -108,
         "radius": 2
@@ -255,7 +247,6 @@
       "number": 39,
       "id": "SC-39",
       "name": "Common Overflow",
-      "description": "+2 Common Souls.",
       "position": {
         "angleDeg": -72,
         "radius": 2
@@ -285,7 +276,6 @@
       "number": 40,
       "id": "SC-40",
       "name": "Uncommon Harvest I",
-      "description": "+1 Uncommon Soul.",
       "position": {
         "angleDeg": -45,
         "radius": 2
@@ -315,7 +305,6 @@
       "number": 41,
       "id": "SC-41",
       "name": "Uncommon Harvest II",
-      "description": "+1 Uncommon Soul.",
       "position": {
         "angleDeg": -15,
         "radius": 2
@@ -345,7 +334,6 @@
       "number": 42,
       "id": "SC-42",
       "name": "Blunt Resistance",
-      "description": "+1% Blunt resistance per level.",
       "position": {
         "angleDeg": 15,
         "radius": 2
@@ -375,7 +363,6 @@
       "number": 43,
       "id": "SC-43",
       "name": "Slash Resistance",
-      "description": "+1% Slash resistance per level.",
       "position": {
         "angleDeg": 45,
         "radius": 2
@@ -405,7 +392,6 @@
       "number": 44,
       "id": "SC-44",
       "name": "Piercing Resistance",
-      "description": "+1% Piercing resistance per level.",
       "position": {
         "angleDeg": 72,
         "radius": 2
@@ -435,7 +421,6 @@
       "number": 45,
       "id": "SC-45",
       "name": "Greater Vitality I",
-      "description": "+500 Max HP per level.",
       "position": {
         "angleDeg": 108,
         "radius": 2
@@ -464,7 +449,6 @@
       "number": 46,
       "id": "SC-46",
       "name": "Greater Vitality II",
-      "description": "+1000 Max HP per level.",
       "position": {
         "angleDeg": 150,
         "radius": 2
@@ -493,7 +477,6 @@
       "number": 47,
       "id": "SC-47",
       "name": "Uncommon Vitality",
-      "description": "+1500 Max HP per level.",
       "position": {
         "angleDeg": 210,
         "radius": 2
@@ -523,7 +506,6 @@
       "number": 48,
       "id": "SC-48",
       "name": "Mending Weave I",
-      "description": "+1 HP/s per level.",
       "position": {
         "angleDeg": 252,
         "radius": 3
@@ -553,7 +535,6 @@
       "number": 49,
       "id": "SC-49",
       "name": "Mending Weave II",
-      "description": "+2 HP/s per level.",
       "position": {
         "angleDeg": 288,
         "radius": 3
@@ -582,7 +563,6 @@
       "number": 50,
       "id": "SC-50",
       "name": "Uncommon Regeneration",
-      "description": "+3 HP/s per level.",
       "position": {
         "angleDeg": 315,
         "radius": 3
@@ -611,7 +591,6 @@
       "number": 51,
       "id": "SC-51",
       "name": "Soulstep II",
-      "description": "+10 Speed per level.",
       "position": {
         "angleDeg": 345,
         "radius": 3
@@ -640,7 +619,6 @@
       "number": 52,
       "id": "SC-52",
       "name": "Critical Focus II",
-      "description": "+15 Critical Chance per level.",
       "position": {
         "angleDeg": 15,
         "radius": 3
@@ -669,7 +647,6 @@
       "number": 53,
       "id": "SC-53",
       "name": "Critical Imprint II",
-      "description": "+25 Critical Damage per level.",
       "position": {
         "angleDeg": 45,
         "radius": 3
@@ -698,7 +675,6 @@
       "number": 54,
       "id": "SC-54",
       "name": "Guarded Soul",
-      "description": "+5 Block Chance per level.",
       "position": {
         "angleDeg": 72,
         "radius": 3
@@ -727,7 +703,6 @@
       "number": 55,
       "id": "SC-55",
       "name": "Blunt Force",
-      "description": "+12 Blunt attack per level.",
       "position": {
         "angleDeg": 108,
         "radius": 3
@@ -757,7 +732,6 @@
       "number": 56,
       "id": "SC-56",
       "name": "Slash Force",
-      "description": "+12 Slash attack per level.",
       "position": {
         "angleDeg": 135,
         "radius": 3
@@ -787,7 +761,6 @@
       "number": 57,
       "id": "SC-57",
       "name": "Piercing Force",
-      "description": "+12 Piercing attack per level.",
       "position": {
         "angleDeg": 165,
         "radius": 3
@@ -817,7 +790,6 @@
       "number": 58,
       "id": "SC-58",
       "name": "Blunt Bulwark",
-      "description": "+10 Blunt defence per level.",
       "position": {
         "angleDeg": 180,
         "radius": 3
@@ -847,7 +819,6 @@
       "number": 59,
       "id": "SC-59",
       "name": "Slash Bulwark",
-      "description": "+10 Slash defence per level.",
       "position": {
         "angleDeg": 195,
         "radius": 3
@@ -877,7 +848,6 @@
       "number": 60,
       "id": "SC-60",
       "name": "Piercing Bulwark",
-      "description": "+10 Piercing defence per level.",
       "position": {
         "angleDeg": 225,
         "radius": 3

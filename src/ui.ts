@@ -249,7 +249,7 @@ export function renderSoulCatcher(nodes: SoulNode[], edges: [string, string][], 
   const node = nodes.find((candidate) => candidate.id === selectedId);
   if (!node || !revealed(node.id)) { ui.soulDetail.innerHTML = '<p>Select a revealed node to inspect it.</p>'; return; }
   const level = save.soulCatcher.nodeLevels[node.id] ?? 0, maxed = level >= node.maxLevel, cost = soulCost(node, level + 1);
-  ui.soulDetail.innerHTML = `<div><small>${node.id}</small><h3>${node.name}</h3><p>${node.description}</p><strong>Level ${level} / ${node.maxLevel}</strong><p>${node.reward.display}</p></div><button type="button" data-purchase-soul="${node.id}" ${!canPurchase(node.id) ? 'disabled' : ''}>${maxed ? 'MAX LEVEL' : `Purchase · ${cost} ${soulIcon(node.cost.soulType)}`}</button>`;
+  ui.soulDetail.innerHTML = `<div><small>${node.id}</small><h3>${node.name}</h3><strong>Level ${level} / ${node.maxLevel}</strong><p>${node.reward.display}</p></div><button type="button" data-purchase-soul="${node.id}" ${!canPurchase(node.id) ? 'disabled' : ''}>${maxed ? 'MAX LEVEL' : `Purchase · ${cost} ${soulIcon(node.cost.soulType)}`}</button>`;
 }
 
 export function showSoulDrop(quantity: number, type: SoulType): void {
