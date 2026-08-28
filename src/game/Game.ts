@@ -497,7 +497,7 @@ function autoAttack(): void {
     const critical = combat.rollChance(heroCriticalChance());
     target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType, profile.itemId);
     const direction = target.root.position.clone().sub(hero.position);
-    if (direction.lengthSq() > 0) {
+    if (hand === 'hand1' && direction.lengthSq() > 0) {
       gameplay.hero.facing = Math.atan2(direction.x, direction.z);
       heroView.setFacing(gameplay.hero.facing);
     }
