@@ -54,6 +54,8 @@ Use compact strict TypeScript, ES modules, and explicit return types on exported
 
 Three.js renders the world; HTML/CSS renders normal UI. iPhone 12 portrait (390×844 CSS) is the minimum reference. Preserve Full/Reduced scale, Smooth/30 FPS, saved preferences, DPR caps (Full 2; Reduced 70%), dev renderer statistics, <=20-second representative initial load, and <500 MB payload. Profile real constrained/mobile hardware; emulation is not proof. Cosmetic failures need playable fallbacks, URLs must be Vite-base-aware, and third-party provenance belongs in `ASSET-LICENSES.md`. For visible changes, inspect a mobile viewport and capture a screenshot when tooling permits.
 
+For production Gaea/Three.js Editor area imports, read `three-editor.md` before changing visual dimensions, world origins, transition chunks, or scene-loading placement. Keep exported area roots local and let the rendering layer apply explicit world transforms.
+
 ## Successive merged PRs
 
 Before a new slice after a prior PR is merged: fetch, branch from current `origin/main`, and verify `git log origin/main..HEAD` plus `git diff origin/main...HEAD` contain only the new slice. Never continue from a stale merged branch.
