@@ -2,21 +2,25 @@
 
 Use this guide when replacing the current procedural/blockout environments with authored Gaea + Three.js Editor scenes.
 
-The preferred workflow is now:
+The preferred workflow is:
 
 ```text
 one assembled MASTER AUTHORING scene
         ↓
-edit areas + shared transitions in context
+edit areas + shared transitions + gameplay guides in context
         ↓
 export each Area_* / Transition_* shipping root independently
+        ↓
+extract/update lightweight gameplay collision data from guides
         ↓
 re-import exported GLBs / load them in Infuse for final QA
 ```
 
 The most important rule is: **world placement belongs to an authoring placement parent or to Infuse; every shipping root stays local at `(0,0,0)`.** Do not bake the global world offset into an area or transition GLB.
 
-These dimensions/origins are production-authoring targets inferred from the accepted world visualization and the current area proportions. Area 1 is the agreed anchor. Area 2/3 values are intentionally target estimates until their production scenes are validated in-game.
+Gameplay collision is a second, equally important rule: **visual meshes are never collision authority.** Three.js Editor may be used to place editor-only collision guides, but Infuse consumes simple renderer-independent gameplay shapes derived from those guides.
+
+These dimensions/origins are production-authoring targets inferred from the accepted world visualization and current area proportions. Area 1 is the agreed anchor. Area 2/3 values are target estimates until their production scenes are validated in-game.
 
 ## Coordinate convention
 
@@ -31,7 +35,7 @@ Infuse currently places Area 2 north of Area 1 at a negative Z world origin, so 
 - Shipping roots use scale `(1, 1, 1)` and zero rotation.
 - Keep a common Y datum across areas. Do not independently re-zero terrain vertically in a way that makes shared water/banks/walls jump at a seam.
 
-The current runtime area origins are still the old blockout values. Do not treat them as the final production positions. When authored areas start replacing the blockouts, Codex should deliberately update rendering/world-placement data to the targets below rather than silently trying to fit the new GLBs to the old dimensions.
+The current runtime area origins are still the old blockout values. Do not treat them as final production positions. When authored areas start replacing the blockouts, Codex should deliberately update rendering/world-placement data to the targets below rather than silently fitting the new GLBs to the old dimensions.
 
 ## Target area sizes
 
@@ -99,7 +103,7 @@ Transition_A<lower-id>_A<higher-id>_<Theme>
 
 Always sort the area IDs. Do not use a directional `A01_to_A02` name because the same transition is viewed and crossed in both directions.
 
-Suggested file names use the same identity in kebab case, for example:
+Suggested file names use the same identity in kebab case:
 
 ```text
 transition-a01-a02-river.glb
@@ -120,7 +124,7 @@ The playable seam is:
 world Z = -36
 ```
 
-The visual overlap is exactly:
+The visual overlap is:
 
 ```text
 world X = -42..42
@@ -202,7 +206,7 @@ world Z = -42..-30
 
 That is sufficient room for the existing gate/transition concept. Do not lock a production theme/name for this shared chunk until Area 2 and Area 3 are authored; use the current `connections.json` gameplay connection as authority in the meantime.
 
-When the art direction is chosen, use the same canonical form:
+When the art direction is chosen, use:
 
 ```text
 Transition_A02_A03_<Theme>
@@ -212,7 +216,7 @@ Transition_A02_A03_<Theme>
 
 Do **not** make day-to-day art iteration depend on opening Area 1, then the river, then Area 2 separately.
 
-Keep an assembled master scene where connected areas and transitions are visible at their final world placement while editing. This lets the river banks, bridge, ruined wall, vegetation, terrain heights and sight lines be adjusted in context.
+Keep an assembled master scene where connected areas and transitions are visible at their final world placement while editing. This lets river banks, bridges, ruined walls, vegetation, terrain heights, collision guides and sight lines be adjusted in context.
 
 The master scene is an **authoring source**, not a shipping asset.
 
@@ -228,8 +232,12 @@ AUTHORING_WORLD                         position 0,0,0
 │  │  ├─ Rocks
 │  │  ├─ Structures
 │  │  └─ Props
-│  ├─ REF_Playable_72x72               editor guide only
-│  └─ REF_Visual_84x84                 editor guide only
+│  ├─ GAMEPLAY_GUIDES
+│  │  ├─ COLLIDER_House_01
+│  │  ├─ COLLIDER_WestCliff_01
+│  │  └─ ...
+│  ├─ REF_Playable_72x72
+│  └─ REF_Visual_84x84
 │
 ├─ Placement_Transition_A01_A02        position (0,0,-36)
 │  ├─ Transition_A01_A02_River         position 0,0,0 / rotation 0 / scale 1
@@ -237,7 +245,10 @@ AUTHORING_WORLD                         position 0,0,0
 │  │  ├─ Bridge
 │  │  ├─ Rocks
 │  │  └─ RiverVegetation
-│  └─ REF_Transition_84x12             editor guide only
+│  ├─ GAMEPLAY_GUIDES
+│  │  ├─ COLLIDER_RiverWest
+│  │  └─ COLLIDER_RiverEast
+│  └─ REF_Transition_84x12
 │
 ├─ Placement_A02                       position (6,0,-72)
 │  ├─ Area_A02_Root                    position 0,0,0 / rotation 0 / scale 1
@@ -246,8 +257,9 @@ AUTHORING_WORLD                         position 0,0,0
 │  │  ├─ Rocks
 │  │  ├─ Structures
 │  │  └─ Props
-│  ├─ REF_Playable_84x72               editor guide only
-│  └─ REF_Visual_96x84                 editor guide only
+│  ├─ GAMEPLAY_GUIDES
+│  ├─ REF_Playable_84x72
+│  └─ REF_Visual_96x84
 │
 ├─ Placement_Transition_A01_A03        position (36,0,0)
 │  ├─ Transition_A01_A03_RuinedWall    position 0,0,0 / rotation 0 / scale 1
@@ -255,7 +267,10 @@ AUTHORING_WORLD                         position 0,0,0
 │  │  ├─ Gate
 │  │  ├─ Rubble
 │  │  └─ SeamProps
-│  └─ REF_Transition_12x84             editor guide only
+│  ├─ GAMEPLAY_GUIDES
+│  │  ├─ COLLIDER_RuinedWallNorth
+│  │  └─ COLLIDER_RuinedWallSouth
+│  └─ REF_Transition_12x84
 │
 └─ Placement_A03                       position (78,0,0)
    ├─ Area_A03_Root                    position 0,0,0 / rotation 0 / scale 1
@@ -264,9 +279,12 @@ AUTHORING_WORLD                         position 0,0,0
    │  ├─ Vegetation
    │  ├─ Rocks
    │  └─ Props
-   ├─ REF_Playable_84x72               editor guide only
-   └─ REF_Visual_96x84                 editor guide only
+   ├─ GAMEPLAY_GUIDES
+   ├─ REF_Playable_84x72
+   └─ REF_Visual_96x84
 ```
+
+`GAMEPLAY_GUIDES` and `REF_*` are authoring-only and must never ship as visible GLB content.
 
 ### Placement parent vs shipping root
 
@@ -282,7 +300,7 @@ rotation = (0,0,0)
 scale    = (1,1,1)
 ```
 
-For example:
+Example:
 
 ```text
 Placement_A02                     world position (6,0,-72)
@@ -304,14 +322,14 @@ This lets the master scene look exactly like the assembled world while keeping e
 
 The transition should normally be edited **inside the master scene with both neighboring areas visible**.
 
-For the river, the normal workflow is therefore:
+For the river:
 
 ```text
 open AUTHORING_WORLD
     ↓
 see Area 1 + river + Area 2 together
     ↓
-edit river / bridge / banks / seam rocks / nearby vegetation
+edit river / bridge / banks / collision guides / seam rocks / nearby vegetation
     ↓
 inspect immediately from both sides
     ↓
@@ -320,7 +338,7 @@ save master authoring scene
 
 There is no requirement to open the river alone just to change it.
 
-The same applies to `Transition_A01_A03_RuinedWall`: edit the wall/gate/rubble while Area 1 and Area 3 remain visible so both sides blend correctly.
+The same applies to `Transition_A01_A03_RuinedWall`: edit the wall/gate/rubble and its movement blockers while Area 1 and Area 3 remain visible.
 
 ### Ownership boundary while editing
 
@@ -332,21 +350,165 @@ If an object belongs to the shared river, place it under:
 Transition_A01_A02_River
 ```
 
-not under Area 1 or Area 2.
+If a collision guide describes that shared river, place it under the transition's sibling `GAMEPLAY_GUIDES` group beneath `Placement_Transition_A01_A02`.
 
-If it is unique Area 1 scenery, place it under:
+If scenery or collision belongs only to Area 1, place it under the Area 1 placement group.
 
-```text
-Area_A01_Root
-```
-
-This prevents accidental duplication when chunks are exported independently.
-
-A useful rule is:
+A useful visual rule is:
 
 > If the object must remain visually identical while either side of the seam is loaded, the transition chunk probably owns it.
 
-Do not place editor-only guides inside shipping roots unless the later export tooling explicitly filters them. Prefer them as siblings under the `Placement_*` parent as shown above.
+A useful gameplay rule is:
+
+> If the movement restriction exists because of a shared transition feature, the transition gameplay data owns it even though the runtime collision itself is not streamed.
+
+## Collision authoring workflow
+
+### Principle
+
+Three.js Editor is the **authoring UI** for collision placement, not the runtime collision engine.
+
+Do not use Gaea terrain triangles, GLB mesh geometry, water meshes, rocks, walls or houses directly as gameplay collision. That would couple movement correctness to presentation detail and make streaming/disposal affect gameplay.
+
+Instead, visually place simple editor-only guides over the scenery that should block movement, then convert those guides into renderer-independent authored collision data.
+
+The current Infuse collision type is deliberately simple:
+
+```text
+rectangle: id + x + z + width + depth
+```
+
+It is currently axis-aligned. Until the gameplay schema explicitly gains rotation, keep `COLLIDER_*` boxes unrotated. If a diagonal cliff or wall needs approximation, use several rectangles rather than silently relying on a rotated editor box the runtime cannot represent.
+
+### Guide naming
+
+Use:
+
+```text
+GAMEPLAY_GUIDES
+├─ COLLIDER_<ReadableId>
+├─ COLLIDER_<ReadableId>
+└─ ...
+```
+
+Examples:
+
+```text
+COLLIDER_RiverWest
+COLLIDER_RiverEast
+COLLIDER_House_01
+COLLIDER_WestCliff_01
+COLLIDER_RuinedWallNorth
+```
+
+Use stable names once gameplay data has been generated from them so later re-exports update the same collision IDs rather than creating new ones unnecessarily.
+
+### Guide representation
+
+For now, use simple BoxGeometry meshes as translucent/wireframe editor helpers:
+
+- X/Z position and X/Z dimensions represent the gameplay rectangle;
+- Y position/height are only for comfortable editor visibility and are ignored by 2D movement collision;
+- rotation must remain zero while runtime supports axis-aligned rectangles only;
+- material/color are authoring convenience only;
+- guides are excluded from shipping GLBs.
+
+Do not trace every visible object exactly. Use collision where the environment clearly communicates “the hero cannot walk here.” Small decorative rocks, grass and props should generally remain non-colliding unless gameplay readability requires otherwise.
+
+### River + bridge pattern
+
+For `Transition_A01_A02_River`, the player should not collide with the bridge. The river itself is blocked **except for the bridge/causeway opening**.
+
+Author two blockers:
+
+```text
+                 Area 2
+
+   COLLIDER_RiverWest      COLLIDER_RiverEast
+   ┌────────────────┐      ┌────────────────┐
+~~~│~~~~~~~~~~~~~~~~│ bridge│~~~~~~~~~~~~~~~~│~~~
+   │                │   │   │                │
+   └────────────────┘   │   └────────────────┘
+                         │
+                    walkable opening
+                         │
+                 Area 1
+```
+
+Resize and position the two blockers while looking at the actual water, banks and bridge. Leave enough clearance around the bridge edges that mobile movement feels forgiving rather than pixel-perfect.
+
+The bridge can have visual rails/rocks that receive their own small blockers only if they materially improve movement behavior. Avoid over-colliding decorative details.
+
+### Area and transition collision ownership
+
+Area-local blockers belong conceptually to that area's gameplay definition:
+
+```text
+Placement_A01
+├─ Area_A01_Root
+└─ GAMEPLAY_GUIDES
+   ├─ COLLIDER_House_01
+   └─ COLLIDER_WestCliff_01
+```
+
+Shared seam blockers belong conceptually to the transition/connection:
+
+```text
+Placement_Transition_A01_A02
+├─ Transition_A01_A02_River
+└─ GAMEPLAY_GUIDES
+   ├─ COLLIDER_RiverWest
+   └─ COLLIDER_RiverEast
+```
+
+Do **not** solve shared river collision by duplicating the same blockers in both Area 1 and Area 2 data.
+
+The exact renderer-independent storage shape for production transition collision should be finalized when the authoring extractor is implemented. It may extend connection/world authored data, but it must not be stored only inside the GLB.
+
+### Collision export/extraction contract
+
+The future authoring/build tool should treat `GAMEPLAY_GUIDES` separately from visual export.
+
+Conceptually:
+
+```text
+MASTER AUTHORING scene
+      │
+      ├─ Area_A01_Root ----------------------> area-a01.glb
+      │
+      ├─ Transition_A01_A02_River ----------> transition-a01-a02-river.glb
+      │
+      └─ GAMEPLAY_GUIDES --------------------> renderer-independent collision data
+```
+
+For each `COLLIDER_*`, extract at least:
+
+```text
+stable collision id
+owning area or transition/connection id
+local x / z
+width / depth
+```
+
+Then apply the documented placement transform deterministically when generating world-space gameplay data if the runtime format requires world coordinates.
+
+The extractor must validate rather than silently accept unsupported authoring:
+
+- non-zero rotation while only axis-aligned rectangles are supported;
+- non-unit or ambiguous nested scale;
+- duplicate collision IDs within the same owner;
+- malformed `COLLIDER_*` helper type;
+- guide accidentally nested inside the shipping root if the export contract expects it as a sibling.
+
+For the first production proof, manual transcription from a small number of guides into authored JSON is acceptable if needed. Do not manually maintain dozens of coordinates once the workflow scales; build the deterministic extractor.
+
+### Runtime collision rule
+
+Gameplay collision is lightweight and must be available independently of visual residency.
+
+If the river GLB is unloaded, the hero must still be unable to walk into the river. If Area 2's visual GLB is still prefetching, its gameplay gate/collision rules still exist. Visual load failure must never create a collision hole or change where the hero can move.
+
+This is why collision guides are authoring metadata, not runtime scene objects.
 
 ## Gaea handoff
 
@@ -368,7 +530,7 @@ When importing Gaea terrain into the master editor scene, import it under the re
 
 ## Independent export workflow
 
-The master authoring scene must eventually produce separate runtime chunks such as:
+The master authoring scene must eventually produce separate runtime chunks:
 
 ```text
 area-a01.glb
@@ -384,7 +546,7 @@ area-a03.glb
 
 Add a small deterministic authoring/build export tool once the first real area workflow is proven.
 
-The tool should find canonical shipping roots by name, for example:
+The tool should find canonical shipping roots by name:
 
 ```text
 Area_A01_Root
@@ -394,16 +556,19 @@ Transition_A01_A02_River
 Transition_A01_A03_RuinedWall
 ```
 
-and serialize each root independently while excluding:
+and serialize each independently while excluding:
 
 - its `Placement_*` parent transform;
 - neighboring areas/transitions;
+- `GAMEPLAY_GUIDES`;
 - `REF_*` editor guides;
 - other authoring-only helpers.
 
 The exported root must remain normalized at local `(0,0,0)`, zero rotation and unit scale.
 
-This export step should later be repeatable rather than relying on manual transform entry for 15+ areas.
+The same tool or a companion step should extract validated `COLLIDER_*` guides into renderer-independent authored data.
+
+This process should be repeatable rather than relying on manual transform entry for 15+ areas.
 
 ### Manual workflow until export automation exists
 
@@ -417,13 +582,14 @@ Use a copy/temporary export scene rather than damaging the master authoring scen
 4. Remove the `Placement_*` world wrapper and all unrelated content/guides.
 5. Confirm the remaining shipping root is exactly `(0,0,0)`, rotation zero, scale one.
 6. Export that chunk to GLB.
-7. Discard the temporary export copy; continue art edits in the master scene.
+7. Manually transfer any required collision-guide values into the gameplay data only for this small proof if no extractor exists yet.
+8. Discard the temporary export copy; continue art edits in the master scene.
 
-Do not repeatedly move roots back and forth between local and world coordinates in the master scene. The placement-parent pattern exists specifically to avoid that source of mistakes.
+Do not repeatedly move roots back and forth between local and world coordinates in the master scene.
 
 ## Shipping verification / clean assembled preview
 
-The master authoring scene is excellent for art iteration, but it does **not** prove that the independent exports retained the correct transforms and ownership.
+The master authoring scene is excellent for art iteration, but it does **not** prove that independent exports retained the correct transforms and ownership.
 
 After exporting, perform a clean assembly check using the exported GLBs themselves — either in a disposable Three.js Editor preview scene or directly through the Infuse production loader.
 
@@ -446,7 +612,8 @@ Inspect:
 - visible gaps from the actual game camera direction;
 - duplicate geometry / z-fighting;
 - whether the 6 m apron is sufficient;
-- whether any authoring world transform was accidentally baked into an exported GLB.
+- whether any authoring world transform was accidentally baked into an exported GLB;
+- whether gameplay collision matches the visible blockers and leaves the intended bridge/gate openings walkable.
 
 This clean re-import is **QA**, not the normal editing workflow.
 
@@ -454,31 +621,34 @@ The intended loop is:
 
 ```text
 MASTER AUTHORING scene = edit comfortably in context
-EXPORTED CHUNKS        = runtime assets
-CLEAN RE-IMPORT/INFUSE = verify the export contract
+EXPORTED CHUNKS        = runtime visuals
+COLLISION DATA         = lightweight gameplay authority
+CLEAN RE-IMPORT/INFUSE = verify both contracts together
 ```
 
 ## Export checklist
 
-Before every GLB export:
+Before every production export/update:
 
 1. Save the master authoring scene.
 2. Identify the canonical `Area_*_Root` / `Transition_*` shipping root.
 3. Confirm that shipping root is locally `(0,0,0)`, zero rotation and unit scale.
 4. Confirm the world transform exists only on its `Placement_*` authoring parent / runtime metadata.
 5. Confirm 1 unit = 1 meter.
-6. Exclude all `REF_*` and other authoring-only helpers.
+6. Exclude all `GAMEPLAY_GUIDES`, `REF_*` and authoring-only helpers from visual GLBs.
 7. Do not include neighboring areas/transitions in the chunk export.
 8. Do not duplicate shared transition water/walls/gates in neighboring area chunks.
 9. Export the area/transition independently to GLB.
-10. Re-import the exported GLB at its documented world transform and inspect the seam.
-11. Optimize shipping assets after editor export; the raw editor export is not automatically the final runtime asset.
+10. Extract/update collision data from `COLLIDER_*` guides, or manually transfer only for the initial small proof.
+11. Re-import the exported GLB at its documented world transform and inspect the seam.
+12. Test hero movement against the resulting gameplay collision, especially every bridge/gate opening.
+13. Optimize shipping assets after editor export; the raw editor export is not automatically the final runtime asset.
 
 ## Runtime implications for later Codex work
 
 When production visuals begin replacing blockouts, the rendering layer should use explicit per-area/transition visual metadata rather than assuming every area is 72 × 72 or deriving positions from GLB contents.
 
-At minimum the rendering side will need stable values equivalent to:
+At minimum the rendering side will need values equivalent to:
 
 ```text
 area id
@@ -500,11 +670,11 @@ visual provider / GLB URL
 
 The GLB itself remains local around `(0,0,0)`.
 
-The master Three.js Editor `Placement_*` positions are authoring representations of those runtime world transforms. Codex should use the documented transforms/manifest as authority when wiring loaders; it should not parse placement parents from the shipping GLB because those parents are deliberately not exported.
+The master Three.js Editor `Placement_*` positions are authoring representations of those runtime world transforms. Codex should use documented transforms/manifest values as authority when wiring loaders; it should not parse placement parents from shipping GLBs because those parents are deliberately not exported.
 
-Transitions should be independently loadable and remain resident whenever their connection needs to be visible — for example while either neighboring area is current/nearby or while the hero approaches the gate. This fits the area-streaming work in `5-area-streaming.md`.
+Transitions should be independently loadable and remain resident whenever their connection needs to be visible. `5-area-streaming.md` defines the runtime residency behavior.
 
-Gameplay JSON remains authoritative for collisions, spawns, gates and progression. Do not infer gameplay geometry from the editor scene. When production area dimensions/origins are accepted, update the authored gameplay/world data intentionally so gameplay coordinates and the rendering manifest describe the same world.
+Gameplay JSON/world data remains authoritative for collisions, spawns, gates and progression. `GAMEPLAY_GUIDES` are a visual authoring input used to generate/update that data; they are never a runtime dependency. When production area dimensions/origins are accepted, update authored gameplay/world data intentionally so gameplay coordinates and the rendering manifest describe the same world.
 
 ## Quick reference
 
@@ -529,5 +699,7 @@ Authoring source:       assembled MASTER scene
 World offset in editor: Placement_* parent
 Shipping root:          ALWAYS local (0,0,0)
 Production export:      one independent GLB per Area_* / Transition_*
-Final seam QA:          re-import exported chunks or load them in Infuse
+Collision authoring:    editor-only GAMEPLAY_GUIDES / COLLIDER_* boxes
+Collision runtime:      renderer-independent data, never streamed with visuals
+Final seam QA:          re-import exported chunks + test gameplay collision
 ```
