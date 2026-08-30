@@ -5,6 +5,24 @@ import type { AreaDefinition } from '../types';
 import { fitModelToFootprint, gameModelAssets, kaykitAssets, quaterniusAssets, type AssetLoader } from './AssetLoader';
 import { AREA_ONE_KAYKIT_PLACEMENTS, AREA_THREE_WALL_PLACEMENTS, areaOneVegetation, type KaykitPlacement, WEST_BORDER_KAYKIT_PLACEMENTS } from './KaykitEnvironmentPlacements';
 
+/** Warms only the asset package belonging to one area; shared loader caches deduplicate requests. */
+export async function prefetchEnvironmentDetails(area: AreaDefinition): Promise<void> {
+  const jobs: Promise<unknown>[] = [];
+  if (area.id === 1) {
+    jobs.push(gameModelAssets.load('props/fountain.glb'));
+    const spawnPoints = SPAWNS.filter((spawn) => spawn.areaId === 1).map((spawn) => ({ x: spawn.x - area.originX, z: spawn.z - area.originZ }));
+    for (const placement of [...AREA_ONE_KAYKIT_PLACEMENTS, ...WEST_BORDER_KAYKIT_PLACEMENTS, ...areaOneVegetation(spawnPoints)]) jobs.push(kaykitAssets.load(placement.path));
+  } else if (area.id === 2) {
+    for (const path of ['nature/models/CommonTree_3.gltf', 'nature/models/Rock_Medium_2.gltf', 'village/models/Prop_WoodenFence_Extension1.gltf']) jobs.push(quaterniusAssets.load(path));
+  } else {
+    for (const placement of AREA_THREE_WALL_PLACEMENTS) jobs.push(kaykitAssets.load(placement.path));
+    for (const path of ['village/models/Prop_Brick1.gltf', 'village/models/Floor_UnevenBrick.gltf', 'nature/models/Rock_Medium_2.gltf']) jobs.push(quaterniusAssets.load(path));
+  }
+  const results = await Promise.allSettled(jobs);
+  const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
+  if (failure) throw failure.reason;
+}
+
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, x: number, y: number, z: number): THREE.Mesh {
   const value = new THREE.Mesh(geometry, material); value.position.set(x, y, z); return value;
 }
@@ -153,5 +171,14 @@ export class EnvironmentView {
     const results=await Promise.allSettled(jobs);
     if(results.every((result)=>result.status==='fulfilled')) this.fallbackDetailsRoot.visible=false;
     else console.warn(`Area ${this.area.id} cosmetic details partially unavailable; macro terrain remains playable.`,results.filter((result)=>result.status==='rejected'));
+  }
+
+  /** Releases only resources created by this procedural owner; cached GLTF data remains shared. */
+  dispose(): void {
+    for (const root of [this.terrainRoot, this.macroRoot, this.fallbackDetailsRoot]) root.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      object.geometry.dispose();
+      for (const material of (Array.isArray(object.material) ? object.material : [object.material])) material.dispose();
+    });
   }
 }

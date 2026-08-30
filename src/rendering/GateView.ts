@@ -7,8 +7,13 @@ export class GateView {
   private readonly fallback = new THREE.Group();
   private openAmount = 0;
   private openTarget = 0;
+  private assetRequest?: Promise<void>;
+  private readonly assets: AssetLoader;
+  private readonly style: 'lake-gate' | 'ruined-fortress-gate';
 
   constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', assets: AssetLoader = quaterniusAssets) {
+    this.assets = assets;
+    this.style = style;
     const stone = new THREE.MeshStandardMaterial({ color: style === 'lake-gate' ? 0x8b846d : 0x686d68, roughness: 1 });
     const darkStone = new THREE.MeshStandardMaterial({ color: 0x454b47, roughness: 1 });
     const wood = new THREE.MeshStandardMaterial({ color: 0x704527, roughness: .92 });
@@ -35,7 +40,11 @@ export class GateView {
     }
     this.root.add(this.fallback);
     this.root.rotation.y = axis === 'x' ? Math.PI / 2 : 0;
-    void this.loadAssetGate(assets, style);
+  }
+
+  prefetch(): Promise<void> {
+    this.assetRequest ??= this.loadAssetGate(this.assets, this.style);
+    return this.assetRequest;
   }
 
   private async loadAssetGate(assets: AssetLoader, style: 'lake-gate' | 'ruined-fortress-gate'): Promise<void> {

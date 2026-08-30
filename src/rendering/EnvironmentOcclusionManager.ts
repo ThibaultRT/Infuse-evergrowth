@@ -9,8 +9,12 @@ export class EnvironmentOcclusionManager {
   private readonly targets = [new THREE.Vector3(), new THREE.Vector3()];
   private fadedNames: string[] = [];
 
-  constructor(private readonly camera: THREE.Camera, roots: readonly THREE.Object3D[]) {
-    for (const root of roots) root.traverse((object) => {
+  constructor(private readonly camera: THREE.Camera, roots: readonly THREE.Object3D[] = []) {
+    for (const root of roots) this.register(root);
+  }
+
+  register(root: THREE.Object3D): void {
+    root.traverse((object) => {
       if (!object.userData.cameraOccluder) return;
       const meshes: THREE.Mesh[] = [];
       object.traverse((child) => {
@@ -28,6 +32,21 @@ export class EnvironmentOcclusionManager {
       });
       if (meshes.length) this.entries.push({ object, meshes, amount: 0, name: object.name || `occluder-${this.entries.length + 1}` });
     });
+  }
+
+  unregister(root: THREE.Object3D): void {
+    for (let index = this.entries.length - 1; index >= 0; index--) {
+      const entry = this.entries[index];
+      if (entry.object !== root && !this.isDescendant(entry.object, root)) continue;
+      for (const mesh of entry.meshes) for (const material of (Array.isArray(mesh.material) ? mesh.material : [mesh.material])) material.dispose();
+      this.entries.splice(index, 1);
+    }
+  }
+
+  private isDescendant(object: THREE.Object3D, root: THREE.Object3D): boolean {
+    let parent = object.parent;
+    while (parent) { if (parent === root) return true; parent = parent.parent; }
+    return false;
   }
 
   update(heroPosition: THREE.Vector3, dt: number): void {

@@ -93,3 +93,10 @@ export const ENEMY_LEASH_RADIUS_METERS = balance.enemy.leashRadiusMeters;
 export const ENEMY_ATTACK_RANGE_METERS = HERO_ATTACK_RANGE_METERS * balance.enemy.attackRangeMultiplier;
 export const ENEMY_POSITIONING_RANGE_METERS = HERO_ATTACK_RANGE_METERS * balance.enemy.positioningRangeMultiplier;
 export const ENEMY_ATTACK_COOLDOWN = balance.enemy.attackCooldownSeconds;
+export const VISUAL_STREAMING = {
+  prefetchDistance: balance.visualStreaming.destinationPrefetchMeters,
+  mountDistance: balance.visualStreaming.destinationMountMeters,
+  unmountDistance: balance.visualStreaming.destinationUnmountMeters,
+  enemyActivateDistance: balance.visualStreaming.enemyActivateMeters,
+  enemyDeactivateDistance: balance.visualStreaming.enemyDeactivateMeters
+} as const;
