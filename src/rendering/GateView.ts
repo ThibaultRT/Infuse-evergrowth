@@ -1,27 +1,32 @@
 import * as THREE from 'three';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
 
+const GATE_ASSETS = ['village/models/DoorFrame_Round_Brick.gltf', 'village/models/Door_4_Round.gltf'] as const;
+
+/** Warms shared gate assets without constructing or mounting a transition view. */
+export async function prefetchGateDetails(assets: AssetLoader = quaterniusAssets): Promise<void> {
+  await Promise.all(GATE_ASSETS.map((path) => assets.load(path)));
+}
+
 export class GateView {
   readonly root = new THREE.Group();
-  private doorPivot = new THREE.Group();
+  private readonly doorPivot = new THREE.Group();
   private readonly fallback = new THREE.Group();
+  private readonly ownedGeometries = new Set<THREE.BufferGeometry>();
+  private readonly ownedMaterials = new Set<THREE.Material>();
   private openAmount = 0;
   private openTarget = 0;
-  private assetRequest?: Promise<void>;
-  private readonly assets: AssetLoader;
-  private readonly style: 'lake-gate' | 'ruined-fortress-gate';
+  private disposed = false;
 
   constructor(axis: 'x' | 'z', style: 'lake-gate' | 'ruined-fortress-gate', assets: AssetLoader = quaterniusAssets) {
-    this.assets = assets;
-    this.style = style;
     const stone = new THREE.MeshStandardMaterial({ color: style === 'lake-gate' ? 0x8b846d : 0x686d68, roughness: 1 });
     const darkStone = new THREE.MeshStandardMaterial({ color: 0x454b47, roughness: 1 });
     const wood = new THREE.MeshStandardMaterial({ color: 0x704527, roughness: .92 });
+    this.ownedMaterials.add(stone); this.ownedMaterials.add(darkStone); this.ownedMaterials.add(wood);
     const makeBlock = (x: number, y: number, z: number, w: number, h: number, d: number, material = stone): THREE.Mesh => {
-      const block = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material); block.position.set(x, y, z); return block;
+      const geometry = new THREE.BoxGeometry(w, h, d); this.ownedGeometries.add(geometry);
+      const block = new THREE.Mesh(geometry, material); block.position.set(x, y, z); return block;
     };
-    // Low, broad gatehouses remain readable from the close portrait camera and
-    // avoid the previous giant cylinders and incorrectly-scaled imported frame.
     for (const side of [-1, 1]) {
       const x = side * 3.05;
       this.fallback.add(makeBlock(x, 1.35, 0, 1.65, 2.7, 1.8));
@@ -40,16 +45,16 @@ export class GateView {
     }
     this.root.add(this.fallback);
     this.root.rotation.y = axis === 'x' ? Math.PI / 2 : 0;
+    void this.loadAssetGate(assets, style);
   }
 
-  prefetch(): Promise<void> {
-    this.assetRequest ??= this.loadAssetGate(this.assets, this.style);
-    return this.assetRequest;
-  }
+  /** Compatibility helper; transition providers should normally call prefetchGateDetails directly. */
+  prefetch(assets: AssetLoader = quaterniusAssets): Promise<void> { return prefetchGateDetails(assets); }
 
   private async loadAssetGate(assets: AssetLoader, style: 'lake-gate' | 'ruined-fortress-gate'): Promise<void> {
     try {
-      const [frame, door] = await Promise.all([assets.cloneScene('village/models/DoorFrame_Round_Brick.gltf'), assets.cloneScene('village/models/Door_4_Round.gltf')]);
+      const [frame, door] = await Promise.all([assets.cloneScene(GATE_ASSETS[0]), assets.cloneScene(GATE_ASSETS[1])]);
+      if (this.disposed) return;
       const fit = (object: THREE.Object3D, height: number): void => {
         const box = new THREE.Box3().setFromObject(object); const size = box.getSize(new THREE.Vector3());
         object.scale.setScalar(height / Math.max(size.y, .001)); box.setFromObject(object);
@@ -59,7 +64,7 @@ export class GateView {
       frame.name = 'Quaternius round brick gate frame'; door.name = 'Quaternius round wooden door';
       this.root.add(frame); this.doorPivot.clear(); this.doorPivot.position.set(-1.65, 0, 0); door.position.x += 1.65; this.doorPivot.add(door); this.root.add(this.doorPivot);
       this.fallback.visible = false;
-    } catch (error) { console.warn('Quaternius gate unavailable; using procedural safety fallback.', error); }
+    } catch (error) { if (!this.disposed) console.warn('Quaternius gate unavailable; using procedural safety fallback.', error); }
   }
 
   setOpen(open: boolean): void { this.openTarget = open ? 1 : 0; }
@@ -67,5 +72,13 @@ export class GateView {
   update(dt: number): void {
     this.openAmount = THREE.MathUtils.damp(this.openAmount, this.openTarget, 5, dt);
     this.doorPivot.rotation.y = -this.openAmount * Math.PI * .58;
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.ownedGeometries.forEach((geometry) => geometry.dispose());
+    this.ownedMaterials.forEach((material) => material.dispose());
+    this.root.clear();
   }
 }

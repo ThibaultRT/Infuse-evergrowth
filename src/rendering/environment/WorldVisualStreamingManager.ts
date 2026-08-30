@@ -8,6 +8,8 @@ export type VisualChunkProvider = {
   kind: VisualChunkKind;
   prefetch: () => Promise<void>;
   create: () => VisualChunkInstance | Promise<VisualChunkInstance>;
+  /** Optional provider-owned package eviction for unique streamed assets such as area GLBs. */
+  evict?: () => void | Promise<void>;
 };
 
 export type VisualResidencySnapshot = {
@@ -23,6 +25,7 @@ type ChunkRecord = {
   mountRequest?: Promise<void>;
   prefetched: boolean;
   wanted: boolean;
+  mountFailed: boolean;
 };
 
 export type StreamingThresholds = { prefetchDistance: number; mountDistance: number; unmountDistance: number };
@@ -46,11 +49,11 @@ export class WorldVisualStreamingManager {
       ...areas.map((area) => `area:${area.id}`),
       ...connections.map((connection) => `transition:${connection.id}`)
     ]);
-    for (const provider of providers) this.chunks.set(provider.id, { provider, prefetched: false, wanted: false });
+    for (const provider of providers) this.chunks.set(provider.id, { provider, prefetched: false, wanted: false, mountFailed: false });
     for (const id of expected) if (!this.chunks.has(id)) throw new Error(`Missing visual provider: ${id}`);
   }
 
-  update(currentAreaId: number, heroPosition: { x: number; z: number }): VisualResidencySnapshot {
+  update(currentAreaId: number, heroPosition: { x: number; z: number }): void {
     const wanted = new Set<string>([`area:${currentAreaId}`]);
     const prefetch = new Set(wanted);
     for (const connection of this.connections) {
@@ -68,12 +71,16 @@ export class WorldVisualStreamingManager {
 
     for (const [id, chunk] of this.chunks) {
       chunk.wanted = wanted.has(id);
-      if (prefetch.has(id) || chunk.wanted) void this.prefetch(chunk);
+      const shouldPrefetch = prefetch.has(id) || chunk.wanted;
+      if (shouldPrefetch) void this.prefetch(chunk);
       if (chunk.wanted) {
-        if (!chunk.instance && !chunk.mountRequest) chunk.mountRequest = this.mount(chunk);
-      } else this.unmount(chunk);
+        if (!chunk.instance && !chunk.mountRequest && !chunk.mountFailed) chunk.mountRequest = this.mount(chunk);
+      } else {
+        chunk.mountFailed = false;
+        this.unmount(chunk);
+        if (!shouldPrefetch) this.evictPrefetchIfIdle(chunk);
+      }
     }
-    return this.snapshot;
   }
 
   private prefetch(chunk: ChunkRecord): Promise<void> {
@@ -86,17 +93,19 @@ export class WorldVisualStreamingManager {
   }
 
   private async mount(chunk: ChunkRecord): Promise<void> {
-    // Creation is deliberately independent of prefetch completion: procedural
-    // fallbacks mount immediately while optional detail packages load.
-    const marker = chunk.request;
-    const instance = await chunk.provider.create();
-    chunk.mountRequest = undefined;
-    if (!chunk.wanted || chunk.instance) { instance.dispose?.(); return; }
-    chunk.instance = instance;
-    this.scene.add(instance.root);
-    this.onMounted?.(instance.root);
-    this.trackMounted(chunk.provider, true);
-    if (marker) void marker;
+    try {
+      const instance = await chunk.provider.create();
+      if (!chunk.wanted || chunk.instance) { instance.dispose?.(); return; }
+      chunk.instance = instance;
+      this.scene.add(instance.root);
+      this.onMounted?.(instance.root);
+      this.trackMounted(chunk.provider, true);
+    } catch (error) {
+      chunk.mountFailed = true;
+      console.warn(`${chunk.provider.id} visual mount failed; gameplay remains authoritative.`, error);
+    } finally {
+      chunk.mountRequest = undefined;
+    }
   }
 
   private unmount(chunk: ChunkRecord): void {
@@ -107,6 +116,13 @@ export class WorldVisualStreamingManager {
     dispose?.();
     chunk.instance = undefined;
     this.trackMounted(chunk.provider, false);
+    this.evictPrefetchIfIdle(chunk);
+  }
+
+  private evictPrefetchIfIdle(chunk: ChunkRecord): void {
+    if (!chunk.provider.evict || chunk.instance || chunk.mountRequest || chunk.request || !chunk.prefetched) return;
+    chunk.prefetched = false;
+    void Promise.resolve(chunk.provider.evict()).catch((error: unknown) => console.warn(`${chunk.provider.id} visual package eviction failed.`, error));
   }
 
   private trackMounted(provider: VisualChunkProvider, mounted: boolean): void {
@@ -123,7 +139,7 @@ export class WorldVisualStreamingManager {
     return {
       mountedAreaIds: new Set(this.mountedAreaIds),
       mountedTransitionIds: new Set(this.mountedTransitionIds),
-      pendingIds: [...this.chunks].filter(([, chunk]) => Boolean(chunk.request)).map(([id]) => id)
+      pendingIds: [...this.chunks].filter(([, chunk]) => Boolean(chunk.request || chunk.mountRequest)).map(([id]) => id)
     };
   }
 
