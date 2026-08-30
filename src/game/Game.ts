@@ -28,7 +28,7 @@ import { GameEvents } from './GameEvents';
 import { EQUIPMENT_BY_ID, attackProfile, equipmentCombatSummary, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { EnvironmentView, prefetchEnvironmentDetails } from '../rendering/EnvironmentView';
-import { GateView } from '../rendering/GateView';
+import { TransitionView, prefetchTransitionDetails } from '../rendering/TransitionView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
@@ -42,7 +42,7 @@ import { GameCommands } from './GameCommands';
 import { browserClock } from './PlatformAdapters';
 import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
-import { WorldVisualStreamingManager, type VisualResidencySnapshot, type VisualChunkProvider } from '../rendering/environment/WorldVisualStreamingManager';
+import { WorldVisualStreamingManager, type VisualChunkProvider } from '../rendering/environment/WorldVisualStreamingManager';
 
 export class Game {
   private started = false;
@@ -231,6 +231,8 @@ class SpawnEntity {
       this.syncTransform();
     } else {
       this.root.removeFromParent();
+      this.enemyView?.dispose();
+      this.crystalView?.dispose();
       this.root.clear();
       this.targetUi.remove();
       this.enemyView = null;
@@ -254,8 +256,6 @@ class SpawnEntity {
   }
 
   syncAreaVisibility(): void {
-    // Every area's occupants are part of one continuous world. Gameplay remains
-    // area-scoped, but crossing a boundary must not be what makes its mobs exist.
     const visible = this.presentationActive && (this.alive || this.deathPresentationRemaining > 0);
     this.root.visible = visible;
     this.targetUi.classList.toggle('hidden', !this.presentationActive || !this.alive);
@@ -337,8 +337,6 @@ class SpawnEntity {
       this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
       if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();
     }
-    // Distant areas stay rendered, but only the active area's character mixers
-    // advance. This keeps the continuous vista cheap as the world grows.
     this.enemyView?.update(dt, this.state.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
   }
 }
@@ -346,27 +344,30 @@ class SpawnEntity {
 const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
 
 class GateEntity {
-  readonly view: GateView;
-  readonly root: THREE.Group;
-  open = false;
+  readonly position: THREE.Vector3;
+  private view: TransitionView | null = null;
+  open: boolean;
 
   constructor(readonly def: WorldConnection) {
-    this.view = new GateView(def.axis, def.visualStyle);
-    this.root = this.view.root;
-    this.root.position.set(def.x, 0, def.z);
-    this.root.userData.gateId = def.id;
-    scene.add(this.root);
-    this.setOpen(save.unlockedAreas.includes(def.requiredUnlockedAreaId));
-    this.syncAreaVisibility();
+    this.position = new THREE.Vector3(def.x, 0, def.z);
+    this.open = save.unlockedAreas.includes(def.requiredUnlockedAreaId);
+  }
+
+  attachView(view: TransitionView): void {
+    this.view = view;
+    view.setOpen(this.open);
+  }
+
+  detachView(view: TransitionView): void {
+    if (this.view === view) this.view = null;
   }
 
   setOpen(value: boolean): void {
     this.open = value;
-    this.view.setOpen(value);
+    this.view?.setOpen(value);
   }
 
-  update(dt: number): void { this.view.update(dt); }
-  syncAreaVisibility(): void { this.root.visible = true; }
+  update(dt: number): void { this.view?.update(dt); }
 }
 
 const gateEntities = WORLD_CONNECTIONS.map((gate) => new GateEntity(gate));
@@ -384,8 +385,15 @@ const visualProviders: VisualChunkProvider[] = [
   ...gateEntities.map((gate): VisualChunkProvider => ({
     id: `transition:${gate.def.id}`,
     kind: 'transition',
-    prefetch: () => gate.view.prefetch(),
-    create: () => ({ root: gate.root })
+    prefetch: () => prefetchTransitionDetails(gate.def),
+    create: () => {
+      const view = new TransitionView(gate.def);
+      gate.attachView(view);
+      return {
+        root: view.root,
+        dispose: () => { gate.detachView(view); view.dispose(); }
+      };
+    }
   }))
 ];
 const visualStreaming = new WorldVisualStreamingManager(
@@ -393,17 +401,16 @@ const visualStreaming = new WorldVisualStreamingManager(
   (root) => environmentOcclusion.register(root),
   (root) => environmentOcclusion.unregister(root)
 );
-let visualResidency: VisualResidencySnapshot = visualStreaming.update(currentAreaId, gameplay.hero.position);
+visualStreaming.update(currentAreaId, gameplay.hero.position);
 
 function syncAreaVisibility(): void {
   entities.forEach((entity) => entity.syncAreaVisibility());
-  gateEntities.forEach((gate) => gate.syncAreaVisibility());
   syncLighting();
 }
 
 function startGateCinematic(gate: GateEntity): void {
   input.reset();
-  cameraController.focus(gate.root.position, 2600);
+  cameraController.focus(gate.position, 2600);
 }
 
 function presentBossDefeat(result: { bossId: string; areaId: number; openedGateIds: string[] }): void {
@@ -411,13 +418,11 @@ function presentBossDefeat(result: { bossId: string; areaId: number; openedGateI
   bossEntity.setPresentationActive(true);
   effects.bossDefeat(bossEntity.spawnPosition);
   const openedGates = gateEntities.filter((gate) => result.openedGateIds.includes(gate.def.id));
-  for (const gate of openedGates) {
-    gate.setOpen(true);
-  }
+  for (const gate of openedGates) gate.setOpen(true);
   if (openedGates[0]) {
     startGateCinematic(openedGates[0]);
     const destination = areaById(openedGates[0].def.requiredUnlockedAreaId).name;
-    effects.gateOpening(openedGates[0].root.position);
+    effects.gateOpening(openedGates[0].position);
     showBossProgression(`${bossEntity.config.label} guardian`, destination);
   } else {
     showBossProgression(`${bossEntity.config.label} guardian`);
@@ -851,7 +856,7 @@ function frame(now: number): void {
     }
   }
   updateHero(dt);
-  visualResidency = visualStreaming.update(currentAreaId, gameplay.hero.position);
+  visualStreaming.update(currentAreaId, gameplay.hero.position);
   syncEnemyPresentations();
   updateGates(dt);
   if (!cameraController.isScripted) entities.forEach((entity) => entity.update());
@@ -869,6 +874,7 @@ function frame(now: number): void {
     const elapsed = now - statsStartedAt;
     if (elapsed >= 500) {
       const info = renderer.info.render;
+      const visualResidency = visualStreaming.snapshot;
       const activeMixers = entities.filter((entity) => entity.presentationActive && entity.alive && entity.enemyView?.animationReady).length + (heroView.animationReady ? 1 : 0);
       const mountedAreas = [...visualResidency.mountedAreaIds].sort().join(', ') || 'none';
       const mountedTransitions = [...visualResidency.mountedTransitionIds].sort().join(', ') || 'none';
