@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { fitModelToHeight, gameModelAssets } from './AssetLoader';
+import { disposeOwnedObject } from './RenderingResourceDisposal';
 
 const SHATTER_DURATION = .45;
 
@@ -7,9 +8,12 @@ const SHATTER_DURATION = .45;
 export class CrystalView {
   readonly root = new THREE.Group();
   private readonly intact = new THREE.Group();
+  private readonly proceduralIntact = new THREE.Group();
   private readonly shards = new THREE.Group();
   private readonly shardMaterials: THREE.MeshStandardMaterial[] = [];
   private deathRemaining = 0;
+  private proceduralDisposed = false;
+  private disposed = false;
 
   constructor(color: number, areaId: number) {
     const crystalMaterial = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: .25, roughness: .35, metalness: .15 });
@@ -18,7 +22,8 @@ export class CrystalView {
     core.position.y = .9;
     const base = new THREE.Mesh(new THREE.CylinderGeometry(.42, .62, .28, 7), new THREE.MeshStandardMaterial({ color: 0x53616a, roughness: 1 }));
     base.position.y = .14;
-    this.intact.add(core, base);
+    this.proceduralIntact.add(core, base);
+    this.intact.add(this.proceduralIntact);
 
     for (let index = 0; index < 6; index++) {
       const material = crystalMaterial.clone();
@@ -35,18 +40,27 @@ export class CrystalView {
     void this.loadModel(areaId);
   }
 
+  private disposeProceduralIntact(): void {
+    if (this.proceduralDisposed) return;
+    this.proceduralDisposed = true;
+    disposeOwnedObject(this.proceduralIntact);
+    this.proceduralIntact.removeFromParent();
+  }
+
   private async loadModel(areaId: number): Promise<void> {
     const colorByArea: Record<number, string> = { 1: 'green', 2: 'purple', 3: 'red' };
     const color = colorByArea[areaId];
     if (!color) return;
     try {
       const model = await gameModelAssets.cloneScene(`crystals/crystal_${color}.glb`);
+      if (this.disposed) return;
       fitModelToHeight(model, 1.75);
       model.traverse((child) => { if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; } });
+      this.disposeProceduralIntact();
       this.intact.clear();
       this.intact.add(model);
     } catch (error) {
-      console.warn(`Area ${areaId} crystal model unavailable; keeping procedural fallback.`, error);
+      if (!this.disposed) console.warn(`Area ${areaId} crystal model unavailable; keeping procedural fallback.`, error);
     }
   }
 
@@ -80,5 +94,13 @@ export class CrystalView {
       shard.rotation.z -= dt * (3 + index * .5);
       this.shardMaterials[index].opacity = 1 - progress;
     });
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.disposeProceduralIntact();
+    disposeOwnedObject(this.shards);
+    this.root.clear();
   }
 }

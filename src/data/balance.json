@@ -121,5 +121,12 @@
   },
   "respawn": {
     "baseSeconds": 300
+  },
+  "visualStreaming": {
+    "destinationPrefetchMeters": 28,
+    "destinationMountMeters": 16,
+    "destinationUnmountMeters": 24,
+    "enemyActivateMeters": 46,
+    "enemyDeactivateMeters": 54
   }
 }

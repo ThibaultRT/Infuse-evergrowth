@@ -14,20 +14,21 @@ import {
   SPAWNS,
   TIER_CONFIG,
   areaById,
+  VISUAL_STREAMING,
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 import { renderEnemyAffinities, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
-import { addRock, makeTierRing } from '../visuals';
+import { makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
 import { EQUIPMENT_BY_ID, attackProfile, equipmentCombatSummary, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
-import { EnvironmentView } from '../rendering/EnvironmentView';
-import { GateView } from '../rendering/GateView';
+import { EnvironmentView, prefetchEnvironmentDetails } from '../rendering/EnvironmentView';
+import { TransitionView, prefetchTransitionDetails } from '../rendering/TransitionView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
@@ -41,6 +42,7 @@ import { GameCommands } from './GameCommands';
 import { browserClock } from './PlatformAdapters';
 import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
+import { WorldVisualStreamingManager, type VisualChunkProvider } from '../rendering/environment/WorldVisualStreamingManager';
 
 export class Game {
   private started = false;
@@ -126,18 +128,6 @@ scene.add(hemisphere);
 const sun = new THREE.DirectionalLight(0xfff0d2, 2.8);
 scene.add(sun, sun.target);
 
-const ROCK_LAYOUT = [
-  [-16, 5, 1.2], [-15, -3, .8], [16, 7, 1], [15, -4, 1.3], [-13, 10, .65], [13, 10, .7],
-  [-16, -17, .85], [16, -16, .9], [-10, 23, .8], [10, 24, 1], [-5, -24, .8], [5, -25, 1.1]
-] as const;
-
-const environmentViews = AREAS.map((area) => {
-  const view = new EnvironmentView(area);
-  scene.add(view.root);
-  if (area.environmentTheme === 'legacy') for (const [x, z, scale] of ROCK_LAYOUT) addRock(scene, area.originX + x, area.originZ + z, scale);
-  return view;
-});
-
 let currentAreaId = gameplay.currentAreaId;
 const initialArea = areaById(currentAreaId);
 const heroView = new HeroView();
@@ -150,7 +140,7 @@ scene.add(hero);
 let heroDeathHidden = false;
 
 const cameraController = new CameraController(camera, hero.position);
-const environmentOcclusion = new EnvironmentOcclusionManager(camera, environmentViews.map((view) => view.root));
+const environmentOcclusion = new EnvironmentOcclusionManager(camera);
 
 function syncLighting(): void {
   const area = areaById(currentAreaId);
@@ -203,8 +193,9 @@ class SpawnEntity {
   readonly healthBar = document.createElement('div');
   readonly healthFill = document.createElement('span');
   readonly healthValue = document.createElement('strong');
-  readonly enemyView: EnemyView | null;
-  readonly crystalView: CrystalView | null;
+  enemyView: EnemyView | null = null;
+  crystalView: CrystalView | null = null;
+  presentationActive = false;
   deathPresentationRemaining = 0;
   readonly state: RuntimeSpawn;
 
@@ -214,19 +205,12 @@ class SpawnEntity {
     this.weakness = def.enemyWeakness === undefined ? areaById(def.areaId).enemyWeakness : def.enemyWeakness;
     this.spawnPosition = new THREE.Vector3(def.x, 0, def.z);
     this.root.position.copy(this.spawnPosition);
-    this.enemyView = def.tier === 'crystal' ? null : new EnemyView(def.tier, this.config.color);
-    this.crystalView = def.tier === 'crystal' ? new CrystalView(this.config.color, def.areaId) : null;
-    this.root.add(this.enemyView?.root ?? this.crystalView!.root, makeTierRing(this.config.color));
-    scene.add(this.root);
-
     this.targetUi.className = `world-target-ui rarity-${def.tier}`;
     this.lootLabel.className = 'world-loot';
     this.healthBar.className = 'world-hp-bar';
     this.healthValue.className = 'world-hp-value';
     this.healthBar.append(this.healthFill, this.healthValue);
     this.targetUi.append(this.lootLabel, this.healthBar);
-    ui.world.append(this.targetUi);
-
     this.renderLoot();
     this.renderHealth();
     this.syncAreaVisibility();
@@ -235,6 +219,27 @@ class SpawnEntity {
   get alive(): boolean { return this.state.alive; }
   get hp(): number { return this.state.hp; }
   get maxHp(): number { return this.state.maxHp; }
+  setPresentationActive(active: boolean): void {
+    if (active === this.presentationActive) return;
+    this.presentationActive = active;
+    if (active) {
+      this.enemyView = this.def.tier === 'crystal' ? null : new EnemyView(this.def.tier, this.config.color);
+      this.crystalView = this.def.tier === 'crystal' ? new CrystalView(this.config.color, this.def.areaId) : null;
+      this.root.add(this.enemyView?.root ?? this.crystalView!.root, makeTierRing(this.config.color));
+      scene.add(this.root);
+      ui.world.append(this.targetUi);
+      this.syncTransform();
+    } else {
+      this.root.removeFromParent();
+      this.enemyView?.dispose();
+      this.crystalView?.dispose();
+      this.root.clear();
+      this.targetUi.remove();
+      this.enemyView = null;
+      this.crystalView = null;
+    }
+    this.syncAreaVisibility();
+  }
   renderLoot(): void {
     const reward = save.spawns[this.def.id].roll.reward;
     const loot = reward.stat;
@@ -251,11 +256,9 @@ class SpawnEntity {
   }
 
   syncAreaVisibility(): void {
-    // Every area's occupants are part of one continuous world. Gameplay remains
-    // area-scoped, but crossing a boundary must not be what makes its mobs exist.
-    const visible = this.alive || this.deathPresentationRemaining > 0;
+    const visible = this.presentationActive && (this.alive || this.deathPresentationRemaining > 0);
     this.root.visible = visible;
-    this.targetUi.classList.toggle('hidden', !this.alive);
+    this.targetUi.classList.toggle('hidden', !this.presentationActive || !this.alive);
   }
 
   setAlive(value: boolean): void {
@@ -334,8 +337,6 @@ class SpawnEntity {
       this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
       if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();
     }
-    // Distant areas stay rendered, but only the active area's character mixers
-    // advance. This keeps the continuous vista cheap as the world grows.
     this.enemyView?.update(dt, this.state.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
   }
 }
@@ -343,54 +344,85 @@ class SpawnEntity {
 const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
 
 class GateEntity {
-  readonly view: GateView;
-  readonly root: THREE.Group;
-  open = false;
+  readonly position: THREE.Vector3;
+  private view: TransitionView | null = null;
+  open: boolean;
 
   constructor(readonly def: WorldConnection) {
-    this.view = new GateView(def.axis, def.visualStyle);
-    this.root = this.view.root;
-    this.root.position.set(def.x, 0, def.z);
-    this.root.userData.gateId = def.id;
-    scene.add(this.root);
-    this.setOpen(save.unlockedAreas.includes(def.requiredUnlockedAreaId));
-    this.syncAreaVisibility();
+    this.position = new THREE.Vector3(def.x, 0, def.z);
+    this.open = save.unlockedAreas.includes(def.requiredUnlockedAreaId);
+  }
+
+  attachView(view: TransitionView): void {
+    this.view = view;
+    view.setOpen(this.open);
+  }
+
+  detachView(view: TransitionView): void {
+    if (this.view === view) this.view = null;
   }
 
   setOpen(value: boolean): void {
     this.open = value;
-    this.view.setOpen(value);
+    this.view?.setOpen(value);
   }
 
-  update(dt: number): void { this.view.update(dt); }
-  syncAreaVisibility(): void { this.root.visible = true; }
+  update(dt: number): void { this.view?.update(dt); }
 }
 
 const gateEntities = WORLD_CONNECTIONS.map((gate) => new GateEntity(gate));
 
+const visualProviders: VisualChunkProvider[] = [
+  ...AREAS.map((area): VisualChunkProvider => ({
+    id: `area:${area.id}`,
+    kind: 'area',
+    prefetch: () => prefetchEnvironmentDetails(area),
+    create: () => {
+      const view = new EnvironmentView(area);
+      return { root: view.root, dispose: () => view.dispose() };
+    }
+  })),
+  ...gateEntities.map((gate): VisualChunkProvider => ({
+    id: `transition:${gate.def.id}`,
+    kind: 'transition',
+    prefetch: () => prefetchTransitionDetails(gate.def),
+    create: () => {
+      const view = new TransitionView(gate.def);
+      gate.attachView(view);
+      return {
+        root: view.root,
+        dispose: () => { gate.detachView(view); view.dispose(); }
+      };
+    }
+  }))
+];
+const visualStreaming = new WorldVisualStreamingManager(
+  scene, AREAS, WORLD_CONNECTIONS, visualProviders, VISUAL_STREAMING,
+  (root) => environmentOcclusion.register(root),
+  (root) => environmentOcclusion.unregister(root)
+);
+visualStreaming.update(currentAreaId, gameplay.hero.position);
+
 function syncAreaVisibility(): void {
   entities.forEach((entity) => entity.syncAreaVisibility());
-  gateEntities.forEach((gate) => gate.syncAreaVisibility());
-  environmentViews.forEach((view) => { view.root.visible = true; });
   syncLighting();
 }
 
 function startGateCinematic(gate: GateEntity): void {
   input.reset();
-  cameraController.focus(gate.root.position, 2600);
+  cameraController.focus(gate.position, 2600);
 }
 
 function presentBossDefeat(result: { bossId: string; areaId: number; openedGateIds: string[] }): void {
   const bossEntity = entities.find((entity) => entity.def.id === result.bossId)!;
+  bossEntity.setPresentationActive(true);
   effects.bossDefeat(bossEntity.spawnPosition);
   const openedGates = gateEntities.filter((gate) => result.openedGateIds.includes(gate.def.id));
-  for (const gate of openedGates) {
-    gate.setOpen(true);
-  }
+  for (const gate of openedGates) gate.setOpen(true);
   if (openedGates[0]) {
     startGateCinematic(openedGates[0]);
     const destination = areaById(openedGates[0].def.requiredUnlockedAreaId).name;
-    effects.gateOpening(openedGates[0].root.position);
+    effects.gateOpening(openedGates[0].position);
     showBossProgression(`${bossEntity.config.label} guardian`, destination);
   } else {
     showBossProgression(`${bossEntity.config.label} guardian`);
@@ -697,13 +729,22 @@ function completeContinuousAreaEntry(targetAreaId: number, connectionId: string)
   showToast(areaById(targetAreaId).name);
 }
 
+function syncEnemyPresentations(): void {
+  for (const entity of entities) {
+    const areaRelevant = visualStreaming.areaIsMounted(entity.def.areaId);
+    const limit = entity.presentationActive ? VISUAL_STREAMING.enemyDeactivateDistance : VISUAL_STREAMING.enemyActivateDistance;
+    const required = entity.deathPresentationRemaining > 0;
+    entity.setPresentationActive(areaRelevant && (required || entity.distanceToHero() <= limit));
+  }
+}
+
 function updateGates(dt: number): void {
   gateEntities.forEach((gate) => gate.update(dt));
 }
 
 function updateTargetUi(): void {
   for (const entity of entities) {
-    if (!entity.alive) {
+    if (!entity.presentationActive || !entity.alive) {
       entity.targetUi.style.visibility = 'hidden';
       continue;
     }
@@ -721,7 +762,7 @@ function formatCountdown(ms: number): string {
 function updateRespawnIndicators(): void {
   const now = browserClock.now();
   for (const indicator of respawnIndicators) {
-    if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.every((member) => !member.alive && member.deathPresentationRemaining === 0)) {
+    if (indicator.members[0].def.areaId !== currentAreaId || !indicator.members.some((member) => member.presentationActive) || !indicator.members.every((member) => !member.alive && member.deathPresentationRemaining === 0)) {
       indicator.element.classList.add('hidden');
       continue;
     }
@@ -776,6 +817,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 syncAreaVisibility();
+syncEnemyPresentations();
 let previous = performance.now();
 let lastRenderedAt = 0;
 let statsStartedAt = performance.now();
@@ -814,6 +856,8 @@ function frame(now: number): void {
     }
   }
   updateHero(dt);
+  visualStreaming.update(currentAreaId, gameplay.hero.position);
+  syncEnemyPresentations();
   updateGates(dt);
   if (!cameraController.isScripted) entities.forEach((entity) => entity.update());
   autoAttack();
@@ -830,8 +874,12 @@ function frame(now: number): void {
     const elapsed = now - statsStartedAt;
     if (elapsed >= 500) {
       const info = renderer.info.render;
-      const activeMixers = entities.filter((entity) => entity.alive && entity.def.areaId === currentAreaId && entity.enemyView?.animationReady).length + (heroView.animationReady ? 1 : 0);
-      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\n${activeMixers} active character mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${environmentOcclusion.diagnostic}\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
+      const visualResidency = visualStreaming.snapshot;
+      const activeMixers = entities.filter((entity) => entity.presentationActive && entity.alive && entity.enemyView?.animationReady).length + (heroView.animationReady ? 1 : 0);
+      const mountedAreas = [...visualResidency.mountedAreaIds].sort().join(', ') || 'none';
+      const mountedTransitions = [...visualResidency.mountedTransitionIds].sort().join(', ') || 'none';
+      const activeEnemies = entities.filter((entity) => entity.presentationActive).length;
+      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\narea ${currentAreaId} · visuals ${mountedAreas}\ntransitions ${mountedTransitions}\nloading ${visualResidency.pendingIds.join(', ') || 'none'}\n${activeEnemies} enemy presentations · ${activeMixers} mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${environmentOcclusion.diagnostic}\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
       statsFrames = 0;
       statsStartedAt = now;
     }

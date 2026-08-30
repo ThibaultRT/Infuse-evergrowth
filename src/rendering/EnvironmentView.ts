@@ -1,21 +1,39 @@
 import * as THREE from 'three';
-import { AREAS, SPAWNS, WORLD_CONNECTIONS } from '../config';
-import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
+import { SPAWNS } from '../config';
 import type { AreaDefinition } from '../types';
 import { fitModelToFootprint, gameModelAssets, kaykitAssets, quaterniusAssets, type AssetLoader } from './AssetLoader';
 import { AREA_ONE_KAYKIT_PLACEMENTS, AREA_THREE_WALL_PLACEMENTS, areaOneVegetation, type KaykitPlacement, WEST_BORDER_KAYKIT_PLACEMENTS } from './KaykitEnvironmentPlacements';
+
+/** Warms only the asset package belonging to one area; shared loader caches deduplicate requests. */
+export async function prefetchEnvironmentDetails(area: AreaDefinition): Promise<void> {
+  const jobs: Promise<unknown>[] = [];
+  if (area.id === 1) {
+    jobs.push(gameModelAssets.load('props/fountain.glb'));
+    const spawnPoints = SPAWNS.filter((spawn) => spawn.areaId === 1).map((spawn) => ({ x: spawn.x - area.originX, z: spawn.z - area.originZ }));
+    for (const placement of [...AREA_ONE_KAYKIT_PLACEMENTS, ...WEST_BORDER_KAYKIT_PLACEMENTS, ...areaOneVegetation(spawnPoints)]) jobs.push(kaykitAssets.load(placement.path));
+  } else if (area.id === 2) {
+    for (const path of ['nature/models/CommonTree_3.gltf', 'nature/models/Rock_Medium_2.gltf', 'village/models/Prop_WoodenFence_Extension1.gltf']) jobs.push(quaterniusAssets.load(path));
+  } else {
+    for (const placement of AREA_THREE_WALL_PLACEMENTS) jobs.push(kaykitAssets.load(placement.path));
+    for (const path of ['village/models/Prop_Brick1.gltf', 'village/models/Floor_UnevenBrick.gltf', 'nature/models/Rock_Medium_2.gltf']) jobs.push(quaterniusAssets.load(path));
+  }
+  const results = await Promise.allSettled(jobs);
+  const failure = results.find((result): result is PromiseRejectedResult => result.status === 'rejected');
+  if (failure) throw failure.reason;
+}
 
 function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, x: number, y: number, z: number): THREE.Mesh {
   const value = new THREE.Mesh(geometry, material); value.position.set(x, y, z); return value;
 }
 
-/** Permanent macro terrain for one authored world chunk. All three roots remain visible. */
+/** Procedural fallback for one independently streamed area visual chunk. */
 export class EnvironmentView {
   readonly root = new THREE.Group();
   private readonly terrainRoot = new THREE.Group();
   private readonly macroRoot = new THREE.Group();
   private readonly assetDetailsRoot = new THREE.Group();
   private readonly fallbackDetailsRoot = new THREE.Group();
+  private disposed = false;
 
   constructor(readonly area: AreaDefinition, private readonly assets: AssetLoader = quaterniusAssets) {
     this.root.position.set(area.originX, 0, area.originZ); this.root.name = `Area ${area.id} environment`;
@@ -54,22 +72,8 @@ export class EnvironmentView {
 
   private buildMeadow(): void {
     this.ground(0x79a957); this.road([[0,4],[3,-10],[8,-28]]); this.road([[0,4],[10,3],[18,0]]); this.road([[0,4],[-10,7],[-18,7]]); this.road([[0,4],[-1,16],[0,28]]);
-    // Two distinct lakes leave a dry opening around the gate and causeway. Their
-    // outer edges extend beyond the chunks while irregular stones soften the banks.
-    const lakeConnection=WORLD_CONNECTIONS.find((connection)=>connection.visualStyle==='lake-gate');
-    if(lakeConnection){
-      const waterMaterial=new THREE.MeshStandardMaterial({color:0x277e9e,roughness:.24,metalness:.08,transparent:true,opacity:.93});
-      const lakeBounds=lakeBarrierBounds(lakeConnection,AREAS);
-      for(const lake of lakeBarrierSegments(lakeConnection,lakeBounds.minX,lakeBounds.maxX)){
-        const water=mesh(new THREE.PlaneGeometry(lake.maxX-lake.minX,lake.maxZ-lake.minZ),waterMaterial,(lake.minX+lake.maxX)/2-this.area.originX,.04,(lake.minZ+lake.maxZ)/2-this.area.originZ);
-        water.rotation.x=-Math.PI/2; this.macroRoot.add(water);
-      }
-    }
-    for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-25.4+Math.sin(x*.72)*.55+Math.sin(x*1.8)*.2; this.macroRoot.add(this.irregularRock(x,.2,z,1.25,.45,.9)); }
-    for(let x=-18;x<=18;x+=2.6){ if(x>5&&x<11)continue; const z=-30.6+Math.sin(x*.61)*.4+Math.sin(x*1.55)*.16; this.macroRoot.add(this.irregularRock(x,.18,z,1.15,.4,.82)); }
-    // Gameplay authority still treats this as the same crossing; its presentation is KayKit.
-    for(const x of [5.85,10.15]) for(let z=-31.5;z<=-24.5;z+=2.25) this.macroRoot.add(this.irregularRock(x,.35,z,.45,.55,.65,0x626556));
-    for(const [x,z,s] of [[-10,-28.4,1.35],[1,-29,1.05],[16,-28.2,.9]] as const) this.macroRoot.add(this.irregularRock(x,.15,z,s,.45,s*.75));
+    // Shared north-lake water, banks, causeway edge rocks and gate now belong to
+    // TransitionView so Area 1 can be replaced independently by an authored GLB.
     // Layered west ridge: human-scale foreground rocks, larger masses pushed outside play.
     const ridge=new THREE.Group(); ridge.name='west layered ridge'; ridge.userData.cameraOccluder=true;
     for(let z=-31;z<=32;z+=4.1){ if(z>-10&&z<10)continue; const wave=Math.sin(z*.5); ridge.add(this.irregularRock(-19.1,.55,z,1.5,1.1,1.7),this.irregularRock(-22.3,1.5,z+1.5,2.5,2.8+wave*.4,2.3),this.irregularRock(-26,2.8,z-.8,4,4.7,3.5)); } this.macroRoot.add(ridge);
@@ -121,15 +125,18 @@ export class EnvironmentView {
     landmark.add(mesh(new THREE.BoxGeometry(3.2,7,3.2),new THREE.MeshStandardMaterial({color:0x595d58,roughness:1}),-7,3.5,-25),mesh(new THREE.BoxGeometry(3.2,5.3,3.2),new THREE.MeshStandardMaterial({color:0x595d58,roughness:1}),7,2.65,-25)); this.macroRoot.add(landmark);
   }
 
-  private async addAsset(path:string,x:number,z:number,scale:number,rotation=0): Promise<void> { const object=await this.assets.cloneScene(path); object.position.set(x,0,z); object.scale.setScalar(scale); object.rotation.y=rotation; this.assetDetailsRoot.add(object); }
+  private async addAsset(path:string,x:number,z:number,scale:number,rotation=0): Promise<void> {
+    const object=await this.assets.cloneScene(path); if(this.disposed)return;
+    object.position.set(x,0,z); object.scale.setScalar(scale); object.rotation.y=rotation; this.assetDetailsRoot.add(object);
+  }
   private async addKaykitAsset(placement: KaykitPlacement): Promise<void> {
-    const object=await kaykitAssets.cloneScene(placement.path);
+    const object=await kaykitAssets.cloneScene(placement.path); if(this.disposed)return;
     object.position.set(placement.x,0,placement.z); object.scale.setScalar(placement.scale); object.rotation.y=placement.rotation ?? 0;
     object.traverse((child)=>{ if(child instanceof THREE.Mesh){ child.castShadow=true; child.receiveShadow=true; } });
     this.assetDetailsRoot.add(object);
   }
   private async addFountain(): Promise<void> {
-    const object=await gameModelAssets.cloneScene('props/fountain.glb');
+    const object=await gameModelAssets.cloneScene('props/fountain.glb'); if(this.disposed)return;
     fitModelToFootprint(object,6.2); object.position.z=5;
     object.traverse((child)=>{ if(child instanceof THREE.Mesh){ child.castShadow=true; child.receiveShadow=true; } });
     this.assetDetailsRoot.add(object);
@@ -151,7 +158,20 @@ export class EnvironmentView {
       for(const [x,z,s] of [[-15,19,.6],[15,18,.65],[-15,-10,.6],[14,-12,.65]] as const) jobs.push(this.addAsset('nature/models/Rock_Medium_2.gltf',x,z,s,x));
     }
     const results=await Promise.allSettled(jobs);
+    if(this.disposed)return;
     if(results.every((result)=>result.status==='fulfilled')) this.fallbackDetailsRoot.visible=false;
     else console.warn(`Area ${this.area.id} cosmetic details partially unavailable; macro terrain remains playable.`,results.filter((result)=>result.status==='rejected'));
+  }
+
+  /** Releases only resources created by this procedural owner; cached GLTF data remains shared. */
+  dispose(): void {
+    if(this.disposed)return;
+    this.disposed=true;
+    for (const root of [this.terrainRoot, this.macroRoot, this.fallbackDetailsRoot]) root.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      object.geometry.dispose();
+      for (const material of (Array.isArray(object.material) ? object.material : [object.material])) material.dispose();
+    });
+    this.root.clear();
   }
 }

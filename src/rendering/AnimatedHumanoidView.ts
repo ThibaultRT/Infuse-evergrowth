@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
+import { disposeOwnedObject } from './RenderingResourceDisposal';
 
 const ANIMATIONS = 'animations/UAL1_Standard.glb';
 const ARM_BONES = ['clavicle', 'upperarm', 'lowerarm', 'hand', 'thumb', 'index', 'middle', 'ring', 'pinky'] as const;
@@ -28,10 +29,21 @@ export abstract class AnimatedHumanoidView {
   private motion: HumanoidMotion = 'idle';
   private oneShotRemaining = 0;
   private deathRequested = false;
+  private fallbackDisposed = false;
+  private disposed = false;
 
-  protected constructor(fallback: THREE.Object3D, protected readonly assets: AssetLoader = quaterniusAssets) {
+  protected constructor(private readonly fallback: THREE.Object3D, protected readonly assets: AssetLoader = quaterniusAssets) {
     fallback.name = 'procedural-fallback';
     this.root.add(fallback);
+  }
+
+  protected get isDisposed(): boolean { return this.disposed; }
+
+  protected disposeFallback(): void {
+    if (this.fallbackDisposed) return;
+    this.fallbackDisposed = true;
+    disposeOwnedObject(this.fallback);
+    this.fallback.removeFromParent();
   }
 
   protected async loadModel(path: string): Promise<void> {
@@ -40,18 +52,20 @@ export abstract class AnimatedHumanoidView {
         this.assets.cloneSkinnedScene(path),
         this.assets.load(ANIMATIONS)
       ]);
+      if (this.disposed) return;
       this.model = model;
       this.hands.left = model.getObjectByName('hand_l') ?? null;
       this.hands.right = model.getObjectByName('hand_r') ?? null;
       this.clips = new Map(animationAsset.animations.map((clip) => [clip.name, clip]));
       this.mixer = new THREE.AnimationMixer(model);
       this.buildLimbLayers(model);
+      this.disposeFallback();
       this.root.clear();
       this.root.add(model);
       this.play('idle', 0);
       await this.onModelReady();
     } catch (error) {
-      console.warn('Quaternius humanoid unavailable; keeping procedural fallback.', error);
+      if (!this.disposed) console.warn('Quaternius humanoid unavailable; keeping procedural fallback.', error);
     }
   }
 
@@ -103,6 +117,26 @@ export abstract class AnimatedHumanoidView {
   }
 
   protected getRigBone(name: string): THREE.Object3D | null { return this.model?.getObjectByName(name) ?? null; }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.stopLimbLayers();
+    this.mixer?.stopAllAction();
+    if (this.model) {
+      this.mixer?.uncacheRoot(this.model);
+      this.limbMixers.left?.uncacheRoot(this.model);
+      this.limbMixers.right?.uncacheRoot(this.model);
+    }
+    this.disposeFallback();
+    this.root.clear();
+    this.model = null;
+    this.mixer = null;
+    this.hands.left = null;
+    this.hands.right = null;
+    this.clips.clear();
+    this.action = null;
+  }
 
   private buildLimbLayers(model: THREE.Object3D): void {
     for (const side of ['left', 'right'] as const) {

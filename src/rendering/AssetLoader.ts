@@ -79,20 +79,5 @@ export function fitModelToFootprint(model: Object3D, footprint: number): void {
 
 export const BOOT_ASSETS = [
   'animations/UAL1_Standard.glb',
-  'characters/models/Male_Ranger.gltf',
-  'characters/models/Male_Peasant.gltf',
-  'nature/models/CommonTree_1.gltf',
-  'nature/models/CommonTree_3.gltf',
-  'nature/models/Rock_Medium_1.gltf',
-  'nature/models/Rock_Medium_2.gltf',
-  'nature/models/Bush_Common_Flowers.gltf',
-  'nature/models/Flower_3_Group.gltf',
-  'nature/models/Grass_Common_Short.gltf',
-  'nature/models/RockPath_Round_Wide.gltf',
-  'village/models/Prop_WoodenFence_Single.gltf',
-  'village/models/Prop_WoodenFence_Extension1.gltf',
-  'village/models/Prop_Brick1.gltf',
-  'village/models/Floor_UnevenBrick.gltf',
-  'village/models/DoorFrame_Round_Brick.gltf',
-  'village/models/Door_4_Round.gltf'
+  'characters/models/Male_Ranger.gltf'
 ] as const;
