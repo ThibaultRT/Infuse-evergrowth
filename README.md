@@ -74,6 +74,27 @@ Current explicit damage types are:
 | Slash | Swords, Area 2 enemy attacks |
 | Piercing | Spears and matching armor mitigation |
 
+### Affinity triangle
+
+Arrows mean **deals bonus damage to**:
+
+```text
+Slash ──▶ Blunt ──▶ Piercing ──▶ Slash
+```
+
+- **Slash → Blunt:** 2× damage
+- **Blunt → Piercing:** 2× damage
+- **Piercing → Slash:** 2× damage
+- The reverse matchup is resisted at 0.5× damage.
+
+### Common weapon quick reference
+
+| Common weapon | Damage type | Base damage | Attack interval | Attack speed | Quick memory |
+| --- | --- | ---: | ---: | ---: | --- |
+| Militia Shortsword | Slash | 8 | 1.0 s | 1.00 hit/s | Fastest, lighter hits |
+| Ashwood Spear | Piercing | 12 | 1.5 s | 0.67 hit/s | Middle ground |
+| Blacksmith's Hammer | Blunt | 15 | 2.0 s | 0.50 hit/s | Slowest, heavier hits |
+
 Hero attacks use the enemy's authored weakness/resistance relationship. Enemy attacks do not use that affinity multiplier against the hero; equipped armor instead subtracts matching flat defense.
 
 New heroes begin with a Level 1 Common hammer equipped. The held weapon uses the hero attack animation; three additional weapons attack asynchronously from orbit. Orbit 1 unlocks with Area 2. Empty slots do not attack. Equipment definitions and owned progression are separate so static item data does not become duplicated save state, and Ascend copy requirements are rarity-specific.
