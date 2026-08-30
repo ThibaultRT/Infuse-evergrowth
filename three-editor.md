@@ -2,24 +2,36 @@
 
 Use this guide when replacing the current procedural/blockout environments with authored Gaea + Three.js Editor scenes.
 
-The important rule is: **author each area around its own local origin and let Infuse place the exported root in world space.** Do not bake the global world offset into an area's GLB.
+The preferred workflow is now:
 
-These dimensions/origins are production-authoring targets inferred from the accepted world visualization and the current area proportions. Area 1 is the agreed anchor. Area 2/3 values are intentionally marked as target estimates until their production scenes are validated in-game.
+```text
+one assembled MASTER AUTHORING scene
+        ↓
+edit areas + shared transitions in context
+        ↓
+export each Area_* / Transition_* shipping root independently
+        ↓
+re-import exported GLBs / load them in Infuse for final QA
+```
+
+The most important rule is: **world placement belongs to an authoring placement parent or to Infuse; every shipping root stays local at `(0,0,0)`.** Do not bake the global world offset into an area or transition GLB.
+
+These dimensions/origins are production-authoring targets inferred from the accepted world visualization and the current area proportions. Area 1 is the agreed anchor. Area 2/3 values are intentionally target estimates until their production scenes are validated in-game.
 
 ## Coordinate convention
 
 Infuse currently places Area 2 north of Area 1 at a negative Z world origin, so preserve the existing runtime convention:
 
-- 1 Three.js/editor/Gaea unit = 1 meter.
+- 1 Three.js Editor/Gaea unit = 1 meter.
 - X = east/west ground axis.
 - +X = east.
 - Z = north/south ground axis.
 - **-Z = north**, +Z = south.
 - Y = elevation/up.
-- Area roots use scale `(1, 1, 1)` and zero rotation.
+- Shipping roots use scale `(1, 1, 1)` and zero rotation.
 - Keep a common Y datum across areas. Do not independently re-zero terrain vertically in a way that makes shared water/banks/walls jump at a seam.
 
-The current runtime area origins are still the old blockout values. Do not treat them as the final production positions. When authored areas start replacing the blockouts, Codex should deliberately update the rendering/world-placement data to the targets below rather than silently trying to fit the new GLBs to the old dimensions.
+The current runtime area origins are still the old blockout values. Do not treat them as the final production positions. When authored areas start replacing the blockouts, Codex should deliberately update rendering/world-placement data to the targets below rather than silently trying to fit the new GLBs to the old dimensions.
 
 ## Target area sizes
 
@@ -96,7 +108,7 @@ transition-a01-a03-ruined-wall.glb
 
 ### Area 1 ↔ Area 2 — river
 
-Canonical root:
+Canonical shipping root:
 
 ```text
 Transition_A01_A02_River
@@ -117,13 +129,13 @@ world Z = -42..-30
 
 So the nominal shared river band is **84 m long × 12 m deep**.
 
-A convenient transition-root placement is:
+Its world placement is:
 
 ```text
-world position = (0, 0, -36)
+(0, 0, -36)
 ```
 
-and the transition can be authored locally around:
+Inside the shipping root, author locally around:
 
 ```text
 X = -42..42
@@ -143,7 +155,7 @@ Area 1 and Area 2 terrain may each form their respective banks, but do not bake 
 
 ### Area 1 ↔ Area 3 — ruined wall
 
-Canonical root:
+Canonical shipping root:
 
 ```text
 Transition_A01_A03_RuinedWall
@@ -164,13 +176,13 @@ world Z = -42..42
 
 So the nominal shared ruined-wall band is **12 m deep × 84 m long**.
 
-A convenient transition-root placement is:
+Its world placement is:
 
 ```text
-world position = (36, 0, 0)
+(36, 0, 0)
 ```
 
-and its local authoring envelope can begin around:
+Inside the shipping root, author locally around:
 
 ```text
 X = -6..6
@@ -196,28 +208,145 @@ When the art direction is chosen, use the same canonical form:
 Transition_A02_A03_<Theme>
 ```
 
-## How to author each area in Three.js Editor
+## Preferred Three.js Editor workflow: one master authoring scene
 
-Use one production editor scene/project per area.
+Do **not** make day-to-day art iteration depend on opening Area 1, then the river, then Area 2 separately.
 
-Example Area 1 hierarchy:
+Keep an assembled master scene where connected areas and transitions are visible at their final world placement while editing. This lets the river banks, bridge, ruined wall, vegetation, terrain heights and sight lines be adjusted in context.
+
+The master scene is an **authoring source**, not a shipping asset.
+
+Recommended hierarchy:
 
 ```text
-Area_A01_Root                position 0,0,0 / rotation 0 / scale 1
-├─ Terrain
-├─ Vegetation
-├─ Rocks
-├─ Structures
-├─ Props
-├─ REF_Playable_72x72       editor guide only — do not ship
-└─ REF_Visual_84x84         editor guide only — do not ship
+AUTHORING_WORLD                         position 0,0,0
+│
+├─ Placement_A01                       position (0,0,0)
+│  ├─ Area_A01_Root                    position 0,0,0 / rotation 0 / scale 1
+│  │  ├─ Terrain
+│  │  ├─ Vegetation
+│  │  ├─ Rocks
+│  │  ├─ Structures
+│  │  └─ Props
+│  ├─ REF_Playable_72x72               editor guide only
+│  └─ REF_Visual_84x84                 editor guide only
+│
+├─ Placement_Transition_A01_A02        position (0,0,-36)
+│  ├─ Transition_A01_A02_River         position 0,0,0 / rotation 0 / scale 1
+│  │  ├─ Water
+│  │  ├─ Bridge
+│  │  ├─ Rocks
+│  │  └─ RiverVegetation
+│  └─ REF_Transition_84x12             editor guide only
+│
+├─ Placement_A02                       position (6,0,-72)
+│  ├─ Area_A02_Root                    position 0,0,0 / rotation 0 / scale 1
+│  │  ├─ Terrain
+│  │  ├─ Vegetation
+│  │  ├─ Rocks
+│  │  ├─ Structures
+│  │  └─ Props
+│  ├─ REF_Playable_84x72               editor guide only
+│  └─ REF_Visual_96x84                 editor guide only
+│
+├─ Placement_Transition_A01_A03        position (36,0,0)
+│  ├─ Transition_A01_A03_RuinedWall    position 0,0,0 / rotation 0 / scale 1
+│  │  ├─ Wall
+│  │  ├─ Gate
+│  │  ├─ Rubble
+│  │  └─ SeamProps
+│  └─ REF_Transition_12x84             editor guide only
+│
+└─ Placement_A03                       position (78,0,0)
+   ├─ Area_A03_Root                    position 0,0,0 / rotation 0 / scale 1
+   │  ├─ Terrain
+   │  ├─ Fortress
+   │  ├─ Vegetation
+   │  ├─ Rocks
+   │  └─ Props
+   ├─ REF_Playable_84x72               editor guide only
+   └─ REF_Visual_96x84                 editor guide only
 ```
 
-Area 2 and Area 3 follow the same pattern with their own reference dimensions.
+### Placement parent vs shipping root
 
-**Never position `Area_A02_Root` at `(6, 0, -72)` inside its production editor scene.** Its production export root stays at `(0, 0, 0)`. `(6, 0, -72)` is the world placement applied by Infuse or by the preview scene.
+This distinction is mandatory.
 
-This keeps every GLB self-contained and makes re-exporting safe.
+The `Placement_*` parent contains the **world transform used only to assemble the authoring scene**.
+
+The child `Area_*_Root` or `Transition_*` node is the **independently exportable shipping root** and always remains:
+
+```text
+position = (0,0,0)
+rotation = (0,0,0)
+scale    = (1,1,1)
+```
+
+For example:
+
+```text
+Placement_A02                     world position (6,0,-72)
+└─ Area_A02_Root                  local position (0,0,0)
+```
+
+Do not move `Area_A02_Root` itself to `(6,0,-72)`.
+
+Likewise:
+
+```text
+Placement_Transition_A01_A02      world position (0,0,-36)
+└─ Transition_A01_A02_River       local position (0,0,0)
+```
+
+This lets the master scene look exactly like the assembled world while keeping each export clean and reusable.
+
+### Editing transitions in context
+
+The transition should normally be edited **inside the master scene with both neighboring areas visible**.
+
+For the river, the normal workflow is therefore:
+
+```text
+open AUTHORING_WORLD
+    ↓
+see Area 1 + river + Area 2 together
+    ↓
+edit river / bridge / banks / seam rocks / nearby vegetation
+    ↓
+inspect immediately from both sides
+    ↓
+save master authoring scene
+```
+
+There is no requirement to open the river alone just to change it.
+
+The same applies to `Transition_A01_A03_RuinedWall`: edit the wall/gate/rubble while Area 1 and Area 3 remain visible so both sides blend correctly.
+
+### Ownership boundary while editing
+
+Even though everything is visible together, keep content ownership strict.
+
+If an object belongs to the shared river, place it under:
+
+```text
+Transition_A01_A02_River
+```
+
+not under Area 1 or Area 2.
+
+If it is unique Area 1 scenery, place it under:
+
+```text
+Area_A01_Root
+```
+
+This prevents accidental duplication when chunks are exported independently.
+
+A useful rule is:
+
+> If the object must remain visually identical while either side of the seam is loaded, the transition chunk probably owns it.
+
+Do not place editor-only guides inside shipping roots unless the later export tooling explicitly filters them. Prefer them as siblings under the `Placement_*` parent as shown above.
 
 ## Gaea handoff
 
@@ -233,11 +362,72 @@ Keep 1 unit = 1 meter and center the exported terrain around the area's local X/
 
 Use terrain geometry for broad silhouette/elevation. Do not spend extreme vertex density on tiny erosion/cracks that can be carried by normal/color textures.
 
-For shared water elevations or other cross-area height references, use one common world Y datum. If a Gaea export arrives vertically offset, move the terrain mesh **inside the local area root** to restore the shared datum rather than giving every area an arbitrary root Y offset.
+For shared water elevations or other cross-area height references, use one common world Y datum. If a Gaea export arrives vertically offset, move the terrain mesh **inside the local area shipping root** to restore the shared datum rather than giving every area an arbitrary root Y offset.
 
-## World-preview scene for seam checks
+When importing Gaea terrain into the master editor scene, import it under the relevant local `Area_*_Root`; do not bake the `Placement_*` world offset into the terrain itself.
 
-Maintain a separate, disposable Three.js Editor preview scene. Import the independently exported GLBs and place them at their proposed world transforms:
+## Independent export workflow
+
+The master authoring scene must eventually produce separate runtime chunks such as:
+
+```text
+area-a01.glb
+transition-a01-a02-river.glb
+area-a02.glb
+transition-a01-a03-ruined-wall.glb
+area-a03.glb
+```
+
+**Never ship/export the whole `AUTHORING_WORLD` as one world GLB.** Streaming depends on the chunks remaining independently loadable.
+
+### Preferred long-term export path
+
+Add a small deterministic authoring/build export tool once the first real area workflow is proven.
+
+The tool should find canonical shipping roots by name, for example:
+
+```text
+Area_A01_Root
+Area_A02_Root
+Area_A03_Root
+Transition_A01_A02_River
+Transition_A01_A03_RuinedWall
+```
+
+and serialize each root independently while excluding:
+
+- its `Placement_*` parent transform;
+- neighboring areas/transitions;
+- `REF_*` editor guides;
+- other authoring-only helpers.
+
+The exported root must remain normalized at local `(0,0,0)`, zero rotation and unit scale.
+
+This export step should later be repeatable rather than relying on manual transform entry for 15+ areas.
+
+### Manual workflow until export automation exists
+
+For the first Area 1 / river proof, manual export is acceptable.
+
+Use a copy/temporary export scene rather than damaging the master authoring scene:
+
+1. Save the master authoring scene first.
+2. Duplicate/open a temporary export copy.
+3. Keep only the shipping root being exported and its descendants.
+4. Remove the `Placement_*` world wrapper and all unrelated content/guides.
+5. Confirm the remaining shipping root is exactly `(0,0,0)`, rotation zero, scale one.
+6. Export that chunk to GLB.
+7. Discard the temporary export copy; continue art edits in the master scene.
+
+Do not repeatedly move roots back and forth between local and world coordinates in the master scene. The placement-parent pattern exists specifically to avoid that source of mistakes.
+
+## Shipping verification / clean assembled preview
+
+The master authoring scene is excellent for art iteration, but it does **not** prove that the independent exports retained the correct transforms and ownership.
+
+After exporting, perform a clean assembly check using the exported GLBs themselves — either in a disposable Three.js Editor preview scene or directly through the Infuse production loader.
+
+Place the exported chunks at:
 
 ```text
 Area_A01_Root                  (0, 0, 0)
@@ -247,7 +437,7 @@ Transition_A01_A02_River       (0, 0, -36)
 Transition_A01_A03_RuinedWall  (36, 0, 0)
 ```
 
-Use this preview to inspect:
+Inspect:
 
 - terrain height continuity;
 - river bank alignment;
@@ -255,28 +445,38 @@ Use this preview to inspect:
 - wall/rubble seams;
 - visible gaps from the actual game camera direction;
 - duplicate geometry / z-fighting;
-- whether the 6 m apron is sufficient.
+- whether the 6 m apron is sufficient;
+- whether any authoring world transform was accidentally baked into an exported GLB.
 
-**Never export the combined world-preview scene as a production area GLB.** Areas and transition chunks remain independently exportable/loadable.
+This clean re-import is **QA**, not the normal editing workflow.
+
+The intended loop is:
+
+```text
+MASTER AUTHORING scene = edit comfortably in context
+EXPORTED CHUNKS        = runtime assets
+CLEAN RE-IMPORT/INFUSE = verify the export contract
+```
 
 ## Export checklist
 
 Before every GLB export:
 
-1. Confirm the production root is at `(0, 0, 0)`.
-2. Root rotation is zero and root scale is `(1, 1, 1)`.
-3. Confirm 1 unit = 1 meter.
-4. Confirm terrain/props are centered around the intended local origin.
-5. Remove or exclude all `REF_*` guides.
-6. Do not include neighboring area GLBs in the export.
-7. Do not duplicate shared transition water/walls/gates.
-8. Export the area/transition independently to GLB.
-9. Re-import it into the World Preview at the documented world transform and inspect the seams.
-10. Optimize shipping assets after editor export; the raw editor export is not automatically the final runtime asset.
+1. Save the master authoring scene.
+2. Identify the canonical `Area_*_Root` / `Transition_*` shipping root.
+3. Confirm that shipping root is locally `(0,0,0)`, zero rotation and unit scale.
+4. Confirm the world transform exists only on its `Placement_*` authoring parent / runtime metadata.
+5. Confirm 1 unit = 1 meter.
+6. Exclude all `REF_*` and other authoring-only helpers.
+7. Do not include neighboring areas/transitions in the chunk export.
+8. Do not duplicate shared transition water/walls/gates in neighboring area chunks.
+9. Export the area/transition independently to GLB.
+10. Re-import the exported GLB at its documented world transform and inspect the seam.
+11. Optimize shipping assets after editor export; the raw editor export is not automatically the final runtime asset.
 
 ## Runtime implications for later Codex work
 
-When production visuals begin replacing blockouts, the rendering layer should use explicit per-area visual metadata rather than assuming every area is 72 × 72 or deriving positions from GLB contents.
+When production visuals begin replacing blockouts, the rendering layer should use explicit per-area/transition visual metadata rather than assuming every area is 72 × 72 or deriving positions from GLB contents.
 
 At minimum the rendering side will need stable values equivalent to:
 
@@ -289,9 +489,20 @@ visual provider / GLB URL
 shared transition IDs
 ```
 
-The GLB itself remains local around `(0, 0, 0)`.
+Transitions similarly need:
 
-Transitions should be independently loadable and should remain resident whenever their connection needs to be visible — for example while either neighboring area is current/nearby or while the hero approaches the gate. This fits the area-streaming work in `5-area-streaming.md`.
+```text
+transition id
+connected area IDs
+world root position
+visual provider / GLB URL
+```
+
+The GLB itself remains local around `(0,0,0)`.
+
+The master Three.js Editor `Placement_*` positions are authoring representations of those runtime world transforms. Codex should use the documented transforms/manifest as authority when wiring loaders; it should not parse placement parents from the shipping GLB because those parents are deliberately not exported.
+
+Transitions should be independently loadable and remain resident whenever their connection needs to be visible — for example while either neighboring area is current/nearby or while the hero approaches the gate. This fits the area-streaming work in `5-area-streaming.md`.
 
 Gameplay JSON remains authoritative for collisions, spawns, gates and progression. Do not infer gameplay geometry from the editor scene. When production area dimensions/origins are accepted, update the authored gameplay/world data intentionally so gameplay coordinates and the rendering manifest describe the same world.
 
@@ -307,11 +518,16 @@ Area 2:     playable 84×72, visual 96×84, root target (6,0,-72)
 Area 3:     playable 84×72, visual 96×84, root target (78,0,0)
 
 A1/A2:      Transition_A01_A02_River
-             seam Z=-36, nominal overlap 84×12
+            seam Z=-36, nominal overlap 84×12
+            world placement (0,0,-36)
 
 A1/A3:      Transition_A01_A03_RuinedWall
-             seam X=36, nominal overlap 12×84
+            seam X=36, nominal overlap 12×84
+            world placement (36,0,0)
 
-Production GLB root: ALWAYS local (0,0,0)
-World offset:          applied by Infuse / preview scene
+Authoring source:       assembled MASTER scene
+World offset in editor: Placement_* parent
+Shipping root:          ALWAYS local (0,0,0)
+Production export:      one independent GLB per Area_* / Transition_*
+Final seam QA:          re-import exported chunks or load them in Infuse
 ```
