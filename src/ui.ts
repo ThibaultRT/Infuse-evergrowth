@@ -259,7 +259,19 @@ export function showSoulDrop(quantity: number, type: SoulType): void {
 
 const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Weapon', orbit1: 'Orbit 1', orbit2: 'Orbit 2', orbit3: 'Orbit 3', helmet: 'Helmet', armor: 'Armor', legs: 'Legs', ring: 'Ring' };
 const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'orbit1', 'orbit2', 'orbit3', 'helmet', 'armor', 'legs', 'ring'];
+const RARITY_ORDER = ['legendary', 'epic', 'rare', 'uncommon', 'common'] as const;
+const DAMAGE_TYPE_ORDER = ['blunt', 'slash', 'piercing'] as const;
 const formatInventoryValue = (value: number): string => value >= 100 ? Math.round(value).toLocaleString() : value.toFixed(value % 1 ? 1 : 0);
+
+function sortInventoryItems(items: OwnedEquipment[]): OwnedEquipment[] {
+  return items.sort((left, right) => {
+    const leftItem = EQUIPMENT_BY_ID.get(left.itemId), rightItem = EQUIPMENT_BY_ID.get(right.itemId);
+    const rarityDifference = RARITY_ORDER.indexOf(leftItem?.rarity ?? 'common') - RARITY_ORDER.indexOf(rightItem?.rarity ?? 'common');
+    if (rarityDifference) return rarityDifference;
+    const typeDifference = DAMAGE_TYPE_ORDER.indexOf(leftItem?.damageType ?? 'blunt') - DAMAGE_TYPE_ORDER.indexOf(rightItem?.damageType ?? 'blunt');
+    return typeDifference || (leftItem?.name ?? left.itemId).localeCompare(rightItem?.name ?? right.itemId);
+  });
+}
 
 export function renderInventory(inventory: InventoryState, summary: InventoryCombatSummary): void {
   const primary = [
@@ -286,7 +298,7 @@ export function renderInventory(inventory: InventoryState, summary: InventoryCom
   });
   const equippedItemIds = new Set(Object.values(inventory.equipped));
   const items = Object.values(inventory.items).filter((owned) => !equippedItemIds.has(owned.itemId));
-  const section = (title: string, sectionItems: OwnedEquipment[]): string => sectionItems.length ? `<section class="inventory-bag-section"><h3>${title}</h3><div class="inventory-bag-grid">${sectionItems.map((owned) => {
+  const section = (title: string, sectionItems: OwnedEquipment[]): string => sectionItems.length ? `<section class="inventory-bag-section"><h3>${title}</h3><div class="inventory-bag-grid">${sortInventoryItems(sectionItems).map((owned) => {
     const item = EQUIPMENT_BY_ID.get(owned.itemId);
     const itemArt = item ? equipmentIcon(item, owned, 'bag') : null;
     return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}${itemArt ? ' equipment-item' : ''}" type="button" data-item-id="${owned.itemId}" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}, ascend ${owned.ascend}">${itemArt ?? damageTypeIcon(item?.damageType ?? 'blunt', 27)}</button>`;
@@ -330,7 +342,8 @@ export function showEquipmentDrop(drop: typeof dropQueue[number]): void {
     if (!next) { showingDrop = false; return; }
     showingDrop = true;
     const item = EQUIPMENT_BY_ID.get(next.itemId)!;
-    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}">${equipmentIcon(item, { itemId: item.id, level: next.newLevel, ascend: next.ascend }, 'detail') ?? damageTypeIcon(item.damageType, 58)}<b>${item.name}</b><span>${item.rarity} ${item.kind === 'weapon' ? item.weaponClass : item.armorClass === 'boots' ? 'legs' : item.armorClass} · x${next.quantity}</span><strong>${next.previousLevel === null ? 'NEW · ' : `Level ${next.previousLevel} → `}Level ${next.newLevel} · Ascend ${next.ascend}</strong></div>`;
+    const copiesRequired = ascendCopies(item.rarity);
+    ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}"><div class="equipment-drop-icon">${equipmentIcon(item, { itemId: item.id, level: next.newLevel, ascend: next.ascend }, 'detail') ?? damageTypeIcon(item.damageType, 48)}</div><div class="equipment-drop-copy"><b>${item.name}</b><strong>+${next.quantity} ${next.quantity === 1 ? 'copy' : 'copies'} <span>(${next.newLevel}/${copiesRequired})</span></strong></div></div>`;
     window.setTimeout(() => { ui.equipmentDropLayer.innerHTML = ''; showingDrop = false; showNext(); }, 1800);
   };
   showNext();
