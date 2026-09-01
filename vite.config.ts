@@ -1,12 +1,20 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import packageInfo from './package.json' with { type: 'json' };
 
 const repoBase = '/Infuse-evergrowth/';
 
 export default defineConfig({
   base: repoBase,
   plugins: [
+    {
+      name: 'published-version',
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ version: packageInfo.version }) });
+      }
+    },
     VitePWA({
+      injectRegister: false,
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg'],
       manifest: {
