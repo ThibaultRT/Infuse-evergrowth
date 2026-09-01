@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-type FloatingText = { element: HTMLDivElement; position: THREE.Vector3; age: number; duration: number };
+type ScreenOffset = { x: number; y: number };
+type FloatingText = { element: HTMLDivElement; position: THREE.Vector3; screenOffset: ScreenOffset; age: number; duration: number };
 
 /** Owns world-to-screen DOM projection and floating combat-text lifetime. */
 export class WorldUiManager {
@@ -19,10 +20,10 @@ export class WorldUiManager {
     return true;
   }
 
-  addCombatText(position: THREE.Vector3, html: string, incoming: boolean): void {
+  addCombatText(position: THREE.Vector3, html: string, incoming: boolean, screenOffset: ScreenOffset = { x: 0, y: 0 }): void {
     const element = document.createElement('div');
     element.className = `combat-text${incoming ? ' incoming' : ''}`; element.innerHTML = html; this.host.append(element);
-    this.floatingTexts.push({ element, position: position.clone(), age: 0, duration: .9 });
+    this.floatingTexts.push({ element, position: position.clone(), screenOffset, age: 0, duration: .9 });
   }
 
   update(dt: number): void {
@@ -31,7 +32,7 @@ export class WorldUiManager {
       if (item.age >= item.duration) { item.element.remove(); this.floatingTexts.splice(index, 1); continue; }
       if (this.project(item.position, item.element)) {
         const progress = item.age / item.duration;
-        item.element.style.transform = `translate(-50%, calc(-50% - ${progress * 24}px))`;
+        item.element.style.transform = `translate(calc(-50% + ${item.screenOffset.x}px), calc(-50% + ${item.screenOffset.y}px - ${progress * 24}px))`;
         item.element.style.opacity = String(1 - progress);
       }
     }

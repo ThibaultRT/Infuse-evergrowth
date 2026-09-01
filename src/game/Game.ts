@@ -18,7 +18,7 @@ import {
 } from '../config';
 import { combatAffinityIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
 import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
-import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WorldConnection } from '../types';
+import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WeaponSlotId, WorldConnection } from '../types';
 import { renderEnemyAffinities, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
 import { makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
@@ -183,6 +183,13 @@ function weaponCombatIcon(itemId: string): string {
     : damageTypeIcon('blunt', 10);
 }
 
+const WEAPON_DAMAGE_TEXT_OFFSET: Record<WeaponSlotId, { x: number; y: number }> = {
+  hand1: { x: 0, y: 0 },
+  orbit1: { x: 72, y: 0 },
+  orbit2: { x: 0, y: 20 },
+  orbit3: { x: 72, y: 20 }
+};
+
 class SpawnEntity {
   readonly config: TierConfig;
   readonly root = new THREE.Group();
@@ -280,13 +287,13 @@ class SpawnEntity {
   }
   distanceToHero(): number { return gameplay.distanceFromHero(this.state.position); }
 
-  receiveDamage(amount: number, type: DamageType, itemId: string): void {
+  receiveDamage(amount: number, type: DamageType, itemId: string, slot: WeaponSlotId): void {
     if (!this.alive || this.def.areaId !== currentAreaId) return;
     const affinityAmount = combat.heroAttackDamage(amount, type, this.weakness);
     events.emit('enemyDamaged', { enemyId: this.def.id, amount: affinityAmount, damageType: type, itemId });
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
-    worldUi.addCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), `<span>-${Math.round(affinityAmount)}</span>${weaponCombatIcon(itemId)}`, false);
+    worldUi.addCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), `<span>-${Math.round(affinityAmount)}</span>${weaponCombatIcon(itemId)}`, false, WEAPON_DAMAGE_TEXT_OFFSET[slot]);
     const result = gameplay.damageSpawn(this.def.id, affinityAmount);
     if (!result) return;
     this.renderHealth();
@@ -527,7 +534,7 @@ function autoAttack(): void {
     heroView.playWeaponAttack(hand, target.root.position, profile.cooldownSeconds);
     events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType, itemId: profile.itemId });
     const critical = combat.rollChance(heroCriticalChance());
-    target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType, profile.itemId);
+    target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType, profile.itemId, hand);
     const direction = target.root.position.clone().sub(hero.position);
     if (hand === 'hand1' && direction.lengthSq() > 0) {
       gameplay.hero.facing = Math.atan2(direction.x, direction.z);
