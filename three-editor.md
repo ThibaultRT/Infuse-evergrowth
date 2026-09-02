@@ -1,33 +1,87 @@
-# Three.js Editor / Gaea world-authoring quick start
+# Three.js Editor world-authoring quick start
 
-Use this guide when replacing the current procedural/blockout environments with authored Gaea + Three.js Editor scenes.
+Use this guide when replacing the current procedural/blockout environments with authored Three.js Editor scenes.
 
-Preferred production workflow:
+The preferred workflow is now **guide-driven authoring**, not terrain generation. Areas 1-3 are small authored RPG levels; do not force Gaea or another terrain generator into the pipeline unless a later region has a clear need for large natural terrain.
+
+## Preferred production workflow
 
 ```text
-ONE GAEA MASTER REGION
+THREE.JS EDITOR
+rough ground + guide objects + manually placed art
         ↓
-deterministic terrain slicing
+export local Editor JSON
         ↓
-ONE THREE.JS MASTER AUTHORING SCENE
+CODEX WORLD-AUTHORING BUILDER
+smooth roads/rivers + clean hierarchy + chunk export + validation
         ↓
-edit areas + shared transitions + gameplay guides in context
+local authoring viewer
         ↓
-export each Area_* / Transition_* shipping root independently
+visual QA
         ↓
-extract/update lightweight gameplay collision data
+production Area_* / Transition_* GLBs
         ↓
-re-import exported chunks / load them in Infuse for QA
+Infuse runtime QA
 ```
 
-Core rules:
+The division of responsibility is deliberate:
 
-- 1 Gaea / Three.js / Infuse unit = 1 meter.
+- **User / Three.js Editor:** composition, proportions, asset choice, object placement, path intent, environmental storytelling.
+- **Builder:** repetitive geometry work, smooth curves, UVs, generated surfaces, naming validation, chunk-local transforms, export and diagnostics.
+- **Infuse runtime:** gameplay state, collision authority, streaming and world placement.
+
+Do not spend authoring time making a road curve perfect by hand when a few guide points can express the same intent.
+
+## Core rules
+
+- 1 Three.js / Infuse unit = 1 meter.
 - +X = east, **-Z = north**, +Y = up.
-- World placement belongs to authoring `Placement_*` parents or Infuse runtime metadata.
+- World placement belongs to authoring `Placement_*` parents or generated runtime visual metadata.
 - Every independently shipped `Area_*_Root` / `Transition_*` root stays local at `(0,0,0)`, zero rotation, unit scale.
 - Visual meshes are never gameplay-collision authority.
-- Terrain should be generated continuously before it is split; runtime terrain chunks must not duplicate the same surface.
+- `GUIDE_*`, `REF_*`, `Placement_*` and other authoring-only objects never ship.
+- The builder never rewrites the user's source Editor JSON.
+- Generated geometry is deterministic: same source JSON + same builder version/config = same output.
+
+## Authoring files and Git policy
+
+Use this exact local workspace:
+
+```text
+authoring/local/
+├─ three-editor/
+│  └─ infuse-world.json
+└─ assets/
+   ├─ textures/
+   └─ models/
+```
+
+`authoring/local/` is ignored by Git.
+
+This is intentional. Three.js Editor source JSON can become large as scene assets are serialized, and downloaded texture/model packs usually contain many unused files. Keep the creative source locally and back it up outside normal Git if needed.
+
+The builder writes disposable files to:
+
+```text
+authoring/generated/
+```
+
+This directory is also ignored.
+
+Only final game assets belong in Git under:
+
+```text
+public/assets/world/
+├─ areas/
+├─ transitions/
+└─ shared/
+```
+
+Do not copy entire source packs into `public/`. Promote only the exact files needed at runtime. Prefer self-contained GLBs where practical so unused source textures/models do not leak into the production payload.
+
+Every third-party texture/model that reaches the shipped game, including assets embedded in a GLB, must be documented in `ASSET-LICENSES.md`.
+
+See `authoring/README.md` for the storage policy.
 
 ## Target world layout
 
@@ -39,15 +93,7 @@ Every area has a playable envelope plus a nominal 6 m visual apron on each side.
 | Area 2 | darker ashwood / river frontage | **84 × 72 m** | **96 × 84 m** | X `-42..42`, Z `-36..36` | X `-48..48`, Z `-42..42` | **target estimate** `(6, 0, -72)` |
 | Area 3 | ruined fortress | **84 × 72 m** | **96 × 84 m** | X `-42..42`, Z `-36..36` | X `-48..48`, Z `-42..42` | **target estimate** `(78, 0, 0)` |
 
-Area 1 is the agreed scale anchor. Area 2/3 are production-start estimates derived from the accepted visualization and current gameplay proportions; validate them before detailed art production.
-
-World-space envelopes:
-
-| Area | Playable X | Playable Z | Visual X | Visual Z |
-| --- | ---: | ---: | ---: | ---: |
-| Area 1 | `-36..36` | `-36..36` | `-42..42` | `-42..42` |
-| Area 2 | `-36..48` | `-108..-36` | `-42..54` | `-114..-30` |
-| Area 3 | `36..120` | `-36..36` | `30..126` | `-42..42` |
+Area 1 is the scale anchor. Area 2/3 remain production-start estimates until visually validated.
 
 The visual envelopes intentionally overlap. Do **not** add another 12 m empty gap between neighboring playable areas.
 
@@ -59,8 +105,6 @@ Canonical root naming:
 Transition_A<lower-id>_A<higher-id>_<Theme>
 ```
 
-Suggested GLB names use the same identity in kebab case.
-
 ### Area 1 ↔ Area 2 — river
 
 ```text
@@ -71,7 +115,7 @@ nominal overlap: X -42..42, Z -42..-30
 local band:      X -42..42, Z -6..6
 ```
 
-The transition owns shared water, bridge/causeway, seam rocks, shared bank props/effects and any terrain strip assigned to the river transition.
+The transition owns shared water, bridge/causeway, seam rocks, shared bank props/effects, and generated river geometry that belongs to the seam.
 
 ### Area 1 ↔ Area 3 — ruined wall
 
@@ -83,210 +127,73 @@ nominal overlap: X 30..42, Z -42..42
 local band:      X -6..6, Z -42..42
 ```
 
-The transition owns shared wall/gate/rubble/seam props. It may also own a terrain strip if the terrain partition requires one, but the visual identity is the ruined wall rather than the ground itself.
+The transition owns shared wall/gate/rubble/seam props.
 
 ### Area 2 ↔ Area 3
 
-Keep the production theme/name open until those two areas are authored. Use:
+Keep the theme open until those two areas are authored:
 
 ```text
 Transition_A02_A03_<Theme>
 ```
 
-when decided.
+## Three.js Editor master scene
 
-## Gaea recommendation: one continuous master region
-
-Prefer **one large continuous Gaea source terrain for the current coherent world region**, not one unrelated Gaea project per area.
-
-Why:
-
-- elevation is continuous across seams;
-- erosion and drainage stay coherent;
-- rivers/canyons naturally cross chunk boundaries;
-- shared water levels use one Y datum;
-- you avoid manually matching independently generated edge heights.
-
-For the current three-area layout, the combined visual bounds already span approximately:
-
-```text
-world X = -42 .. 126
-world Z = -114 .. 42
-```
-
-The Gaea master may extend beyond those values for useful scenery margin. Do not make the entire hypothetical future 15-area world today; expand this master region later or create another regional master when required.
-
-### Gaea source vs shipping chunks
-
-The Gaea project is **source art**, not a runtime chunk.
-
-Conceptually:
-
-```text
-GAEA_MASTER_REGION
-        │
-        ├─ crop/partition → terrain for Area A01
-        ├─ crop/partition → terrain for Transition A01/A02 River
-        ├─ crop/partition → terrain for Area A02
-        ├─ crop/partition → terrain for Transition A01/A03 if needed
-        └─ crop/partition → terrain for Area A03
-```
-
-Do not independently regenerate those pieces in Gaea after the master terrain is accepted. They should all derive from the same source heightfield/mesh so seam elevations remain identical.
-
-### Terrain ownership: no duplicate surfaces
-
-The **visual envelopes may overlap, but shipping terrain surfaces should not**.
-
-If a transition owns terrain, neighboring area terrain must stop at that transition-owned strip. Example for the river:
-
-```text
-Area 2 terrain
-───────────────
-River transition terrain
-───────────────
-Area 1 terrain
-```
-
-Do not ship Area 1 terrain + river terrain + Area 2 terrain all occupying the same coincident 12 m surface; that wastes GPU work and risks z-fighting.
-
-A transition does not have to own terrain merely because it owns visual props. The deterministic terrain partition decides ownership. For example, the ruined-wall transition may use a small shared ground strip if useful, or the terrain may split at a clean seam beneath the wall. Either way, every world-space terrain surface has exactly one runtime owner.
-
-## Recommended Codex terrain-slicing tool
-
-Once the first useful Gaea master export exists, build a small deterministic **terrain slicer** rather than manually cutting terrain for every area.
-
-This is a production-authoring tool, **not part of the `5-area-streaming.md` implementation slice**. Implement streaming first; add the slicer when integrating the first real Gaea terrain.
-
-### Single source of truth
-
-Do not hardcode the area coordinates again inside the slicer.
-
-When production dimensions/origins are accepted, Codex should centralize them in stable authored world/layout data and have both runtime placement and authoring tools consume that data.
-
-Current `src/data/areas/area-*.json` still contains the old blockout sizes/origins. Therefore the slicer must **not** blindly use those values until the production layout is intentionally migrated.
-
-Recommended split of authority:
-
-- gameplay area origin/playable size: renderer-independent authored area data;
-- visual apron, GLB provider and terrain-crop/transition ownership: focused rendering/authoring manifest;
-- transition identity/connectivity: existing authored connection IDs plus focused visual metadata where needed.
-
-The exact filename can be chosen during implementation, but there must be one authoritative layout contract rather than copies in `three-editor.md`, runtime code and scripts.
-
-### Inputs
-
-The tool should consume:
-
-```text
-master Gaea terrain export
-+ master world bounds / scale metadata
-+ authoritative area/transition layout manifest
-```
-
-The master terrain source may be a mesh/GLB or a high-quality heightfield pipeline, depending on which proves more reliable. Preserve enough source metadata to map every sample/vertex back to world X/Z deterministically.
-
-### Outputs
-
-Generate chunk-local terrain assets such as:
-
-```text
-terrain-a01.glb
-terrain-transition-a01-a02-river.glb
-terrain-a02.glb
-terrain-a03.glb
-```
-
-Only generate a transition-terrain asset when that transition actually owns a terrain strip.
-
-Each result must be rebased so its shipping root is local `(0,0,0)` and Infuse applies the documented world placement externally.
-
-### Required slicer behavior
-
-The tool should:
-
-1. Read chunk bounds from the authoritative layout instead of magic numbers.
-2. Partition/crop the master terrain into non-overlapping runtime ownership regions.
-3. Preserve exact shared-edge height samples/vertices so adjacent chunks cannot develop cracks.
-4. Keep the common world Y datum; never independently normalize each chunk vertically.
-5. Rebase X/Z into each chunk's local coordinate system after cutting.
-6. Validate that terrain ownership has no unintended gaps or coincident duplicate surfaces.
-7. Emit useful diagnostics for chunk bounds, vertex counts and seam ownership.
-8. Be deterministic: rerunning it from the same master source + manifest produces the same chunk geometry.
-
-If source textures/material maps are global, the first proof may keep them simple. For true long-term streaming efficiency, the toolchain should eventually crop/remap large terrain texture maps per chunk or use another deliberate shared-texture strategy; do not unknowingly make every small terrain chunk retain a unique copy of one giant texture.
-
-### Why automate this
-
-The desired iteration becomes:
-
-```text
-edit ONE Gaea master region
-        ↓
-export master terrain
-        ↓
-run terrain slicer
-        ↓
-all area/transition terrain chunks regenerated at correct bounds
-        ↓
-Three.js master scene / Infuse QA
-```
-
-That avoids manually re-cutting Area 1, river, Area 2, etc. every time the master terrain changes.
-
-## Three.js Editor: one master authoring scene
-
-Use one assembled editor scene for day-to-day environment work. This lets you edit the river while seeing both banks and edit the ruined wall while seeing both neighboring areas.
+Use one assembled scene so neighboring areas and transitions can be authored in context.
 
 Recommended hierarchy:
 
 ```text
 AUTHORING_WORLD
 │
-├─ Placement_A01                       world (0,0,0)
-│  ├─ Area_A01_Root                    local (0,0,0)
+├─ Placement_A01                         world (0,0,0)
+│  ├─ Area_A01_Root                      local (0,0,0)
 │  │  ├─ Terrain
 │  │  ├─ Vegetation
 │  │  ├─ Rocks
 │  │  ├─ Structures
 │  │  └─ Props
+│  ├─ AUTHORING_GUIDES
 │  ├─ GAMEPLAY_GUIDES
 │  ├─ REF_Playable_72x72
 │  └─ REF_Visual_84x84
 │
-├─ Placement_Transition_A01_A02        world (0,0,-36)
-│  ├─ Transition_A01_A02_River         local (0,0,0)
-│  │  ├─ Terrain        optional/owned strip from Gaea slicer
+├─ Placement_Transition_A01_A02          world (0,0,-36)
+│  ├─ Transition_A01_A02_River           local (0,0,0)
 │  │  ├─ Water
 │  │  ├─ Bridge
 │  │  ├─ Rocks
 │  │  └─ RiverVegetation
+│  ├─ AUTHORING_GUIDES
 │  ├─ GAMEPLAY_GUIDES
 │  └─ REF_Transition_84x12
 │
-├─ Placement_A02                       world (6,0,-72)
-│  ├─ Area_A02_Root                    local (0,0,0)
+├─ Placement_A02                         world (6,0,-72)
+│  ├─ Area_A02_Root                      local (0,0,0)
+│  ├─ AUTHORING_GUIDES
 │  ├─ GAMEPLAY_GUIDES
 │  ├─ REF_Playable_84x72
 │  └─ REF_Visual_96x84
 │
-├─ Placement_Transition_A01_A03        world (36,0,0)
-│  ├─ Transition_A01_A03_RuinedWall    local (0,0,0)
+├─ Placement_Transition_A01_A03          world (36,0,0)
+│  ├─ Transition_A01_A03_RuinedWall      local (0,0,0)
+│  ├─ AUTHORING_GUIDES
 │  ├─ GAMEPLAY_GUIDES
 │  └─ REF_Transition_12x84
 │
-└─ Placement_A03                       world (78,0,0)
-   ├─ Area_A03_Root                    local (0,0,0)
+└─ Placement_A03                         world (78,0,0)
+   ├─ Area_A03_Root                      local (0,0,0)
+   ├─ AUTHORING_GUIDES
    ├─ GAMEPLAY_GUIDES
    ├─ REF_Playable_84x72
    └─ REF_Visual_96x84
 ```
 
-`Placement_*`, `GAMEPLAY_GUIDES` and `REF_*` are authoring structures. Only canonical `Area_*_Root` / `Transition_*` roots and their visual descendants become runtime GLBs.
+Only canonical `Area_*_Root` / `Transition_*` roots and their production visual descendants become runtime GLBs.
 
 ### Placement parent vs shipping root
 
-Mandatory rule:
+Mandatory:
 
 ```text
 Placement_A02           position (6,0,-72)
@@ -302,28 +209,135 @@ Placement_Transition_A01_A02     position (0,0,-36)
 
 Never bake the placement-parent world offset into the shipping root.
 
-### Ownership while editing
+## Start with simple ground, not generated terrain
 
-Even though all chunks are visible together, ownership stays strict:
+For Area 1, start with an exact-size ground plane:
 
-- unique Area 1 scenery → `Area_A01_Root`;
-- shared river scenery → `Transition_A01_A02_River`;
-- shared ruined-wall scenery → `Transition_A01_A03_RuinedWall`;
-- collision helpers → sibling `GAMEPLAY_GUIDES` of their owning placement group.
+```text
+Ground_Grass
+PlaneGeometry 84 × 84 m
+```
 
-Useful rule: if an object must remain identical while either side of a seam is loaded, the transition probably owns it.
+The central meadow can remain simple. Add natural shape only where it creates visible value: west cliffs/elevation, south rift, north river transition, east ruined-wall transition.
+
+Do not introduce a terrain generator just to create small height variation. If later testing proves that a specific region needs real heightfield terrain, add that as a specialized source workflow rather than making it mandatory for every area.
+
+## AUTHORING_GUIDES: express intent, not final geometry
+
+The builder interprets authoring guides and creates clean production geometry.
+
+### Roads
+
+Create a group:
+
+```text
+GUIDE_ROAD_<id>
+├─ STYLE
+├─ P_001
+├─ P_002
+├─ P_003
+└─ ...
+```
+
+Rules:
+
+- `P_*` objects are simple marker meshes placed along the desired road centerline.
+- Numeric order defines path order.
+- Markers can be ugly spheres/cylinders; only their transforms matter.
+- `STYLE` is a simple flat road sample that communicates desired width/material. It does not ship.
+- The builder samples a smooth curve through the points and generates a road ribbon with tiled UVs.
+
+You should spend time deciding **where the road goes**, not drawing curved road polygons.
+
+### Circular road around a fountain
+
+Use:
+
+```text
+GUIDE_ROAD_RING_<id>
+└─ STYLE
+```
+
+Place the guide at the fountain center and scale its geometry/radius to show the desired ring. The builder generates a clean annular road and blends/overlaps incoming road ribbons with a tiny deterministic vertical bias where required to avoid z-fighting.
+
+For the first implementation, visual overlap at joins is acceptable if it is stable and invisible from the game camera. Do not add CSG complexity unless QA proves it necessary.
+
+### Rivers
+
+Create:
+
+```text
+GUIDE_RIVER_<id>
+├─ STYLE
+├─ P_001
+├─ P_002
+├─ P_003
+└─ ...
+```
+
+`STYLE` communicates approximate width/material. The builder creates a smooth ribbon/water surface from the path. Bank meshes or detailed terrain deformation are optional later extensions; do not block the first useful builder on them.
+
+### Other irregular surfaces
+
+If a future need cannot be expressed cleanly with a road/river spline, add a new explicit guide type rather than abusing arbitrary mesh names. Keep guide semantics deterministic and documented.
+
+## Manual assets remain manual
+
+These stay under the production roots and are preserved by the builder:
+
+- buildings;
+- fountain;
+- trees and vegetation groups;
+- rocks/cliff assets;
+- ruined walls;
+- bridge models;
+- lamps, signs and storytelling props.
+
+The builder must not move or rewrite arbitrary manually placed production assets.
+
+Useful ownership rule: if an object must remain identical while either side of a seam is loaded, the transition probably owns it.
+
+## Generated-object ownership
+
+The builder creates generated visual objects with a `GENERATED_*` prefix, for example:
+
+```text
+GENERATED_ROAD_Main
+GENERATED_ROAD_RING_Fountain
+GENERATED_RIVER_A01A02
+```
+
+These exist only in generated output, never as hand-maintained source objects.
+
+The source JSON remains:
+
+```text
+manual production objects
++ GUIDE_*
++ REF_*
++ Placement_*
+```
+
+The generated scene becomes:
+
+```text
+manual production objects
++ GENERATED_*
+```
+
+and strips the authoring-only objects before shipping export.
 
 ## Collision authoring workflow
 
-Three.js Editor is the **authoring UI** for collision placement, not the runtime collision engine.
+Three.js Editor is the authoring UI for collision placement, not the runtime collision engine.
 
-The current Infuse collision type is axis-aligned rectangles:
+Current Infuse collision is axis-aligned rectangles:
 
 ```text
 id + x + z + width + depth
 ```
 
-Use editor-only translucent/wireframe BoxGeometry helpers:
+Use editor-only translucent/wireframe boxes:
 
 ```text
 GAMEPLAY_GUIDES
@@ -333,7 +347,9 @@ GAMEPLAY_GUIDES
 └─ COLLIDER_WestCliff_01
 ```
 
-Until runtime collision explicitly supports rotation, keep these boxes unrotated. Approximate diagonal walls/cliffs with several rectangles if needed.
+Until runtime collision explicitly supports rotation, keep these boxes unrotated. Approximate diagonal blockers with several rectangles if necessary.
+
+The builder may validate/extract collider transforms, but generated visual meshes never become collision authority automatically.
 
 ### River + bridge
 
@@ -348,39 +364,64 @@ Block the river, not the bridge:
                     walkable opening
 ```
 
-Leave forgiving clearance around the bridge for mobile movement. Do not over-collide decorative details.
+Leave forgiving clearance for mobile movement.
 
-Area-local blockers conceptually belong to that area's gameplay data. Shared seam blockers conceptually belong to the connection/transition. The generated runtime collision remains lightweight and loaded even when its visual GLB is not resident.
+## Builder outputs
 
-A future exporter should validate `COLLIDER_*` IDs/transforms and generate/update renderer-independent collision data. For the first small production proof, a few values may be transferred manually; do not scale that manual process to many colliders.
+The planned tool is defined in `6-world-authoring-builder.md`.
 
-## Independent visual export
-
-The master editor scene must produce independent runtime chunks, for example:
+Default local input:
 
 ```text
-area-a01.glb
-transition-a01-a02-river.glb
-area-a02.glb
-transition-a01-a03-ruined-wall.glb
-area-a03.glb
+authoring/local/three-editor/infuse-world.json
+```
+
+Disposable outputs:
+
+```text
+authoring/generated/
+├─ preview/
+│  └─ assembled-world.glb
+├─ reports/
+│  └─ build-report.json
+└─ manifests/
+   └─ world-visual-manifest.json
+```
+
+Production outputs after explicit build/promotion:
+
+```text
+public/assets/world/
+├─ areas/
+│  ├─ area-a01.glb
+│  ├─ area-a02.glb
+│  └─ area-a03.glb
+├─ transitions/
+│  ├─ transition-a01-a02-river.glb
+│  └─ transition-a01-a03-ruined-wall.glb
+└─ shared/
 ```
 
 Never ship the combined `AUTHORING_WORLD` as one runtime GLB.
 
-After the first production proof, Codex should provide a deterministic authoring/export tool that:
+## Independent visual export requirements
 
-- finds canonical `Area_*_Root` / `Transition_*` roots;
-- excludes `Placement_*`, `GAMEPLAY_GUIDES`, `REF_*` and unrelated chunks;
-- preserves each shipping root at local `(0,0,0)`, zero rotation, unit scale;
-- exports each root independently;
-- optionally invokes/coordinates the collision extractor and Gaea terrain slicer as one repeatable authoring build.
+The builder must:
 
-Do not repeatedly move roots between local and world positions to export them manually.
+- find canonical `Area_*_Root` / `Transition_*` roots;
+- preserve manual production visuals;
+- generate supported `GUIDE_*` geometry;
+- exclude `Placement_*`, `AUTHORING_GUIDES`, `GAMEPLAY_GUIDES`, `GUIDE_*`, `REF_*` and editor helpers from GLBs;
+- preserve each shipping root at local `(0,0,0)`, zero rotation, unit scale;
+- export each area/transition independently;
+- report missing/duplicate roots, bad naming, invalid transforms and suspicious asset sizes;
+- produce a local assembled preview for QA.
+
+Do not repeatedly move roots between local and world positions to export manually.
 
 ## Shipping QA
 
-After export, assemble the **exported chunks**, not the master editor objects, at their runtime transforms:
+Reassemble **exported chunks**, not source editor objects, at runtime transforms:
 
 ```text
 Area_A01_Root                  (0,0,0)
@@ -392,42 +433,22 @@ Transition_A01_A03_RuinedWall  (36,0,0)
 
 Check:
 
-- terrain seams have no cracks, gaps or z-fighting;
-- Y/elevation continuity is preserved;
-- river banks and bridge align;
-- ruined wall/gate/rubble align;
-- no authoring world transform was baked into a GLB;
-- collision matches visible blockers and leaves bridge/gate openings walkable;
-- visual aprons hide loading boundaries from the actual portrait camera.
+- generated roads are smooth and their textures tile rather than stretch;
+- fountain ring and incoming paths look natural at game-camera distance;
+- river, bridge and banks align;
+- no z-fighting is visible;
+- no authoring guide/reference/helper ships;
+- no placement-parent transform is baked into a GLB;
+- collision still matches visible blockers;
+- visual aprons hide loading boundaries from the portrait camera;
+- repeated assets/materials have not caused unreasonable file-size growth;
+- Full/Reduced graphics modes remain within mobile performance targets.
 
-The clean re-import/Infuse assembly is QA, not the normal editing workflow.
+## Optional terrain-generator escape hatch
 
-## Runtime implications for Codex
+Gaea, ProceduralTerrains or Blender terrain workflows are **optional specialist inputs**, not the default Area 1-3 workflow.
 
-When production visuals replace blockouts, runtime needs explicit visual metadata for both area and transition chunks. Do not derive placement from GLB contents.
-
-At minimum:
-
-```text
-AREA
-id
-world root
-playable width/depth
-visual width/depth
-provider / GLB URL
-shared transition IDs
-
-TRANSITION
-connection id
-connected area IDs
-world root
-provider / GLB URL
-optional terrain ownership/crop metadata
-```
-
-Gameplay JSON/world data remains authoritative for collisions, spawns, gates and progression. Visual metadata remains a rendering/authoring concern. The terrain slicer and Three.js exporter should consume the same accepted layout data used by runtime rather than maintaining separate coordinates.
-
-`5-area-streaming.md` defines runtime residency. The terrain slicer/export tooling belongs to the later production-authoring integration, after streaming is proven.
+Use one only when the desired environment genuinely requires terrain that is difficult to express through simple ground + placed cliff/rock assets + guide-generated surfaces. If introduced later, its output should enter the same builder/chunk/export pipeline rather than creating a second runtime convention.
 
 ## Quick reference
 
@@ -441,20 +462,25 @@ Area 2:     playable 84×72, visual 96×84, root target (6,0,-72)
 Area 3:     playable 84×72, visual 96×84, root target (78,0,0)
 
 A1/A2:      Transition_A01_A02_River
-            seam Z=-36, nominal overlap 84×12
             world placement (0,0,-36)
 
 A1/A3:      Transition_A01_A03_RuinedWall
-            seam X=36, nominal overlap 12×84
             world placement (36,0,0)
 
-Terrain source:         one continuous Gaea master region
-Terrain runtime:        deterministic non-overlapping area/transition slices
-Terrain slicer:         reads authoritative world/layout metadata, no magic coordinates
-Editor source:          one assembled Three.js MASTER scene
+Editor source:          authoring/local/three-editor/infuse-world.json
+Source asset packs:     authoring/local/assets/**
+Generated previews:     authoring/generated/**
+Shipping world assets:  public/assets/world/**
+
+Editor responsibility: composition + guides + manual asset placement
+Builder responsibility: generated geometry + validation + chunk export
+Runtime responsibility: world placement + streaming + gameplay authority
+
 World editor offset:    Placement_* parent
 Shipping visual root:   ALWAYS local (0,0,0)
+Road guides:            GUIDE_ROAD_* / P_###
+Road rings:             GUIDE_ROAD_RING_*
+River guides:           GUIDE_RIVER_* / P_###
 Collision authoring:    GAMEPLAY_GUIDES / COLLIDER_* boxes
-Collision runtime:      renderer-independent, never streamed with visuals
-Final QA:               exported chunks reassembled in Infuse / clean preview
+Generated visuals:      GENERATED_*
 ```
