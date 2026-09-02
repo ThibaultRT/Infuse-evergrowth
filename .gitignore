@@ -2,3 +2,10 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Local Three.js Editor authoring workspace. These files may contain embedded
+# textures/models and are intentionally kept out of normal Git history.
+authoring/local/
+
+# Disposable outputs produced by the world-authoring builder/viewer.
+authoring/generated/
