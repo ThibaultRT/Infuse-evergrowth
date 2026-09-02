@@ -1,13 +1,17 @@
 {
   "name": "infuse-evergrowth",
   "private": true,
-  "version": "0.66.1",
+  "version": "0.67.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "validate:release": "node scripts/validate-release.mjs"
+    "validate:release": "node scripts/validate-release.mjs",
+    "authoring:build": "node scripts/world-authoring/build.mjs",
+    "authoring:promote": "node scripts/world-authoring/build.mjs --promote",
+    "authoring:validate": "node scripts/world-authoring/build.mjs --validate-only",
+    "authoring:viewer": "vite --config tools/world-authoring-viewer/vite.config.ts"
   },
   "dependencies": {
     "three": "^0.185.1"

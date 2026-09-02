@@ -55,3 +55,11 @@ Every third-party asset that reaches `public/` or is embedded in a shipping GLB 
 - `tools/world-authoring-viewer/**`: tracked local viewer tooling.
 
 See `three-editor.md` for the authoring conventions and `6-world-authoring-builder.md` for the implementation plan.
+
+## Commands
+
+Run `npm run authoring:build` to build the local Editor export, or
+`npm run authoring:build -- --fixture` for the committed smoke-test scene. Inspect
+the result with `npm run authoring:viewer`. `npm run authoring:validate` performs
+contract validation only and falls back to the fixture when the local source is
+absent. Only `npm run authoring:promote` writes validated chunks into `public/`.
