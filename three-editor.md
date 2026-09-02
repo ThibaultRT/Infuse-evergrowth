@@ -90,10 +90,10 @@ Every area has a playable envelope plus a nominal 6 m visual apron on each side.
 | Area | Theme / role | Playable target | Visual target | Local playable bounds | Local visual bounds | Proposed world root |
 | --- | --- | --- | --- | --- | --- | --- |
 | Area 1 | meadow / hub | **72 × 72 m** | **84 × 84 m** | X `-36..36`, Z `-36..36` | X `-42..42`, Z `-42..42` | `(0, 0, 0)` |
-| Area 2 | darker ashwood / river frontage | **84 × 72 m** | **96 × 84 m** | X `-42..42`, Z `-36..36` | X `-48..48`, Z `-42..42` | **target estimate** `(6, 0, -72)` |
-| Area 3 | ruined fortress | **84 × 72 m** | **96 × 84 m** | X `-42..42`, Z `-36..36` | X `-48..48`, Z `-42..42` | **target estimate** `(78, 0, 0)` |
+| Area 2 | darker ashwood / river frontage | **144 × 48 m** | **156 × 60 m** | X `-75..75`, Z `-24..24` | X `-81..81`, Z `-30..30` | `(36, 0, -60)` |
+| Area 3 | ruined fortress | **72 × 72 m** | **84 × 84 m** | X `-36..36`, Z `-36..36` | X `-42..42`, Z `-42..42` | `(72, 0, 0)` |
 
-Area 1 is the scale anchor. Area 2/3 remain production-start estimates until visually validated.
+Area 1 is the scale anchor. Area 2's west playable edge aligns with Area 1's west playable edge, and its south playable edge meets the north playable edges of Areas 1 and 3. Area 3's west playable edge meets Area 1's east playable edge. This produces a connected L-shaped playable layout with no gaps.
 
 The visual envelopes intentionally overlap. Do **not** add another 12 m empty gap between neighboring playable areas.
 
@@ -168,12 +168,12 @@ AUTHORING_WORLD
 │  ├─ GAMEPLAY_GUIDES
 │  └─ REF_Transition_84x12
 │
-├─ Placement_A02                         world (6,0,-72)
+├─ Placement_A02                         world (39,0,-60)
 │  ├─ Area_A02_Root                      local (0,0,0)
 │  ├─ AUTHORING_GUIDES
 │  ├─ GAMEPLAY_GUIDES
-│  ├─ REF_Playable_84x72
-│  └─ REF_Visual_96x84
+│  ├─ REF_Playable_150x48
+│  └─ REF_Visual_162x60
 │
 ├─ Placement_Transition_A01_A03          world (36,0,0)
 │  ├─ Transition_A01_A03_RuinedWall      local (0,0,0)
@@ -181,12 +181,12 @@ AUTHORING_WORLD
 │  ├─ GAMEPLAY_GUIDES
 │  └─ REF_Transition_12x84
 │
-└─ Placement_A03                         world (78,0,0)
+└─ Placement_A03                         world (72,0,0)
    ├─ Area_A03_Root                      local (0,0,0)
    ├─ AUTHORING_GUIDES
    ├─ GAMEPLAY_GUIDES
-   ├─ REF_Playable_84x72
-   └─ REF_Visual_96x84
+   ├─ REF_Playable_72x72
+   └─ REF_Visual_84x84
 ```
 
 Only canonical `Area_*_Root` / `Transition_*` roots and their production visual descendants become runtime GLBs.
@@ -196,7 +196,7 @@ Only canonical `Area_*_Root` / `Transition_*` roots and their production visual 
 Mandatory:
 
 ```text
-Placement_A02           position (6,0,-72)
+Placement_A02           position (39,0,-60)
 └─ Area_A02_Root        position (0,0,0)
 ```
 
@@ -425,8 +425,8 @@ Reassemble **exported chunks**, not source editor objects, at runtime transforms
 
 ```text
 Area_A01_Root                  (0,0,0)
-Area_A02_Root                  (6,0,-72)
-Area_A03_Root                  (78,0,0)
+Area_A02_Root                  (39,0,-60)
+Area_A03_Root                  (72,0,0)
 Transition_A01_A02_River       (0,0,-36)
 Transition_A01_A03_RuinedWall  (36,0,0)
 ```
@@ -458,8 +458,8 @@ Units:      1 unit = 1 meter
 Apron:      nominal 6 m per visual side
 
 Area 1:     playable 72×72, visual 84×84, root world (0,0,0)
-Area 2:     playable 84×72, visual 96×84, root target (6,0,-72)
-Area 3:     playable 84×72, visual 96×84, root target (78,0,0)
+Area 2:     playable 150×48, visual 162×60, root world (39,0,-60)
+Area 3:     playable 72×72, visual 84×84, root world (72,0,0)
 
 A1/A2:      Transition_A01_A02_River
             world placement (0,0,-36)
