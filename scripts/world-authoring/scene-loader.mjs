@@ -1,17 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import * as THREE from 'three';
-
-function rejectUnresolvedImages(document) {
-  for (const image of document.images ?? []) {
-    const url = image.url;
-    const urls = Array.isArray(url) ? url : [url];
-    for (const candidate of urls) {
-      if (typeof candidate === 'string' && /^(blob:|https?:|\.\.?\/)/i.test(candidate)) {
-        throw new Error(`Image ${image.name ?? image.uuid ?? '<unknown>'} uses unresolved URL "${candidate}". Embed the image in the Editor export.`);
-      }
-    }
-  }
-}
+import { normalizeEmbeddedImages } from './embedded-image.mjs';
 
 export async function loadEditorScene(sourcePath) {
   let text;
@@ -22,7 +11,7 @@ export async function loadEditorScene(sourcePath) {
   catch (error) { throw new Error(`Invalid JSON in ${sourcePath}: ${error.message}`); }
   const document = input.scene?.object ? input.scene : input.scene?.metadata ? input.scene : input.object ? input : null;
   if (!document?.object) throw new Error('Unsupported Three.js Editor JSON: expected a project scene or exported Object/Scene document.');
-  rejectUnresolvedImages(document);
+  normalizeEmbeddedImages(document);
   let scene;
   try { scene = new THREE.ObjectLoader().parse(document); }
   catch (error) { throw new Error(`Three.js ObjectLoader failed: ${error.message}`); }

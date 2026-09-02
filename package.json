@@ -1,7 +1,7 @@
 {
   "name": "infuse-evergrowth",
   "private": true,
-  "version": "0.67.0",
+  "version": "0.67.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,8 @@
     "authoring:viewer": "vite --config tools/world-authoring-viewer/vite.config.ts"
   },
   "dependencies": {
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0",
     "three": "^0.185.1"
   },
   "devDependencies": {

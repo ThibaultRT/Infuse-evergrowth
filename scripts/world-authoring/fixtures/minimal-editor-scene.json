@@ -6,10 +6,12 @@
     { "uuid": "geo-ring", "type": "RingGeometry", "innerRadius": 3, "outerRadius": 4, "thetaSegments": 32 }
   ],
   "materials": [
-    { "uuid": "mat-ground", "type": "MeshStandardMaterial", "color": 5219362, "side": 2 },
+    { "uuid": "mat-ground", "type": "MeshStandardMaterial", "color": 5219362, "map": "tex-ground", "side": 2 },
     { "uuid": "mat-road", "type": "MeshStandardMaterial", "color": 9138256, "side": 2 },
     { "uuid": "mat-water", "type": "MeshStandardMaterial", "color": 3381759, "transparent": true, "opacity": 0.75, "side": 2 }
   ],
+  "textures": [ { "uuid": "tex-ground", "image": "img-ground", "wrap": [1000, 1000], "repeat": [4, 4] } ],
+  "images": [ { "uuid": "img-ground", "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=" } ],
   "object": { "uuid": "scene", "type": "Scene", "name": "AUTHORING_WORLD", "children": [
     { "uuid": "place-a01", "type": "Group", "name": "Placement_A01", "children": [
       { "uuid": "root-a01", "type": "Group", "name": "Area_A01_Root", "children": [
