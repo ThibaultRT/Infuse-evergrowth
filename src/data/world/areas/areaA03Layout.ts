@@ -9,6 +9,9 @@ export const AREA_A03_LAYOUT = {
   playableSize: { width: 72, depth: 72 },
   visualSize: { width: 84, depth: 84 },
   terrain: 'cobble',
+  terrainCutouts: [
+    { name: 'A03_Mosswater_Riverbed', center: [0, -37.5], size: { width: 84, depth: 8.5 }, elevation: 0.02 },
+  ],
   roads: [
     { name: 'A03_Avenue_Main', points: [[-42, 3.6], [-20.7, 3.6], [-4.5, 5.4], [16.2, 3.6], [42, 0]], width: 6.2, material: 'cobble' },
     { name: 'A03_Avenue_North', points: [[7.2, -42], [7.2, -19.8], [-8.1, -7.2], [0, 5.4]], width: 5.2, material: 'cobble' },
@@ -30,9 +33,9 @@ export const AREA_A03_LAYOUT = {
     { name: 'A03_DungeonCorner', prop: 'ruin.dungeonCorner', position: [9, 1.05, -21.6], rotation: 0.2 },
     { name: 'A03_Crate', prop: 'prop.crateOpen', position: [9.9, 1.15, 19.8], rotation: 0.9, scale: 0.72 },
     { name: 'A03_Barrel', prop: 'prop.barrel', position: [12.6, 1.15, 21.6], rotation: 0.1, scale: 0.72 },
-    ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 4, from: [35.5, -32.5], to: [35.5, 32.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
-    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-19.5, 35.5], to: [32.5, 35.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
-    { name: 'A03_Corner_SE', prop: 'fortress.corner', position: [35.5, 1.1, 35.5], rotation: Math.PI / 2, scale: 1.1 },
+    ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 4, from: [35.5, -32.5], to: [35.5, 32.5], spacing: 6.5, elevation: 1.1, scale: 1.08, omitIndices: [1, 2, 10, 11] }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-19.5, 35.5], to: [32.5, 35.5], spacing: 6.5, elevation: 1.1, scale: 1.08, omitIndices: [8, 9] }),
+    { name: 'A03_Corner_SE', prop: 'fortress.corner', position: [35.807, 1.1, 29.645], rotation: Math.PI / 6, scale: 1.1 },
   ],
   scatters: [
     { prefix: 'A03_Rubble', props: ['ruin.rubbleHalf', 'ruin.rubbleLarge', 'nature.rockMedium1'], count: 17, bounds: { minX: -27.9, maxX: 29.7, minZ: -28.8, maxZ: 28.8 }, seed: 301, scale: [0.35, 0.78], exclusions: [{ center: [0, 5.4], radius: 13 }] },

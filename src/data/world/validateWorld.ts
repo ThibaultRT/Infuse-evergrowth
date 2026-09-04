@@ -13,6 +13,9 @@ export function validateWorldLayouts(layouts: readonly AnyWorldLayout[]): WorldV
     chunkIds.add(layout.id);
     if (layout.visualSize.width <= 0 || layout.visualSize.depth <= 0) issues.push({ severity: 'error', message: `${layout.id} has invalid visual dimensions.` });
     if (layout.kind === 'area' && (layout.playableSize.width <= 0 || layout.playableSize.depth <= 0)) issues.push({ severity: 'error', message: `${layout.id} has invalid playable dimensions.` });
+    for (const cutout of layout.terrainCutouts ?? []) {
+      if (cutout.size.width <= 0 || cutout.size.depth <= 0) issues.push({ severity: 'error', message: `${layout.id}/${cutout.name} has invalid terrain-cutout dimensions.` });
+    }
     const placements = [...layout.props, ...layout.scatters.flatMap(expandWorldScatter)];
     for (const placement of placements) {
       const qualified = `${layout.id}/${placement.name}`;

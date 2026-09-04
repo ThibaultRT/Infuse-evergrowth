@@ -11,14 +11,26 @@ function edgeFade(layout: AnyWorldLayout, x: number, z: number): number {
 export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number): number {
   if (layout.kind === 'transition') return 0;
   const ripple = (Math.sin((x + layout.origin[0]) * 0.105) * 0.08 + Math.cos((z + layout.origin[2]) * 0.085) * 0.07) * edgeFade(layout, x, z);
+  let height: number;
   if (layout.areaId === 2) {
     const northward = Math.min(1, Math.max(0, (-z + 24) / 48));
     const highland = northward * 1.45 * edgeFade(layout, x, z);
     const basin = Math.exp(-(((x + 39.6) ** 2) / 340 + ((z - 1.2) ** 2) / 30)) * 0.62;
-    return Math.max(-0.38, highland + ripple - basin);
+    height = Math.max(-0.38, highland + ripple - basin);
+  } else if (layout.areaId === 3) height = 0.85 * edgeFade(layout, x, z) + ripple * 0.65;
+  else height = ripple * 0.72;
+
+  for (const cutout of layout.terrainCutouts ?? []) {
+    const rotation = cutout.rotation ?? 0;
+    const dx = x - cutout.center[0];
+    const dz = z - cutout.center[1];
+    const localX = Math.cos(rotation) * dx - Math.sin(rotation) * dz;
+    const localZ = Math.sin(rotation) * dx + Math.cos(rotation) * dz;
+    if (Math.abs(localX) <= cutout.size.width / 2 && Math.abs(localZ) <= cutout.size.depth / 2) {
+      height = Math.min(height, cutout.elevation);
+    }
   }
-  if (layout.areaId === 3) return 0.85 * edgeFade(layout, x, z) + ripple * 0.65;
-  return ripple * 0.72;
+  return height;
 }
 
 export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Material): THREE.Mesh {

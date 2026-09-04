@@ -35,9 +35,11 @@ export const WORLD_PROP_CATALOG = {
   'ruin.scaffolding': occludingProp('ruin.scaffolding', [rectangle(4.2, 2.8)]),
   'crossing.bridgeA': prop('crossing.bridgeA'),
   'crossing.bridgeB': prop('crossing.bridgeB'),
-  'fortress.wall': prop('fortress.wall', [rectangle(5.8, 0.9)]),
-  'fortress.wallBroken': prop('fortress.wall', [rectangle(5.8, 0.9)]),
-  'fortress.gate': prop('fortress.gate', [rectangle(1.25, 1.1, [-2.35, 0]), rectangle(1.25, 1.1, [2.35, 0])]),
+  // These lengths follow the visible GLB bounds after the catalog's 7x base scale.
+  // The gate proxies cover its solid side wings while preserving the open arch.
+  'fortress.wall': prop('fortress.wall', [rectangle(14, 0.9)]),
+  'fortress.wallBroken': prop('fortress.wall', [rectangle(14, 0.9)]),
+  'fortress.gate': prop('fortress.gate', [rectangle(5.275, 1.1, [-4.3625, 0]), rectangle(5.275, 1.1, [4.3625, 0])]),
   // The normalized outside-corner pivot is asymmetric. These two local proxies
   // follow its long arms and rotate with every placement.
   'fortress.corner': prop('fortress.corner', [

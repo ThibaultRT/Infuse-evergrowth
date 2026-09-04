@@ -43,6 +43,14 @@ export type WorldSurfacePlacement = {
   readonly elevation?: number;
 };
 
+export type WorldTerrainCutout = {
+  readonly name: string;
+  readonly center: WorldVec2;
+  readonly size: WorldSize;
+  readonly rotation?: number;
+  readonly elevation: number;
+};
+
 export type ExplicitCollisionVolume = CollisionProxy & {
   readonly id: string;
   readonly activation?: CollisionActivation;
@@ -54,6 +62,7 @@ type WorldLayoutBase = {
   readonly origin: WorldVec3;
   readonly visualSize: WorldSize;
   readonly terrain: TerrainProfile;
+  readonly terrainCutouts?: readonly WorldTerrainCutout[];
   readonly roads: readonly WorldRoadPlacement[];
   readonly surfaces?: readonly WorldSurfacePlacement[];
   readonly props: readonly WorldPropPlacement[];
@@ -92,6 +101,7 @@ export type WallRunSpec = {
   readonly brokenProp?: WorldPropKey;
   readonly rotationOffset?: number;
   readonly omitIndices?: readonly number[];
+  readonly positionOverrides?: Readonly<Record<number, WorldVec2>>;
 };
 
 export function createWallRun(spec: WallRunSpec): WorldPropPlacement[] {
@@ -105,8 +115,8 @@ export function createWallRun(spec: WallRunSpec): WorldPropPlacement[] {
     const authoredIndex = index + 1;
     if (spec.omitIndices?.includes(authoredIndex)) continue;
     const progress = index / count;
-    const x = spec.from[0] + dx * progress;
-    const z = spec.from[1] + dz * progress;
+    const defaultPosition: WorldVec2 = [spec.from[0] + dx * progress, spec.from[1] + dz * progress];
+    const [x, z] = spec.positionOverrides?.[authoredIndex] ?? defaultPosition;
     if (spec.gaps?.some(({ center, radius }) => Math.hypot(x - center[0], z - center[1]) < radius)) continue;
     const prop = spec.brokenEvery && spec.brokenProp && index % spec.brokenEvery === spec.brokenEvery - 1 ? spec.brokenProp : spec.prop;
     placements.push({

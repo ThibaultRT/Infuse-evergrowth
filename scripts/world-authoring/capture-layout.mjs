@@ -113,7 +113,12 @@ function inspectDebugGlb(buffer) {
   const jsonLength = buffer.readUInt32LE(12);
   const document = JSON.parse(buffer.subarray(20, 20 + jsonLength).toString('utf8').trim());
   const names = new Set((document.nodes ?? []).map((node) => node.name).filter(Boolean));
-  const required = ['area_A01', 'area_A02', 'area_A03', 'transition_A01-A02', 'transition_A01-A03', 'transition_A02-A03', 'A03_Corner_SW'];
+  const required = [
+    'area_A01', 'area_A02', 'area_A03',
+    'transition_A01-A02', 'transition_A01-A03', 'transition_A02-A03',
+    'A03_Corner_NW', 'A03_Corner_NE', 'A03_Corner_SE', 'A03_Corner_SW',
+    'A03_WestGate', 'A03_NorthGate',
+  ];
   const missing = required.filter((name) => !names.has(name));
   if (missing.length > 0) throw new Error(`Debug GLB is missing stable nodes: ${missing.join(', ')}`);
   if (![...names].some((name) => name.startsWith('COLLIDER_'))) throw new Error('Debug GLB contains no named collision helpers.');
