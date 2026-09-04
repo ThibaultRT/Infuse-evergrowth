@@ -60,7 +60,7 @@
   "ruin.dungeonCorner": { "kind": "model", "source": "kaykit-dungeon/wall_corner.gltf", "runtime": "assets/world/shared/models/ruin-dungeon-corner.glb", "baseScale": 1, "castShadow": true },
   "ruin.rubbleHalf": { "kind": "model", "source": "kaykit-dungeon/rubble_half.gltf", "runtime": "assets/world/shared/models/ruin-rubble-half.glb", "baseScale": 1, "castShadow": true },
   "ruin.rubbleLarge": { "kind": "model", "source": "kaykit-dungeon/rubble_large.gltf", "runtime": "assets/world/shared/models/ruin-rubble-large.glb", "baseScale": 1, "castShadow": true },
-  "landmark.fountain": { "kind": "model", "source": "props/fountain-cc0.glb", "runtime": "assets/world/shared/models/landmark-fountain.glb", "baseScale": 1.45, "castShadow": true },
+  "landmark.fountain": { "kind": "model", "sourceRoot": "public", "source": "assets/models/props/fountain.glb", "runtime": "assets/models/props/fountain.glb", "fitFootprint": 6.2, "castShadow": true },
   "terrain.meadowColor": { "kind": "texture", "source": "textures/leafy_grass_diff_1k.jpg", "runtime": "assets/world/shared/textures/terrain-meadow-color.jpg" },
   "terrain.meadowNormal": { "kind": "texture", "source": "textures/leafy_grass_nor_gl_1k.jpg", "runtime": "assets/world/shared/textures/terrain-meadow-normal.jpg" },
   "terrain.forestColor": { "kind": "texture", "source": "textures/forrest_ground_01_diff_1k.jpg", "runtime": "assets/world/shared/textures/terrain-forest-color.jpg" },

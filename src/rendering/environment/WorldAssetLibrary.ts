@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { WorldAssetKey } from '../../data/world/WorldAssetKeys';
+import { fitModelToFootprint } from '../AssetLoader';
 import type { WorldAssetResolver } from './WorldVisualAssetCatalog';
 
 type LoadedModel = { readonly scene: THREE.Object3D; readonly definition: ReturnType<WorldAssetResolver['resolve']> };
@@ -25,10 +26,9 @@ export class WorldAssetLibrary {
   async instantiate(key: WorldAssetKey, name: string): Promise<THREE.Object3D> {
     try {
       const loaded = await this.loadModel(key);
-      const object = cloneSkinned(loaded.scene);
-      object.name = name;
-      object.scale.setScalar(loaded.definition.baseScale ?? 1);
-      object.traverse((child) => {
+      const content = cloneSkinned(loaded.scene);
+      content.scale.setScalar(loaded.definition.baseScale ?? 1);
+      content.traverse((child) => {
         if (!(child instanceof THREE.Mesh)) return;
         child.castShadow = loaded.definition.castShadow ?? true;
         child.receiveShadow = true;
@@ -38,7 +38,16 @@ export class WorldAssetLibrary {
           material.needsUpdate = true;
         }
       });
-      return object;
+      if (!loaded.definition.fitFootprint) {
+        content.name = name;
+        return content;
+      }
+      fitModelToFootprint(content, loaded.definition.fitFootprint);
+      content.name = `${name}_Model`;
+      const normalized = new THREE.Group();
+      normalized.name = name;
+      normalized.add(content);
+      return normalized;
     } catch (error) {
       console.warn(`World asset ${key} failed; using a visible fallback.`, error);
       const fallback = new THREE.Mesh(

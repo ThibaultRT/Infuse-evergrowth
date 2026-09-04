@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-04T03:39:18.581Z",
+  "generatedAt": "2026-09-04T06:17:16.395Z",
   "assets": [
     {
       "key": "crossing.bridgeA",
@@ -147,15 +147,16 @@
     },
     {
       "key": "landmark.fountain",
-      "source": "props/fountain-cc0.glb",
-      "runtime": "assets/world/shared/models/landmark-fountain.glb",
+      "sourceRoot": "public",
+      "source": "assets/models/props/fountain.glb",
+      "runtime": "assets/models/props/fountain.glb",
       "sourceDigest": {
-        "bytes": 85876,
-        "sha256": "0a8f2884303228dc19764684dfaba94e7de4c305916466d5f33688647122526c"
+        "bytes": 1563448,
+        "sha256": "283972d4b7a6c9dc2ac6c2f0a3bcefa820f121ed2cb2e01b1049a6e1ee741733"
       },
       "runtimeDigest": {
-        "bytes": 85876,
-        "sha256": "0a8f2884303228dc19764684dfaba94e7de4c305916466d5f33688647122526c"
+        "bytes": 1563448,
+        "sha256": "283972d4b7a6c9dc2ac6c2f0a3bcefa820f121ed2cb2e01b1049a6e1ee741733"
       }
     },
     {

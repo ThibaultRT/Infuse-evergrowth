@@ -90,6 +90,8 @@ export type WallRunSpec = {
   readonly gaps?: readonly { readonly center: WorldVec2; readonly radius: number }[];
   readonly brokenEvery?: number;
   readonly brokenProp?: WorldPropKey;
+  readonly rotationOffset?: number;
+  readonly omitIndices?: readonly number[];
 };
 
 export function createWallRun(spec: WallRunSpec): WorldPropPlacement[] {
@@ -97,16 +99,18 @@ export function createWallRun(spec: WallRunSpec): WorldPropPlacement[] {
   const dz = spec.to[1] - spec.from[1];
   const distance = Math.hypot(dx, dz);
   const count = Math.max(1, Math.floor(distance / spec.spacing));
-  const rotation = Math.atan2(dz, dx);
+  const rotation = Math.atan2(dz, dx) + (spec.rotationOffset ?? 0);
   const placements: WorldPropPlacement[] = [];
   for (let index = 0; index <= count; index += 1) {
+    const authoredIndex = index + 1;
+    if (spec.omitIndices?.includes(authoredIndex)) continue;
     const progress = index / count;
     const x = spec.from[0] + dx * progress;
     const z = spec.from[1] + dz * progress;
     if (spec.gaps?.some(({ center, radius }) => Math.hypot(x - center[0], z - center[1]) < radius)) continue;
     const prop = spec.brokenEvery && spec.brokenProp && index % spec.brokenEvery === spec.brokenEvery - 1 ? spec.brokenProp : spec.prop;
     placements.push({
-      name: `${spec.prefix}_${String(index + 1).padStart(3, '0')}`,
+      name: `${spec.prefix}_${String(authoredIndex).padStart(3, '0')}`,
       prop,
       position: [x, spec.elevation ?? 0, z],
       rotation,

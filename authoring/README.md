@@ -44,8 +44,9 @@ outside the repository.
 
 ## Runtime promotion
 
-`src/data/world/world-assets.json` maps semantic asset keys to captured source paths
-and normalized runtime filenames. Promote the active catalog with:
+`src/data/world/world-assets.json` maps semantic asset keys to captured sources or
+already-tracked project assets and their normalized runtime filenames. Promote the
+active catalog with:
 
 ```bash
 npm run authoring:assets:promote -- --all
@@ -55,6 +56,9 @@ npm run authoring:assets:verify
 Source `.gltf` dependency trees are repacked as self-contained GLBs. Only assets
 referenced by accepted layouts belong under `public/assets/world/`; the generated
 manifest records source/runtime hashes. Do not copy full packs into `public/`.
+For a project-owned asset that is already under `public/`, use
+`sourceRoot: "public"` with matching source and runtime paths. Promotion then
+records and verifies the existing file without creating a duplicate.
 
 ## Preview, validation and debug GLB
 

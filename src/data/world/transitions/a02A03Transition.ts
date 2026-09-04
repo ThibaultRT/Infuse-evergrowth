@@ -20,7 +20,7 @@ export const A02_A03_TRANSITION = {
     { name: 'A02_A03_Mosswater', kind: 'water', center: [0, -1.5], size: { width: 84, depth: 7.5 }, elevation: 0.08 },
   ],
   props: [
-    ...createWallRun({ prefix: 'A03_CurtainWall_North', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-35.5, 1.7], to: [35.5, 1.7], spacing: 6.4, elevation: 1.1, scale: 1.08, gaps: [{ center: [7.2, 1.7], radius: 4.2 }] }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_North', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-35.5, 1.7], to: [35.5, 1.7], spacing: 6.4, elevation: 1.1, scale: 1.08, rotationOffset: Math.PI, gaps: [{ center: [7.2, 1.7], radius: 4.2 }] }),
     { name: 'A02_A03_Bridge', prop: 'crossing.bridgeA', position: [7.2, 0.15, -1.5], scale: 0.76, collision: 'none' },
     { name: 'A03_NorthGate', prop: 'fortress.gate', position: [7.2, 1.1, 1.7], scale: 0.84 },
     { name: 'A03_Corner_NE', prop: 'fortress.corner', position: [35.5, 1.1, 1.7], scale: 1.1 },

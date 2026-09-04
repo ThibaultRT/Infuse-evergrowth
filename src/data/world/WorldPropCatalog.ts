@@ -7,7 +7,7 @@ export type WorldPropDefinition = {
   readonly cameraOccluder?: boolean;
 };
 
-const rectangle = (width: number, depth: number, center: readonly [number, number] = [0, 0]): CollisionProxy => ({ kind: 'rectangle', center, width, depth });
+const rectangle = (width: number, depth: number, center: readonly [number, number] = [0, 0], rotation?: number): CollisionProxy => ({ kind: 'rectangle', center, width, depth, ...(rotation === undefined ? {} : { rotation }) });
 const circle = (radius: number, center: readonly [number, number] = [0, 0]): CollisionProxy => ({ kind: 'circle', center, radius });
 const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision });
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
@@ -38,7 +38,12 @@ export const WORLD_PROP_CATALOG = {
   'fortress.wall': prop('fortress.wall', [rectangle(5.8, 0.9)]),
   'fortress.wallBroken': prop('fortress.wall', [rectangle(5.8, 0.9)]),
   'fortress.gate': prop('fortress.gate', [rectangle(1.25, 1.1, [-2.35, 0]), rectangle(1.25, 1.1, [2.35, 0])]),
-  'fortress.corner': prop('fortress.corner', [rectangle(2.0, 2.0)]),
+  // The normalized outside-corner pivot is asymmetric. These two local proxies
+  // follow its long arms and rotate with every placement.
+  'fortress.corner': prop('fortress.corner', [
+    rectangle(0.9, 8.2, [-6.3, 2.7], Math.PI / 3),
+    rectangle(12.3, 0.9, [0.35, -0.6], Math.PI / 3),
+  ]),
   'village.woodFence': prop('village.woodFence', [rectangle(5.4, 0.45)]),
   'village.woodFenceGate': prop('village.woodFenceGate', [rectangle(1.5, 0.45, [-1.9, 0]), rectangle(1.5, 0.45, [1.9, 0])]),
   'prop.barrel': prop('prop.barrel', [circle(0.48)]),

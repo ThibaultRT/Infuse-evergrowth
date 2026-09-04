@@ -16,6 +16,9 @@ export class ProductionWorldAssetResolver implements WorldAssetResolver {
 export class DevelopmentWorldAssetResolver implements WorldAssetResolver {
   resolve(key: WorldAssetKey): ResolvedWorldAsset {
     const definition = WORLD_ASSET_DEFINITIONS[key];
-    return { ...definition, key, url: `/@world-development/${definition.source}` };
+    const url = definition.sourceRoot === 'public'
+      ? `${import.meta.env.BASE_URL}${definition.source}`
+      : `/@world-development/${definition.source}`;
+    return { ...definition, key, url };
   }
 }

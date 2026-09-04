@@ -88,15 +88,26 @@ async function gltfToGlb(source, destination) {
 }
 
 async function promoteAsset(key, definition) {
-  const source = path.join(capturedAssetsRoot, definition.source);
+  const source = definition.sourceRoot === 'public'
+    ? path.join(repositoryRoot, 'public', definition.source)
+    : path.join(capturedAssetsRoot, definition.source);
   const destination = path.join(repositoryRoot, 'public', definition.runtime);
   await stat(source);
-  if (definition.kind === 'model' && path.extname(source).toLowerCase() === '.gltf') await gltfToGlb(source, destination);
-  else {
-    await mkdir(path.dirname(destination), { recursive: true });
-    await copyFile(source, destination);
+  if (path.resolve(source) !== path.resolve(destination)) {
+    if (definition.kind === 'model' && path.extname(source).toLowerCase() === '.gltf') await gltfToGlb(source, destination);
+    else {
+      await mkdir(path.dirname(destination), { recursive: true });
+      await copyFile(source, destination);
+    }
   }
-  return { key, source: definition.source, runtime: definition.runtime, sourceDigest: await digest(source), runtimeDigest: await digest(destination) };
+  return {
+    key,
+    ...(definition.sourceRoot ? { sourceRoot: definition.sourceRoot } : {}),
+    source: definition.source,
+    runtime: definition.runtime,
+    sourceDigest: await digest(source),
+    runtimeDigest: await digest(destination),
+  };
 }
 
 async function promoteLicenses() {

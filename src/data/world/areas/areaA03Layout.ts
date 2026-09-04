@@ -31,7 +31,7 @@ export const AREA_A03_LAYOUT = {
     { name: 'A03_Crate', prop: 'prop.crateOpen', position: [9.9, 1.15, 19.8], rotation: 0.9, scale: 0.72 },
     { name: 'A03_Barrel', prop: 'prop.barrel', position: [12.6, 1.15, 21.6], rotation: 0.1, scale: 0.72 },
     ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 4, from: [35.5, -32.5], to: [35.5, 32.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
-    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-32.5, 35.5], to: [32.5, 35.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-19.5, 35.5], to: [32.5, 35.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
     { name: 'A03_Corner_SE', prop: 'fortress.corner', position: [35.5, 1.1, 35.5], rotation: Math.PI / 2, scale: 1.1 },
   ],
   scatters: [

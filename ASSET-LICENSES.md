@@ -45,8 +45,9 @@ promoted filename, source SHA-256 and runtime SHA-256 are recorded in
 - Poly Haven's four accepted 1K terrain material pairs are copied with descriptive
   runtime names under `public/assets/world/shared/textures/`. Their individual
   credits and source pages are listed below.
-- The approved CC0 fountain is copied to
-  `public/assets/world/shared/models/landmark-fountain.glb`.
+- Area A01 uses the project-supplied fountain at
+  `public/assets/models/props/fountain.glb`, referenced directly by the typed world
+  asset catalog and recorded in the runtime manifest.
 
 Raw source dependency trees, reference screenshots and the complete upstream
 provenance ledger remain in the ignored, checksummed

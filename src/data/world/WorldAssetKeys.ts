@@ -4,8 +4,10 @@ export type WorldAssetKey = keyof typeof assetDefinitions;
 export type WorldAssetDefinition = {
   readonly kind: 'model' | 'texture';
   readonly source: string;
+  readonly sourceRoot?: 'captured' | 'public';
   readonly runtime: string;
   readonly baseScale?: number;
+  readonly fitFootprint?: number;
   readonly castShadow?: boolean;
 };
 
