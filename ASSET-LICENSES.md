@@ -23,7 +23,7 @@ Each supplied Standard archive contains its own Quaternius license file declarin
 
 The original source archives are intentionally not intended for the shipped web application. Keep only the selected runtime subset needed by implemented areas/features.
 
-Runtime selections and future asset work are summarized in `2-environment.md`; exact shipped files are recorded by their runtime manifests.
+Runtime selection and promotion rules are documented in `authoring/README.md`; exact shipped files are recorded by their runtime manifests.
 
 ## Typed-world runtime subset
 

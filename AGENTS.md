@@ -69,7 +69,7 @@ Use compact strict TypeScript, ES modules, and explicit return types on exported
 
 Three.js renders the world; HTML/CSS renders normal UI. iPhone 12 portrait (390×844 CSS) is the minimum reference. Preserve Full/Reduced scale, Smooth/30 FPS, saved preferences, DPR caps (Full 2; Reduced 70%), dev renderer statistics, <=20-second representative initial load, and <500 MB payload. Profile real constrained/mobile hardware; emulation is not proof. Cosmetic failures need playable fallbacks, URLs must be Vite-base-aware, and third-party provenance belongs in `ASSET-LICENSES.md`. For visible changes, inspect a mobile viewport and capture a screenshot when tooling permits.
 
-For production world changes, read `three-editor.md` and `2-environment.md` before changing dimensions, world origins, prop/collision definitions, transition chunks, or scene-loading placement. Keep exported visual roots local; derive rendering placement and compiled gameplay collision from the shared renderer-neutral world layout.
+For production world changes, read `three-editor.md` and `authoring/README.md` before changing dimensions, world origins, prop/collision definitions, transition chunks, or scene-loading placement. Keep exported visual roots local; derive rendering placement and compiled gameplay collision from the shared renderer-neutral world layout.
 
 ## Successive merged PRs
 

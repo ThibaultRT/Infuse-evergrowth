@@ -7,4 +7,4 @@ Curated runtime subset derived from the user-provided Quaternius Standard archiv
 - Textures in this runtime subset are resized to a maximum of 1024 px from the original 2K/4K PNGs for browser/mobile use.
 - Original model geometry and UVs are unchanged.
 - `animations/UAL1_Standard.glb` is the non-root-motion library because Infuse owns character movement in gameplay code.
-- See `manifest.json`, the repository `ASSET-LICENSES.md`, and `2-environment.md` for provenance and implementation direction.
+- See `manifest.json`, the repository `ASSET-LICENSES.md`, and `authoring/README.md` for provenance and world-asset workflow.

@@ -29,5 +29,5 @@ presentation counts, mixers, geometries, textures and render-buffer size. Verify
 portrait crossings in both directions, delayed-load races, context loss and Full /
 Reduced rendering modes whenever provider or asset weight changes.
 
-See `2-environment.md` for the implemented environment migration and
+See `authoring/README.md` for world-layout ownership and commands, and
 `three-editor.md` for the spatial/debug contract.
