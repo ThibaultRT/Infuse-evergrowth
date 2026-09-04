@@ -38,13 +38,12 @@ export const WORLD_PROP_CATALOG = {
   // These lengths follow the visible GLB bounds after the catalog's 7x base scale.
   // The gate proxies cover its solid side wings while preserving the open arch.
   'fortress.wall': prop('fortress.wall', [rectangle(14, 0.9)]),
-  'fortress.wallBroken': prop('fortress.wall', [rectangle(14, 0.9)]),
   'fortress.gate': prop('fortress.gate', [rectangle(5.275, 1.1, [-4.3625, 0]), rectangle(5.275, 1.1, [4.3625, 0])]),
   // The normalized outside-corner pivot is asymmetric. These two local proxies
   // follow its long arms and rotate with every placement.
   'fortress.corner': prop('fortress.corner', [
-    rectangle(0.9, 8.2, [-6.3, 2.7], Math.PI / 3),
-    rectangle(12.3, 0.9, [0.35, -0.6], Math.PI / 3),
+    rectangle(0.9, 9.8, [-5.825, 0.297], Math.PI / 3),
+    rectangle(14.84, 0.9, [0.855, -1.475], Math.PI / 3),
   ]),
   'village.woodFence': prop('village.woodFence', [rectangle(5.4, 0.45)]),
   'village.woodFenceGate': prop('village.woodFenceGate', [rectangle(1.5, 0.45, [-1.9, 0]), rectangle(1.5, 0.45, [1.9, 0])]),

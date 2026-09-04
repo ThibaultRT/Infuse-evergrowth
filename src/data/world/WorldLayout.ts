@@ -91,34 +91,44 @@ export type AnyWorldLayout = AreaWorldLayout | TransitionWorldLayout;
 export type WallRunSpec = {
   readonly prefix: string;
   readonly prop: WorldPropKey;
+  /** Physical outer boundaries of the straight span, not module centers. */
   readonly from: WorldVec2;
   readonly to: WorldVec2;
-  readonly spacing: number;
+  /** Unscaled length of the prop along its local X axis. */
+  readonly moduleLength: number;
   readonly elevation?: number;
   readonly scale?: number;
-  readonly gaps?: readonly { readonly center: WorldVec2; readonly radius: number }[];
+  readonly alignment?: 'start' | 'center' | 'end';
+  readonly startIndex?: number;
   readonly brokenEvery?: number;
   readonly brokenProp?: WorldPropKey;
   readonly rotationOffset?: number;
-  readonly omitIndices?: readonly number[];
-  readonly positionOverrides?: Readonly<Record<number, WorldVec2>>;
 };
 
 export function createWallRun(spec: WallRunSpec): WorldPropPlacement[] {
   const dx = spec.to[0] - spec.from[0];
   const dz = spec.to[1] - spec.from[1];
   const distance = Math.hypot(dx, dz);
-  const count = Math.max(1, Math.floor(distance / spec.spacing));
+  const moduleLength = spec.moduleLength * (spec.scale ?? 1);
+  if (distance <= 0) throw new RangeError(`${spec.prefix} wall run must have distinct endpoints.`);
+  if (moduleLength <= 0) throw new RangeError(`${spec.prefix} wall run must have a positive module length and scale.`);
+  const count = Math.max(1, Math.ceil(distance / moduleLength));
+  const coverage = count * moduleLength;
+  const alignmentOffset = spec.alignment === 'start'
+    ? 0
+    : spec.alignment === 'end'
+      ? distance - coverage
+      : (distance - coverage) / 2;
+  const ux = dx / distance;
+  const uz = dz / distance;
   const rotation = Math.atan2(dz, dx) + (spec.rotationOffset ?? 0);
   const placements: WorldPropPlacement[] = [];
-  for (let index = 0; index <= count; index += 1) {
-    const authoredIndex = index + 1;
-    if (spec.omitIndices?.includes(authoredIndex)) continue;
-    const progress = index / count;
-    const defaultPosition: WorldVec2 = [spec.from[0] + dx * progress, spec.from[1] + dz * progress];
-    const [x, z] = spec.positionOverrides?.[authoredIndex] ?? defaultPosition;
-    if (spec.gaps?.some(({ center, radius }) => Math.hypot(x - center[0], z - center[1]) < radius)) continue;
-    const prop = spec.brokenEvery && spec.brokenProp && index % spec.brokenEvery === spec.brokenEvery - 1 ? spec.brokenProp : spec.prop;
+  for (let index = 0; index < count; index += 1) {
+    const authoredIndex = (spec.startIndex ?? 1) + index;
+    const centerOffset = alignmentOffset + (index + 0.5) * moduleLength;
+    const x = spec.from[0] + ux * centerOffset;
+    const z = spec.from[1] + uz * centerOffset;
+    const prop = spec.brokenEvery && spec.brokenProp && authoredIndex % spec.brokenEvery === 0 ? spec.brokenProp : spec.prop;
     placements.push({
       name: `${spec.prefix}_${String(authoredIndex).padStart(3, '0')}`,
       prop,

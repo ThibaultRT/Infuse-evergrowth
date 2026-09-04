@@ -16,12 +16,12 @@ export const A01_A03_TRANSITION = {
     { name: 'A01_A03_GateRoad', points: [[-6, 3.6], [0, 3.6], [6, 3.6]], width: 6.2, material: 'cobble' },
   ],
   props: [
-    // At these render scales, wall and gate half-lengths are 7.56 m and 5.88 m;
-    // the adjacent overrides make their visible ends tangent instead of overlapping.
-    ...createWallRun({ prefix: 'A03_CurtainWall_West', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 4, from: [0, -35.5], to: [0, 35.5], spacing: 6.4, elevation: 1.1, scale: 1.08, rotationOffset: -Math.PI, omitIndices: [1, 2, 6, 8, 11, 12], positionOverrides: { 5: [0, -9.84], 9: [0, 17.04] }, gaps: [{ center: [0, 3.6], radius: 4.2 }] }),
+    // The gate's visible outer faces are z=-2.28 and z=9.48 at scale 0.84.
+    ...createWallRun({ prefix: 'A03_CurtainWall_West', prop: 'fortress.wall', from: [0, -18.4], to: [0, -2.28], moduleLength: 14, elevation: 1.1, scale: 1.153, alignment: 'end', rotationOffset: -Math.PI }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_West', prop: 'fortress.wall', from: [0, 9.48], to: [0, 25.03], moduleLength: 14, elevation: 1.1, scale: 1.111, alignment: 'start', startIndex: 2, rotationOffset: -Math.PI }),
     { name: 'A03_WestGate', prop: 'fortress.gate', position: [0, 1.1, 3.6], rotation: Math.PI / 2, scale: 0.84 },
     { name: 'A03_Corner_NW', prop: 'fortress.corner', position: [-0.307, 1.1, -28.445], rotation: 7 * Math.PI / 6, scale: 1.1 },
-    { name: 'A03_Corner_SW', prop: 'fortress.corner', position: [5.855, 1.1, 35.807], rotation: 5 * Math.PI / 3, scale: 1.1 },
+    { name: 'A03_Corner_SW', prop: 'fortress.corner', position: [3.486, 1.1, 35.807], rotation: 5 * Math.PI / 3, scale: 1.1 },
   ],
   scatters: [],
   collision: [

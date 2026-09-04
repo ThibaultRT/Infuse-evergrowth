@@ -91,17 +91,33 @@ try {
   const keep = config.AREAS.find((area) => area.id === 3);
   check(Boolean(keep), 'Area 3 is missing.');
   if (keep) {
-    for (let offset = -35.5; offset <= 35.5; offset += 1) {
-      const samples = [
-        { side: 'west', point: { x: 36, z: offset }, gate: Math.abs(offset - 3.6) < 3.4 },
-        { side: 'east', point: { x: 107.5, z: offset }, gate: false },
-        { side: 'north', point: { x: 72 + offset, z: -35.5 }, gate: Math.abs(offset - 7.2) < 3.4 },
-        { side: 'south', point: { x: 72 + offset, z: 35.5 }, gate: false },
-      ];
-      for (const sample of samples) {
-        if (sample.gate) continue;
-        check(keep.collision.some((shape) => !shape.activation && collisionMath.circleOverlapsWorldCollision(sample.point, 0.45, shape)), `Area 3 perimeter gap at ${sample.side}:${offset}.`);
+    const straightSpans = [
+      { side: 'west', from: -18.4, to: 25.03, point: (offset) => ({ x: 36, z: offset }), gate: (offset) => Math.abs(offset - 3.6) < 5.9 },
+      { side: 'east', from: -23.8, to: 19.6, point: (offset) => ({ x: 107.5, z: offset }) },
+      { side: 'north', from: -25.8, to: 19.6, point: (offset) => ({ x: 72 + offset, z: -34.3 }), gate: (offset) => Math.abs(offset - 7.2) < 5.9 },
+      { side: 'south', from: -22.5, to: 25, point: (offset) => ({ x: 72 + offset, z: 35.5 }) },
+    ];
+    for (const span of straightSpans) {
+      for (let offset = span.from; offset <= span.to; offset += 0.5) {
+        if (span.gate?.(offset)) continue;
+        check(keep.collision.some((shape) => !shape.activation && collisionMath.circleOverlapsWorldCollision(span.point(offset), 0.45, shape)), `Area 3 perimeter gap at ${span.side}:${offset}.`);
       }
+    }
+    const wallColliders = compiled.all.filter((shape) => shape.kind === 'rectangle' && shape.sourcePlacementName?.startsWith('A03_CurtainWall_'));
+    check(wallColliders.length === 12, `Expected 12 dimension-derived A03 wall modules, found ${wallColliders.length}.`);
+    for (const side of ['West', 'North', 'East', 'South']) {
+      const sideColliders = wallColliders.filter((shape) => shape.sourcePlacementName?.startsWith(`A03_CurtainWall_${side}_`));
+      for (let left = 0; left < sideColliders.length; left += 1) {
+        for (let right = left + 1; right < sideColliders.length; right += 1) {
+          const first = sideColliders[left];
+          const second = sideColliders[right];
+          const separation = Math.hypot(first.x - second.x, first.z - second.z);
+          check(separation + 1e-6 >= (first.width + second.width) / 2, `${first.sourcePlacementName} overlaps ${second.sourcePlacementName}.`);
+        }
+      }
+    }
+    for (const corner of ['NW', 'NE', 'SE', 'SW']) {
+      check(compiled.all.filter((shape) => shape.sourcePlacementName === `A03_Corner_${corner}`).length === 2, `A03_Corner_${corner} must retain both asset-level collision arms.`);
     }
   }
 

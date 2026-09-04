@@ -33,8 +33,8 @@ export const AREA_A03_LAYOUT = {
     { name: 'A03_DungeonCorner', prop: 'ruin.dungeonCorner', position: [9, 1.05, -21.6], rotation: 0.2 },
     { name: 'A03_Crate', prop: 'prop.crateOpen', position: [9.9, 1.15, 19.8], rotation: 0.9, scale: 0.72 },
     { name: 'A03_Barrel', prop: 'prop.barrel', position: [12.6, 1.15, 21.6], rotation: 0.1, scale: 0.72 },
-    ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 4, from: [35.5, -32.5], to: [35.5, 32.5], spacing: 6.5, elevation: 1.1, scale: 1.08, omitIndices: [1, 2, 10, 11] }),
-    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-19.5, 35.5], to: [32.5, 35.5], spacing: 6.5, elevation: 1.1, scale: 1.08, omitIndices: [8, 9] }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'fortress.wall', from: [35.5, -23.8], to: [35.5, 19.6], moduleLength: 14, elevation: 1.1, scale: 1.08 }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', from: [-22.5, 35.5], to: [25, 35.5], moduleLength: 14, elevation: 1.1, scale: 1.08 }),
     { name: 'A03_Corner_SE', prop: 'fortress.corner', position: [35.807, 1.1, 29.645], rotation: Math.PI / 6, scale: 1.1 },
   ],
   scatters: [

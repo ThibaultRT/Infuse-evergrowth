@@ -20,9 +20,9 @@ export const A02_A03_TRANSITION = {
     { name: 'A02_A03_Mosswater', kind: 'water', center: [0, -1.5], size: { width: 84, depth: 7.5 }, elevation: 0.08 },
   ],
   props: [
-    // Gate-adjacent wall centers use the measured 7.56 m wall and 5.88 m gate
-    // half-lengths, keeping the arch clear without opening the perimeter.
-    ...createWallRun({ prefix: 'A03_CurtainWall_North', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-35.5, 1.7], to: [35.5, 1.7], spacing: 6.4, elevation: 1.1, scale: 1.08, rotationOffset: Math.PI, omitIndices: [1, 2, 11, 12], positionOverrides: { 6: [-6.24, 1.7], 9: [20.64, 1.7] }, gaps: [{ center: [7.2, 1.7], radius: 4.2 }] }),
+    // The gate's visible outer faces are x=1.32 and x=13.08 at scale 0.84.
+    ...createWallRun({ prefix: 'A03_CurtainWall_North', prop: 'fortress.wall', from: [-25.8, 1.7], to: [1.32, 1.7], moduleLength: 14, elevation: 1.1, scale: 1.08, alignment: 'end', startIndex: 1, rotationOffset: Math.PI }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_North', prop: 'fortress.wall', from: [13.08, 1.7], to: [19.6, 1.7], moduleLength: 14, elevation: 1.1, scale: 1.08, alignment: 'start', startIndex: 3, rotationOffset: Math.PI }),
     { name: 'A02_A03_Bridge', prop: 'crossing.bridgeA', position: [7.2, 0.15, -1.5], scale: 0.76, collision: 'none' },
     { name: 'A03_NorthGate', prop: 'fortress.gate', position: [7.2, 1.1, 1.7], scale: 0.84 },
     { name: 'A03_Corner_NE', prop: 'fortress.corner', position: [29.645, 1.1, 1.393], rotation: 2 * Math.PI / 3, scale: 1.1 },

@@ -88,10 +88,12 @@ inspection in Three.js Editor or other glTF tools and never ships as the runtime
 world. If `A03_Corner_SW` needs a 90-degree rotation, change that named entry in its
 typed layout and regenerate; edits made inside the debug GLB do not round-trip.
 
-Wall runs may use one-based `omitIndices` and `positionOverrides` to preserve
-stable debug names while trimming joins around gates and corners. Area layouts may
-use named `terrainCutouts` to lower overlapping terrain beneath a shared water
-surface without changing the river or bridge elevation.
+Wall runs use physical `from`/`to` boundaries plus the unscaled GLB
+`moduleLength`. The generator applies placement scale, derives the required count,
+and aligns modules edge-to-edge; split runs can align directly to either side of a
+gate while `startIndex` keeps stable sequential debug names. Area layouts may use
+named `terrainCutouts` to lower overlapping terrain beneath a shared water surface
+without changing the river or bridge elevation.
 
 ## Ownership
 
