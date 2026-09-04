@@ -104,9 +104,11 @@ try {
       }
     }
     const wallColliders = compiled.all.filter((shape) => shape.kind === 'rectangle' && shape.sourcePlacementName?.startsWith('A03_CurtainWall_'));
-    check(wallColliders.length === 12, `Expected 12 dimension-derived A03 wall modules, found ${wallColliders.length}.`);
-    for (const side of ['West', 'North', 'East', 'South']) {
+    const expectedWallModules = new Map([['West', 4], ['North', 3], ['East', 4], ['South', 4]]);
+    check(wallColliders.length === 15, `Expected 15 authored A03 wall modules, found ${wallColliders.length}.`);
+    for (const [side, expectedCount] of expectedWallModules) {
       const sideColliders = wallColliders.filter((shape) => shape.sourcePlacementName?.startsWith(`A03_CurtainWall_${side}_`));
+      check(sideColliders.length === expectedCount, `Expected ${expectedCount} A03 ${side.toLowerCase()} wall modules, found ${sideColliders.length}.`);
       for (let left = 0; left < sideColliders.length; left += 1) {
         for (let right = left + 1; right < sideColliders.length; right += 1) {
           const first = sideColliders[left];
