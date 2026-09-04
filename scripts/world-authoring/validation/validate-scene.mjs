@@ -1,3 +1,0 @@
-export function isAuthoringOnly(object) { return object.name === 'AUTHORING_GUIDES' || object.name === 'GAMEPLAY_GUIDES' || object.name === 'STYLE' || object.name.startsWith('GUIDE_') || object.name.startsWith('REF_') || /^P_/.test(object.name) || object.name.startsWith('Placement_') || ((object.isCamera||object.isLight||object.isHelper)&&!object.name.startsWith('PRODUCTION_')); }
-export function stripAuthoringObjects(root) { let count=0; for(const child of [...root.children]) { if(isAuthoringOnly(child)){root.remove(child);count++;} else count+=stripAuthoringObjects(child); } return count; }
-export function findAuthoringObjects(root) { const found=[]; root.traverse(o=>{if(o!==root&&isAuthoringOnly(o))found.push(o.name||o.type);}); return found; }

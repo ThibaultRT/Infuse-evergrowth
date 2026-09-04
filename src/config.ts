@@ -3,10 +3,13 @@ import area1 from './data/areas/area-1.json';
 import area2 from './data/areas/area-2.json';
 import area3 from './data/areas/area-3.json';
 import connections from './data/areas/connections.json';
+import { AREA_WORLD_LAYOUTS, TRANSITION_WORLD_LAYOUTS, WORLD_LAYOUTS } from './data/world';
+import { compileWorldCollision } from './domain/world/WorldCollisionCompiler';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, Tier, TierConfig, WorldConnection } from './types';
 
 const tierBalance = balance.enemy.tiers;
 const areaData = { areas: [area1, area2, area3], connections };
+const compiledCollision = compileWorldCollision(WORLD_LAYOUTS);
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
 const tierConfig = (tier: Tier): TierConfig => {
   const source = tierBalance[tier];
@@ -29,39 +32,57 @@ export const TIER_CONFIG: Record<Tier, TierConfig> = {
 };
 
 export const AREAS: AreaDefinition[] = areaData.areas.map((area) => ({
+  ...(() => {
+    const layout = AREA_WORLD_LAYOUTS.find((candidate) => candidate.areaId === area.id);
+    if (!layout) throw new Error(`Missing world layout for area ${area.id}`);
+    return {
+      originX: layout.origin[0],
+      originZ: layout.origin[2],
+      size: layout.playableSize,
+      collision: [...(compiledCollision.byAreaId[area.id] ?? [])],
+    };
+  })(),
   id: area.id,
   name: area.name,
-  originX: area.worldOrigin.x,
-  originZ: area.worldOrigin.z,
   bossSpawnId: area.bossSpawnId,
   enemyWeapon: area.enemyWeapon as CombatAffinity,
   enemyWeakness: area.enemyWeakness as CombatAffinity,
   environmentTheme: area.environmentTheme,
-  size: area.size,
-  collision: (('collision' in area ? area.collision : []) as AreaDefinition['collision']).map((shape) => ({ ...shape, x: area.worldOrigin.x + shape.x, z: area.worldOrigin.z + shape.z }))
 }));
 
 export const SPAWNS: SpawnDefinition[] = areaData.areas.flatMap((area) =>
-  area.spawns.map((spawn) => ({
+  area.spawns.map((spawn) => {
+    const layout = AREA_WORLD_LAYOUTS.find((candidate) => candidate.areaId === area.id);
+    if (!layout) throw new Error(`Missing world layout for area ${area.id}`);
+    return ({
     id: spawn.id,
     tier: spawn.tier as Tier,
     areaId: area.id,
-    x: area.worldOrigin.x + spawn.x,
-    z: area.worldOrigin.z + spawn.z,
+    x: layout.origin[0] + spawn.x,
+    z: layout.origin[2] + spawn.z,
     hp: spawn.hp,
     rewards: spawn.rewards as SpawnDefinition['rewards'],
     attackDamage: spawn.attackDamage,
     ...(spawn.isBoss ? { isBoss: true } : {}),
     ...(spawn.group ? { group: spawn.group } : {}),
     ...('enemyWeakness' in spawn ? { enemyWeakness: spawn.enemyWeakness as CombatAffinity | null } : {})
-  }))
+    });
+  })
 );
 
-export const WORLD_CONNECTIONS: WorldConnection[] = areaData.connections.map((connection) => ({
-  ...connection,
-  axis: connection.axis as 'x' | 'z',
-  visualStyle: connection.visualStyle as WorldConnection['visualStyle']
-}));
+export const WORLD_CONNECTIONS: WorldConnection[] = areaData.connections.map((connection) => {
+  const layout = TRANSITION_WORLD_LAYOUTS.find((candidate) => candidate.connectionId === connection.id);
+  if (!layout) throw new Error(`Missing world layout for connection ${connection.id}`);
+  return {
+    ...connection,
+    x: layout.origin[0] + (layout.axis === 'z' ? layout.crossingCenter : 0),
+    z: layout.origin[2] + (layout.axis === 'x' ? layout.crossingCenter : 0),
+    axis: layout.axis,
+    width: layout.crossingWidth,
+    ...('barrierDepth' in layout && layout.barrierDepth ? { barrierDepth: layout.barrierDepth } : {}),
+    visualStyle: connection.visualStyle as WorldConnection['visualStyle'],
+  };
+});
 
 export function areaById(areaId: number): AreaDefinition {
   return AREAS.find((area) => area.id === areaId) ?? AREAS[0];

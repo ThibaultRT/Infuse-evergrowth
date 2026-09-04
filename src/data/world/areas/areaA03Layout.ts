@@ -1,0 +1,43 @@
+import { createWallRun, type AreaWorldLayout } from '../WorldLayout';
+
+export const AREA_A03_LAYOUT = {
+  kind: 'area',
+  id: 'area:A03',
+  areaId: 3,
+  name: 'The Fallen Keep — Citadel of Ash',
+  origin: [72, 0, 0],
+  playableSize: { width: 72, depth: 72 },
+  visualSize: { width: 84, depth: 84 },
+  terrain: 'cobble',
+  roads: [
+    { name: 'A03_Avenue_Main', points: [[-42, 3.6], [-20.7, 3.6], [-4.5, 5.4], [16.2, 3.6], [42, 0]], width: 6.2, material: 'cobble' },
+    { name: 'A03_Avenue_North', points: [[7.2, -42], [7.2, -19.8], [-8.1, -7.2], [0, 5.4]], width: 5.2, material: 'cobble' },
+  ],
+  props: [
+    { name: 'A03_Castle_Ruined', prop: 'keep.castleRed', position: [19.8, 1.1, -21.6], rotation: -2.35, scale: 1.18 },
+    { name: 'A03_Chapel_Ruin', prop: 'ruin.destroyed', position: [-4.5, 1.1, -14.4], rotation: 2.9, scale: 2.2 },
+    { name: 'A03_Scaffolding', prop: 'ruin.scaffolding', position: [3.6, 1.2, -17.1], rotation: -2.1, scale: 0.86 },
+    { name: 'A03_Ruined_House_West', prop: 'keep.homeRedA', position: [-18.9, 1.0, 19.8], rotation: 2.2 },
+    { name: 'A03_Ruined_House_East', prop: 'keep.homeRedB', position: [19.8, 1.0, 13.5], rotation: -0.9, scale: 1.08 },
+    { name: 'A03_Barracks', prop: 'keep.barracksRed', position: [0.9, 1.0, 24.3], rotation: 0.2, scale: 1.12 },
+    { name: 'A03_Tower_Northeast', prop: 'keep.towerRedA', position: [28.8, 1.0, -9], rotation: -1.25, scale: 1.08 },
+    { name: 'A03_Tower_Southeast', prop: 'keep.towerRedB', position: [27, 1.0, 27], rotation: -0.8, scale: 1.16 },
+    { name: 'A03_Rubble_01', prop: 'ruin.rubbleLarge', position: [-8.1, 1.1, -5.4], rotation: 0.4, scale: 1.15 },
+    { name: 'A03_Rubble_02', prop: 'ruin.rubbleHalf', position: [8.1, 1.1, 14.4], rotation: -0.7, scale: 1.08 },
+    { name: 'A03_Rubble_03', prop: 'ruin.rubbleLarge', position: [15.3, 1.1, -2.7], rotation: 1.3, scale: 0.92 },
+    { name: 'A03_DungeonWall_01', prop: 'ruin.dungeonWallBroken', position: [-9.9, 1.05, -20.7], rotation: 0.1, scale: 1.1 },
+    { name: 'A03_DungeonWall_02', prop: 'ruin.dungeonWallCracked', position: [1.8, 1.05, -24.3], rotation: 0.15, scale: 1.05 },
+    { name: 'A03_DungeonCorner', prop: 'ruin.dungeonCorner', position: [9, 1.05, -21.6], rotation: 0.2 },
+    { name: 'A03_Crate', prop: 'prop.crateOpen', position: [9.9, 1.15, 19.8], rotation: 0.9, scale: 0.72 },
+    { name: 'A03_Barrel', prop: 'prop.barrel', position: [12.6, 1.15, 21.6], rotation: 0.1, scale: 0.72 },
+    ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 4, from: [35.5, -32.5], to: [35.5, 32.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'fortress.wall', brokenProp: 'fortress.wallBroken', brokenEvery: 5, from: [-32.5, 35.5], to: [32.5, 35.5], spacing: 6.5, elevation: 1.1, scale: 1.08 }),
+    { name: 'A03_Corner_SE', prop: 'fortress.corner', position: [35.5, 1.1, 35.5], rotation: Math.PI / 2, scale: 1.1 },
+  ],
+  scatters: [
+    { prefix: 'A03_Rubble', props: ['ruin.rubbleHalf', 'ruin.rubbleLarge', 'nature.rockMedium1'], count: 17, bounds: { minX: -27.9, maxX: 29.7, minZ: -28.8, maxZ: 28.8 }, seed: 301, scale: [0.35, 0.78], exclusions: [{ center: [0, 5.4], radius: 13 }] },
+    { prefix: 'A03_Bush', props: ['nature.flowerBush', 'nature.grassTuft'], count: 18, bounds: { minX: -30.6, maxX: 31.5, minZ: -30.6, maxZ: 30.6 }, seed: 302, scale: [0.58, 0.98], exclusions: [{ center: [0, 5.4], radius: 12 }] },
+    { prefix: 'A03_Tree', props: ['nature.pineA', 'nature.pineB', 'nature.treeCommon3'], count: 13, bounds: { minX: -33.3, maxX: 33.3, minZ: -33.3, maxZ: 33.3 }, seed: 303, scale: [0.82, 1.14], exclusions: [{ center: [0, 4.5], radius: 25 }] },
+  ],
+  collision: [],
+} as const satisfies AreaWorldLayout;

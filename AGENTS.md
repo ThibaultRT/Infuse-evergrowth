@@ -49,7 +49,10 @@ Model state is authoritative; systems change it; views project it. Cross-system 
 - The held weapon and three orbit weapons are independently scheduled. Equipped weapons use weapon damage plus the persistent stat of the same type—no extra bare-hand term.
 - Hero affinity modifies outgoing hero damage. Enemy damage ignores affinity and is reduced by matching equipped defense.
 - All progression is persisted. Save-shape changes require type, normalization, migration, version, and storage-key updates without discarding supported progression.
-- Authored collision and gameplay positions stay renderer-independent. DOM world labels must track life and visibility.
+- Authored collision and gameplay positions stay renderer-independent. Shared typed
+  world placements may generate collision from semantic prop proxies, but never from
+  loaded meshes or GLB bounds; structural transforms must not be copied into a
+  parallel collision list. DOM world labels must track life and visibility.
 
 ## Feature workflow
 
@@ -60,13 +63,13 @@ Model state is authoritative; systems change it; views project it. Cross-system 
 5. Project state in rendering/UI.
 6. Keep `Game.ts` limited to composition and ordering.
 
-Use compact strict TypeScript, ES modules, and explicit return types on exported functions. Never wrap imports in `try`/`catch`. Put global tuning in `balance.json` and world/spawn content in one JSON per area under `src/data/areas/`. Add every queried UI element to exported `ui`; HUD controls need `pointer-events: auto`.
+Use compact strict TypeScript, ES modules, and explicit return types on exported functions. Never wrap imports in `try`/`catch`. Put global tuning in `balance.json` and keep spawn/enemy/reward content in one JSON per area under `src/data/areas/`. Shared renderer-neutral dimensions, named placements, semantic prop definitions and collision proxies belong under `src/data/world/`; both collision compilation and rendering consume them without importing Three.js into data/domain code. Add every queried UI element to exported `ui`; HUD controls need `pointer-events: auto`.
 
 ## Graphics and assets
 
 Three.js renders the world; HTML/CSS renders normal UI. iPhone 12 portrait (390×844 CSS) is the minimum reference. Preserve Full/Reduced scale, Smooth/30 FPS, saved preferences, DPR caps (Full 2; Reduced 70%), dev renderer statistics, <=20-second representative initial load, and <500 MB payload. Profile real constrained/mobile hardware; emulation is not proof. Cosmetic failures need playable fallbacks, URLs must be Vite-base-aware, and third-party provenance belongs in `ASSET-LICENSES.md`. For visible changes, inspect a mobile viewport and capture a screenshot when tooling permits.
 
-For production Gaea/Three.js Editor area imports, read `three-editor.md` before changing visual dimensions, world origins, transition chunks, or scene-loading placement. Keep exported area roots local and let the rendering layer apply explicit world transforms.
+For production world changes, read `three-editor.md` and `2-environment.md` before changing dimensions, world origins, prop/collision definitions, transition chunks, or scene-loading placement. Keep exported visual roots local; derive rendering placement and compiled gameplay collision from the shared renderer-neutral world layout.
 
 ## Successive merged PRs
 

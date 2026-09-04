@@ -27,8 +27,6 @@ import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
 import { EQUIPMENT_BY_ID, attackProfile, equipmentCombatSummary, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
-import { EnvironmentView, prefetchEnvironmentDetails } from '../rendering/EnvironmentView';
-import { TransitionView, prefetchTransitionDetails } from '../rendering/TransitionView';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
@@ -43,6 +41,12 @@ import { browserClock } from './PlatformAdapters';
 import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
 import { WorldVisualStreamingManager, type VisualChunkProvider } from '../rendering/environment/WorldVisualStreamingManager';
+import { WORLD_LAYOUTS } from '../data/world';
+import { WorldAssetLibrary } from '../rendering/environment/WorldAssetLibrary';
+import { ProductionWorldAssetResolver } from '../rendering/environment/WorldVisualAssetCatalog';
+import { createWorldMaterials } from '../rendering/environment/WorldMaterials';
+import { WorldBuilder, type WorldChunkView } from '../rendering/environment/WorldBuilder';
+import { createLayoutVisualProvider } from '../rendering/environment/LayoutVisualProvider';
 
 export class Game {
   private started = false;
@@ -352,7 +356,7 @@ const entities = SPAWNS.map((spawn) => new SpawnEntity(spawn));
 
 class GateEntity {
   readonly position: THREE.Vector3;
-  private view: TransitionView | null = null;
+  private view: WorldChunkView | null = null;
   open: boolean;
 
   constructor(readonly def: WorldConnection) {
@@ -360,12 +364,12 @@ class GateEntity {
     this.open = save.unlockedAreas.includes(def.requiredUnlockedAreaId);
   }
 
-  attachView(view: TransitionView): void {
+  attachView(view: WorldChunkView): void {
     this.view = view;
     view.setOpen(this.open);
   }
 
-  detachView(view: TransitionView): void {
+  detachView(view: WorldChunkView): void {
     if (this.view === view) this.view = null;
   }
 
@@ -379,30 +383,15 @@ class GateEntity {
 
 const gateEntities = WORLD_CONNECTIONS.map((gate) => new GateEntity(gate));
 
-const visualProviders: VisualChunkProvider[] = [
-  ...AREAS.map((area): VisualChunkProvider => ({
-    id: `area:${area.id}`,
-    kind: 'area',
-    prefetch: () => prefetchEnvironmentDetails(area),
-    create: () => {
-      const view = new EnvironmentView(area);
-      return { root: view.root, dispose: () => view.dispose() };
-    }
-  })),
-  ...gateEntities.map((gate): VisualChunkProvider => ({
-    id: `transition:${gate.def.id}`,
-    kind: 'transition',
-    prefetch: () => prefetchTransitionDetails(gate.def),
-    create: () => {
-      const view = new TransitionView(gate.def);
-      gate.attachView(view);
-      return {
-        root: view.root,
-        dispose: () => { gate.detachView(view); view.dispose(); }
-      };
-    }
-  }))
-];
+const worldAssetLibrary = new WorldAssetLibrary(new ProductionWorldAssetResolver());
+const worldBuilder = createWorldMaterials(worldAssetLibrary).then((materials) => new WorldBuilder(worldAssetLibrary, materials));
+const visualProviders: VisualChunkProvider[] = WORLD_LAYOUTS.map((layout) => {
+  const gate = layout.kind === 'transition' ? gateEntities.find((candidate) => candidate.def.id === layout.connectionId) : undefined;
+  return createLayoutVisualProvider(layout, worldBuilder, {
+    onCreated: (view) => gate?.attachView(view),
+    onDisposed: (view) => gate?.detachView(view),
+  });
+});
 const visualStreaming = new WorldVisualStreamingManager(
   scene, AREAS, WORLD_CONNECTIONS, visualProviders, VISUAL_STREAMING,
   (root) => environmentOcclusion.register(root),
@@ -886,7 +875,7 @@ function frame(now: number): void {
       const mountedAreas = [...visualResidency.mountedAreaIds].sort().join(', ') || 'none';
       const mountedTransitions = [...visualResidency.mountedTransitionIds].sort().join(', ') || 'none';
       const activeEnemies = entities.filter((entity) => entity.presentationActive).length;
-      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\narea ${currentAreaId} · visuals ${mountedAreas}\ntransitions ${mountedTransitions}\nloading ${visualResidency.pendingIds.join(', ') || 'none'}\n${activeEnemies} enemy presentations · ${activeMixers} mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${environmentOcclusion.diagnostic}\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
+      ui.rendererStats.textContent = `${Math.round(statsFrames * 1000 / elapsed)} FPS\n${info.calls} calls · ${info.triangles.toLocaleString()} triangles\narea ${currentAreaId} · hero ${gameplay.hero.position.x.toFixed(1)}, ${gameplay.hero.position.z.toFixed(1)}\nvisuals ${mountedAreas}\ntransitions ${mountedTransitions}\nloading ${visualResidency.pendingIds.join(', ') || 'none'}\n${activeEnemies} enemy presentations · ${activeMixers} mixers\n${renderer.info.memory.geometries} geometries · ${renderer.info.memory.textures} textures\n${environmentOcclusion.diagnostic}\n${renderer.domElement.width}×${renderer.domElement.height} buffer`;
       statsFrames = 0;
       statsStartedAt = now;
     }

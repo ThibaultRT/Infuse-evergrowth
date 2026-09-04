@@ -4,17 +4,13 @@
   "environmentTheme": "ruined-fortress",
   "enemyWeapon": "pierce",
   "enemyWeakness": "blunt",
-  "worldOrigin": {
-    "x": 38,
-    "z": 0
-  },
   "bossSpawnId": "area3-epic-01",
   "spawns": [
     {
       "id": "area3-crystal-01",
       "tier": "crystal",
-      "x": -15,
-      "z": 18,
+      "x": -23.25,
+      "z": 20.7,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -41,8 +37,8 @@
     {
       "id": "area3-crystal-02",
       "tier": "crystal",
-      "x": -11,
-      "z": 18,
+      "x": -25,
+      "z": 25,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -69,8 +65,8 @@
     {
       "id": "area3-crystal-03",
       "tier": "crystal",
-      "x": -7,
-      "z": 18,
+      "x": -10.85,
+      "z": 20.7,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -97,8 +93,8 @@
     {
       "id": "area3-crystal-04",
       "tier": "crystal",
-      "x": -14,
-      "z": 14,
+      "x": -21.7,
+      "z": 16.1,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -125,8 +121,8 @@
     {
       "id": "area3-crystal-05",
       "tier": "crystal",
-      "x": -10,
-      "z": 14,
+      "x": -15.5,
+      "z": 16.1,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -153,8 +149,8 @@
     {
       "id": "area3-crystal-06",
       "tier": "crystal",
-      "x": -6,
-      "z": 14,
+      "x": -9.3,
+      "z": 16.1,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -181,8 +177,8 @@
     {
       "id": "area3-crystal-07",
       "tier": "crystal",
-      "x": 6,
-      "z": 17,
+      "x": 17,
+      "z": 25,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -209,8 +205,8 @@
     {
       "id": "area3-crystal-08",
       "tier": "crystal",
-      "x": 10,
-      "z": 18,
+      "x": 15.5,
+      "z": 20.7,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -237,8 +233,8 @@
     {
       "id": "area3-crystal-09",
       "tier": "crystal",
-      "x": 14,
-      "z": 17,
+      "x": 21.7,
+      "z": 19.55,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -265,8 +261,8 @@
     {
       "id": "area3-crystal-10",
       "tier": "crystal",
-      "x": 6,
-      "z": 12,
+      "x": 13,
+      "z": 8,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -293,8 +289,8 @@
     {
       "id": "area3-crystal-11",
       "tier": "crystal",
-      "x": 10,
-      "z": 13,
+      "x": 15.5,
+      "z": 14.95,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -321,8 +317,8 @@
     {
       "id": "area3-crystal-12",
       "tier": "crystal",
-      "x": 14,
-      "z": 12,
+      "x": 26,
+      "z": 10,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -349,8 +345,8 @@
     {
       "id": "area3-crystal-13",
       "tier": "crystal",
-      "x": -15,
-      "z": -2,
+      "x": -23.25,
+      "z": -2.3,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -377,8 +373,8 @@
     {
       "id": "area3-crystal-14",
       "tier": "crystal",
-      "x": -12,
-      "z": -3,
+      "x": -18.6,
+      "z": -3.45,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -405,8 +401,8 @@
     {
       "id": "area3-crystal-15",
       "tier": "crystal",
-      "x": -9,
-      "z": -2,
+      "x": -13.95,
+      "z": -2.3,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -433,8 +429,8 @@
     {
       "id": "area3-crystal-16",
       "tier": "crystal",
-      "x": 9,
-      "z": -3,
+      "x": 20,
+      "z": -7,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -461,8 +457,8 @@
     {
       "id": "area3-crystal-17",
       "tier": "crystal",
-      "x": 12,
-      "z": -4,
+      "x": 18.6,
+      "z": -4.6,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -489,8 +485,8 @@
     {
       "id": "area3-crystal-18",
       "tier": "crystal",
-      "x": 15,
-      "z": -3,
+      "x": 23.25,
+      "z": -3.45,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -517,8 +513,8 @@
     {
       "id": "area3-crystal-19",
       "tier": "crystal",
-      "x": -6,
-      "z": -16,
+      "x": -22,
+      "z": -24,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -545,8 +541,8 @@
     {
       "id": "area3-crystal-20",
       "tier": "crystal",
-      "x": -3,
-      "z": -18,
+      "x": -4.65,
+      "z": -20.7,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -574,7 +570,7 @@
       "id": "area3-crystal-21",
       "tier": "crystal",
       "x": 0,
-      "z": -17,
+      "z": -19.55,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -601,8 +597,8 @@
     {
       "id": "area3-crystal-22",
       "tier": "crystal",
-      "x": 3,
-      "z": -18,
+      "x": 4.65,
+      "z": -20.7,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -629,8 +625,8 @@
     {
       "id": "area3-crystal-23",
       "tier": "crystal",
-      "x": 6,
-      "z": -16,
+      "x": 9.3,
+      "z": -18.4,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -657,8 +653,8 @@
     {
       "id": "area3-crystal-24",
       "tier": "crystal",
-      "x": -5,
-      "z": -12,
+      "x": -18,
+      "z": -11,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -685,8 +681,8 @@
     {
       "id": "area3-crystal-25",
       "tier": "crystal",
-      "x": 5,
-      "z": -12,
+      "x": 7.75,
+      "z": -13.8,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -713,8 +709,8 @@
     {
       "id": "area3-crystal-26",
       "tier": "crystal",
-      "x": 0,
-      "z": -21,
+      "x": -2,
+      "z": -30,
       "hp": {
         "min": 2000,
         "max": 4000
@@ -741,8 +737,8 @@
     {
       "id": "area3-common-01",
       "tier": "common",
-      "x": -14,
-      "z": 7,
+      "x": -21.7,
+      "z": 8.05,
       "hp": {
         "min": 13000,
         "max": 13000
@@ -760,8 +756,8 @@
     {
       "id": "area3-common-02",
       "tier": "common",
-      "x": -11,
-      "z": 7,
+      "x": -17.05,
+      "z": 8.05,
       "hp": {
         "min": 13000,
         "max": 13000
@@ -779,8 +775,8 @@
     {
       "id": "area3-common-03",
       "tier": "common",
-      "x": -8,
-      "z": 7,
+      "x": -12.4,
+      "z": 8.05,
       "hp": {
         "min": 13000,
         "max": 13000
@@ -798,8 +794,8 @@
     {
       "id": "area3-common-04",
       "tier": "common",
-      "x": 8,
-      "z": 5,
+      "x": 12.4,
+      "z": 5.75,
       "hp": {
         "min": 3000,
         "max": 3000
@@ -817,8 +813,8 @@
     {
       "id": "area3-common-05",
       "tier": "common",
-      "x": 11,
-      "z": 5,
+      "x": 17.05,
+      "z": 5.75,
       "hp": {
         "min": 3000,
         "max": 3000
@@ -836,8 +832,8 @@
     {
       "id": "area3-common-06",
       "tier": "common",
-      "x": 14,
-      "z": 5,
+      "x": 21.7,
+      "z": 5.75,
       "hp": {
         "min": 3000,
         "max": 3000
@@ -855,8 +851,8 @@
     {
       "id": "area3-common-07",
       "tier": "common",
-      "x": -5,
-      "z": -5,
+      "x": -14,
+      "z": -4,
       "hp": {
         "min": 7000,
         "max": 7000
@@ -873,8 +869,8 @@
     {
       "id": "area3-common-08",
       "tier": "common",
-      "x": 5,
-      "z": -5,
+      "x": 7.75,
+      "z": -5.75,
       "hp": {
         "min": 7000,
         "max": 7000
@@ -891,8 +887,8 @@
     {
       "id": "area3-common-09",
       "tier": "common",
-      "x": -8,
-      "z": -10,
+      "x": -12.4,
+      "z": -11.5,
       "hp": {
         "min": 7000,
         "max": 7000
@@ -909,8 +905,8 @@
     {
       "id": "area3-common-10",
       "tier": "common",
-      "x": 8,
-      "z": -10,
+      "x": 12.4,
+      "z": -11.5,
       "hp": {
         "min": 3000,
         "max": 3000
@@ -928,8 +924,8 @@
     {
       "id": "area3-common-11",
       "tier": "common",
-      "x": -3,
-      "z": -12,
+      "x": 3,
+      "z": -7,
       "hp": {
         "min": 3000,
         "max": 3000
@@ -947,8 +943,8 @@
     {
       "id": "area3-common-12",
       "tier": "common",
-      "x": 3,
-      "z": -12,
+      "x": 4.65,
+      "z": -13.8,
       "hp": {
         "min": 3000,
         "max": 3000
@@ -966,8 +962,8 @@
     {
       "id": "area3-uncommon-01",
       "tier": "uncommon",
-      "x": -13,
-      "z": -15,
+      "x": -20.15,
+      "z": -17.25,
       "hp": {
         "min": 4000,
         "max": 6000
@@ -984,8 +980,8 @@
     {
       "id": "area3-uncommon-02",
       "tier": "uncommon",
-      "x": 13,
-      "z": -15,
+      "x": 28,
+      "z": -18,
       "hp": {
         "min": 4000,
         "max": 6000
@@ -1012,8 +1008,8 @@
     {
       "id": "area3-rare-01",
       "tier": "rare",
-      "x": -7,
-      "z": -20,
+      "x": -10.85,
+      "z": -23,
       "hp": {
         "min": 12000,
         "max": 12000
@@ -1031,7 +1027,7 @@
       "id": "area3-epic-01",
       "tier": "epic",
       "x": 0,
-      "z": -18,
+      "z": -20.7,
       "hp": {
         "min": 30000,
         "max": 45000
@@ -1049,8 +1045,8 @@
     {
       "id": "area3-epic-02",
       "tier": "epic",
-      "x": 7,
-      "z": -20,
+      "x": 10.85,
+      "z": -23,
       "hp": {
         "min": 20000,
         "max": 25000
@@ -1073,36 +1069,6 @@
         }
       ],
       "attackDamage": 288
-    }
-  ],
-  "size": {
-    "width": 40,
-    "depth": 56
-  },
-  "collision": [
-    {
-      "id": "east-fortress-wall",
-      "kind": "rectangle",
-      "x": 20.2,
-      "z": 0,
-      "width": 1.35,
-      "depth": 52
-    },
-    {
-      "id": "west-south-ruin",
-      "kind": "rectangle",
-      "x": -20,
-      "z": 17,
-      "width": 2.2,
-      "depth": 19
-    },
-    {
-      "id": "boss-court-back",
-      "kind": "rectangle",
-      "x": 0,
-      "z": -22,
-      "width": 18,
-      "depth": 1.25
     }
   ]
 }

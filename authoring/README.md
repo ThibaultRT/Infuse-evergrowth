@@ -1,65 +1,97 @@
 # World authoring workspace
 
-This directory separates **creative source material** from **runtime assets**.
+The game world is authored as renderer-neutral TypeScript under `src/data/world/`.
+Those layouts are the only source of placement transforms. The renderer and the
+pure collision compiler consume the same named placements.
 
-## Local-only authoring files
+## Local development library
 
-Put the working Three.js Editor project and any source texture/model packs here:
+Run:
 
-```text
-authoring/local/
-├─ three-editor/
-│  └─ infuse-world.json
-└─ assets/
-   ├─ textures/
-   └─ models/
+```bash
+npm run authoring:assets:capture -- another-example
+npm run authoring:assets:audit -- another-example
 ```
 
-`authoring/local/` is intentionally ignored by Git. Three.js Editor JSON can become large because imported image/model data may be serialized into the project, and downloaded asset packs often contain many files that never ship in the game.
+The capture command validates the prototype shape, preserves all public assets and
+their relative dependencies, copies reference renders/source/provenance, backs up
+the prior local Three.js Editor source, and writes SHA-256 plus byte size for every
+captured file.
 
-Keep your latest working Editor JSON backed up outside normal Git if it matters as creative source material. If long-term versioning of large authoring sources becomes necessary, use dedicated artifact storage or Git LFS rather than committing them to ordinary Git history.
-
-## Generated local outputs
-
-The planned authoring builder writes previews, reports, and intermediate files under:
-
-```text
-authoring/generated/
-```
-
-This directory is also ignored by Git. Everything in it must be reproducible from the authoring source plus the tracked builder code.
-
-## Shipping assets
-
-Only assets intentionally promoted to the game belong under:
+While the source folder exists, the audit verifies both capture integrity and exact
+source parity. After `another-example/` is deliberately deleted, the same audit
+continues to verify every preserved file against the captured SHA-256 inventory.
 
 ```text
-public/assets/world/
-├─ areas/
-├─ transitions/
-└─ shared/
+authoring/local/world-development/
+├─ source-assets/another-example-public-assets/
+├─ references/
+│  ├─ Layout.png
+│  ├─ general-layout.png
+│  ├─ iphone-preview.png
+│  ├─ world-layout.glb
+│  └─ prototype-source/
+├─ provenance/
+│  ├─ ASSET-LICENSES.md
+│  └─ upstream-license-files/
+├─ legacy-three-editor-source/
+└─ inventory.json
 ```
 
-These files are tracked and shipped by the application. Prefer self-contained GLBs for area/transition chunks so unused source textures and model packs do not enter the production payload.
+`authoring/local/` is ignored by Git. Never flatten raw glTF trees or use this
+directory from production code. Keep irreplaceable local creative sources backed up
+outside the repository.
 
-Do not copy an entire downloaded texture/model pack into `public/` just because one item was used while authoring. Promote only the exact runtime files required by the final scene.
+## Runtime promotion
 
-Every third-party asset that reaches `public/` or is embedded in a shipping GLB must have its provenance/license recorded in `ASSET-LICENSES.md`.
+`src/data/world/world-assets.json` maps semantic asset keys to captured source paths
+and normalized runtime filenames. Promote the active catalog with:
 
-## Source vs generated ownership
+```bash
+npm run authoring:assets:promote -- --all
+npm run authoring:assets:verify
+```
 
-- `authoring/local/**`: user-owned creative workspace; the builder must never rewrite it.
-- `authoring/generated/**`: builder-owned disposable output.
-- `public/assets/world/**`: production output intentionally committed after visual QA.
-- `scripts/world-authoring/**`: tracked deterministic build tooling.
-- `tools/world-authoring-viewer/**`: tracked local viewer tooling.
+Source `.gltf` dependency trees are repacked as self-contained GLBs. Only assets
+referenced by accepted layouts belong under `public/assets/world/`; the generated
+manifest records source/runtime hashes. Do not copy full packs into `public/`.
 
-See `three-editor.md` for the authoring conventions and `6-world-authoring-builder.md` for the implementation plan.
+## Preview, validation and debug GLB
 
-## Commands
+```bash
+npm run authoring:viewer
+npm run authoring:world:validate
+npm run authoring:world:capture
+```
 
-Run `npm run authoring:build` to build the local Editor export, or
-`npm run authoring:build -- --fixture` for the committed smoke-test scene. Inspect
-the result with `npm run authoring:viewer`. `npm run authoring:validate` performs
-contract validation only and falls back to the fixture when the local source is
-absent. Only `npm run authoring:promote` writes validated chunks into `public/`.
+The browser preview uses the production `WorldBuilder` and
+`WorldCollisionCompiler`. It provides chunk visibility, asset resolver switching,
+stable-name search/picking, collider/spawn/gate-clearance overlays, camera presets,
+statistics, and validation.
+
+The capture command uses an installed Chromium browser to write:
+
+```text
+authoring/generated/captures/general-layout.png
+authoring/generated/captures/iphone-12-area-a01.png
+authoring/generated/captures/iphone-12-area-a02.png
+authoring/generated/captures/iphone-12-area-a03.png
+authoring/generated/debug/assembled-world-debug.glb
+```
+
+The assembled GLB contains stable prop names and `COLLIDER_*` helpers. It is for
+inspection in Three.js Editor or other glTF tools and never ships as the runtime
+world. If `A03_Corner_SW` needs a 90-degree rotation, change that named entry in its
+typed layout and regenerate; edits made inside the debug GLB do not round-trip.
+
+## Ownership
+
+- `src/data/world/**`: authoritative dimensions, layouts, prop catalog and asset map.
+- `src/domain/world/**`: pure transforms, collision values/math/compiler.
+- `src/rendering/environment/**`: assets, materials, geometry, builder and providers.
+- `authoring/local/**`: ignored raw/reference material; never rewritten by the builder.
+- `authoring/generated/**`: ignored reproducible captures and debug output.
+- `public/assets/world/**`: tracked curated runtime assets only.
+
+See `three-editor.md` for the spatial and inspection contract and
+`ASSET-LICENSES.md` for shipped provenance.

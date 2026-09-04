@@ -1,0 +1,51 @@
+import type { AreaWorldLayout } from '../WorldLayout';
+
+export const AREA_A02_LAYOUT = {
+  kind: 'area',
+  id: 'area:A02',
+  areaId: 2,
+  name: 'Highwood — The Mosswater Wilds',
+  origin: [36, 0, -60],
+  playableSize: { width: 144, depth: 48 },
+  visualSize: { width: 156, depth: 60 },
+  terrain: 'forest',
+  roads: [
+    { name: 'A02_Trail_FromA01', points: [[-25.2, 30], [-21.6, 15.6], [-5.4, 8.4], [12.6, 1.2], [32.4, -4.8], [55.8, -14.4]], width: 4.4, material: 'trail' },
+    { name: 'A02_Trail_ToA03', points: [[43.2, 30], [39.6, 15], [18, 7.2], [12.6, 1.2]], width: 3.8, material: 'trail' },
+  ],
+  surfaces: [
+    { name: 'A02_Lake_Mosswater', kind: 'water', center: [-39.6, 1.2], size: { width: 48, depth: 12.2 }, rotation: -0.18, elevation: 0.11 },
+  ],
+  props: [
+    { name: 'A02_Watermill', prop: 'wilds.watermillGreen', position: [-39.6, 0.45, 4.8], rotation: 1.82, scale: 1.18 },
+    { name: 'A02_Watchtower_West', prop: 'wilds.towerGreenA', position: [-55.8, 1.1, -7.8], rotation: 0.35, scale: 1.02 },
+    { name: 'A02_Watchtower_North', prop: 'wilds.towerGreenB', position: [7.2, 1.2, -16.8], rotation: -0.6, scale: 0.96 },
+    { name: 'A02_Watchtower_East', prop: 'wilds.towerGreenA', position: [55.8, 0.8, 4.8], rotation: -1.4, scale: 1.02 },
+    { name: 'A02_Mine', prop: 'wilds.mineGreen', position: [52.2, 1.2, -16.8], rotation: -2.2, scale: 1.1 },
+    { name: 'A02_Camp_Tent', prop: 'prop.tent', position: [32.4, 0.7, -1.8], rotation: -0.7, scale: 1.06 },
+    { name: 'A02_Camp_Crate', prop: 'prop.crate', position: [41.4, 0.7, -2.4], rotation: 0.6, scale: 0.66 },
+    { name: 'A02_Camp_Barrel', prop: 'prop.barrel', position: [37.8, 0.7, 0.6], rotation: 0.15, scale: 0.72 },
+    { name: 'A02_StonePile', prop: 'prop.stonePile', position: [57.6, 1.1, -13.8], rotation: 0.5, scale: 0.82 },
+    { name: 'A02_Highland_Mountain_West', prop: 'wilds.mountainTreesA', position: [-59.4, 1.2, -18], rotation: 0.2, scale: 1.85 },
+    { name: 'A02_Highland_Mountain_East', prop: 'wilds.mountainTreesB', position: [23.4, 1.3, -21], rotation: -0.45, scale: 1.68 },
+    { name: 'A02_Hillside_West', prop: 'wilds.hillTreesA', position: [-61.2, 0.8, -3.6], rotation: 0.6, scale: 1.42 },
+    { name: 'A02_Hillside_East', prop: 'wilds.hillTreesB', position: [63, 0.7, -7.2], rotation: -0.4, scale: 1.38 },
+    { name: 'A02_Lilies_01', prop: 'wilds.waterLily', position: [-45, 0.18, 1.2], rotation: 0.4, scale: 1.4, collision: 'none' },
+    { name: 'A02_Reeds_01', prop: 'wilds.waterPlant', position: [-27, 0.18, 3.6], rotation: -0.4, scale: 1.3, collision: 'none' },
+    { name: 'A02_Mosswater_Bridge', prop: 'crossing.bridgeA', position: [-32.4, 0.55, 7.2], rotation: -0.5, scale: 0.68, collision: 'none' },
+  ],
+  scatters: [
+    { prefix: 'A02_Tree_West', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 29, bounds: { minX: -68.4, maxX: -45, minZ: -21.6, maxZ: 19.2 }, seed: 201, scale: [1.08, 1.62], exclusions: [{ center: [-46.8, 3], radius: 13 }] },
+    { prefix: 'A02_Tree_North', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 27, bounds: { minX: -39.6, maxX: 66.6, minZ: -22.2, maxZ: -14.4 }, seed: 202, scale: [1.04, 1.58], exclusions: [{ center: [52.2, -16.8], radius: 10 }] },
+    { prefix: 'A02_Tree_East', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 25, bounds: { minX: 50.4, maxX: 68.4, minZ: -13.8, maxZ: 19.2 }, seed: 203, scale: [1.02, 1.5], exclusions: [{ center: [55.8, 4.8], radius: 8 }] },
+    { prefix: 'A02_Tree_Interior', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 24, bounds: { minX: -41.4, maxX: 45, minZ: -12.6, maxZ: 16.8 }, seed: 204, scale: [0.96, 1.42], exclusions: [{ center: [18, -0.6], radius: 15 }, { center: [-34.2, 4.8], radius: 13 }] },
+    { prefix: 'A02_Tree_Landmark', props: ['nature.treeCommon1', 'nature.treeCommon3'], count: 8, bounds: { minX: -43.2, maxX: 46.8, minZ: -13.2, maxZ: 16.2 }, seed: 207, scale: [0.86, 1.12], exclusions: [{ center: [18, -0.6], radius: 15 }] },
+    { prefix: 'A02_Rock', props: ['nature.forestRockA', 'nature.forestRockB', 'nature.forestRockC', 'nature.rockMedium2'], count: 28, bounds: { minX: -66.6, maxX: 66.6, minZ: -21.6, maxZ: 20.4 }, seed: 205, scale: [0.6, 1.3], exclusions: [{ center: [18, -0.6], radius: 12 }] },
+    { prefix: 'A02_Bush', props: ['nature.forestBushA', 'nature.forestBushB', 'nature.forestBushC', 'nature.grassTuft'], count: 31, bounds: { minX: -61.2, maxX: 61.2, minZ: -18.6, maxZ: 19.8 }, seed: 206, scale: [0.75, 1.3], exclusions: [{ center: [18, -0.6], radius: 11 }] },
+  ],
+  collision: [
+    { id: 'A02_Lake_Core', kind: 'rectangle', center: [-39.6, 1.2], width: 46, depth: 10.5, rotation: -0.18 },
+    { id: 'A02_River_North', kind: 'rectangle', center: [-53.5, -15.5], width: 5.4, depth: 13, rotation: 0.18 },
+    { id: 'A02_River_South', kind: 'rectangle', center: [-19, 17], width: 5.4, depth: 13, rotation: -0.55 },
+  ],
+} as const satisfies AreaWorldLayout;

@@ -1,0 +1,928 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-04T03:39:18.581Z",
+  "assets": [
+    {
+      "key": "crossing.bridgeA",
+      "source": "kaykit-hexagon/buildings/neutral/building_bridge_A.gltf",
+      "runtime": "assets/world/shared/models/crossing-bridge-a.glb",
+      "sourceDigest": {
+        "bytes": 3039,
+        "sha256": "7f3a7e8b3e72a66dec70d6a00eb87e62d3ca5c6892b9b965c675cb9d193e4d29"
+      },
+      "runtimeDigest": {
+        "bytes": 42732,
+        "sha256": "dd3d089b51aa49262be6a13ac5fbdff6fcfa492619426eb3d25018f4023679f9"
+      }
+    },
+    {
+      "key": "crossing.bridgeB",
+      "source": "kaykit-hexagon/buildings/neutral/building_bridge_B.gltf",
+      "runtime": "assets/world/shared/models/crossing-bridge-b.glb",
+      "sourceDigest": {
+        "bytes": 3039,
+        "sha256": "b5f8d508c1b5cfd528a2276f6105627a386a75a77d987e2068605b1b7762a71d"
+      },
+      "runtimeDigest": {
+        "bytes": 42732,
+        "sha256": "3de41bcd3aef1a4a4079f5fabfd30500a63de12b7e2b8c359385e2e6e98cd627"
+      }
+    },
+    {
+      "key": "fortress.corner",
+      "source": "kaykit-hexagon/buildings/neutral/wall_corner_A_outside.gltf",
+      "runtime": "assets/world/shared/models/fortress-corner.glb",
+      "sourceDigest": {
+        "bytes": 3063,
+        "sha256": "75a1adaba70ec6df4ead3a955d3ac02007c8d7b45081ba087584748e805ebd61"
+      },
+      "runtimeDigest": {
+        "bytes": 41964,
+        "sha256": "88f62c6d6f603ce2195968822f9b4fe427013c60c53ee0c53678efc84f7cebbb"
+      }
+    },
+    {
+      "key": "fortress.gate",
+      "source": "kaykit-hexagon/buildings/neutral/wall_straight_gate.gltf",
+      "runtime": "assets/world/shared/models/fortress-gate.glb",
+      "sourceDigest": {
+        "bytes": 7198,
+        "sha256": "877f3e95f89c23741c38b9d2f8f307c1369042ec5c354d7858d72ab2b9666c3a"
+      },
+      "runtimeDigest": {
+        "bytes": 66192,
+        "sha256": "3cd304c88a0ecdd6689ecd4e25233f2d17a6d53c707b8549a8620e718b14737a"
+      }
+    },
+    {
+      "key": "fortress.wall",
+      "source": "kaykit-hexagon/buildings/neutral/wall_straight.gltf",
+      "runtime": "assets/world/shared/models/fortress-wall.glb",
+      "sourceDigest": {
+        "bytes": 3009,
+        "sha256": "7f466420a00fac9c6eb568178a81ef2719ac3c710f1fdc4027f8fc46a262ad7a"
+      },
+      "runtimeDigest": {
+        "bytes": 48220,
+        "sha256": "8d29ab925f714295f9b306bf1a5950b95a4244e4a0a663b01bf6b5fe1f697428"
+      }
+    },
+    {
+      "key": "keep.barracksRed",
+      "source": "kaykit-hexagon/buildings/red/building_barracks_red.gltf",
+      "runtime": "assets/world/shared/models/keep-barracks-red.glb",
+      "sourceDigest": {
+        "bytes": 3075,
+        "sha256": "3a10bf352be40343281658a0cffa28cef84bb452636c08fe1cc68e35af1b2665"
+      },
+      "runtimeDigest": {
+        "bytes": 246864,
+        "sha256": "ed9ba0c4180e8222013a8f9edb1be1a454028fb6f340e52cd3b33b73d61f5341"
+      }
+    },
+    {
+      "key": "keep.castleRed",
+      "source": "kaykit-hexagon/buildings/red/building_castle_red.gltf",
+      "runtime": "assets/world/shared/models/keep-castle-red.glb",
+      "sourceDigest": {
+        "bytes": 3069,
+        "sha256": "a9006907e13955578e803f0230a8b641d20bc499aeb6e4ead546e6e6894f4e9c"
+      },
+      "runtimeDigest": {
+        "bytes": 334916,
+        "sha256": "26dabf6c04aaaf211629a0aafd3e0093d5d50a37dfbbdc975e6f2fcc5862a9ba"
+      }
+    },
+    {
+      "key": "keep.homeRedA",
+      "source": "kaykit-hexagon/buildings/red/building_home_A_red.gltf",
+      "runtime": "assets/world/shared/models/keep-home-red-a.glb",
+      "sourceDigest": {
+        "bytes": 3087,
+        "sha256": "158bcb4149f4d6db461774d7bd67d264262f30145762eddd0a8def8be292286c"
+      },
+      "runtimeDigest": {
+        "bytes": 72548,
+        "sha256": "25e067d2b2c22b3b4a29257a0e3166d9447ef951c8905790d8e70692c808a863"
+      }
+    },
+    {
+      "key": "keep.homeRedB",
+      "source": "kaykit-hexagon/buildings/red/building_home_B_red.gltf",
+      "runtime": "assets/world/shared/models/keep-home-red-b.glb",
+      "sourceDigest": {
+        "bytes": 3087,
+        "sha256": "0c43594d4fd7eadf098de4189414764476b18cfbc6ea6c695c1dda01c768fffe"
+      },
+      "runtimeDigest": {
+        "bytes": 99320,
+        "sha256": "ed9e7d9a1de0ff48c3a42ae7f731c06f3b8afce015430cd9ea345a529d8a42ac"
+      }
+    },
+    {
+      "key": "keep.towerRedA",
+      "source": "kaykit-hexagon/buildings/red/building_tower_A_red.gltf",
+      "runtime": "assets/world/shared/models/keep-tower-red-a.glb",
+      "sourceDigest": {
+        "bytes": 5042,
+        "sha256": "9275233fb07f3906111f82da7ef43b5c81195922662396a2c4106095ea94bf27"
+      },
+      "runtimeDigest": {
+        "bytes": 130876,
+        "sha256": "50e60ba42e5ebba903ff538178c550fb31f12741d6b9166edd3772cc546a94d1"
+      }
+    },
+    {
+      "key": "keep.towerRedB",
+      "source": "kaykit-hexagon/buildings/red/building_tower_B_red.gltf",
+      "runtime": "assets/world/shared/models/keep-tower-red-b.glb",
+      "sourceDigest": {
+        "bytes": 5043,
+        "sha256": "ea0d5107771df1532eb1dffe20d5c69c34eced9e67515eef8c7218736cb592b2"
+      },
+      "runtimeDigest": {
+        "bytes": 148972,
+        "sha256": "105673b44053d581cac8c17a6f2b32fb3834526ceeff2357a3143145c06ec159"
+      }
+    },
+    {
+      "key": "landmark.fountain",
+      "source": "props/fountain-cc0.glb",
+      "runtime": "assets/world/shared/models/landmark-fountain.glb",
+      "sourceDigest": {
+        "bytes": 85876,
+        "sha256": "0a8f2884303228dc19764684dfaba94e7de4c305916466d5f33688647122526c"
+      },
+      "runtimeDigest": {
+        "bytes": 85876,
+        "sha256": "0a8f2884303228dc19764684dfaba94e7de4c305916466d5f33688647122526c"
+      }
+    },
+    {
+      "key": "nature.flowerBush",
+      "source": "quaternius/nature/models/Bush_Common_Flowers.gltf",
+      "runtime": "assets/world/shared/models/nature-flower-bush.glb",
+      "sourceDigest": {
+        "bytes": 2719,
+        "sha256": "e2d33f8525d830ec89d20b8e9cd2282f6df922770669db16c1c77324f081f51a"
+      },
+      "runtimeDigest": {
+        "bytes": 732760,
+        "sha256": "263354ae2ce6d0466d2989a2195ccb89db737028ddb91851897ec5f10e2f1aac"
+      }
+    },
+    {
+      "key": "nature.flowerGroup",
+      "source": "quaternius/nature/models/Flower_3_Group.gltf",
+      "runtime": "assets/world/shared/models/nature-flower-group.glb",
+      "sourceDigest": {
+        "bytes": 2686,
+        "sha256": "22bbd696967bf0ad6b085790fb466ba713535ca524212b636e285c58b930bb64"
+      },
+      "runtimeDigest": {
+        "bytes": 1235616,
+        "sha256": "183675e82ae2f3a392652d30d384d1ea2715958fe88be38ab57f8fa036d3c5f4"
+      }
+    },
+    {
+      "key": "nature.forestBushA",
+      "source": "kaykit-forest/Bush_1_A_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-forest-bush-a.glb",
+      "sourceDigest": {
+        "bytes": 3054,
+        "sha256": "bc6cf33dbed296a181d8afbd82ffe1c44ee5e57cb095f9efdf4b63e93c165b70"
+      },
+      "runtimeDigest": {
+        "bytes": 52424,
+        "sha256": "71ee9dc0f2683d59b2395d0a143bc6c03b96fcf06bb956794e852cfc36ccae2f"
+      }
+    },
+    {
+      "key": "nature.forestBushB",
+      "source": "kaykit-forest/Bush_2_B_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-forest-bush-b.glb",
+      "sourceDigest": {
+        "bytes": 3057,
+        "sha256": "a56841ace35231c41b81f3038f5bd180fd0c6ffbd8bc0ab3070bd31e99e58aad"
+      },
+      "runtimeDigest": {
+        "bytes": 52516,
+        "sha256": "dc6e6eb4884abbfc83986a20f0123760a7275491bcb3c378124171e693f835d9"
+      }
+    },
+    {
+      "key": "nature.forestBushC",
+      "source": "kaykit-forest/Bush_4_C_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-forest-bush-c.glb",
+      "sourceDigest": {
+        "bytes": 3052,
+        "sha256": "7423fd4cc074944e6ed6d2db2fbdceb12eb417c79ee48cd1645ab95e5e1897f0"
+      },
+      "runtimeDigest": {
+        "bytes": 52640,
+        "sha256": "10e99225d90c04894dbaa40a86bbbdb98c39ee5c3b4db50e53c6e8faf3a1b04a"
+      }
+    },
+    {
+      "key": "nature.forestRockA",
+      "source": "kaykit-forest/Rock_1_J_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-forest-rock-a.glb",
+      "sourceDigest": {
+        "bytes": 3046,
+        "sha256": "8821410d8b261346bd18547f41ac7d465f2254007d8fa6fee6ecf43c072979c9"
+      },
+      "runtimeDigest": {
+        "bytes": 80872,
+        "sha256": "c39f7ee3ff90beb8175ed2239b5f09566ab2d264b9b42221a0f359dfe85918d3"
+      }
+    },
+    {
+      "key": "nature.forestRockB",
+      "source": "kaykit-forest/Rock_1_K_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-forest-rock-b.glb",
+      "sourceDigest": {
+        "bytes": 3060,
+        "sha256": "1e7a18bd9e03a00a25ec15953391f0c65f7822951e752c360e676d09604c6cf6"
+      },
+      "runtimeDigest": {
+        "bytes": 81064,
+        "sha256": "607a1512a114fc124b413f80e4d2bb0c754b957e41dcfe5c192924cf82d88092"
+      }
+    },
+    {
+      "key": "nature.forestRockC",
+      "source": "kaykit-forest/Rock_1_M_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-forest-rock-c.glb",
+      "sourceDigest": {
+        "bytes": 3044,
+        "sha256": "e3cc71684110ffbe6a68d173979aeac3e56ae6215e821db1840c2c62ef0c92ad"
+      },
+      "runtimeDigest": {
+        "bytes": 80240,
+        "sha256": "2f467f2698479d63a154cf3e5df9c88c5ff680311327ad62b5dd89d75a7a5890"
+      }
+    },
+    {
+      "key": "nature.grassTuft",
+      "source": "quaternius/nature/models/Grass_Common_Short.gltf",
+      "runtime": "assets/world/shared/models/nature-grass-tuft.glb",
+      "sourceDigest": {
+        "bytes": 1491,
+        "sha256": "22623d0e2861c16bfe5545be269c7c60479d4e54d02a59a4bd0d0906a0b43177"
+      },
+      "runtimeDigest": {
+        "bytes": 42172,
+        "sha256": "71c02f2fb5cdb81db5c3a56885e4fb65712bafa2f39522517cc3f080d8fe7474"
+      }
+    },
+    {
+      "key": "nature.pineA",
+      "source": "kaykit-forest/Tree_4_A_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-pine-a.glb",
+      "sourceDigest": {
+        "bytes": 3061,
+        "sha256": "14f8f50af9f9cf8d2bb488cae15613f9e2ed6ce0002d2aa11721a2efc2ba3010"
+      },
+      "runtimeDigest": {
+        "bytes": 62648,
+        "sha256": "a0ef3c284ee4d4b91d72142219d3dd14e84dcba1e4f56dd148ba66d2e253da9b"
+      }
+    },
+    {
+      "key": "nature.pineB",
+      "source": "kaykit-forest/Tree_4_B_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-pine-b.glb",
+      "sourceDigest": {
+        "bytes": 3059,
+        "sha256": "7dad365ccc9e9da3e1cbcdbd5ec16b67f0058a3c76aaa06a1bfaa17c706f1ce5"
+      },
+      "runtimeDigest": {
+        "bytes": 66168,
+        "sha256": "c98628c3be7710762c1d16c8bb8f2c8939d0aec69f99d5053ae6c32153248aea"
+      }
+    },
+    {
+      "key": "nature.pineC",
+      "source": "kaykit-forest/Tree_4_C_Color1.gltf",
+      "runtime": "assets/world/shared/models/nature-pine-c.glb",
+      "sourceDigest": {
+        "bytes": 3061,
+        "sha256": "b0ad5efa06e081126366879cca48cf26563ef712899170023c95558b13ef058a"
+      },
+      "runtimeDigest": {
+        "bytes": 81220,
+        "sha256": "8937d16f00392f868dd46fd7fdff28e1509c4b2b176889a0059ce00913e2f7ed"
+      }
+    },
+    {
+      "key": "nature.rockMedium1",
+      "source": "quaternius/nature/models/Rock_Medium_1.gltf",
+      "runtime": "assets/world/shared/models/nature-rock-medium-1.glb",
+      "sourceDigest": {
+        "bytes": 1354,
+        "sha256": "e5b05d48c15aa454577e7f276fe0f7cbb7f6d9876f76ca335ebe8dad21a9be07"
+      },
+      "runtimeDigest": {
+        "bytes": 995564,
+        "sha256": "ef242ad51bb73931f212140df5cb6e3dcc25f70ec9d3dbb8c2466daa0af6b14a"
+      }
+    },
+    {
+      "key": "nature.rockMedium2",
+      "source": "quaternius/nature/models/Rock_Medium_2.gltf",
+      "runtime": "assets/world/shared/models/nature-rock-medium-2.glb",
+      "sourceDigest": {
+        "bytes": 1348,
+        "sha256": "0dd1476e2cdc668a8937a47a09a102aab4085605d58892e9206d0df7cae68b1f"
+      },
+      "runtimeDigest": {
+        "bytes": 991704,
+        "sha256": "bd27f19a634749b0417491d42e115c63d00068f7ce1c73d63f74f55c302d167f"
+      }
+    },
+    {
+      "key": "nature.treeCommon1",
+      "source": "quaternius/nature/models/CommonTree_1.gltf",
+      "runtime": "assets/world/shared/models/nature-tree-common-1.glb",
+      "sourceDigest": {
+        "bytes": 2901,
+        "sha256": "50ffe07fe581196a403401a0c7718cf8599e418f3e854680460e171eda76c81d"
+      },
+      "runtimeDigest": {
+        "bytes": 2887136,
+        "sha256": "aa382452e69e3078106fbb9c33d77c69bfea62f90776be87aa672d806e3e430c"
+      }
+    },
+    {
+      "key": "nature.treeCommon3",
+      "source": "quaternius/nature/models/CommonTree_3.gltf",
+      "runtime": "assets/world/shared/models/nature-tree-common-3.glb",
+      "sourceDigest": {
+        "bytes": 2896,
+        "sha256": "98f9f668869ef23460b586bd6d10ddb34a76fac4c13e2ea78acba36268820d94"
+      },
+      "runtimeDigest": {
+        "bytes": 2692536,
+        "sha256": "118d4bbad337f6d7246f9c692d47e88b49886a1e142f454a1a639759f1e081fa"
+      }
+    },
+    {
+      "key": "prop.barrel",
+      "source": "kaykit-hexagon/decoration/props/barrel.gltf",
+      "runtime": "assets/world/shared/models/prop-barrel.glb",
+      "sourceDigest": {
+        "bytes": 3042,
+        "sha256": "24673663eb53ffab6c8db612654856f051c4877bfc02ea25fee89cd95ee4d100"
+      },
+      "runtimeDigest": {
+        "bytes": 32720,
+        "sha256": "7f3200b22a9feeaff23c306eae3b27742f0df5a1a2132a0cb9d1440037213744"
+      }
+    },
+    {
+      "key": "prop.crate",
+      "source": "kaykit-hexagon/decoration/props/crate_A_big.gltf",
+      "runtime": "assets/world/shared/models/prop-crate.glb",
+      "sourceDigest": {
+        "bytes": 3055,
+        "sha256": "a96ce5522e45104b5a04cf9605ca30b9572cc79c7633d41f3434b9843010a225"
+      },
+      "runtimeDigest": {
+        "bytes": 24180,
+        "sha256": "79b93a4230b8471c411ebca91c950403206809550a3c7c056dafc1691177e077"
+      }
+    },
+    {
+      "key": "prop.crateOpen",
+      "source": "kaykit-hexagon/decoration/props/crate_open.gltf",
+      "runtime": "assets/world/shared/models/prop-crate-open.glb",
+      "sourceDigest": {
+        "bytes": 3054,
+        "sha256": "e82806d7cd3d905c4915e81cad1973415aecec83a8d3ad968e0298d8920265ed"
+      },
+      "runtimeDigest": {
+        "bytes": 29236,
+        "sha256": "885a59c885f5fa63762d57bdd14924b6a46cdc2a964ee452cf5069fe5048661b"
+      }
+    },
+    {
+      "key": "prop.lumber",
+      "source": "kaykit-hexagon/decoration/props/resource_lumber.gltf",
+      "runtime": "assets/world/shared/models/prop-lumber.glb",
+      "sourceDigest": {
+        "bytes": 3060,
+        "sha256": "601a69f44f0c4a9b5070a80bd4a20887960e01f1523a6125c1edc8ba19168f1f"
+      },
+      "runtimeDigest": {
+        "bytes": 29060,
+        "sha256": "a0bfb9592d51a57c8533296d5f7ee967a9c06f8eb67bdddda3f99fb6eeabc3ac"
+      }
+    },
+    {
+      "key": "prop.stonePile",
+      "source": "kaykit-hexagon/decoration/props/resource_stone.gltf",
+      "runtime": "assets/world/shared/models/prop-stone-pile.glb",
+      "sourceDigest": {
+        "bytes": 3061,
+        "sha256": "427a22daaec3934ac85cd7e538415157264b96527577a3c9bbf793c1b5df8dca"
+      },
+      "runtimeDigest": {
+        "bytes": 28740,
+        "sha256": "c86ca40badcc81a43c53308ef3af32806925246da4f349a27e6c912e667038de"
+      }
+    },
+    {
+      "key": "prop.tent",
+      "source": "kaykit-hexagon/decoration/props/tent.gltf",
+      "runtime": "assets/world/shared/models/prop-tent.glb",
+      "sourceDigest": {
+        "bytes": 3008,
+        "sha256": "d8920394ddec09d8afa0cfaa2dad1c75b55fd21819fbd7c31392b3b8dce5dca0"
+      },
+      "runtimeDigest": {
+        "bytes": 23288,
+        "sha256": "3835a4207f428fb923f1302111395e5fef94a62e69abc08940eb3302ebd81ca3"
+      }
+    },
+    {
+      "key": "prop.wheelbarrow",
+      "source": "kaykit-hexagon/decoration/props/wheelbarrow.gltf",
+      "runtime": "assets/world/shared/models/prop-wheelbarrow.glb",
+      "sourceDigest": {
+        "bytes": 3059,
+        "sha256": "bb037662a3e5be1f4fe597ffc4927d2a6ad88d307da10388cfb178ca5fdae63d"
+      },
+      "runtimeDigest": {
+        "bytes": 36196,
+        "sha256": "f05c7cfe4c5f42691acac674febf7518314d8c15e3ba409bbb1422185a060bee"
+      }
+    },
+    {
+      "key": "ruin.destroyed",
+      "source": "kaykit-hexagon/buildings/neutral/building_destroyed.gltf",
+      "runtime": "assets/world/shared/models/ruin-destroyed.glb",
+      "sourceDigest": {
+        "bytes": 3079,
+        "sha256": "e5cd1027e9c2f7981a29a7d9e036504f6b168680b017a0289313a8fdcbc634bc"
+      },
+      "runtimeDigest": {
+        "bytes": 73880,
+        "sha256": "f02481591f82101ada6ea35164830ce6ce243dcabaf82e1cef858ab41f5adfc0"
+      }
+    },
+    {
+      "key": "ruin.dungeonCorner",
+      "source": "kaykit-dungeon/wall_corner.gltf",
+      "runtime": "assets/world/shared/models/ruin-dungeon-corner.glb",
+      "sourceDigest": {
+        "bytes": 2988,
+        "sha256": "0e11f419d2bac3495978a57b5130f42c2bc50231e9335c8b7687bcfef4e33f59"
+      },
+      "runtimeDigest": {
+        "bytes": 49548,
+        "sha256": "74852b6513792f0b459310d57865868ecb1e57897b544b55a09e1739d60cdf87"
+      }
+    },
+    {
+      "key": "ruin.dungeonWallBroken",
+      "source": "kaykit-dungeon/wall_broken.gltf",
+      "runtime": "assets/world/shared/models/ruin-dungeon-wall-broken.glb",
+      "sourceDigest": {
+        "bytes": 2992,
+        "sha256": "dbe92e94803622c436fb3aead68ede2c08056a96a04f70521f2de06d16e7f4e1"
+      },
+      "runtimeDigest": {
+        "bytes": 70508,
+        "sha256": "5bd54ce8a9fcfaa9e5e413ffe1723d69815704ac0202e07f8c9a9a9919a726d1"
+      }
+    },
+    {
+      "key": "ruin.dungeonWallCracked",
+      "source": "kaykit-dungeon/wall_cracked.gltf",
+      "runtime": "assets/world/shared/models/ruin-dungeon-wall-cracked.glb",
+      "sourceDigest": {
+        "bytes": 2997,
+        "sha256": "4eb34d05e4bc5f38d7e1ba1adb9ce8cb6e73ddcf15daaec433a838c2f0bec38b"
+      },
+      "runtimeDigest": {
+        "bytes": 121648,
+        "sha256": "a47610707741df74cf14e896dbc9bb017575b4e5745d1efa5d058aeb7adf2997"
+      }
+    },
+    {
+      "key": "ruin.rubbleHalf",
+      "source": "kaykit-dungeon/rubble_half.gltf",
+      "runtime": "assets/world/shared/models/ruin-rubble-half.glb",
+      "sourceDigest": {
+        "bytes": 3045,
+        "sha256": "6afe02e2962410d95cd07dfdaea78c6dafd95eefeab3fdabe03d28b8f0200e68"
+      },
+      "runtimeDigest": {
+        "bytes": 40196,
+        "sha256": "dfab224016e8eb22e6b816ec63acc39171ac3a02caef34555b901067ed3173d2"
+      }
+    },
+    {
+      "key": "ruin.rubbleLarge",
+      "source": "kaykit-dungeon/rubble_large.gltf",
+      "runtime": "assets/world/shared/models/ruin-rubble-large.glb",
+      "sourceDigest": {
+        "bytes": 3042,
+        "sha256": "ec76b40daae2426b59a9e8cd4078f71280fa73ce1eb8c58a4d58d59a6b581b50"
+      },
+      "runtimeDigest": {
+        "bytes": 61560,
+        "sha256": "a2baa9491e2136e793116af6b6086ec364e9c3dd8bdb371212c691239c165fbb"
+      }
+    },
+    {
+      "key": "ruin.scaffolding",
+      "source": "kaykit-hexagon/buildings/neutral/building_scaffolding.gltf",
+      "runtime": "assets/world/shared/models/ruin-scaffolding.glb",
+      "sourceDigest": {
+        "bytes": 3092,
+        "sha256": "1c11a7545694863a7edc58780ee60510b55676b97d6c5eee7e0dc7c256185c7a"
+      },
+      "runtimeDigest": {
+        "bytes": 182744,
+        "sha256": "d5d466e025c6f847ec75d455a57d647daa599c7f4d47481d78fe6ca1f2413d00"
+      }
+    },
+    {
+      "key": "terrain.cobbleColor",
+      "source": "textures/grassy_cobblestone_diff_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-cobble-color.jpg",
+      "sourceDigest": {
+        "bytes": 742841,
+        "sha256": "9e7ba40919fd1bb4b98397b9522de0e6e537be8ea4121344772238d63fe50fcc"
+      },
+      "runtimeDigest": {
+        "bytes": 742841,
+        "sha256": "9e7ba40919fd1bb4b98397b9522de0e6e537be8ea4121344772238d63fe50fcc"
+      }
+    },
+    {
+      "key": "terrain.cobbleNormal",
+      "source": "textures/grassy_cobblestone_nor_gl_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-cobble-normal.jpg",
+      "sourceDigest": {
+        "bytes": 1040297,
+        "sha256": "f9721ccd828523edbb19b3f391ad706efe3f5fe142133ea9c137bfd2f7751cd9"
+      },
+      "runtimeDigest": {
+        "bytes": 1040297,
+        "sha256": "f9721ccd828523edbb19b3f391ad706efe3f5fe142133ea9c137bfd2f7751cd9"
+      }
+    },
+    {
+      "key": "terrain.forestColor",
+      "source": "textures/forrest_ground_01_diff_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-forest-color.jpg",
+      "sourceDigest": {
+        "bytes": 833711,
+        "sha256": "3dd6875cb3908e022a3c45ebbffa5e84c670ff2691fbbb6dc9ea4bff88523800"
+      },
+      "runtimeDigest": {
+        "bytes": 833711,
+        "sha256": "3dd6875cb3908e022a3c45ebbffa5e84c670ff2691fbbb6dc9ea4bff88523800"
+      }
+    },
+    {
+      "key": "terrain.forestNormal",
+      "source": "textures/forrest_ground_01_nor_gl_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-forest-normal.jpg",
+      "sourceDigest": {
+        "bytes": 1428763,
+        "sha256": "32528a7cdee962cc0b248ee4023a74d0df175737ea90e1eb425122351e0bdab4"
+      },
+      "runtimeDigest": {
+        "bytes": 1428763,
+        "sha256": "32528a7cdee962cc0b248ee4023a74d0df175737ea90e1eb425122351e0bdab4"
+      }
+    },
+    {
+      "key": "terrain.meadowColor",
+      "source": "textures/leafy_grass_diff_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-meadow-color.jpg",
+      "sourceDigest": {
+        "bytes": 1195394,
+        "sha256": "cfa40bc9d9417d1852db8753a8d5917f110c40101179f63543c382e39bc05e4a"
+      },
+      "runtimeDigest": {
+        "bytes": 1195394,
+        "sha256": "cfa40bc9d9417d1852db8753a8d5917f110c40101179f63543c382e39bc05e4a"
+      }
+    },
+    {
+      "key": "terrain.meadowNormal",
+      "source": "textures/leafy_grass_nor_gl_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-meadow-normal.jpg",
+      "sourceDigest": {
+        "bytes": 1466049,
+        "sha256": "832328216adc0a7e1f70a31d5ee48c9ab7f2152d83816122736cf42ac4b2ebd6"
+      },
+      "runtimeDigest": {
+        "bytes": 1466049,
+        "sha256": "832328216adc0a7e1f70a31d5ee48c9ab7f2152d83816122736cf42ac4b2ebd6"
+      }
+    },
+    {
+      "key": "terrain.trailColor",
+      "source": "textures/grass_path_3_diff_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-trail-color.jpg",
+      "sourceDigest": {
+        "bytes": 646551,
+        "sha256": "71b0a514bbb65a0ec2731e82b6bad0bb3a1e089cb671cf697bfe53f75f5da943"
+      },
+      "runtimeDigest": {
+        "bytes": 646551,
+        "sha256": "71b0a514bbb65a0ec2731e82b6bad0bb3a1e089cb671cf697bfe53f75f5da943"
+      }
+    },
+    {
+      "key": "terrain.trailNormal",
+      "source": "textures/grass_path_3_nor_gl_1k.jpg",
+      "runtime": "assets/world/shared/textures/terrain-trail-normal.jpg",
+      "sourceDigest": {
+        "bytes": 829401,
+        "sha256": "473bf439c266ffe357409fb0fb4758ed6cd1d6889df588f42e174b7cb6481cc5"
+      },
+      "runtimeDigest": {
+        "bytes": 829401,
+        "sha256": "473bf439c266ffe357409fb0fb4758ed6cd1d6889df588f42e174b7cb6481cc5"
+      }
+    },
+    {
+      "key": "village.blacksmithBlue",
+      "source": "kaykit-hexagon/buildings/blue/building_blacksmith_blue.gltf",
+      "runtime": "assets/world/shared/models/village-blacksmith-blue.glb",
+      "sourceDigest": {
+        "bytes": 3103,
+        "sha256": "b9b76474cde5a379334b31cf8ef108c26e8051b6f7560402cd7c2a100fb4bf54"
+      },
+      "runtimeDigest": {
+        "bytes": 140252,
+        "sha256": "6c1c30458a9d55c5dc93dd61d32ba76a81c629720261644b1672f3e27d387d8d"
+      }
+    },
+    {
+      "key": "village.homeBlueA",
+      "source": "kaykit-hexagon/buildings/blue/building_home_A_blue.gltf",
+      "runtime": "assets/world/shared/models/village-home-blue-a.glb",
+      "sourceDigest": {
+        "bytes": 3090,
+        "sha256": "60b3568e086d586b491eed8168c46acb61bb9670fb2c296faa64929b18dfcbea"
+      },
+      "runtimeDigest": {
+        "bytes": 72552,
+        "sha256": "d229f52ea08b7ebd4d63443d2ee2557c751b5e558aade47a229043aac7871067"
+      }
+    },
+    {
+      "key": "village.homeBlueB",
+      "source": "kaykit-hexagon/buildings/blue/building_home_B_blue.gltf",
+      "runtime": "assets/world/shared/models/village-home-blue-b.glb",
+      "sourceDigest": {
+        "bytes": 3090,
+        "sha256": "bf503f4edcd3a744a021ccdd5b9215f6c8934ef87fa44d95632cb653422797eb"
+      },
+      "runtimeDigest": {
+        "bytes": 99324,
+        "sha256": "f65a5bb042e35f7b3c5c137c6deaffedfe49616956faf3c5df271adc784fef2c"
+      }
+    },
+    {
+      "key": "village.marketBlue",
+      "source": "kaykit-hexagon/buildings/blue/building_market_blue.gltf",
+      "runtime": "assets/world/shared/models/village-market-blue.glb",
+      "sourceDigest": {
+        "bytes": 3091,
+        "sha256": "24874a4651dfff0d1aea31e15a32b9c35122958764c6f968ca55f286285ffbe9"
+      },
+      "runtimeDigest": {
+        "bytes": 169368,
+        "sha256": "6855192e966551c8c868dea1fbc686252f86ce293f0433b5af898eafb6cb4042"
+      }
+    },
+    {
+      "key": "village.tavernBlue",
+      "source": "kaykit-hexagon/buildings/blue/building_tavern_blue.gltf",
+      "runtime": "assets/world/shared/models/village-tavern-blue.glb",
+      "sourceDigest": {
+        "bytes": 3093,
+        "sha256": "58a3573cf468f9c5f1d03a6da74fbc884f5f662ccddbfef2a10860abfe50109b"
+      },
+      "runtimeDigest": {
+        "bytes": 188060,
+        "sha256": "2864d566a0bb23434b2692b99d15a007b7012a589e58282a2ad307a5ac2d41b1"
+      }
+    },
+    {
+      "key": "village.towerBlueA",
+      "source": "kaykit-hexagon/buildings/blue/building_tower_A_blue.gltf",
+      "runtime": "assets/world/shared/models/village-tower-blue-a.glb",
+      "sourceDigest": {
+        "bytes": 5047,
+        "sha256": "792eee30a2c4524a1c26eace28cd7b324ef86a72120766399e695923ea06058c"
+      },
+      "runtimeDigest": {
+        "bytes": 130880,
+        "sha256": "2a170b85a7d553f23aa81f91d451c23307774ac73dbb97771ef5cc27bbce902d"
+      }
+    },
+    {
+      "key": "village.towerBlueB",
+      "source": "kaykit-hexagon/buildings/blue/building_tower_B_blue.gltf",
+      "runtime": "assets/world/shared/models/village-tower-blue-b.glb",
+      "sourceDigest": {
+        "bytes": 5048,
+        "sha256": "41c06933eec6ddcd043c2411e4e6c82ba2efd8371e09d8565b22e14b7d57b33e"
+      },
+      "runtimeDigest": {
+        "bytes": 148976,
+        "sha256": "d1a6890209f06c2a57ef77b09dcffff013b1574c1bd5b925cab63a30493434d3"
+      }
+    },
+    {
+      "key": "village.wellBlue",
+      "source": "kaykit-hexagon/buildings/blue/building_well_blue.gltf",
+      "runtime": "assets/world/shared/models/village-well-blue.glb",
+      "sourceDigest": {
+        "bytes": 3083,
+        "sha256": "66305823322b2e6a7f1cb8d8bf0d91ed9b94b8d96f61d0f7af77bd0d09f6463e"
+      },
+      "runtimeDigest": {
+        "bytes": 59540,
+        "sha256": "e91874848e41ad201d7b784b01aae95479e337daceb86fe01d02e391e06b7330"
+      }
+    },
+    {
+      "key": "village.woodFence",
+      "source": "kaykit-hexagon/buildings/neutral/fence_wood_straight.gltf",
+      "runtime": "assets/world/shared/models/village-wood-fence.glb",
+      "sourceDigest": {
+        "bytes": 3061,
+        "sha256": "5a2af87c5a6b90875e3bc11f289a321a5d4b2459975dba52351edbc58b2132e3"
+      },
+      "runtimeDigest": {
+        "bytes": 32208,
+        "sha256": "b0d2c3b8aaeb9d11e13c796ed57af6d646ffe6cb63c18464655e5b1803343489"
+      }
+    },
+    {
+      "key": "village.woodFenceGate",
+      "source": "kaykit-hexagon/buildings/neutral/fence_wood_straight_gate.gltf",
+      "runtime": "assets/world/shared/models/village-wood-fence-gate.glb",
+      "sourceDigest": {
+        "bytes": 5220,
+        "sha256": "ca9cc002a5896f387754e562f2109d5544ab5cf0e6f9555f2fa6a051664258eb"
+      },
+      "runtimeDigest": {
+        "bytes": 37492,
+        "sha256": "fd3d45224c81409b1e726ebef3d58effd077d6be1055089897090e6d572fc5b0"
+      }
+    },
+    {
+      "key": "wilds.hillTreesA",
+      "source": "kaykit-hexagon/decoration/nature/hills_A_trees.gltf",
+      "runtime": "assets/world/shared/models/wilds-hill-trees-a.glb",
+      "sourceDigest": {
+        "bytes": 3043,
+        "sha256": "6e7e71bd37856c442dc7cf562a1cc1e9eb172050dc002d2d65c3fb5b90ae1d28"
+      },
+      "runtimeDigest": {
+        "bytes": 48208,
+        "sha256": "00cd544c80eb5561427b2e493b4288c3054d6f8ec3e96a8e8abc0090637dc464"
+      }
+    },
+    {
+      "key": "wilds.hillTreesB",
+      "source": "kaykit-hexagon/decoration/nature/hills_B_trees.gltf",
+      "runtime": "assets/world/shared/models/wilds-hill-trees-b.glb",
+      "sourceDigest": {
+        "bytes": 3058,
+        "sha256": "7cc42569d75c661951ca96db8f9d1e1ed163b8fb1d5cce893256648a4f9c20ef"
+      },
+      "runtimeDigest": {
+        "bytes": 42400,
+        "sha256": "f1cdb97891fdfd7ad085a685f202edb263fd0f247ea1bedd1abcf6f37da6a1db"
+      }
+    },
+    {
+      "key": "wilds.mineGreen",
+      "source": "kaykit-hexagon/buildings/green/building_mine_green.gltf",
+      "runtime": "assets/world/shared/models/wilds-mine-green.glb",
+      "sourceDigest": {
+        "bytes": 3087,
+        "sha256": "2ddc0a7f59fc845cb1dd7a8d063d7d325cfff5aa0d1abedeb0286c85d9d0e79d"
+      },
+      "runtimeDigest": {
+        "bytes": 83224,
+        "sha256": "087800693022b15dcad8fff044be147bf10d0cebcbc8e1f447f8a55ca6d16eaa"
+      }
+    },
+    {
+      "key": "wilds.mountainTreesA",
+      "source": "kaykit-hexagon/decoration/nature/mountain_A_grass_trees.gltf",
+      "runtime": "assets/world/shared/models/wilds-mountain-trees-a.glb",
+      "sourceDigest": {
+        "bytes": 3085,
+        "sha256": "defb29e0132afd4ec5cb33281efb890c9ed9603b5181471b31ff4f21d71c143a"
+      },
+      "runtimeDigest": {
+        "bytes": 44516,
+        "sha256": "cc16191a3aaa2f3d77b5ac2a27913d17c85b41db2a86244a88050ab42e4eaa05"
+      }
+    },
+    {
+      "key": "wilds.mountainTreesB",
+      "source": "kaykit-hexagon/decoration/nature/mountain_B_grass_trees.gltf",
+      "runtime": "assets/world/shared/models/wilds-mountain-trees-b.glb",
+      "sourceDigest": {
+        "bytes": 3089,
+        "sha256": "bdab5e7879a6ac0d783470b2cf7435425b273d101ef38f8aa43b8e19424097f8"
+      },
+      "runtimeDigest": {
+        "bytes": 50372,
+        "sha256": "1b9d90f7a49db349aaa89f55dd134d3eb9264633c1fd36c6bfb3ac487243f483"
+      }
+    },
+    {
+      "key": "wilds.towerGreenA",
+      "source": "kaykit-hexagon/buildings/green/building_tower_A_green.gltf",
+      "runtime": "assets/world/shared/models/wilds-tower-green-a.glb",
+      "sourceDigest": {
+        "bytes": 5052,
+        "sha256": "8d144181835e2069bdbc55fc53bbe1639a0db6c9b005e0f21f71543151ebd5ac"
+      },
+      "runtimeDigest": {
+        "bytes": 130884,
+        "sha256": "a11c5ef31ed60b72a82653d37f249b768632cc805188c536a971f2b9eebc246a"
+      }
+    },
+    {
+      "key": "wilds.towerGreenB",
+      "source": "kaykit-hexagon/buildings/green/building_tower_B_green.gltf",
+      "runtime": "assets/world/shared/models/wilds-tower-green-b.glb",
+      "sourceDigest": {
+        "bytes": 5053,
+        "sha256": "bdea3426dcfd1afb61065f632794da9dbd1aae3a196ef55a43bc72222987932c"
+      },
+      "runtimeDigest": {
+        "bytes": 148980,
+        "sha256": "d159e3b2fcd25630c9ef3c0ea371a2cd4d828825ffb9ec3d43311bad457f1515"
+      }
+    },
+    {
+      "key": "wilds.waterLily",
+      "source": "kaykit-hexagon/decoration/nature/waterlily_A.gltf",
+      "runtime": "assets/world/shared/models/wilds-water-lily.glb",
+      "sourceDigest": {
+        "bytes": 3027,
+        "sha256": "037a145b2e75f8dc35b0712456469dd99697046b112194843deac454589474b8"
+      },
+      "runtimeDigest": {
+        "bytes": 19768,
+        "sha256": "21d1937e73dcecbc35badfd8024c556d58187d6d061dc3aa09d3734a41965c25"
+      }
+    },
+    {
+      "key": "wilds.watermillGreen",
+      "source": "kaykit-hexagon/buildings/green/building_watermill_green.gltf",
+      "runtime": "assets/world/shared/models/wilds-watermill-green.glb",
+      "sourceDigest": {
+        "bytes": 5240,
+        "sha256": "4083fc4f0c05d12edfe83d20ad42f79539b5fa4b28074566d1a3429420026e23"
+      },
+      "runtimeDigest": {
+        "bytes": 129468,
+        "sha256": "e4f5032ad4fa5c2f3c8947cd35960286495addf1773e9c689600259cb292e3f5"
+      }
+    },
+    {
+      "key": "wilds.waterPlant",
+      "source": "kaykit-hexagon/decoration/nature/waterplant_A.gltf",
+      "runtime": "assets/world/shared/models/wilds-water-plant.glb",
+      "sourceDigest": {
+        "bytes": 3049,
+        "sha256": "a4b1c359cc60eb24e702d60777f65795cc490e79ac3ce2699458909a470a7abd"
+      },
+      "runtimeDigest": {
+        "bytes": 20160,
+        "sha256": "d2e4a92fdb24fa40e6f683f1ba9177c2087c5ee5fc05670fddc553bc260b7676"
+      }
+    }
+  ],
+  "licenses": [
+    {
+      "file": "assets/world/shared/licenses/kaykit-medieval-hexagon-cc0.txt",
+      "bytes": 1027,
+      "sha256": "893a2b22391f4589070ba416f2cdb11bc5f54ad9a543d4f59f6d22b19072f39c"
+    },
+    {
+      "file": "assets/world/shared/licenses/quaternius-stylized-nature-cc0.txt",
+      "bytes": 828,
+      "sha256": "5de0412f4f694f3d8cfa2b334a3ddb7ebbdc3ac5b1e9c262ff4870d0564341db"
+    }
+  ]
+}

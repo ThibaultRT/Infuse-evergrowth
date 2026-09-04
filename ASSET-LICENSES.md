@@ -25,6 +25,33 @@ The original source archives are intentionally not intended for the shipped web 
 
 Runtime selections and future asset work are summarized in `2-environment.md`; exact shipped files are recorded by their runtime manifests.
 
+## Typed-world runtime subset
+
+The environment recreated from the approved prototype uses a curated subset under
+`public/assets/world/shared/`. The exact semantic key, upstream source path,
+promoted filename, source SHA-256 and runtime SHA-256 are recorded in
+`public/assets/world/asset-manifest.json`.
+
+- KayKit Medieval Hexagon buildings, walls, bridges, fences and props are repacked
+  from their source glTF dependency trees into self-contained GLBs. Creator: Kay
+  Lousberg. License: CC0 1.0. The supplied notice is retained as
+  `public/assets/world/shared/licenses/kaykit-medieval-hexagon-cc0.txt`.
+- KayKit Forest and legacy Dungeon models are likewise repacked as self-contained
+  runtime GLBs. Creator: Kay Lousberg. License: CC0 1.0; canonical source links are
+  recorded in the KayKit section below.
+- Quaternius Stylized Nature MegaKit models are repacked into self-contained GLBs.
+  Creator: Quaternius. License: CC0 1.0. The supplied notice is retained as
+  `public/assets/world/shared/licenses/quaternius-stylized-nature-cc0.txt`.
+- Poly Haven's four accepted 1K terrain material pairs are copied with descriptive
+  runtime names under `public/assets/world/shared/textures/`. Their individual
+  credits and source pages are listed below.
+- The approved CC0 fountain is copied to
+  `public/assets/world/shared/models/landmark-fountain.glb`.
+
+Raw source dependency trees, reference screenshots and the complete upstream
+provenance ledger remain in the ignored, checksummed
+`authoring/local/world-development/` library. They are not shipped.
+
 ## KayKit environment proof subset
 
 The curated runtime files under `public/assets/kaykit/` come from these original, unmodified archives retained under `source-assets/`:

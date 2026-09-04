@@ -1,16 +1,21 @@
 {
   "name": "infuse-evergrowth",
   "private": true,
-  "version": "0.66.2",
+  "version": "0.68.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "validate:release": "node scripts/validate-release.mjs",
-    "authoring:build": "node scripts/world-authoring/build.mjs",
-    "authoring:promote": "node scripts/world-authoring/build.mjs --promote",
-    "authoring:validate": "node scripts/world-authoring/build.mjs --validate-only",
+    "validate:release": "node scripts/world-authoring/validate-layout.mjs && node scripts/world-assets/promote.mjs --verify && node scripts/validate-release.mjs",
+    "authoring:assets:capture": "node scripts/world-assets/capture.mjs",
+    "authoring:assets:audit": "node scripts/world-assets/capture.mjs --audit",
+    "authoring:assets:promote": "node scripts/world-assets/promote.mjs",
+    "authoring:assets:verify": "node scripts/world-assets/promote.mjs --verify",
+    "authoring:world:capture": "node scripts/world-authoring/capture-layout.mjs",
+    "authoring:world:build-debug": "node scripts/world-authoring/capture-layout.mjs",
+    "authoring:world:validate": "node scripts/world-authoring/validate-layout.mjs",
+    "authoring:world:smoke-runtime": "node scripts/world-authoring/smoke-runtime.mjs",
     "authoring:viewer": "vite --config tools/world-authoring-viewer/vite.config.ts"
   },
   "dependencies": {

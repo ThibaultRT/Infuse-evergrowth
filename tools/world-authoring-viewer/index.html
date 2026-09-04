@@ -1,1 +1,47 @@
-<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Infuse World Authoring Viewer</title><link rel="stylesheet" href="./viewer.css"></head><body><canvas id="view"></canvas><aside><h1>World Authoring</h1><div id="status">Loading…</div><div class="buttons"><button id="iso">Isometric</button><button id="top">Top</button><button id="frame">Frame</button><button id="reload">Reload generated world</button></div><label><input id="generated" type="checkbox" checked> Generated roads / rivers</label><label><input id="guides" type="checkbox"> Guide centerlines</label><h2>Chunks</h2><div id="chunks"></div><h2>Statistics</h2><div id="stats">—</div><h2>Warnings</h2><ul id="warnings"></ul><p class="note">Temporary inspection preset: 45° azimuth, 52° elevation. Editing remains in Three.js Editor.</p></aside><script type="module" src="./main.ts"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Infuse World Layout Preview</title>
+    <link rel="stylesheet" href="./viewer.css">
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <aside>
+      <h1>World Layout Preview</h1>
+      <div id="status">Loading…</div>
+      <div class="toolbar">
+        <button data-camera="world">World</button>
+        <button data-camera="area:A01">A01</button>
+        <button data-camera="area:A02">A02</button>
+        <button data-camera="area:A03">A03</button>
+        <button data-camera="top">Top</button>
+        <button id="reload">Reload</button>
+      </div>
+      <label>Asset resolver
+        <select id="resolver"><option value="production">Promoted production assets</option><option value="development">Ignored development library</option></select>
+      </label>
+      <label>Find placement <input id="search" type="search" list="placement-names" placeholder="A03_Corner_SW"></label>
+      <datalist id="placement-names"></datalist>
+      <div class="toggles">
+        <label><input id="colliders" type="checkbox"> Collision</label>
+        <label><input id="spawns" type="checkbox"> Spawns</label>
+        <label><input id="clearances" type="checkbox"> Gate clearance</label>
+        <label><input id="scatter" type="checkbox" checked> Scatter</label>
+      </div>
+      <h2>Chunks</h2>
+      <div id="chunks"></div>
+      <h2>Selection</h2>
+      <pre id="selection">Click a prop or search by stable name.</pre>
+      <button id="copy" disabled>Copy placement name</button>
+      <h2>Statistics</h2>
+      <div id="stats">—</div>
+      <h2>Validation</h2>
+      <ul id="warnings"></ul>
+      <button id="export">Download assembled debug GLB</button>
+      <p class="note">Typed layouts are authoritative. Make accepted edits in the named layout entry, then reload; the preview and collision recompile together.</p>
+    </aside>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -4,17 +4,13 @@
   "environmentTheme": "sunlit-meadow",
   "enemyWeapon": "blunt",
   "enemyWeakness": "slash",
-  "worldOrigin": {
-    "x": 0,
-    "z": 0
-  },
   "bossSpawnId": "area1-uncommon-03",
   "spawns": [
     {
       "id": "area1-crystal-01",
       "tier": "crystal",
-      "x": -4,
-      "z": 7,
+      "x": -6.4,
+      "z": 12,
       "hp": {
         "min": 35,
         "max": 80
@@ -36,8 +32,8 @@
     {
       "id": "area1-crystal-02",
       "tier": "crystal",
-      "x": 4,
-      "z": 8,
+      "x": 6.4,
+      "z": 10,
       "hp": {
         "min": 35,
         "max": 80
@@ -59,8 +55,8 @@
     {
       "id": "area1-crystal-03",
       "tier": "crystal",
-      "x": -8,
-      "z": 2,
+      "x": -12.8,
+      "z": 2.5,
       "hp": {
         "min": 35,
         "max": 80
@@ -82,8 +78,8 @@
     {
       "id": "area1-crystal-04",
       "tier": "crystal",
-      "x": 8,
-      "z": 1,
+      "x": 12.8,
+      "z": 1.25,
       "hp": {
         "min": 35,
         "max": 80
@@ -105,8 +101,8 @@
     {
       "id": "area1-crystal-05",
       "tier": "crystal",
-      "x": -10,
-      "z": -6,
+      "x": -16,
+      "z": -7.5,
       "hp": {
         "min": 35,
         "max": 80
@@ -128,8 +124,8 @@
     {
       "id": "area1-crystal-06",
       "tier": "crystal",
-      "x": 10,
-      "z": -7,
+      "x": 16,
+      "z": -8.75,
       "hp": {
         "min": 35,
         "max": 80
@@ -151,8 +147,8 @@
     {
       "id": "area1-crystal-07",
       "tier": "crystal",
-      "x": -13,
-      "z": 5,
+      "x": -20.8,
+      "z": 6.25,
       "hp": {
         "min": 35,
         "max": 80
@@ -174,8 +170,8 @@
     {
       "id": "area1-crystal-08",
       "tier": "crystal",
-      "x": 13,
-      "z": 5,
+      "x": 20.8,
+      "z": 6.25,
       "hp": {
         "min": 35,
         "max": 80
@@ -197,8 +193,8 @@
     {
       "id": "area1-crystal-09",
       "tier": "crystal",
-      "x": -5,
-      "z": -2,
+      "x": -8,
+      "z": -2.5,
       "hp": {
         "min": 35,
         "max": 80
@@ -220,8 +216,8 @@
     {
       "id": "area1-crystal-10",
       "tier": "crystal",
-      "x": 5,
-      "z": -3,
+      "x": 8,
+      "z": -3.75,
       "hp": {
         "min": 35,
         "max": 80
@@ -243,8 +239,8 @@
     {
       "id": "area1-common-01",
       "tier": "common",
-      "x": -8,
-      "z": 14,
+      "x": -12.8,
+      "z": 17.5,
       "hp": {
         "min": 35,
         "max": 80
@@ -267,8 +263,8 @@
     {
       "id": "area1-common-02",
       "tier": "common",
-      "x": -6,
-      "z": 15,
+      "x": -9.6,
+      "z": 18.75,
       "hp": {
         "min": 35,
         "max": 80
@@ -291,8 +287,8 @@
     {
       "id": "area1-common-03",
       "tier": "common",
-      "x": -4,
-      "z": 14,
+      "x": -6.4,
+      "z": 17.5,
       "hp": {
         "min": 35,
         "max": 80
@@ -315,8 +311,8 @@
     {
       "id": "area1-common-04",
       "tier": "common",
-      "x": -7,
-      "z": 12,
+      "x": -11.2,
+      "z": 15,
       "hp": {
         "min": 35,
         "max": 80
@@ -339,8 +335,8 @@
     {
       "id": "area1-common-05",
       "tier": "common",
-      "x": -5,
-      "z": 12,
+      "x": -8,
+      "z": 15,
       "hp": {
         "min": 35,
         "max": 80
@@ -363,8 +359,8 @@
     {
       "id": "area1-common-06",
       "tier": "common",
-      "x": -3,
-      "z": 13,
+      "x": -4.8,
+      "z": 16.25,
       "hp": {
         "min": 35,
         "max": 80
@@ -387,8 +383,8 @@
     {
       "id": "area1-common-07",
       "tier": "common",
-      "x": 5,
-      "z": -13,
+      "x": 8,
+      "z": -16.25,
       "hp": {
         "min": 35,
         "max": 80
@@ -411,8 +407,8 @@
     {
       "id": "area1-common-08",
       "tier": "common",
-      "x": 7,
-      "z": -14,
+      "x": 11.2,
+      "z": -17.5,
       "hp": {
         "min": 35,
         "max": 80
@@ -435,8 +431,8 @@
     {
       "id": "area1-common-09",
       "tier": "common",
-      "x": 9,
-      "z": -13,
+      "x": 20,
+      "z": -20,
       "hp": {
         "min": 35,
         "max": 80
@@ -459,8 +455,8 @@
     {
       "id": "area1-common-10",
       "tier": "common",
-      "x": 4,
-      "z": -15,
+      "x": 6.4,
+      "z": -18.75,
       "hp": {
         "min": 35,
         "max": 80
@@ -483,8 +479,8 @@
     {
       "id": "area1-common-11",
       "tier": "common",
-      "x": 6,
-      "z": -16,
+      "x": 9.6,
+      "z": -20,
       "hp": {
         "min": 35,
         "max": 80
@@ -507,8 +503,8 @@
     {
       "id": "area1-common-12",
       "tier": "common",
-      "x": 8,
-      "z": -16,
+      "x": 12.8,
+      "z": -20,
       "hp": {
         "min": 35,
         "max": 80
@@ -531,8 +527,8 @@
     {
       "id": "area1-common-13",
       "tier": "common",
-      "x": 10,
-      "z": -15,
+      "x": 16,
+      "z": -18.75,
       "hp": {
         "min": 35,
         "max": 80
@@ -555,8 +551,8 @@
     {
       "id": "area1-common-14",
       "tier": "common",
-      "x": 11,
-      "z": -12,
+      "x": 17.6,
+      "z": -15,
       "hp": {
         "min": 35,
         "max": 80
@@ -579,8 +575,8 @@
     {
       "id": "area1-common-15",
       "tier": "common",
-      "x": 1,
-      "z": 17,
+      "x": 1.6,
+      "z": 21.25,
       "hp": {
         "min": 35,
         "max": 80
@@ -603,8 +599,8 @@
     {
       "id": "area1-uncommon-01",
       "tier": "uncommon",
-      "x": 9,
-      "z": 15,
+      "x": 14.4,
+      "z": 18.75,
       "hp": {
         "min": 200,
         "max": 200
@@ -622,7 +618,7 @@
       "id": "area1-uncommon-02",
       "tier": "uncommon",
       "x": -12,
-      "z": -13,
+      "z": -20,
       "hp": {
         "min": 500,
         "max": 500
@@ -640,7 +636,7 @@
       "id": "area1-uncommon-03",
       "tier": "uncommon",
       "x": 0,
-      "z": 23,
+      "z": 28.75,
       "hp": {
         "min": 2000,
         "max": 2000
@@ -659,8 +655,8 @@
     {
       "id": "area1-rare-01",
       "tier": "rare",
-      "x": -14,
-      "z": 19,
+      "x": -22.4,
+      "z": 23.75,
       "hp": {
         "min": 4500,
         "max": 4500
@@ -673,36 +669,6 @@
         }
       ],
       "attackDamage": 70
-    }
-  ],
-  "size": {
-    "width": 36,
-    "depth": 56
-  },
-  "collision": [
-    {
-      "id": "meadow-shrine",
-      "kind": "rectangle",
-      "x": 0,
-      "z": 5,
-      "width": 2.2,
-      "depth": 2.2
-    },
-    {
-      "id": "north-rift-west",
-      "kind": "rectangle",
-      "x": -7,
-      "z": 27.4,
-      "width": 10,
-      "depth": 1.5
-    },
-    {
-      "id": "north-rift-east",
-      "kind": "rectangle",
-      "x": 7,
-      "z": 27.4,
-      "width": 10,
-      "depth": 1.5
     }
   ]
 }

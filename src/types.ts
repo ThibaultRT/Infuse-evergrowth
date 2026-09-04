@@ -1,3 +1,5 @@
+import type { WorldCollisionShape } from './domain/world/WorldCollision';
+
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type DamageType = 'blunt' | 'slash' | 'piercing';
 export type SoulType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -37,7 +39,7 @@ export type AreaDefinition = {
   collision: CollisionShape[];
 };
 
-export type CollisionShape = { id: string; kind: 'rectangle'; x: number; z: number; width: number; depth: number };
+export type CollisionShape = WorldCollisionShape;
 
 export type WorldConnection = {
   id: string;

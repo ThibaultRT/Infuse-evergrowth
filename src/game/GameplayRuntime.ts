@@ -1,6 +1,6 @@
 import type { Position } from '../domain/world/Position';
 import { copyPosition, distanceBetween } from '../domain/world/Position';
-import { lakeBarrierBounds, lakeBarrierSegments } from '../domain/world/LakeBoundary';
+import { circleOverlapsWorldCollision } from '../domain/world/CollisionMath';
 import { EnemyAISystem, type EnemyAIState } from '../systems/EnemyAISystem';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 
@@ -234,7 +234,6 @@ export class GameplayRuntime {
         }
       }
     }
-    this.constrainToLakeBank(candidate, area, heroRadius, previous);
     this.constrainToAuthoredCollision(candidate, previous, area, heroRadius);
     this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
     this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
@@ -259,47 +258,22 @@ export class GameplayRuntime {
     const radius = .45;
     spawn.position.x = Math.min(area.originX + area.size.width / 2 - radius, Math.max(area.originX - area.size.width / 2 + radius, spawn.position.x));
     spawn.position.z = Math.min(area.originZ + area.size.depth / 2 - radius, Math.max(area.originZ - area.size.depth / 2 + radius, spawn.position.z));
-    this.constrainToLakeBank(spawn.position, area, radius);
     this.constrainToAuthoredCollision(spawn.position, previous, area, radius);
   }
 
   private constrainToAuthoredCollision(position: Position, previous: Position, area: AreaDefinition, radius: number): void {
     for (const shape of area.collision) {
-      const overlaps = (point: Position): boolean => Math.abs(point.x - shape.x) < shape.width / 2 + radius && Math.abs(point.z - shape.z) < shape.depth / 2 + radius;
+      if (shape.activation) {
+        const connection = this.options.connections.find((candidate) => candidate.id === shape.activation?.connectionId);
+        if (!connection || this.options.unlockedAreas.includes(connection.requiredUnlockedAreaId)) continue;
+      }
+      const overlaps = (point: Position): boolean => circleOverlapsWorldCollision(point, radius, shape);
       if (!overlaps(position)) continue;
       const xOnly = { ...position, z: previous.z };
       const zOnly = { ...position, x: previous.x };
       if (!overlaps(xOnly)) position.z = previous.z;
       else if (!overlaps(zOnly)) position.x = previous.x;
       else copyPosition(position, previous);
-    }
-  }
-
-  /** Keep both lakes solid while allowing movement along and across the causeway. */
-  private constrainToLakeBank(position: Position, area: AreaDefinition, radius: number, previous?: Position): void {
-    const connection = this.options.connections.find((item) =>
-      item.visualStyle === 'lake-gate' && item.axis === 'z' && (item.areaAId === area.id || item.areaBId === area.id)
-    );
-    if (!connection) return;
-    const bounds = lakeBarrierBounds(connection, this.options.areas);
-    const segments = lakeBarrierSegments(connection, bounds.minX, bounds.maxX);
-    for (const segment of segments) {
-      const overlapsX = position.x + radius > segment.minX && position.x - radius < segment.maxX;
-      const overlapsZ = position.z + radius > segment.minZ && position.z - radius < segment.maxZ;
-      if (!overlapsX || !overlapsZ) continue;
-
-      // When entering from the causeway, stop at the lake's vertical end instead
-      // of snapping all the way back to a bank. This closes the gate-side leak.
-      const previousWasInOpening = previous && previous.x - radius >= segments[0].maxX && previous.x + radius <= segments[1].minX;
-      const previousWasAlongLake = previous && previous.z + radius > segment.minZ && previous.z - radius < segment.maxZ;
-      if (previousWasInOpening && previousWasAlongLake) {
-        position.x = segment === segments[0] ? segment.maxX + radius : segment.minX - radius;
-        continue;
-      }
-
-      const bankInset = (connection.barrierDepth ?? 0) / 2 + radius;
-      if (area.originZ > connection.z) position.z = connection.z + bankInset;
-      else position.z = connection.z - bankInset;
     }
   }
 
