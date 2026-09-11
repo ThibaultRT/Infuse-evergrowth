@@ -97,6 +97,18 @@ function buildDiagnostics(): void {
     spawnRoot.add(marker);
   }
   spawnRoot.visible = false;
+  // These rings reserve floor space only; they do not instantiate enemies.
+  for (const layout of WORLD_LAYOUTS) {
+    if (layout.kind !== 'area' || !('encounterSpots' in layout)) continue;
+    for (const spot of layout.encounterSpots) {
+      const marker = new THREE.Mesh(new THREE.RingGeometry(spot.radius - .08, spot.radius, 48), new THREE.MeshBasicMaterial({ color: 0x7be4d1, side: THREE.DoubleSide }));
+      marker.name = spot.id;
+      marker.rotation.x = -Math.PI / 2;
+      marker.position.set(layout.origin[0] + spot.center[0], .16, layout.origin[2] + spot.center[1]);
+      marker.userData = { encounterName: spot.name, reservedRadius: spot.radius, sourceChunkId: layout.id };
+      spawnRoot.add(marker);
+    }
+  }
   clearanceRoot.clear();
   for (const connection of WORLD_CONNECTIONS) {
     const alongX = connection.axis === 'z';
@@ -152,6 +164,12 @@ function framePreset(preset: string): void {
   } else if (preset === 'highwood:portrait') {
     controls.target.set(18, 0, -60);
     camera.position.set(27, 23, -36);
+  } else if (preset === 'fallen-keep') {
+    controls.target.set(72, 0, -1);
+    camera.position.set(99, 83, 80);
+  } else if (preset === 'fallen-keep:portrait') {
+    controls.target.set(73, 0, -13);
+    camera.position.set(80, 24, 14);
   } else if (preset === 'bridge:A01-A02') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === 'area1-area2')!;
     const portraitDistance = Math.max(1, 0.8 / camera.aspect);

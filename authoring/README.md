@@ -178,6 +178,45 @@ simulation floor, and the landscape stays within four draws / 45k triangles / 4 
 captures portrait views, and checks persisted Reduced/30 FPS and missing-landscape
 fallback. These browser checks do not replace real iPhone profiling.
 
+## Fallen Keep reference layout
+
+Area A03 follows the ruined castle in `Layout.png`: shattered ramparts on all four
+sides, hollow corner towers, blue gatehouse banner remnants, a roofless keep and
+chapel, small destroyed houses, a barracks, and connected stone courts. Its 72 × 72 m
+playable footprint, root, two gate connections, existing spawn IDs and progression
+are retained. Walking remains at Y=0; paving is a cosmetic surface dressing.
+
+`src/data/world/fallen-keep.json` owns masonry dimensions, building wall segments,
+roads, outer cliff dimensions and seven reserved encounter spots. The Blender
+exporter and semantic collision proxies consume those same values. Building
+interiors and entrances are open; ruined perimeter walls remain barriers.
+
+The reserved spots are Gate Court, Ash Court, Chapel, Keep Hall, Smithy, Barracks
+and East Court. Their stable `A03_Encounter_*` IDs, centers and clear radii can be
+used by future spawn authoring; they do not create enemies or change saves.
+The viewer's **Spawns / reserved spots** overlay shows turquoise clearance rings.
+
+Run `scripts/world-assets/export-fallen-keep.py` through Blender MCP with its
+absolute path as `__file__`. It creates an isolated scene and writes
+`authoring/local/fallen-keep/fallen-keep.blend`. On a fresh checkout, download the
+CC0 Castle Kit archive documented in `ASSET-LICENSES.md` to
+`authoring/local/fallen-keep/source/kenney_castle-kit.zip` before exporting.
+Run `scripts/world-assets/optimize-fallen-keep.ps1` after export for lossless
+glTF Transform deduplication and pruning; it does not add runtime dependencies.
+Promote the ten exports with:
+
+```bash
+npm run authoring:assets:promote -- terrain.fallenKeep ruin.curtainA ruin.curtainB ruin.cornerTower ruin.gate ruin.cottage ruin.barracks ruin.chapel ruin.keepHall ruin.siegeDebris
+```
+
+`authoring:world:validate` checks every existing encounter, building interior,
+both gate approaches, the reserved clear radii and a 6 MiB / 85k unique triangle
+asset budget. `authoring:world:capture` adds `area3-target-layout.png` and
+`iphone-12-fallen-keep-court.png`. `authoring:world:smoke-runtime -- --fallen-keep`
+walks both gates, the chapel and barracks, checks the south barrier, and exercises
+saved Reduced/30 FPS and missing-terrain fallback. These browser captures are not
+a substitute for real iPhone performance measurements.
+
 ## Ownership
 
 - `src/data/world/**`: authoritative dimensions, layouts, prop catalog and asset map.

@@ -4,6 +4,7 @@ import type { WorldWalkSurface } from '../../domain/world/WorldWalkSurface';
 import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_SURFACE } from './woodlandBridge';
 import { GREENHAVEN_COLLISION } from './greenhaven';
 import { HIGHWOOD_COLLISION } from './highwood';
+import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_WALL_COLLISION, fallenKeepShellCollision } from './fallenKeep';
 
 export type WorldPropDefinition = {
   readonly asset: WorldAssetKey;
@@ -20,6 +21,16 @@ const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): 
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
 
 export const WORLD_PROP_CATALOG = {
+  'terrain.fallenKeep': { asset: 'terrain.fallenKeep', collision: [], absoluteElevation: true },
+  'ruin.curtainA': occludingProp('ruin.curtainA', FALLEN_KEEP_WALL_COLLISION),
+  'ruin.curtainB': occludingProp('ruin.curtainB', FALLEN_KEEP_WALL_COLLISION),
+  'ruin.cornerTower': occludingProp('ruin.cornerTower', FALLEN_KEEP_CORNER_COLLISION),
+  'ruin.gate': occludingProp('ruin.gate', FALLEN_KEEP_GATE_COLLISION),
+  'ruin.cottage': occludingProp('ruin.cottage', fallenKeepShellCollision('cottage')),
+  'ruin.barracks': occludingProp('ruin.barracks', fallenKeepShellCollision('barracks')),
+  'ruin.chapel': occludingProp('ruin.chapel', fallenKeepShellCollision('chapel')),
+  'ruin.keepHall': occludingProp('ruin.keepHall', fallenKeepShellCollision('hall')),
+  'ruin.siegeDebris': prop('ruin.siegeDebris', [rectangle(3.4, 3.4)]),
   'terrain.highwood': { asset: 'terrain.highwood', collision: HIGHWOOD_COLLISION, absoluteElevation: true },
   'nature.highwoodBareA': occludingProp('nature.highwoodBareA', [circle(0.55)]),
   'nature.highwoodBareB': occludingProp('nature.highwoodBareB', [circle(0.55)]),

@@ -19,13 +19,13 @@ export const A01_A03_TRANSITION = {
     // Keep two standard-scale modules on each side of the gate. The inner modules
     // are tangent to its visible faces at z=-2.28 and z=9.48; the outer modules
     // continue edge-to-edge into the asymmetric corner pieces.
-    { name: 'A03_CurtainWall_West_001', prop: 'fortress.wall', position: [0, 1.1, -24.96], rotation: -Math.PI / 2, scale: 1.08 },
-    { name: 'A03_CurtainWall_West_002', prop: 'fortress.wall', position: [0, 1.1, -9.84], rotation: -Math.PI / 2, scale: 1.08 },
-    { name: 'A03_CurtainWall_West_003', prop: 'fortress.wall', position: [0, 1.1, 17.04], rotation: -Math.PI / 2, scale: 1.08 },
-    { name: 'A03_CurtainWall_West_004', prop: 'fortress.wall', position: [0, 1.1, 32.16], rotation: -Math.PI / 2, scale: 1.08 },
-    { name: 'A03_WestGate', prop: 'fortress.gate', position: [0, 1.1, 3.6], rotation: Math.PI / 2, scale: 0.84 },
-    { name: 'A03_Corner_NW', prop: 'fortress.corner', position: [-0.307, 1.1, -28.445], rotation: 7 * Math.PI / 6, scale: 1.1 },
-    { name: 'A03_Corner_SW', prop: 'fortress.corner', position: [3.486, 1.1, 35.807], rotation: 5 * Math.PI / 3, scale: 1.1 },
+    { name: 'A03_CurtainWall_West_001', prop: 'ruin.curtainA', position: [0, 0, -24.96], rotation: -Math.PI / 2, scale: 1.08 },
+    { name: 'A03_CurtainWall_West_002', prop: 'ruin.curtainA', position: [0, 0, -9.84], rotation: -Math.PI / 2, scale: 1.08 },
+    { name: 'A03_CurtainWall_West_003', prop: 'ruin.curtainA', position: [0, 0, 17.04], rotation: -Math.PI / 2, scale: 1.08 },
+    { name: 'A03_CurtainWall_West_004', prop: 'ruin.curtainA', position: [0, 0, 32.16], rotation: -Math.PI / 2, scale: 1.08 },
+    { name: 'A03_WestGate', prop: 'ruin.gate', position: [0, 0, 3.6], rotation: Math.PI / 2, scale: 0.84 },
+    { name: 'A03_Corner_NW', prop: 'ruin.cornerTower', position: [-0.307, 0, -28.445], rotation: 7 * Math.PI / 6, scale: 1.1 },
+    { name: 'A03_Corner_SW', prop: 'ruin.cornerTower', position: [3.486, 0, 35.807], rotation: 5 * Math.PI / 3, scale: 1.1 },
   ],
   scatters: [],
   collision: [

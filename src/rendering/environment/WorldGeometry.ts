@@ -3,19 +3,13 @@ import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement } from '
 import type { WorldMaterialSet } from './WorldMaterials';
 import { greenhavenGroundHeight } from '../../data/world/greenhaven';
 import { highwoodGroundHeight } from '../../data/world/highwood';
-
-function edgeFade(layout: AnyWorldLayout, x: number, z: number): number {
-  const halfWidth = layout.visualSize.width / 2;
-  const halfDepth = layout.visualSize.depth / 2;
-  return Math.min(1, Math.max(0, (halfWidth - Math.abs(x)) / 5), Math.max(0, (halfDepth - Math.abs(z)) / 5));
-}
+import { fallenKeepGroundHeight } from '../../data/world/fallenKeep';
 
 export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number): number {
   if (layout.kind === 'transition') return 0;
-  const ripple = (Math.sin((x + layout.origin[0]) * 0.105) * 0.08 + Math.cos((z + layout.origin[2]) * 0.085) * 0.07) * edgeFade(layout, x, z);
   let height: number;
   if (layout.areaId === 2) height = highwoodGroundHeight();
-  else if (layout.areaId === 3) height = 0.85 * edgeFade(layout, x, z) + ripple * 0.65;
+  else if (layout.areaId === 3) height = fallenKeepGroundHeight();
   else height = greenhavenGroundHeight(x, z);
 
   for (const cutout of layout.terrainCutouts ?? []) {

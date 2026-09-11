@@ -37,6 +37,13 @@ west wall and gate. The A02/A03 fortified river transition owns its north wall,
 bridge and gate. Area A03 owns the east and south walls. Broken-looking wall pieces
 remain collidable; only the two authored gates are traversable.
 
+Its ruined masonry now uses `fallen-keep.json` for both Blender dimensions and
+semantic collision. Corner towers add a round footprint to the two wall arms.
+Roofless house, chapel and keep shells have wall-segment proxies so their interiors
+can be entered. Seven `A03_Encounter_*` clearings are reserved for later spawn
+authoring; the viewer shows their radii with its spawn overlay. They are scenery
+authoring metadata and do not create live enemies or persistent state.
+
 ## Daily editing loop
 
 Run `npm run authoring:viewer`. The preview builds the real layouts with the real

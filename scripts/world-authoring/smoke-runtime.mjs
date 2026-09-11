@@ -11,6 +11,7 @@ const woodlandBridge = process.argv.includes('--woodland-bridge');
 const greenhaven = process.argv.includes('--greenhaven');
 const greenhavenShore = process.argv.includes('--greenhaven-shore');
 const highwood = process.argv.includes('--highwood');
+const fallenKeep = process.argv.includes('--fallen-keep');
 const port = 4173;
 const gameUrl = `http://127.0.0.1:${port}/Infuse-evergrowth/`;
 const outputRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -42,6 +43,7 @@ class CdpClient {
   nextId = 1;
   pending = new Map();
   errors = [];
+  pageLoads = 0;
 
   constructor(webSocket) {
     this.socket = webSocket;
@@ -56,6 +58,7 @@ class CdpClient {
         return;
       }
       if (message.method === 'Runtime.exceptionThrown') this.errors.push(message.params.exceptionDetails?.text ?? 'Runtime exception');
+      if (message.method === 'Page.loadEventFired') this.pageLoads++;
       if (message.method === 'Log.entryAdded' && message.params.entry?.level === 'error') this.errors.push(message.params.entry.text);
     });
   }
@@ -81,11 +84,26 @@ async function evaluate(client, expression, awaitPromise = false) {
 async function waitFor(client, expression, description, timeoutMs = 90000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    if (await evaluate(client, expression)) return;
+    try {
+      if (await evaluate(client, expression)) return;
+    } catch (error) {
+      // Readiness polling can straddle an initial navigation. Never retry writes.
+      if (!/context.*destroyed|Inspected target navigated|Cannot find context/i.test(String(error))) throw error;
+    }
     await wait(250);
   }
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent ?? 'renderer statistics unavailable'");
   throw new Error(`Timed out waiting for ${description}.\n${rendererStats}`);
+}
+
+async function reloadPage(client) {
+  const previousLoads = client.pageLoads;
+  await client.send('Page.reload');
+  const deadline = Date.now() + 90000;
+  while (client.pageLoads === previousLoads) {
+    if (Date.now() > deadline) throw new Error('Timed out waiting for the reloaded document.');
+    await wait(100);
+  }
 }
 
 async function holdKey(client, code, key, milliseconds) {
@@ -98,6 +116,7 @@ async function holdKey(client, code, key, milliseconds) {
 async function capture(client, file) {
   const screenshot = await client.send('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
   await writeFile(path.join(outputRoot, file), Buffer.from(screenshot.data, 'base64'));
+  if (fallenKeep) console.log(`Captured ${file}`);
 }
 
 async function waitForArea(client, areaId) {
@@ -183,12 +202,62 @@ try {
     localStorage.setItem(key, JSON.stringify(save));
     return true;
   })()`);
-  await client.send('Page.reload');
+  await reloadPage(client);
   await waitFor(client, gameReadyExpression, 'instrumented game boot');
   await waitForArea(client, 1);
   await capture(client, 'runtime-iphone-12-area-a01.png');
 
-  if (highwood) {
+  if (fallenKeep) {
+    await moveAxis(client, 'x', 6);
+    await moveAxis(client, 'z', 3.6);
+    await moveAxis(client, 'x', 48);
+    await waitForArea(client, 3);
+    await capture(client, 'runtime-iphone-12-keep-west-gate.png');
+    await moveAxis(client, 'x', 72);
+    await capture(client, 'runtime-iphone-12-keep-ash-court.png');
+    await moveAxis(client, 'z', -21);
+    await capture(client, 'runtime-iphone-12-keep-chapel.png');
+    await moveAxis(client, 'z', -10);
+    await moveAxis(client, 'x', 81.2);
+    await moveAxis(client, 'z', -31);
+    await moveAxis(client, 'x', 79.2);
+    await moveAxis(client, 'z', -42);
+    await waitForArea(client, 2);
+    await capture(client, 'runtime-iphone-12-keep-north-gate.png');
+    await moveAxis(client, 'z', -31);
+    await waitForArea(client, 3);
+    await moveAxis(client, 'x', 81.2);
+    await moveAxis(client, 'z', 24);
+    await moveAxis(client, 'x', 72);
+    await moveAxis(client, 'z', 22);
+    await capture(client, 'runtime-iphone-12-keep-barracks.png');
+    await moveAxis(client, 'x', 81.2);
+    await moveAxis(client, 'z', 28.5);
+    await moveAxis(client, 'x', 80);
+    await moveAxis(client, 'z', 34);
+    await holdKey(client, 'ArrowDown', 'ArrowDown', 1300);
+    if ((await heroPosition(client)).z > 35.2) throw new Error('The ruined south wall is traversable.');
+    await capture(client, 'runtime-iphone-12-keep-south-wall.png');
+    await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
+    await reloadPage(client);
+    await waitFor(client, gameReadyExpression, 'saved Reduced/30 FPS keep boot');
+    await waitForArea(client, 3);
+    const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
+    if (quality.renderScale !== .7 || quality.frameRateLimit !== 30) throw new Error('Keep rendering preferences did not persist.');
+    if (await evaluate(client, "document.querySelector('#canvas-host canvas').width") !== 273) throw new Error('Keep reduced drawing buffer is incorrect.');
+    await capture(client, 'runtime-iphone-12-keep-reduced.png');
+    await client.send('Network.enable');
+    await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+    await client.send('Network.setBlockedURLs', { urls: ['*fallen-keep-landscape.glb*'] });
+    await reloadPage(client);
+    await waitFor(client, gameReadyExpression, 'keep landscape fallback');
+    await waitForArea(client, 3);
+    const before = await heroPosition(client);
+    await holdKey(client, 'ArrowRight', 'ArrowRight', 300);
+    if ((await heroPosition(client)).x <= before.x) throw new Error('Keep fallback is not playable.');
+    await capture(client, 'runtime-iphone-12-keep-fallback.png');
+    client.errors = client.errors.filter((message) => !message.includes('ERR_BLOCKED_BY_CLIENT'));
+  } else if (highwood) {
     await approachWoodlandBridge(client);
     await moveAxis(client, 'z', -45.2);
     await waitForArea(client, 2);
@@ -204,7 +273,7 @@ try {
     await moveAxis(client, 'z', -42);
     await waitForArea(client, 2);
     await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
-    await client.send('Page.reload');
+    await reloadPage(client);
     await waitFor(client, gameReadyExpression, 'saved Reduced/30 FPS boot');
     await waitForArea(client, 2);
     const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
@@ -217,7 +286,7 @@ try {
     await client.send('Network.enable');
     await client.send('Network.setCacheDisabled', { cacheDisabled: true });
     await client.send('Network.setBlockedURLs', { urls: ['*highwood-landscape.glb*'] });
-    await client.send('Page.reload');
+    await reloadPage(client);
     await waitFor(client, gameReadyExpression, 'Highwood landscape failure fallback boot');
     await waitForArea(client, 2);
     await walkTo(client, 36, -64);
@@ -255,7 +324,7 @@ try {
     await moveAxis(client, 'z', 0);
     await capture(client, 'runtime-iphone-12-greenhaven-full.png');
     await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
-    await client.send('Page.reload');
+    await reloadPage(client);
     await waitFor(client, gameReadyExpression, 'saved Reduced/30 FPS boot');
     await waitForArea(client, 1);
     const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
@@ -266,7 +335,7 @@ try {
     await client.send('Network.enable');
     await client.send('Network.setCacheDisabled', { cacheDisabled: true });
     await client.send('Network.setBlockedURLs', { urls: ['*greenhaven-landscape.glb*'] });
-    await client.send('Page.reload');
+    await reloadPage(client);
     await waitFor(client, gameReadyExpression, 'landscape failure fallback boot');
     await waitForArea(client, 1);
     await moveAxis(client, 'x', 3);
@@ -284,7 +353,7 @@ try {
       save.unlockedAreas = [1, 2, 3];
       localStorage.setItem(key, JSON.stringify(save));
     })()`);
-    await client.send('Page.reload');
+    await reloadPage(client);
     await waitFor(client, gameReadyExpression, 'unlocked bridge boot');
     await waitForArea(client, 1);
     await approachWoodlandBridge(client);
@@ -317,7 +386,7 @@ try {
 
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
   if (client.errors.length > 0) throw new Error(`Browser errors:\n${client.errors.join('\n')}`);
-  console.log(`Runtime smoke passed: ${highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed future bridge, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
+  console.log(`Runtime smoke passed: ${fallenKeep ? 'Fallen Keep gates, chapel/barracks interiors, south wall, persisted Reduced/30 FPS, terrain fallback' : highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed future bridge, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

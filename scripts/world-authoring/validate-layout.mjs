@@ -5,6 +5,7 @@ import { createServer } from 'vite';
 import { validateCrossings } from './validate-crossings.mjs';
 import { validateGreenhaven } from './validate-greenhaven.mjs';
 import { validateHighwood } from './validate-highwood.mjs';
+import { validateFallenKeep } from './validate-fallen-keep.mjs';
 
 const repositoryRoot = process.cwd();
 const vite = await createServer({ root: repositoryRoot, configFile: false, appType: 'custom', server: { middlewareMode: true }, logLevel: 'silent' });
@@ -122,7 +123,8 @@ try {
       }
     }
     for (const corner of ['NW', 'NE', 'SE', 'SW']) {
-      check(compiled.all.filter((shape) => shape.sourcePlacementName === `A03_Corner_${corner}`).length === 2, `A03_Corner_${corner} must retain both asset-level collision arms.`);
+      const shapes = compiled.all.filter((shape) => shape.sourcePlacementName === `A03_Corner_${corner}`);
+      check(shapes.filter((shape) => shape.kind === 'rectangle').length === 2 && shapes.some((shape) => shape.kind === 'circle'), `A03_Corner_${corner} must retain both wall arms and its ruined tower footprint.`);
     }
   }
 
@@ -142,6 +144,7 @@ try {
   await validateCrossings(vite, config);
   await validateGreenhaven(vite, config);
   await validateHighwood(vite, config);
+  await validateFallenKeep(vite, config);
   console.log(`World validation passed: ${WORLD_LAYOUTS.length} chunks, ${placementNames.size} named authored/scatter groups, ${compiled.all.length} colliders, ${config.SPAWNS.length} spawns, ${referencedAssets.size} promoted assets.`);
 } finally {
   await vite.close();

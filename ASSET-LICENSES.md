@@ -1,5 +1,28 @@
 # Third-party asset licenses
 
+## Fallen Keep ruins
+
+- Files: `public/assets/world/shared/models/fallen-keep-*.glb`.
+- The broken curtain walls, hollow corner towers, breached gatehouse, four roofless
+  building shells, weathered paving and rocky outer apron were authored for this
+  project through Blender MCP from the owner's `Layout.png` reference. They use
+  portable vertex colors; semantic footprints are shared in `fallen-keep.json`.
+  The soil reuses the accepted Poly Haven `terrain-cobble-color.jpg` as an embedded,
+  desaturated 512px palette variant; the original texture is unchanged.
+- The demolished catapult reuses `siege-catapult-demolished.glb` and its embedded
+  palette from [Kenney's Castle Kit](https://kenney.nl/assets/castle-kit), CC0 1.0.
+  Downloaded September 11, 2026 from
+  `https://kenney.nl/media/pages/assets/castle-kit/a395102d20-1711543616/kenney_castle-kit.zip`.
+  Archive SHA-256: `921f3f73927bb23106cae34bc21d5ab4b033a9fc120475e96f714a406e3169df`.
+  Its notice is retained at `public/assets/world/shared/licenses/kenney-castle-cc0.txt`.
+- Existing KayKit rubble and the project's Highwood trees retain their provenance
+  below. The asset review preferred these reusable props; the available wall models
+  had intact upper beams and did not provide the required collapsed silhouettes.
+- Reproduction: `scripts/world-assets/export-fallen-keep.py`, executed through
+  Blender MCP. It verifies the source archive and exports ten self-contained GLBs,
+  plus `authoring/local/fallen-keep/fallen-keep.blend`. The local creative scene and
+  source archive are not shipped.
+
 ## Quaternius
 
 The following Quaternius Standard asset packs have been inspected from the actual source ZIPs selected for Infuse: Evergrowth:

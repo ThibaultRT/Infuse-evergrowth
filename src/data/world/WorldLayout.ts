@@ -76,6 +76,15 @@ export type AreaWorldLayout = WorldLayoutBase & {
   readonly kind: 'area';
   readonly areaId: number;
   readonly playableSize: WorldSize;
+  /** Reserved clear ground for future encounters; never creates live spawns. */
+  readonly encounterSpots?: readonly WorldEncounterSpot[];
+};
+
+export type WorldEncounterSpot = {
+  readonly id: string;
+  readonly name: string;
+  readonly center: WorldVec2;
+  readonly radius: number;
 };
 
 export type TransitionWorldLayout = WorldLayoutBase & {

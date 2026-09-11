@@ -1,0 +1,80 @@
+{
+  "seed": 31109,
+  "groundHeight": 0,
+  "wall": {"width": 14, "depth": 0.9, "height": 5.8},
+  "corner": {
+    "arms": [
+      {"center": [-5.825, 0.297], "width": 0.9, "depth": 9.8, "rotation": 1.0471975511965976},
+      {"center": [0.855, -1.475], "width": 14.84, "depth": 0.9, "rotation": 1.0471975511965976}
+    ],
+    "tower": {"center": [-1.581, 2.747], "radius": 2.15, "height": 7.4}
+  },
+  "gate": {"width": 14, "opening": 3.45, "depth": 1.1, "height": 6.5},
+  "shells": {
+    "cottage": {
+      "floor": [8, 7],
+      "segments": [
+        {"center": [0, -3.5], "width": 8, "depth": 0.65, "height": 4.7, "windows": true},
+        {"center": [-4, 0], "width": 7, "depth": 0.65, "height": 3.8, "rotation": 1.5707963267948966},
+        {"center": [4, -2], "width": 3, "depth": 0.65, "height": 2.9, "rotation": 1.5707963267948966},
+        {"center": [-2.8, 3.5], "width": 2.4, "depth": 0.65, "height": 2.1},
+        {"center": [2.8, 3.5], "width": 2.4, "depth": 0.65, "height": 1.1}
+      ]
+    },
+    "barracks": {
+      "floor": [10, 8],
+      "segments": [
+        {"center": [0, -4], "width": 10, "depth": 0.7, "height": 4.5, "windows": true},
+        {"center": [-5, 0], "width": 8, "depth": 0.7, "height": 3.7, "rotation": 1.5707963267948966},
+        {"center": [5, -2.5], "width": 3, "depth": 0.7, "height": 2.4, "rotation": 1.5707963267948966},
+        {"center": [-3.6, 4], "width": 2.8, "depth": 0.7, "height": 1.5},
+        {"center": [3.6, 4], "width": 2.8, "depth": 0.7, "height": 2.8}
+      ]
+    },
+    "chapel": {
+      "floor": [12, 13],
+      "segments": [
+        {"center": [0, -6.5], "width": 12, "depth": 0.85, "height": 6.7, "windows": true},
+        {"center": [-6, -2.1], "width": 8.8, "depth": 0.85, "height": 5.6, "rotation": 1.5707963267948966, "windows": true},
+        {"center": [6, -3.7], "width": 5.6, "depth": 0.85, "height": 4.4, "rotation": 1.5707963267948966},
+        {"center": [-4.5, 6.5], "width": 3, "depth": 0.85, "height": 3.2},
+        {"center": [4.5, 6.5], "width": 3, "depth": 0.85, "height": 1.7}
+      ]
+    },
+    "hall": {
+      "floor": [11, 12],
+      "segments": [
+        {"center": [0, -6], "width": 11, "depth": 0.95, "height": 7.8, "windows": true},
+        {"center": [-5.5, -1], "width": 10, "depth": 0.95, "height": 6.5, "rotation": 1.5707963267948966, "windows": true},
+        {"center": [5.5, -2], "width": 8, "depth": 0.95, "height": 5.5, "rotation": 1.5707963267948966},
+        {"center": [-3.8, 6], "width": 3.4, "depth": 0.95, "height": 3.5},
+        {"center": [3.8, 6], "width": 3.4, "depth": 0.95, "height": 2.1}
+      ]
+    }
+  },
+  "roads": [
+    {"name": "A03_Gate_Avenue", "points": [[-42, 3.6], [-24, 3.6], [-8, 3.6], [6, 2], [24, 2]], "width": 5.8},
+    {"name": "A03_North_Processional", "points": [[7.2, -42], [7.2, -32], [9, -27], [9, -17], [6, -9], [2, 2]], "width": 4.8},
+    {"name": "A03_Chapel_Lane", "points": [[-25, 3.6], [-25, -6], [-17, -10], [-7, -10], [0, -16], [0, -23]], "width": 4},
+    {"name": "A03_South_Loop", "points": [[-25, 3.6], [-29, 14], [-27, 29], [-9, 30], [8, 30], [20, 28], [29, 14], [26, 2]], "width": 4.5},
+    {"name": "A03_Barracks_Lane", "points": [[2, 2], [3, 12], [0, 22], [0, 30]], "width": 4},
+    {"name": "A03_Keep_Lane", "points": [[24, 2], [27, -9], [24, -14], [18, -16], [18, -24]], "width": 4}
+  ],
+  "courts": [
+    {"center": [-24, 4], "radius": 5.5},
+    {"center": [0, 2], "radius": 8.5},
+    {"center": [0, -21], "radius": 4.9},
+    {"center": [18, -23], "radius": 3.7},
+    {"center": [16, 16], "radius": 5.4}
+  ],
+  "encounterSpots": [
+    {"id": "A03_Encounter_GateCourt", "name": "Gate court", "center": [-25, 4], "radius": 3},
+    {"id": "A03_Encounter_AshCourt", "name": "Ash court", "center": [0, 2], "radius": 5},
+    {"id": "A03_Encounter_Chapel", "name": "Roofless chapel", "center": [0, -21], "radius": 3.5},
+    {"id": "A03_Encounter_KeepHall", "name": "Fallen keep hall", "center": [18, -24], "radius": 3.5},
+    {"id": "A03_Encounter_Smithy", "name": "Broken smithy", "center": [-27, -17], "radius": 2.3},
+    {"id": "A03_Encounter_Barracks", "name": "Barracks interior", "center": [0, 22], "radius": 3},
+    {"id": "A03_Encounter_EastCourt", "name": "Eastern muster court", "center": [17, 15], "radius": 3.2}
+  ],
+  "outerCliff": {"edge": 37, "outerEdge": 42, "from": -34, "base": -4.2, "rockCenter": 39, "rockStart": -36, "rockStep": 2.9, "rockCount": 27}
+}
