@@ -146,6 +146,12 @@ function framePreset(preset: string): void {
   } else if (preset === 'greenhaven') {
     controls.target.set(-2, 0, -2);
     camera.position.set(29, 77, 86);
+  } else if (preset === 'highwood') {
+    controls.target.set(34, 0, -61);
+    camera.position.set(45, 102, 28);
+  } else if (preset === 'highwood:portrait') {
+    controls.target.set(18, 0, -60);
+    camera.position.set(27, 23, -36);
   } else if (preset === 'bridge:A01-A02') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === 'area1-area2')!;
     const portraitDistance = Math.max(1, 0.8 / camera.aspect);

@@ -145,6 +145,39 @@ settings, and verify playable loading fallback with the landscape request blocke
 occlusion fade to keep the followed hero visible.
 These are desktop browser checks; a real iPhone performance pass remains necessary.
 
+## Highwood reference layout
+
+Area A02 follows the northern woodland in `Layout.png`: darker forest soil, more
+leafless trees than pines, winding stone trails, timber lookouts, rocky northern
+and western edges, and a broken stone riverbank. Its 144 × 48 m playable footprint,
+world root, existing encounters, progression and both gate connections are retained.
+`highwood.json` owns the terrain bounds, rock footprints and paths; `highwood.ts`
+provides their pure collision and road values. The adjacent transitions own the
+water and bridge approaches, including the cutouts in Area A02's visual apron.
+
+Run `scripts/world-assets/export-highwood.py` through Blender MCP, setting `__file__`
+to that script's absolute path. Background Blender can run the same script with
+`--background --python`. It creates a separate scene and writes an editable local
+copy without resetting the open file. Before the first export on a fresh checkout,
+download the Quaternius source documented in `ASSET-LICENSES.md` to
+`authoring/local/highwood/source/CygapExMf5.glb`; the exporter verifies its SHA-256.
+The other source geometry comes from the tracked local KayKit/Kenney archives and
+the already-promoted Greenhaven pines.
+
+Promote with:
+
+```bash
+npm run authoring:assets:promote -- terrain.highwood nature.highwoodBareA nature.highwoodBareB nature.highwoodBareC nature.highwoodPineA nature.highwoodPineB wilds.timberWatchtower
+```
+
+The capture command adds `area2-target-layout.png` and
+`iphone-12-highwood-trail.png`. `authoring:world:validate` checks all Area 2
+encounters and route destinations remain reachable, walkable ground matches the
+simulation floor, and the landscape stays within four draws / 45k triangles / 4 MiB.
+`authoring:world:smoke-runtime -- --highwood` walks both crossings and the main trail,
+captures portrait views, and checks persisted Reduced/30 FPS and missing-landscape
+fallback. These browser checks do not replace real iPhone profiling.
+
 ## Ownership
 
 - `src/data/world/**`: authoritative dimensions, layouts, prop catalog and asset map.

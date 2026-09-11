@@ -1,4 +1,11 @@
 {
+  "terrain.highwood": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-landscape.glb", "runtime": "assets/world/shared/models/highwood-landscape.glb", "baseScale": 1, "castShadow": true },
+  "nature.highwoodBareA": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-bare-a.glb", "runtime": "assets/world/shared/models/highwood-bare-a.glb", "baseScale": 1, "castShadow": true },
+  "nature.highwoodBareB": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-bare-b.glb", "runtime": "assets/world/shared/models/highwood-bare-b.glb", "baseScale": 1, "castShadow": true },
+  "nature.highwoodBareC": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-bare-c.glb", "runtime": "assets/world/shared/models/highwood-bare-c.glb", "baseScale": 1, "castShadow": true },
+  "nature.highwoodPineA": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-pine-a.glb", "runtime": "assets/world/shared/models/highwood-pine-a.glb", "baseScale": 1, "castShadow": true },
+  "nature.highwoodPineB": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-pine-b.glb", "runtime": "assets/world/shared/models/highwood-pine-b.glb", "baseScale": 1, "castShadow": true },
+  "wilds.timberWatchtower": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/highwood-watchtower.glb", "runtime": "assets/world/shared/models/highwood-watchtower.glb", "baseScale": 1, "castShadow": true },
   "terrain.greenhaven": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/greenhaven-landscape.glb", "runtime": "assets/world/shared/models/greenhaven-landscape.glb", "baseScale": 1, "castShadow": true },
   "village.rusticFence": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/greenhaven-fence.glb", "runtime": "assets/world/shared/models/greenhaven-fence.glb", "baseScale": 1, "castShadow": true },
   "village.rusticFenceGate": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/greenhaven-fence-gate.glb", "runtime": "assets/world/shared/models/greenhaven-fence-gate.glb", "baseScale": 1, "castShadow": true },

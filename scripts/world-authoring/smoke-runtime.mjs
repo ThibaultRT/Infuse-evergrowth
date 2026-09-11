@@ -10,6 +10,7 @@ const repositoryRoot = process.cwd();
 const woodlandBridge = process.argv.includes('--woodland-bridge');
 const greenhaven = process.argv.includes('--greenhaven');
 const greenhavenShore = process.argv.includes('--greenhaven-shore');
+const highwood = process.argv.includes('--highwood');
 const port = 4173;
 const gameUrl = `http://127.0.0.1:${port}/Infuse-evergrowth/`;
 const outputRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -123,6 +124,25 @@ async function moveAxis(client, axis, destination) {
   throw new Error(`Could not walk to ${axis}=${destination}: ${JSON.stringify(await heroPosition(client))}`);
 }
 
+async function walkTo(client, x, z) {
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const position = await heroPosition(client);
+    const dx = x - position.x, dz = z - position.z;
+    if (Math.hypot(dx, dz) < 0.35) return;
+    const keys = [
+      ...(Math.abs(dx) > 0.2 ? [dx > 0 ? 'ArrowRight' : 'ArrowLeft'] : []),
+      ...(Math.abs(dz) > 0.2 ? [dz > 0 ? 'ArrowDown' : 'ArrowUp'] : []),
+    ];
+    const distance = Math.min(...[Math.abs(dx), Math.abs(dz)].filter((value) => value > 0.2));
+    const duration = Math.min(320, Math.max(40, distance * Math.sqrt(keys.length) / 7.6 * 1000));
+    for (const key of keys) await client.send('Input.dispatchKeyEvent', { type: 'keyDown', code: key, key });
+    await wait(duration);
+    for (const key of keys) await client.send('Input.dispatchKeyEvent', { type: 'keyUp', code: key, key });
+    await wait(100);
+  }
+  throw new Error(`Could not follow trail to ${x}, ${z}: ${JSON.stringify(await heroPosition(client))}`);
+}
+
 async function approachWoodlandBridge(client) {
   await moveAxis(client, 'x', 6);
   await moveAxis(client, 'z', -22);
@@ -168,7 +188,42 @@ try {
   await waitForArea(client, 1);
   await capture(client, 'runtime-iphone-12-area-a01.png');
 
-  if (greenhavenShore) {
+  if (highwood) {
+    await approachWoodlandBridge(client);
+    await moveAxis(client, 'z', -45.2);
+    await waitForArea(client, 2);
+    await capture(client, 'runtime-iphone-12-highwood-arrival.png');
+    // Exercise the authored trail with real keyboard input, including its bends.
+    for (const [x, z] of [[10.8, -49], [6, -55], [12, -62], [21, -65], [30, -63], [42, -65], [53, -62], [63, -57], [68, -51], [76, -48], [79.2, -42]]) {
+      await walkTo(client, x, z);
+      if (x === 21) await capture(client, 'runtime-iphone-12-highwood-full.png');
+    }
+    await capture(client, 'runtime-iphone-12-highwood-keep-approach.png');
+    await moveAxis(client, 'z', -30);
+    await waitForArea(client, 3);
+    await moveAxis(client, 'z', -42);
+    await waitForArea(client, 2);
+    await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
+    await client.send('Page.reload');
+    await waitFor(client, gameReadyExpression, 'saved Reduced/30 FPS boot');
+    await waitForArea(client, 2);
+    const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
+    if (quality.renderScale !== 0.7 || quality.frameRateLimit !== 30) throw new Error('Rendering preferences did not persist.');
+    // Reload restores the saved current area at its spawn, rather than Area 1.
+    await walkTo(client, 36, -64);
+    const bufferWidth = await evaluate(client, "document.querySelector('#canvas-host canvas').width");
+    if (bufferWidth !== 273) throw new Error(`Reduced rendering buffer is ${bufferWidth}, expected 273.`);
+    await capture(client, 'runtime-iphone-12-highwood-reduced.png');
+    await client.send('Network.enable');
+    await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+    await client.send('Network.setBlockedURLs', { urls: ['*highwood-landscape.glb*'] });
+    await client.send('Page.reload');
+    await waitFor(client, gameReadyExpression, 'Highwood landscape failure fallback boot');
+    await waitForArea(client, 2);
+    await walkTo(client, 36, -64);
+    await capture(client, 'runtime-iphone-12-highwood-fallback.png');
+    client.errors = client.errors.filter((message) => message.includes('ERR_BLOCKED_BY_CLIENT') === false);
+  } else if (greenhavenShore) {
     const fountainStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
     if (!fountainStats?.includes('A01_Fountain_Central')) throw new Error('The fountain hides the initial hero without fading.');
     await moveAxis(client, 'x', -30);
@@ -262,7 +317,7 @@ try {
 
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
   if (client.errors.length > 0) throw new Error(`Browser errors:\n${client.errors.join('\n')}`);
-  console.log(`Runtime smoke passed: ${greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed future bridge, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
+  console.log(`Runtime smoke passed: ${highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed future bridge, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

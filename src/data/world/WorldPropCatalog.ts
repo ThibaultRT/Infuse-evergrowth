@@ -3,6 +3,7 @@ import type { WorldAssetKey } from './WorldAssetKeys';
 import type { WorldWalkSurface } from '../../domain/world/WorldWalkSurface';
 import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_SURFACE } from './woodlandBridge';
 import { GREENHAVEN_COLLISION } from './greenhaven';
+import { HIGHWOOD_COLLISION } from './highwood';
 
 export type WorldPropDefinition = {
   readonly asset: WorldAssetKey;
@@ -19,6 +20,13 @@ const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): 
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
 
 export const WORLD_PROP_CATALOG = {
+  'terrain.highwood': { asset: 'terrain.highwood', collision: HIGHWOOD_COLLISION, absoluteElevation: true },
+  'nature.highwoodBareA': occludingProp('nature.highwoodBareA', [circle(0.55)]),
+  'nature.highwoodBareB': occludingProp('nature.highwoodBareB', [circle(0.55)]),
+  'nature.highwoodBareC': occludingProp('nature.highwoodBareC', [circle(0.55)]),
+  'nature.highwoodPineA': occludingProp('nature.highwoodPineA', [circle(0.45)]),
+  'nature.highwoodPineB': occludingProp('nature.highwoodPineB', [circle(0.45)]),
+  'wilds.timberWatchtower': occludingProp('wilds.timberWatchtower', [rectangle(2.9, 3.1)]),
   'terrain.greenhaven': { asset: 'terrain.greenhaven', collision: GREENHAVEN_COLLISION, absoluteElevation: true },
   'village.rusticFence': prop('village.rusticFence', [rectangle(5.4, 0.22)]),
   'village.rusticFenceGate': prop('village.rusticFenceGate', [rectangle(1.5, 0.22, [-1.9, 0]), rectangle(1.5, 0.22, [1.9, 0])]),

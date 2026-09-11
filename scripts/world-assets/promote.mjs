@@ -116,9 +116,13 @@ async function promoteLicenses() {
     [path.join(developmentRoot, 'source-assets', 'another-example-public-assets', 'kaykit-hexagon', 'LICENSE.txt'), path.join(runtimeRoot, 'shared', 'licenses', 'kaykit-medieval-hexagon-cc0.txt')],
     [path.join(developmentRoot, 'provenance', 'upstream-license-files', 'stylized-nature-standard.txt'), path.join(runtimeRoot, 'shared', 'licenses', 'quaternius-stylized-nature-cc0.txt')],
   ];
+  for (const name of ['kaykit-highwood-cc0.txt', 'kenney-fantasy-town-cc0.txt', 'quaternius-highwood-cc0.txt']) {
+    const file = path.join(runtimeRoot, 'shared', 'licenses', name);
+    licenses.push([file, file]);
+  }
   for (const [source, destination] of licenses) {
     await mkdir(path.dirname(destination), { recursive: true });
-    const normalized = (await readFile(source, 'utf8')).replace(/[ \t]+$/gm, '').replace(/\r?\n/g, '\n');
+    const normalized = (await readFile(source, 'utf8')).replace(/\r?\n/g, '\n').replace(/[ \t]+$/gm, '');
     await writeFile(destination, normalized.endsWith('\n') ? normalized : `${normalized}\n`, 'utf8');
   }
   return Promise.all(licenses.map(async ([, file]) => ({ file: path.relative(path.join(repositoryRoot, 'public'), file).split(path.sep).join('/'), ...await digest(file) })));

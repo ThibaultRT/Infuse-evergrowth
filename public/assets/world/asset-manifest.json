@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T12:34:51.624Z",
+  "generatedAt": "2026-09-11T14:33:23.379Z",
   "assets": [
     {
       "key": "crossing.bridgeA",
@@ -347,6 +347,76 @@
       }
     },
     {
+      "key": "nature.highwoodBareA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-bare-a.glb",
+      "runtime": "assets/world/shared/models/highwood-bare-a.glb",
+      "sourceDigest": {
+        "bytes": 38148,
+        "sha256": "15b083d5e5a1d1ffbf502a7b75dcbe68e594aed3340605aa3c5e5a8be8915d1d"
+      },
+      "runtimeDigest": {
+        "bytes": 38148,
+        "sha256": "15b083d5e5a1d1ffbf502a7b75dcbe68e594aed3340605aa3c5e5a8be8915d1d"
+      }
+    },
+    {
+      "key": "nature.highwoodBareB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-bare-b.glb",
+      "runtime": "assets/world/shared/models/highwood-bare-b.glb",
+      "sourceDigest": {
+        "bytes": 39060,
+        "sha256": "7fe47b26c7a67c2ab63280130ab094969456b6e156a0f4b6e8cf59c01dc9e9d4"
+      },
+      "runtimeDigest": {
+        "bytes": 39060,
+        "sha256": "7fe47b26c7a67c2ab63280130ab094969456b6e156a0f4b6e8cf59c01dc9e9d4"
+      }
+    },
+    {
+      "key": "nature.highwoodBareC",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-bare-c.glb",
+      "runtime": "assets/world/shared/models/highwood-bare-c.glb",
+      "sourceDigest": {
+        "bytes": 47272,
+        "sha256": "695e67748c3ace20463cd4579953800ca06618a4815a3f34b74043cd8fa3de6f"
+      },
+      "runtimeDigest": {
+        "bytes": 47272,
+        "sha256": "695e67748c3ace20463cd4579953800ca06618a4815a3f34b74043cd8fa3de6f"
+      }
+    },
+    {
+      "key": "nature.highwoodPineA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-pine-a.glb",
+      "runtime": "assets/world/shared/models/highwood-pine-a.glb",
+      "sourceDigest": {
+        "bytes": 34484,
+        "sha256": "07a9a5dc1c75270f42d04768c9d4d91cc4e0b60f0fd4e614bd94c405e14b2cae"
+      },
+      "runtimeDigest": {
+        "bytes": 34484,
+        "sha256": "07a9a5dc1c75270f42d04768c9d4d91cc4e0b60f0fd4e614bd94c405e14b2cae"
+      }
+    },
+    {
+      "key": "nature.highwoodPineB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-pine-b.glb",
+      "runtime": "assets/world/shared/models/highwood-pine-b.glb",
+      "sourceDigest": {
+        "bytes": 34480,
+        "sha256": "d90627cb74977ae73fb06ad98ae6d9d0de26a6824fd19b6f3538d384061f45d8"
+      },
+      "runtimeDigest": {
+        "bytes": 34480,
+        "sha256": "d90627cb74977ae73fb06ad98ae6d9d0de26a6824fd19b6f3538d384061f45d8"
+      }
+    },
+    {
       "key": "nature.pineA",
       "source": "kaykit-forest/Tree_4_A_Color1.gltf",
       "runtime": "assets/world/shared/models/nature-pine-a.glb",
@@ -686,6 +756,20 @@
       }
     },
     {
+      "key": "terrain.highwood",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-landscape.glb",
+      "runtime": "assets/world/shared/models/highwood-landscape.glb",
+      "sourceDigest": {
+        "bytes": 3134960,
+        "sha256": "e193dcd83685b80e8e0ecb0e5b723f733add510afb73d58d9ee922b46de55989"
+      },
+      "runtimeDigest": {
+        "bytes": 3134960,
+        "sha256": "e193dcd83685b80e8e0ecb0e5b723f733add510afb73d58d9ee922b46de55989"
+      }
+    },
+    {
       "key": "terrain.meadowColor",
       "source": "textures/leafy_grass_diff_1k.jpg",
       "runtime": "assets/world/shared/textures/terrain-meadow-color.jpg",
@@ -989,6 +1073,20 @@
       }
     },
     {
+      "key": "wilds.timberWatchtower",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/highwood-watchtower.glb",
+      "runtime": "assets/world/shared/models/highwood-watchtower.glb",
+      "sourceDigest": {
+        "bytes": 73272,
+        "sha256": "c011aa79dd6ade5b62563736eed882e384b34defdd170371c726a97c449649ae"
+      },
+      "runtimeDigest": {
+        "bytes": 73272,
+        "sha256": "c011aa79dd6ade5b62563736eed882e384b34defdd170371c726a97c449649ae"
+      }
+    },
+    {
       "key": "wilds.towerGreenA",
       "source": "kaykit-hexagon/buildings/green/building_tower_A_green.gltf",
       "runtime": "assets/world/shared/models/wilds-tower-green-a.glb",
@@ -1064,6 +1162,21 @@
       "file": "assets/world/shared/licenses/quaternius-stylized-nature-cc0.txt",
       "bytes": 828,
       "sha256": "5de0412f4f694f3d8cfa2b334a3ddb7ebbdc3ac5b1e9c262ff4870d0564341db"
+    },
+    {
+      "file": "assets/world/shared/licenses/kaykit-highwood-cc0.txt",
+      "bytes": 1403,
+      "sha256": "93b07b1fed0055e5a8853603e6d0fe8b1fc4135b39be0dfb3f9d7aabc3893173"
+    },
+    {
+      "file": "assets/world/shared/licenses/kenney-fantasy-town-cc0.txt",
+      "bytes": 676,
+      "sha256": "61fc44f12cd72a0d96b665d999b13954a1acc1bb445cd51fe579321993ecfe9f"
+    },
+    {
+      "file": "assets/world/shared/licenses/quaternius-highwood-cc0.txt",
+      "bytes": 716,
+      "sha256": "854530f7cfdd41672973f7d30289ac2691cb18cedb51ae7c6dd0f79f5d1075bc"
     }
   ]
 }

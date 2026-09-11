@@ -35,7 +35,7 @@ async function tiledMaterial(
 export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<WorldMaterialSet> {
   const [meadow, forest, trail, cobble] = await Promise.all([
     tiledMaterial(assets, 'terrain.meadowColor', 'terrain.meadowNormal', 12, 0xb8c59e),
-    tiledMaterial(assets, 'terrain.forestColor', 'terrain.forestNormal', 11, 0x9baa87),
+    tiledMaterial(assets, 'terrain.forestColor', 'terrain.forestNormal', 11, 0x626c50),
     tiledMaterial(assets, 'terrain.trailColor', 'terrain.trailNormal', 5, 0xcdbb91),
     tiledMaterial(assets, 'terrain.cobbleColor', 'terrain.cobbleNormal', 14, 0xc4beb0),
   ]);

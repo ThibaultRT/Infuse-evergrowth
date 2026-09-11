@@ -145,6 +145,8 @@ try {
 
   await capture(client, path.join(capturesRoot, 'general-layout.png'), 'world', 1440, 900);
   await capture(client, path.join(capturesRoot, 'area1-target-layout.png'), 'greenhaven', 1280, 1100);
+  await capture(client, path.join(capturesRoot, 'area2-target-layout.png'), 'highwood', 1600, 1000);
+  await capture(client, path.join(capturesRoot, 'iphone-12-highwood-trail.png'), 'highwood:portrait', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a01.png'), 'area:A01', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a02.png'), 'area:A02', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a03.png'), 'area:A03', 390, 844);
@@ -157,7 +159,7 @@ try {
   const debugPath = path.join(debugRoot, 'assembled-world-debug.glb');
   await rename(downloaded, debugPath);
   const inspection = inspectDebugGlb(await readFile(debugPath));
-  console.log(`Captured eight world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
+  console.log(`Captured ten world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

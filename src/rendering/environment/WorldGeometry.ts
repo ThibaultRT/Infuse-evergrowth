@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement } from '../../data/world/WorldLayout';
 import type { WorldMaterialSet } from './WorldMaterials';
 import { greenhavenGroundHeight } from '../../data/world/greenhaven';
+import { highwoodGroundHeight } from '../../data/world/highwood';
 
 function edgeFade(layout: AnyWorldLayout, x: number, z: number): number {
   const halfWidth = layout.visualSize.width / 2;
@@ -13,12 +14,8 @@ export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number)
   if (layout.kind === 'transition') return 0;
   const ripple = (Math.sin((x + layout.origin[0]) * 0.105) * 0.08 + Math.cos((z + layout.origin[2]) * 0.085) * 0.07) * edgeFade(layout, x, z);
   let height: number;
-  if (layout.areaId === 2) {
-    const northward = Math.min(1, Math.max(0, (-z + 24) / 48));
-    const highland = northward * 1.45 * edgeFade(layout, x, z);
-    const basin = Math.exp(-(((x + 39.6) ** 2) / 340 + ((z - 1.2) ** 2) / 30)) * 0.62;
-    height = Math.max(-0.38, highland + ripple - basin);
-  } else if (layout.areaId === 3) height = 0.85 * edgeFade(layout, x, z) + ripple * 0.65;
+  if (layout.areaId === 2) height = highwoodGroundHeight();
+  else if (layout.areaId === 3) height = 0.85 * edgeFade(layout, x, z) + ripple * 0.65;
   else height = greenhavenGroundHeight(x, z);
 
   for (const cutout of layout.terrainCutouts ?? []) {
