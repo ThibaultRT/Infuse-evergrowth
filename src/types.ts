@@ -1,4 +1,5 @@
 import type { WorldCollisionShape } from './domain/world/WorldCollision';
+import type { PlacedWorldWalkSurface } from './domain/world/WorldWalkSurface';
 
 export type Tier = 'crystal' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type DamageType = 'blunt' | 'slash' | 'piercing';
@@ -37,6 +38,7 @@ export type AreaDefinition = {
   environmentTheme: string;
   size: { width: number; depth: number };
   collision: CollisionShape[];
+  walkSurfaces: readonly PlacedWorldWalkSurface[];
 };
 
 export type CollisionShape = WorldCollisionShape;

@@ -1,16 +1,21 @@
 import type { AreaWorldLayout } from '../WorldLayout';
+import { A01_A02_TRANSITION } from '../transitions/a01A02Transition';
+import { clearTransitionApproaches, transitionTerrainCutouts } from '../transitionTerrainCutouts';
+
+const origin = [36, 0, -60] as const;
 
 export const AREA_A02_LAYOUT = {
   kind: 'area',
   id: 'area:A02',
   areaId: 2,
   name: 'Highwood — The Mosswater Wilds',
-  origin: [36, 0, -60],
+  origin,
   playableSize: { width: 144, depth: 48 },
   visualSize: { width: 156, depth: 60 },
   terrain: 'forest',
+  terrainCutouts: transitionTerrainCutouts(A01_A02_TRANSITION, origin),
   roads: [
-    { name: 'A02_Trail_FromA01', points: [[-25.2, 30], [-21.6, 15.6], [-5.4, 8.4], [12.6, 1.2], [32.4, -4.8], [55.8, -14.4]], width: 4.4, material: 'trail' },
+    { name: 'A02_Trail_FromA01', points: [[-25.2, 15], [-25.2, 12], [-5.4, 8.4], [12.6, 1.2], [32.4, -4.8], [55.8, -14.4]], width: 3.6, material: 'trail' },
     { name: 'A02_Trail_ToA03', points: [[43.2, 30], [39.6, 15], [18, 7.2], [12.6, 1.2]], width: 3.8, material: 'trail' },
   ],
   surfaces: [
@@ -34,7 +39,7 @@ export const AREA_A02_LAYOUT = {
     { name: 'A02_Reeds_01', prop: 'wilds.waterPlant', position: [-27, 0.18, 3.6], rotation: -0.4, scale: 1.3, collision: 'none' },
     { name: 'A02_Mosswater_Bridge', prop: 'crossing.bridgeA', position: [-32.4, 0.55, 7.2], rotation: -0.5, scale: 0.68, collision: 'none' },
   ],
-  scatters: [
+  scatters: clearTransitionApproaches([
     { prefix: 'A02_Tree_West', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 29, bounds: { minX: -68.4, maxX: -45, minZ: -21.6, maxZ: 19.2 }, seed: 201, scale: [1.08, 1.62], exclusions: [{ center: [-46.8, 3], radius: 13 }] },
     { prefix: 'A02_Tree_North', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 27, bounds: { minX: -39.6, maxX: 66.6, minZ: -22.2, maxZ: -14.4 }, seed: 202, scale: [1.04, 1.58], exclusions: [{ center: [52.2, -16.8], radius: 10 }] },
     { prefix: 'A02_Tree_East', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 25, bounds: { minX: 50.4, maxX: 68.4, minZ: -13.8, maxZ: 19.2 }, seed: 203, scale: [1.02, 1.5], exclusions: [{ center: [55.8, 4.8], radius: 8 }] },
@@ -42,10 +47,11 @@ export const AREA_A02_LAYOUT = {
     { prefix: 'A02_Tree_Landmark', props: ['nature.treeCommon1', 'nature.treeCommon3'], count: 8, bounds: { minX: -43.2, maxX: 46.8, minZ: -13.2, maxZ: 16.2 }, seed: 207, scale: [0.86, 1.12], exclusions: [{ center: [18, -0.6], radius: 15 }] },
     { prefix: 'A02_Rock', props: ['nature.forestRockA', 'nature.forestRockB', 'nature.forestRockC', 'nature.rockMedium2'], count: 28, bounds: { minX: -66.6, maxX: 66.6, minZ: -21.6, maxZ: 20.4 }, seed: 205, scale: [0.6, 1.3], exclusions: [{ center: [18, -0.6], radius: 12 }] },
     { prefix: 'A02_Bush', props: ['nature.forestBushA', 'nature.forestBushB', 'nature.forestBushC', 'nature.grassTuft'], count: 31, bounds: { minX: -61.2, maxX: 61.2, minZ: -18.6, maxZ: 19.8 }, seed: 206, scale: [0.75, 1.3], exclusions: [{ center: [18, -0.6], radius: 11 }] },
-  ],
+  ], A01_A02_TRANSITION, origin),
   collision: [
     { id: 'A02_Lake_Core', kind: 'rectangle', center: [-39.6, 1.2], width: 46, depth: 10.5, rotation: -0.18 },
     { id: 'A02_River_North', kind: 'rectangle', center: [-53.5, -15.5], width: 5.4, depth: 13, rotation: 0.18 },
-    { id: 'A02_River_South', kind: 'rectangle', center: [-19, 17], width: 5.4, depth: 13, rotation: -0.55 },
+    // End the inland river blocker before the woodland bridge's north landing.
+    { id: 'A02_River_South', kind: 'rectangle', center: [-17.3, 14.2], width: 5.4, depth: 6.5, rotation: -0.55 },
   ],
 } as const satisfies AreaWorldLayout;

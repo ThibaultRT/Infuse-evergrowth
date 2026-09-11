@@ -1,0 +1,10 @@
+{
+  "sourceDeckMin": -4.369133472442627,
+  "sourceDeckMax": 4.925070285797119,
+  "sourceDeckHeight": 1.54,
+  "deckLength": 12,
+  "deckHeight": 1.65,
+  "pathWidth": 3.6,
+  "approachLength": 3,
+  "sourceHinge": [1.38, -3.81, 1.62]
+}

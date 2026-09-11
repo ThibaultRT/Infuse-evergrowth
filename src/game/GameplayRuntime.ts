@@ -1,6 +1,7 @@
 import type { Position } from '../domain/world/Position';
 import { copyPosition, distanceBetween } from '../domain/world/Position';
 import { circleOverlapsWorldCollision } from '../domain/world/CollisionMath';
+import { worldWalkHeight } from '../domain/world/WorldWalkSurface';
 import { EnemyAISystem, type EnemyAIState } from '../systems/EnemyAISystem';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, TierConfig, WorldConnection } from '../types';
 
@@ -195,16 +196,16 @@ export class GameplayRuntime {
     this.hero.moving = controlsEnabled && (movement.x !== 0 || movement.y !== 0);
     if (!this.hero.moving) return null;
     const previous = { ...this.hero.position };
-    const candidate = { x: previous.x + movement.x * this.options.heroSpeed * dt, y: 0, z: previous.z - movement.y * this.options.heroSpeed * dt };
+    const candidate = { x: previous.x + movement.x * this.options.heroSpeed * dt, y: previous.y, z: previous.z - movement.y * this.options.heroSpeed * dt };
     const area = this.area(this.currentAreaId);
     const heroRadius = .45;
     const halfWidth = area.size.width / 2;
     const halfDepth = area.size.depth / 2;
-    // Start resolving a boundary crossing when the hero's collision circle reaches
-    // the edge. Waiting for the centre to leave the area made the normal clamp put
-    // the hero back half a metre on every frame, so no gate could ever be crossed.
+    // Resolve the bridge rails and locked doors before considering an area entry.
+    this.constrainToAuthoredCollision(candidate, previous, area, heroRadius);
     const outsideX = Math.abs(candidate.x - area.originX) > halfWidth - heroRadius;
     const outsideZ = Math.abs(candidate.z - area.originZ) > halfDepth - heroRadius;
+    let crossingAxis: 'x' | 'z' | undefined;
     if (outsideX || outsideZ) {
       const connection = this.options.connections.find((item) => {
         if (item.areaAId !== area.id && item.areaBId !== area.id) return false;
@@ -212,20 +213,26 @@ export class GameplayRuntime {
         const coordinate = item.axis === 'x' ? candidate.z : candidate.x;
         const center = item.axis === 'x' ? item.z : item.x;
         const crossed = item.axis === 'x' ? outsideX : outsideZ;
-        // Match the dry causeway's collision opening exactly. A looser crossing
-        // tolerance let the hero enter the destination while clipping a lake end,
-        // which looked like a teleport from the gate into the water.
-        return crossed && Math.abs(coordinate - center) <= item.width / 2 - heroRadius;
+        const boundary = item.axis === 'x' ? item.x : item.z;
+        const along = item.axis === 'x' ? candidate.x : candidate.z;
+        return crossed && Math.abs(along - boundary) <= this.options.heroSpeed * dt + heroRadius
+          && Math.abs(coordinate - center) <= item.width / 2 - heroRadius;
       });
       if (connection) {
         const target = connection.areaAId === area.id ? connection.areaBId : connection.areaAId;
         const targetArea = this.area(target);
-        // Adjacent chunks meet at the authored boundary. Accept the hero while its
-        // circle straddles that shared edge, then let the destination clamp move it
-        // fully inside on the following update.
+        crossingAxis = connection.axis;
+        const boundary = connection.axis === 'x' ? connection.x : connection.z;
+        const direction = Math.sign(connection.axis === 'x' ? targetArea.originX - area.originX : targetArea.originZ - area.originZ);
+        const crossedCenter = (candidate[connection.axis] - boundary) * direction > 0;
+        // Let the circle straddle an unlocked seam, but change area only when its
+        // centre crosses it. This avoids repeated A01/A02 entries on the deck.
         const targetHalfWidth = targetArea.size.width / 2 + heroRadius;
         const targetHalfDepth = targetArea.size.depth / 2 + heroRadius;
-        if (Math.abs(candidate.x - targetArea.originX) <= targetHalfWidth && Math.abs(candidate.z - targetArea.originZ) <= targetHalfDepth) {
+        if (crossedCenter && Math.abs(candidate.x - targetArea.originX) <= targetHalfWidth && Math.abs(candidate.z - targetArea.originZ) <= targetHalfDepth) {
+          this.constrainToAuthoredCollision(candidate, previous, targetArea, heroRadius);
+          if ((candidate[connection.axis] - boundary) * direction <= 0) return null;
+          candidate.y = worldWalkHeight(targetArea.walkSurfaces, candidate);
           this.hero.position = candidate;
           this.currentAreaId = target;
           for (const spawn of this.spawns) spawn.provoked = false;
@@ -234,9 +241,11 @@ export class GameplayRuntime {
         }
       }
     }
-    this.constrainToAuthoredCollision(candidate, previous, area, heroRadius);
-    this.hero.position.x = Math.min(area.originX + halfWidth - heroRadius, Math.max(area.originX - halfWidth + heroRadius, candidate.x));
-    this.hero.position.z = Math.min(area.originZ + halfDepth - heroRadius, Math.max(area.originZ - halfDepth + heroRadius, candidate.z));
+    const marginX = crossingAxis === 'x' ? 0 : heroRadius;
+    const marginZ = crossingAxis === 'z' ? 0 : heroRadius;
+    this.hero.position.x = Math.min(area.originX + halfWidth - marginX, Math.max(area.originX - halfWidth + marginX, candidate.x));
+    this.hero.position.z = Math.min(area.originZ + halfDepth - marginZ, Math.max(area.originZ - halfDepth + marginZ, candidate.z));
+    this.hero.position.y = worldWalkHeight(area.walkSurfaces, this.hero.position);
     this.hero.facing = Math.atan2(movement.x, -movement.y);
     return null;
   }
@@ -259,6 +268,7 @@ export class GameplayRuntime {
     spawn.position.x = Math.min(area.originX + area.size.width / 2 - radius, Math.max(area.originX - area.size.width / 2 + radius, spawn.position.x));
     spawn.position.z = Math.min(area.originZ + area.size.depth / 2 - radius, Math.max(area.originZ - area.size.depth / 2 + radius, spawn.position.z));
     this.constrainToAuthoredCollision(spawn.position, previous, area, radius);
+    spawn.position.y = worldWalkHeight(area.walkSurfaces, spawn.position);
   }
 
   private constrainToAuthoredCollision(position: Position, previous: Position, area: AreaDefinition, radius: number): void {

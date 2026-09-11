@@ -25,6 +25,13 @@ the same transforms. Never treat an edited GLB or mesh bounds as gameplay author
 Area A02 spans the combined width of A01 and A03. Visual aprons overlap; there is no
 additional empty gap between playable chunks.
 
+The A01/A02 crossing uses the project-supplied woodland bridge. Its deck runs
+from world Z=-30 to Z=-42 over the river, with 3 m approaches reaching dry land
+at Z=-27 and Z=-45. The shared area boundary at Z=-36 lies at midspan; neither
+area root moves. The semantic prop's floor profile raises actors to Y=1.65 and
+lowers them at the banks, independently of visual loading. Its hinged doors keep
+the existing Area A01 boss unlock requirement.
+
 Area A03 is completely enclosed by a ruined wall. The A01/A03 transition owns its
 west wall and gate. The A02/A03 fortified river transition owns its north wall,
 bridge and gate. Area A03 owns the east and south walls. Broken-looking wall pieces

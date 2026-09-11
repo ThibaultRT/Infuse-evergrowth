@@ -91,6 +91,7 @@ async function waitForReady(client) {
 
 async function capture(client, file, preset, width, height) {
   await client.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width <= 430 });
+  await wait(150);
   await evaluate(client, `window.__WORLD_AUTHORING_CAMERA__?.(${JSON.stringify(preset)}); document.querySelector('aside').style.display='none';`);
   await wait(700);
   const result = await client.send('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
@@ -144,6 +145,8 @@ try {
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a01.png'), 'area:A01', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a02.png'), 'area:A02', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a03.png'), 'area:A03', 390, 844);
+  await capture(client, path.join(capturesRoot, 'woodland-bridge.png'), 'bridge:A01-A02', 1000, 900);
+  await capture(client, path.join(capturesRoot, 'iphone-12-woodland-bridge.png'), 'bridge:A01-A02', 390, 844);
 
   await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadRoot, eventsEnabled: true });
   await evaluate(client, "document.querySelector('aside').style.display='block'; document.querySelector('#export').click();");
@@ -151,7 +154,7 @@ try {
   const debugPath = path.join(debugRoot, 'assembled-world-debug.glb');
   await rename(downloaded, debugPath);
   const inspection = inspectDebugGlb(await readFile(debugPath));
-  console.log(`Captured four world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
+  console.log(`Captured six world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
 } finally {
   socket?.close();
   browserProcess?.kill();

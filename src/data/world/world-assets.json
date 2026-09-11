@@ -19,6 +19,7 @@
   "keep.castleRed": { "kind": "model", "source": "kaykit-hexagon/buildings/red/building_castle_red.gltf", "runtime": "assets/world/shared/models/keep-castle-red.glb", "baseScale": 7, "castShadow": true },
   "ruin.destroyed": { "kind": "model", "source": "kaykit-hexagon/buildings/neutral/building_destroyed.gltf", "runtime": "assets/world/shared/models/ruin-destroyed.glb", "baseScale": 7, "castShadow": true },
   "ruin.scaffolding": { "kind": "model", "source": "kaykit-hexagon/buildings/neutral/building_scaffolding.gltf", "runtime": "assets/world/shared/models/ruin-scaffolding.glb", "baseScale": 7, "castShadow": true },
+  "crossing.woodlandBridge": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/woodland-bridge.glb", "runtime": "assets/world/shared/models/woodland-bridge.glb", "baseScale": 1, "castShadow": true },
   "crossing.bridgeA": { "kind": "model", "source": "kaykit-hexagon/buildings/neutral/building_bridge_A.gltf", "runtime": "assets/world/shared/models/crossing-bridge-a.glb", "baseScale": 7, "castShadow": true },
   "crossing.bridgeB": { "kind": "model", "source": "kaykit-hexagon/buildings/neutral/building_bridge_B.gltf", "runtime": "assets/world/shared/models/crossing-bridge-b.glb", "baseScale": 7, "castShadow": true },
   "fortress.wall": { "kind": "model", "source": "kaykit-hexagon/buildings/neutral/wall_straight.gltf", "runtime": "assets/world/shared/models/fortress-wall.glb", "baseScale": 7, "castShadow": true },

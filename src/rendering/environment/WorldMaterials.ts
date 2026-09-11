@@ -9,6 +9,7 @@ export type WorldMaterialSet = {
   readonly water: THREE.MeshPhysicalMaterial;
   readonly cliff: THREE.MeshStandardMaterial;
   readonly lockedGate: THREE.MeshStandardMaterial;
+  readonly timber: THREE.MeshStandardMaterial;
 };
 
 async function tiledMaterial(
@@ -49,5 +50,6 @@ export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<W
     water: new THREE.MeshPhysicalMaterial({ color: 0x3e94a0, emissive: 0x163b40, emissiveIntensity: 0.3, roughness: 0.2, transmission: 0.16, transparent: true, opacity: 0.84, side: THREE.DoubleSide }),
     cliff: new THREE.MeshStandardMaterial({ color: 0x6f7569, roughness: 0.96 }),
     lockedGate: new THREE.MeshStandardMaterial({ color: 0x5a3020, roughness: 0.82, metalness: 0.05 }),
+    timber: new THREE.MeshStandardMaterial({ color: 0x977047, roughness: 0.86 }),
   };
 }

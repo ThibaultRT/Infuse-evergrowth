@@ -1,17 +1,22 @@
 import type { AreaWorldLayout } from '../WorldLayout';
+import { A01_A02_TRANSITION } from '../transitions/a01A02Transition';
+import { clearTransitionApproaches, transitionTerrainCutouts } from '../transitionTerrainCutouts';
+
+const origin = [0, 0, 0] as const;
 
 export const AREA_A01_LAYOUT = {
   kind: 'area',
   id: 'area:A01',
   areaId: 1,
   name: 'Greenhaven — The Hearthland',
-  origin: [0, 0, 0],
+  origin,
   playableSize: { width: 72, depth: 72 },
   visualSize: { width: 84, depth: 84 },
   terrain: 'meadow',
+  terrainCutouts: transitionTerrainCutouts(A01_A02_TRANSITION, origin),
   roads: [
     { name: 'A01_Road_WestEast', points: [[-36, -5.4], [-19.8, -2.7], [-7.2, 1.8], [0.9, 4.5], [15.3, 2.7], [28.8, 3.6], [42, 3.6]], width: 5.4, material: 'trail' },
-    { name: 'A01_Road_North', points: [[0.9, 4.5], [4.5, -7.2], [12.6, -18], [17.5, -28], [10.8, -42]], width: 4.8, material: 'trail' },
+    { name: 'A01_Road_North', points: [[0.9, 4.5], [4.5, -7.2], [12.6, -18], [10.8, -24], [10.8, -27]], width: 3.6, material: 'trail' },
     { name: 'A01_Road_South', points: [[0.9, 4.5], [2.7, 14.4], [5.4, 26.1], [7.2, 36]], width: 4.6, material: 'trail' },
   ],
   props: [
@@ -34,7 +39,7 @@ export const AREA_A01_LAYOUT = {
     { name: 'A01_FutureGate_West', prop: 'fortress.gate', position: [-40.5, 0.2, -5.4], rotation: Math.PI / 2, scale: 0.72, collision: 'none' },
     { name: 'A01_FutureBridge_South', prop: 'crossing.bridgeB', position: [7.2, 0.1, 40.5], scale: 0.68, collision: 'none' },
   ],
-  scatters: [
+  scatters: clearTransitionApproaches([
     { prefix: 'A01_Tree_West', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 19, bounds: { minX: -34.2, maxX: -25.2, minZ: -32.4, maxZ: 31.5 }, seed: 101, scale: [1, 1.38] },
     { prefix: 'A01_Tree_North', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 18, bounds: { minX: -24.3, maxX: 34.2, minZ: -34.2, maxZ: -26.1 }, seed: 102, scale: [0.98, 1.34], exclusions: [{ center: [10.8, -32.4], radius: 8 }] },
     { prefix: 'A01_Tree_South', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 14, bounds: { minX: -30.6, maxX: 31.5, minZ: 27.9, maxZ: 34.2 }, seed: 103, scale: [0.96, 1.28], exclusions: [{ center: [7.2, 32.4], radius: 8 }] },
@@ -42,6 +47,6 @@ export const AREA_A01_LAYOUT = {
     { prefix: 'A01_Bush', props: ['nature.forestBushA', 'nature.forestBushB', 'nature.flowerBush'], count: 18, bounds: { minX: -27, maxX: 30.6, minZ: -24.3, maxZ: 26.1 }, seed: 104, scale: [0.72, 1.15], exclusions: [{ center: [0, 4.5], radius: 15 }] },
     { prefix: 'A01_Flower', props: ['nature.flowerGroup', 'nature.grassTuft'], count: 18, bounds: { minX: -25.2, maxX: 29.7, minZ: -22.5, maxZ: 24.3 }, seed: 105, scale: [0.7, 1.2], exclusions: [{ center: [0, 4.5], radius: 10 }] },
     { prefix: 'A01_Rock', props: ['nature.forestRockA', 'nature.forestRockB', 'nature.rockMedium1'], count: 11, bounds: { minX: -32.4, maxX: 32.4, minZ: -32.4, maxZ: 32.4 }, seed: 106, scale: [0.55, 0.95], exclusions: [{ center: [0, 4.5], radius: 18 }] },
-  ],
+  ], A01_A02_TRANSITION, origin),
   collision: [],
 } as const satisfies AreaWorldLayout;

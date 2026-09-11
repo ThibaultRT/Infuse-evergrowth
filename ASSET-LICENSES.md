@@ -82,3 +82,13 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Source: crystal, fountain, and rare-enemy models supplied directly by the project owner.
 - Processing: files were organized into the runtime asset hierarchy; their displayed scale and placement are normalized at runtime.
 - Usage: project-owned/user-supplied artwork; included with permission for Infuse: Evergrowth.
+
+## Woodland bridge
+
+- File: `public/assets/world/shared/models/woodland-bridge.glb`.
+- Source: the project owner's `woodland_bridge.blend`, supplied from the September 10, 2026 Blender design task.
+- Source SHA-256: `dc2155f3678ad24bd4ff5a72729ab063c268cc754db2fd63500feaec53d28cfa`.
+- Processing: procedural oak and cedar baked to embedded color maps; rope, ivy and hardware retain material colors as vertex colors; curves reduced and static geometry batched for browser use. The two side hinges and canopy occlusion group remain separate.
+- Normalization: the deck spans 12 meters with its floor at 1.65 meters. The shared dimensions are in `src/data/world/woodland-bridge.json`; production placement, rail/door proxies and approach profiles remain renderer-independent.
+- Reproduction: open the supplied source with Blender in background mode and run `scripts/world-assets/export-woodland-bridge.py`, then `npm run authoring:assets:promote -- crossing.woodlandBridge`.
+- Usage: project-owned/user-supplied artwork; included with permission for Infuse: Evergrowth. The creative `.blend` and its packed reference are not shipped or modified.

@@ -95,6 +95,20 @@ gate while `startIndex` keeps stable sequential debug names. Area layouts may us
 named `terrainCutouts` to lower overlapping terrain beneath a shared water surface
 without changing the river or bridge elevation.
 
+The A01/A02 woodland bridge has a semantic `walkSurface` profile and a hinged
+`gate` definition in its prop catalog entry. Its one placement supplies rendering,
+rail and door collision, and the floor used by hero/enemy movement. The 12 m deck
+crosses the transition at Y=1.65; 3 m timber approaches descend to each bank.
+The adjacent areas derive riverbed/landing terrain cutouts and scatter exclusions
+from that transition. No mesh raycasts determine gameplay elevation.
+
+`npm run authoring:world:validate` also checks two-way traversal at 30/60 Hz,
+continuous elevation, rail containment, and the progression lock. Run
+`npm run authoring:world:smoke-runtime -- --woodland-bridge` for keyboard-driven
+portrait captures of the closed gate, opened gate, deck, and both landings.
+The capture command also produces `woodland-bridge.png` and
+`iphone-12-woodland-bridge.png` using the production builder.
+
 ## Ownership
 
 - `src/data/world/**`: authoritative dimensions, layouts, prop catalog and asset map.

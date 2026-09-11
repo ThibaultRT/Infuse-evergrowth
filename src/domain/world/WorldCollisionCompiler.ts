@@ -40,12 +40,16 @@ function compileProxy(
 
 function compilePlacement(chunk: AnyWorldLayout, placement: WorldPropPlacement): WorldCollisionShape[] {
   if (placement.collision === 'none') return [];
-  const definition = WORLD_PROP_CATALOG[placement.prop];
+  const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
   const transform = composeWorldTransform(
     { position: chunk.origin },
     { position: placement.position, rotation: placement.rotation, scale: placement.scale },
   );
-  return definition.collision.map((proxy, index) => compileProxy(chunk, placement.name, index, proxy, transform, placement.name));
+  const shapes = definition.collision.map((proxy, index) => compileProxy(chunk, placement.name, index, proxy, transform, placement.name));
+  if (definition.gate && chunk.kind === 'transition') {
+    shapes.push(compileProxy(chunk, placement.name, 0, { ...definition.gate.barrier, id: `${placement.name}/LockedGate`, activation: { kind: 'connection-locked', connectionId: chunk.connectionId } }, transform, placement.name));
+  }
+  return shapes;
 }
 
 function compileChunk(chunk: AnyWorldLayout): WorldCollisionShape[] {

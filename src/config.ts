@@ -5,11 +5,13 @@ import area3 from './data/areas/area-3.json';
 import connections from './data/areas/connections.json';
 import { AREA_WORLD_LAYOUTS, TRANSITION_WORLD_LAYOUTS, WORLD_LAYOUTS } from './data/world';
 import { compileWorldCollision } from './domain/world/WorldCollisionCompiler';
+import { compileWorldWalkSurfaces } from './domain/world/WorldWalkSurfaceCompiler';
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, Tier, TierConfig, WorldConnection } from './types';
 
 const tierBalance = balance.enemy.tiers;
 const areaData = { areas: [area1, area2, area3], connections };
 const compiledCollision = compileWorldCollision(WORLD_LAYOUTS);
+const compiledWalkSurfaces = compileWorldWalkSurfaces(WORLD_LAYOUTS);
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);
 const tierConfig = (tier: Tier): TierConfig => {
   const source = tierBalance[tier];
@@ -40,6 +42,7 @@ export const AREAS: AreaDefinition[] = areaData.areas.map((area) => ({
       originZ: layout.origin[2],
       size: layout.playableSize,
       collision: [...(compiledCollision.byAreaId[area.id] ?? [])],
+      walkSurfaces: compiledWalkSurfaces[area.id] ?? [],
     };
   })(),
   id: area.id,

@@ -1,10 +1,14 @@
 import type { CollisionProxy } from '../../domain/world/WorldCollision';
 import type { WorldAssetKey } from './WorldAssetKeys';
+import type { WorldWalkSurface } from '../../domain/world/WorldWalkSurface';
+import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_SURFACE } from './woodlandBridge';
 
 export type WorldPropDefinition = {
   readonly asset: WorldAssetKey;
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
+  readonly walkSurface?: WorldWalkSurface;
+  readonly gate?: { readonly barrier: CollisionProxy; readonly leaves: readonly { readonly node: string; readonly openAngle: number }[] };
 };
 
 const rectangle = (width: number, depth: number, center: readonly [number, number] = [0, 0], rotation?: number): CollisionProxy => ({ kind: 'rectangle', center, width, depth, ...(rotation === undefined ? {} : { rotation }) });
@@ -35,6 +39,7 @@ export const WORLD_PROP_CATALOG = {
   'ruin.scaffolding': occludingProp('ruin.scaffolding', [rectangle(4.2, 2.8)]),
   'crossing.bridgeA': prop('crossing.bridgeA'),
   'crossing.bridgeB': prop('crossing.bridgeB'),
+  'crossing.woodlandBridge': { asset: 'crossing.woodlandBridge', collision: WOODLAND_BRIDGE_COLLISION, walkSurface: WOODLAND_BRIDGE_WALK_SURFACE, gate: WOODLAND_BRIDGE_GATE },
   // These lengths follow the visible GLB bounds after the catalog's 7x base scale.
   // The gate proxies cover its solid side wings while preserving the open arch.
   'fortress.wall': prop('fortress.wall', [rectangle(14, 0.9)]),

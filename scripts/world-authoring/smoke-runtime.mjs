@@ -6,6 +6,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 const repositoryRoot = process.cwd();
+const woodlandBridge = process.argv.includes('--woodland-bridge');
 const port = 4173;
 const gameUrl = `http://127.0.0.1:${port}/Infuse-evergrowth/`;
 const outputRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -99,6 +100,32 @@ async function waitForArea(client, areaId) {
   await waitFor(client, `document.getElementById('renderer-stats')?.textContent.includes('loading none')`, `Area ${areaId} visual residency`, 30000);
 }
 
+async function heroPosition(client) {
+  await wait(600);
+  const stats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
+  const match = /area (\d+) · hero (-?[\d.]+), (-?[\d.]+)/.exec(stats ?? '');
+  if (!match) throw new Error(`Missing hero diagnostics: ${stats}`);
+  return { area: Number(match[1]), x: Number(match[2]), z: Number(match[3]) };
+}
+
+async function moveAxis(client, axis, destination) {
+  for (let attempt = 0; attempt < 35; attempt++) {
+    const position = await heroPosition(client);
+    const delta = destination - position[axis];
+    if (Math.abs(delta) < 0.2) return;
+    const key = axis === 'x' ? delta > 0 ? 'ArrowRight' : 'ArrowLeft' : delta > 0 ? 'ArrowDown' : 'ArrowUp';
+    await holdKey(client, key, key, Math.max(35, Math.min(800, Math.abs(delta) / 7.6 * 1000)));
+  }
+  throw new Error(`Could not walk to ${axis}=${destination}: ${JSON.stringify(await heroPosition(client))}`);
+}
+
+async function approachWoodlandBridge(client) {
+  await moveAxis(client, 'x', 6);
+  await moveAxis(client, 'z', -22);
+  await moveAxis(client, 'x', 10.8);
+  await moveAxis(client, 'z', -29);
+}
+
 const gameReadyExpression = `Boolean(
   document.getElementById('canvas-host')
   && !document.getElementById('loading-screen')
@@ -126,7 +153,7 @@ try {
     localStorage.setItem('infuse-rendering-quality-v1', JSON.stringify({ renderScale: 1, frameRateLimit: 60, showStats: true }));
     const key = 'infuse-evergrowth-save-v18';
     const save = JSON.parse(localStorage.getItem(key));
-    save.unlockedAreas = [1, 2, 3];
+    save.unlockedAreas = ${woodlandBridge ? '[1]' : '[1, 2, 3]'};
     save.heroHp = 100000000;
     save.stats.maxHp.base = 100000000;
     localStorage.setItem(key, JSON.stringify(save));
@@ -137,6 +164,33 @@ try {
   await waitForArea(client, 1);
   await capture(client, 'runtime-iphone-12-area-a01.png');
 
+  if (woodlandBridge) {
+    await approachWoodlandBridge(client);
+    await holdKey(client, 'ArrowUp', 'ArrowUp', 1800);
+    const stopped = await heroPosition(client);
+    if (stopped.area !== 1 || stopped.z < -30.2) throw new Error(`Closed bridge was traversable: ${JSON.stringify(stopped)}`);
+    await capture(client, 'runtime-iphone-12-woodland-closed.png');
+    await evaluate(client, `(() => {
+      const key = 'infuse-evergrowth-save-v18';
+      const save = JSON.parse(localStorage.getItem(key));
+      save.unlockedAreas = [1, 2, 3];
+      localStorage.setItem(key, JSON.stringify(save));
+    })()`);
+    await client.send('Page.reload');
+    await waitFor(client, gameReadyExpression, 'unlocked bridge boot');
+    await waitForArea(client, 1);
+    await approachWoodlandBridge(client);
+    await moveAxis(client, 'z', -33);
+    await capture(client, 'runtime-iphone-12-woodland-open.png');
+    await moveAxis(client, 'z', -37);
+    await waitForArea(client, 2);
+    await capture(client, 'runtime-iphone-12-woodland-deck.png');
+    await moveAxis(client, 'z', -45.2);
+    await capture(client, 'runtime-iphone-12-woodland-north-landing.png');
+    await moveAxis(client, 'z', -26.8);
+    await waitForArea(client, 1);
+    await capture(client, 'runtime-iphone-12-woodland-return.png');
+  } else {
   await holdKey(client, 'ArrowRight', 'ArrowRight', 1000);
   await holdKey(client, 'ArrowDown', 'ArrowDown', 470);
   await holdKey(client, 'ArrowRight', 'ArrowRight', 5400);
@@ -151,10 +205,11 @@ try {
   await holdKey(client, 'ArrowUp', 'ArrowUp', 1600);
   await waitForArea(client, 2);
   await capture(client, 'runtime-iphone-12-area-a02-south-gate.png');
+  }
 
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
   if (client.errors.length > 0) throw new Error(`Browser errors:\n${client.errors.join('\n')}`);
-  console.log(`Runtime smoke passed through Areas 1 → 3 → 1 → 2.\n${rendererStats}`);
+  console.log(`Runtime smoke passed: ${woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
 } finally {
   socket?.close();
   browserProcess?.kill();

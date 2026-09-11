@@ -1,5 +1,5 @@
 import { WORLD_ASSET_DEFINITIONS } from './WorldAssetKeys';
-import { WORLD_PROP_CATALOG } from './WorldPropCatalog';
+import { WORLD_PROP_CATALOG, type WorldPropDefinition } from './WorldPropCatalog';
 import { expandWorldScatter, type AnyWorldLayout } from './WorldLayout';
 
 export type WorldValidationIssue = { readonly severity: 'error' | 'warning'; readonly message: string };
@@ -21,10 +21,16 @@ export function validateWorldLayouts(layouts: readonly AnyWorldLayout[]): WorldV
       const qualified = `${layout.id}/${placement.name}`;
       if (placementNames.has(qualified)) issues.push({ severity: 'error', message: `Duplicate placement name: ${qualified}` });
       placementNames.add(qualified);
-      const definition = WORLD_PROP_CATALOG[placement.prop];
+      const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
       if (!definition) { issues.push({ severity: 'error', message: `${qualified} uses unknown prop ${placement.prop}.` }); continue; }
       if (!WORLD_ASSET_DEFINITIONS[definition.asset]) issues.push({ severity: 'error', message: `${qualified} uses unresolvable asset ${definition.asset}.` });
       if ((placement.scale ?? 1) <= 0) issues.push({ severity: 'error', message: `${qualified} has a non-positive scale.` });
+      if (definition.walkSurface) {
+        const { width, profile } = definition.walkSurface;
+        if (!(width > 0) || !Number.isFinite(width) || profile.length < 2 || profile.some(([z, y], index) => !Number.isFinite(z) || !Number.isFinite(y) || (index > 0 && z <= profile[index - 1][0]))) {
+          issues.push({ severity: 'error', message: `${qualified} has an invalid walkable floor profile.` });
+        }
+      }
     }
     for (const volume of layout.collision) {
       const valid = volume.kind === 'circle' ? volume.radius > 0 : volume.width > 0 && volume.depth > 0;

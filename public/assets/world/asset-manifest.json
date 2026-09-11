@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-04T06:17:16.395Z",
+  "generatedAt": "2026-09-11T06:35:34.404Z",
   "assets": [
     {
       "key": "crossing.bridgeA",
@@ -26,6 +26,20 @@
       "runtimeDigest": {
         "bytes": 42732,
         "sha256": "3de41bcd3aef1a4a4079f5fabfd30500a63de12b7e2b8c359385e2e6e98cd627"
+      }
+    },
+    {
+      "key": "crossing.woodlandBridge",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/woodland-bridge.glb",
+      "runtime": "assets/world/shared/models/woodland-bridge.glb",
+      "sourceDigest": {
+        "bytes": 8818680,
+        "sha256": "77dd93136f33f69f8adc60e1d0ee07837fc92c5b7d016639312b7aae50b9665d"
+      },
+      "runtimeDigest": {
+        "bytes": 8818680,
+        "sha256": "77dd93136f33f69f8adc60e1d0ee07837fc92c5b7d016639312b7aae50b9665d"
       }
     },
     {

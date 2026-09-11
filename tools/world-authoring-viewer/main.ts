@@ -143,6 +143,11 @@ function framePreset(preset: string): void {
   if (preset === 'top') {
     controls.target.set(36, 0, -30);
     camera.position.set(36, 210, -29.9);
+  } else if (preset === 'bridge:A01-A02') {
+    const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === 'area1-area2')!;
+    const portraitDistance = Math.max(1, 0.8 / camera.aspect);
+    controls.target.set(bridge.x, 1.8, bridge.z);
+    camera.position.set(bridge.x - 13 * portraitDistance, 1.8 + 14.2 * portraitDistance, bridge.z + 18 * portraitDistance);
   } else if (layout) {
     controls.target.set(layout.origin[0], 0, layout.origin[2]);
     const distance = Math.max(layout.visualSize.width, layout.visualSize.depth) * 0.72;
