@@ -2,11 +2,13 @@ import type { CollisionProxy } from '../../domain/world/WorldCollision';
 import type { WorldAssetKey } from './WorldAssetKeys';
 import type { WorldWalkSurface } from '../../domain/world/WorldWalkSurface';
 import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_SURFACE } from './woodlandBridge';
+import { GREENHAVEN_COLLISION } from './greenhaven';
 
 export type WorldPropDefinition = {
   readonly asset: WorldAssetKey;
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
+  readonly absoluteElevation?: boolean;
   readonly walkSurface?: WorldWalkSurface;
   readonly gate?: { readonly barrier: CollisionProxy; readonly leaves: readonly { readonly node: string; readonly openAngle: number }[] };
 };
@@ -17,6 +19,15 @@ const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): 
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
 
 export const WORLD_PROP_CATALOG = {
+  'terrain.greenhaven': { asset: 'terrain.greenhaven', collision: GREENHAVEN_COLLISION, absoluteElevation: true },
+  'village.rusticFence': prop('village.rusticFence', [rectangle(5.4, 0.22)]),
+  'village.rusticFenceGate': prop('village.rusticFenceGate', [rectangle(1.5, 0.22, [-1.9, 0]), rectangle(1.5, 0.22, [1.9, 0])]),
+  'village.warmHomeA': occludingProp('village.warmHomeA', [rectangle(4.2, 3.7)]),
+  'village.warmHomeB': occludingProp('village.warmHomeB', [rectangle(4.2, 3.7)]),
+  'nature.greenhavenPineA': occludingProp('nature.greenhavenPineA', [circle(0.45)]),
+  'nature.greenhavenPineB': occludingProp('nature.greenhavenPineB', [circle(0.45)]),
+  'nature.greenhavenBoulder': prop('nature.greenhavenBoulder', [circle(0.9)]),
+  'crossing.greenhavenFutureBridge': { asset: 'crossing.greenhavenFutureBridge', collision: [], absoluteElevation: true },
   'village.homeBlueA': occludingProp('village.homeBlueA', [rectangle(4.2, 3.7)]),
   'village.homeBlueB': occludingProp('village.homeBlueB', [rectangle(4.2, 3.7)]),
   'village.tavernBlue': occludingProp('village.tavernBlue', [rectangle(5.4, 4.2)]),
@@ -86,7 +97,7 @@ export const WORLD_PROP_CATALOG = {
   'ruin.dungeonCorner': prop('ruin.dungeonCorner', [rectangle(1.1, 1.1)]),
   'ruin.rubbleHalf': prop('ruin.rubbleHalf', [circle(0.9)]),
   'ruin.rubbleLarge': prop('ruin.rubbleLarge', [circle(1.3)]),
-  'landmark.fountain': prop('landmark.fountain', [circle(1.65)]),
+  'landmark.fountain': occludingProp('landmark.fountain', [circle(1.65)]),
 } as const satisfies Record<string, WorldPropDefinition>;
 
 export type WorldPropKey = keyof typeof WORLD_PROP_CATALOG;

@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:f
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 
 const repositoryRoot = process.cwd();
 const viewerPort = 4174;
@@ -30,6 +31,7 @@ const viteProcess = spawn(process.execPath, [
 
 let browserProcess;
 let socket;
+let client;
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -128,7 +130,7 @@ function inspectDebugGlb(buffer) {
 
 try {
   await waitForHttp(viewerUrl, 30000);
-  const debugPort = 9334;
+  const debugPort = await availableDebugPort();
   browserProcess = spawn(browserExecutable, [
     '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${path.join(temporaryRoot, 'browser-profile')}`,
     '--no-first-run', '--no-default-browser-check', '--enable-unsafe-swiftshader', '--disable-background-networking', 'about:blank',
@@ -137,11 +139,12 @@ try {
   const target = await createBrowserTarget(debugPort);
   socket = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
-  const client = new CdpClient(socket);
+  client = new CdpClient(socket);
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
   await capture(client, path.join(capturesRoot, 'general-layout.png'), 'world', 1440, 900);
+  await capture(client, path.join(capturesRoot, 'area1-target-layout.png'), 'greenhaven', 1280, 1100);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a01.png'), 'area:A01', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a02.png'), 'area:A02', 390, 844);
   await capture(client, path.join(capturesRoot, 'iphone-12-area-a03.png'), 'area:A03', 390, 844);
@@ -154,11 +157,9 @@ try {
   const debugPath = path.join(debugRoot, 'assembled-world-debug.glb');
   await rename(downloaded, debugPath);
   const inspection = inspectDebugGlb(await readFile(debugPath));
-  console.log(`Captured six world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
+  console.log(`Captured eight world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
 } finally {
-  socket?.close();
-  browserProcess?.kill();
-  viteProcess.kill();
+  await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);
-  await rm(temporaryRoot, { recursive: true, force: true });
+  await rm(temporaryRoot, { recursive: true, force: true, maxRetries: 12, retryDelay: 500 });
 }

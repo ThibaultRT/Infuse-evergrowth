@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement } from '../../data/world/WorldLayout';
 import type { WorldMaterialSet } from './WorldMaterials';
+import { greenhavenGroundHeight } from '../../data/world/greenhaven';
 
 function edgeFade(layout: AnyWorldLayout, x: number, z: number): number {
   const halfWidth = layout.visualSize.width / 2;
@@ -18,7 +19,7 @@ export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number)
     const basin = Math.exp(-(((x + 39.6) ** 2) / 340 + ((z - 1.2) ** 2) / 30)) * 0.62;
     height = Math.max(-0.38, highland + ripple - basin);
   } else if (layout.areaId === 3) height = 0.85 * edgeFade(layout, x, z) + ripple * 0.65;
-  else height = ripple * 0.72;
+  else height = greenhavenGroundHeight(x, z);
 
   for (const cutout of layout.terrainCutouts ?? []) {
     const rotation = cutout.rotation ?? 0;
@@ -48,8 +49,9 @@ export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Mater
     }
     return [...samples].sort((a, b) => a - b);
   };
-  const xs = axisSamples(layout.visualSize.width, 28, 0);
-  const zs = axisSamples(layout.visualSize.depth, 20, 1);
+  const meadow = layout.kind === 'area' && layout.areaId === 1;
+  const xs = axisSamples(layout.visualSize.width, meadow ? 112 : 28, 0);
+  const zs = axisSamples(layout.visualSize.depth, meadow ? 112 : 20, 1);
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
@@ -112,7 +114,9 @@ export function createWorldRoad(layout: AnyWorldLayout, road: WorldRoadPlacement
 }
 
 export function createWorldSurface(surface: WorldSurfacePlacement, materials: WorldMaterialSet): THREE.Mesh {
-  const geometry = new THREE.PlaneGeometry(surface.size.width, surface.size.depth);
+  const geometry = surface.outline
+    ? new THREE.ShapeGeometry(new THREE.Shape(surface.outline.map(([x, z]) => new THREE.Vector2(x, -z))))
+    : new THREE.PlaneGeometry(surface.size.width, surface.size.depth);
   geometry.rotateX(-Math.PI / 2);
   const mesh = new THREE.Mesh(geometry, surface.kind === 'water' ? materials.water : materials.cliff);
   mesh.name = surface.name;

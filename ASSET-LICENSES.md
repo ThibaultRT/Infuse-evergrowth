@@ -92,3 +92,11 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Normalization: the deck spans 12 meters with its floor at 1.65 meters. The shared dimensions are in `src/data/world/woodland-bridge.json`; production placement, rail/door proxies and approach profiles remain renderer-independent.
 - Reproduction: open the supplied source with Blender in background mode and run `scripts/world-assets/export-woodland-bridge.py`, then `npm run authoring:assets:promote -- crossing.woodlandBridge`.
 - Usage: project-owned/user-supplied artwork; included with permission for Infuse: Evergrowth. The creative `.blend` and its packed reference are not shipped or modified.
+
+## Greenhaven landscape and village details
+
+- Files: `public/assets/world/shared/models/greenhaven-*.glb`.
+- The landscape, pines, boulder, low timber fences, and closed southern bridge were procedurally authored for this project in Blender from the owner's `Layout.png` reference. They contain portable vertex colors and no external texture dependencies.
+- `greenhaven-home-a.glb` and `greenhaven-home-b.glb` are warm-roof palette variants of Kay Lousberg's CC0 KayKit Hexagon homes, derived from the already-promoted `keep-home-red-a.glb` and `keep-home-red-b.glb`. Geometry, pivots and scale are preserved; the modified palette is embedded. The upstream license remains under `public/assets/world/licenses/`.
+- Reproduction: `scripts/world-assets/export-greenhaven.py` reads `src/data/world/greenhaven.json` and writes the nine runtime GLBs plus an editable local scene at `authoring/local/greenhaven/greenhaven.blend`. The local `.blend` is not shipped.
+- The existing project-supplied fountain and woodland bridge retain their original provenance above.

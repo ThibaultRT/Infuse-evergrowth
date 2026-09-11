@@ -109,6 +109,42 @@ portrait captures of the closed gate, opened gate, deck, and both landings.
 The capture command also produces `woodland-bridge.png` and
 `iphone-12-woodland-bridge.png` using the production builder.
 
+## Greenhaven reference layout
+
+Area A01 follows `Layout.png` within its unchanged 72 × 72 m playable footprint:
+a northwest lake cove, west rock escarpment, southern canyon, fountain plaza,
+branching stone lanes, a southern village loop, cottage gardens and pine clusters.
+The west and south future exits remain closed by the existing world boundary.
+
+`src/data/world/greenhaven.json` owns the lake/rock footprints, plateau dimensions,
+roads, plaza, gardens and scenic bridge dimensions. The pure layout and the Blender
+exporter consume this same data. Walkable village ground remains at Y=0; only
+impassable lake/cliff ground drops below it. The woodland bridge continues to use
+its existing independent floor profile and boss lock.
+
+Rebuild the landscape and nine small asset exports with the installed Blender:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-greenhaven.py
+npm run authoring:assets:promote -- terrain.greenhaven village.rusticFence village.rusticFenceGate village.warmHomeA village.warmHomeB nature.greenhavenPineA nature.greenhavenPineB nature.greenhavenBoulder crossing.greenhavenFutureBridge
+```
+
+This saves an editable scene to `authoring/local/greenhaven/greenhaven.blend`.
+The landscape uses three vertex-color batches, under 60k triangles / 5 MiB.
+Warm-roof homes reuse the existing CC0 geometry and embedded recolored palettes.
+Blender MCP was unavailable during this revision; the reproducible background
+Blender exporter was used instead.
+
+`authoring:world:validate` checks plateau height, all Area1 spawn/exit reachability,
+scatter exclusions and the landscape export budget. `authoring:world:capture`
+adds `area1-target-layout.png`. Run
+`npm run authoring:world:smoke-runtime -- --greenhaven` to walk the village loop,
+check the lake and future boundary, exercise persisted Full/Reduced and 30 FPS
+settings, and verify playable loading fallback with the landscape request blocked.
+`--greenhaven-shore` checks that the new pines and central fountain use the existing
+occlusion fade to keep the followed hero visible.
+These are desktop browser checks; a real iPhone performance pass remains necessary.
+
 ## Ownership
 
 - `src/data/world/**`: authoritative dimensions, layouts, prop catalog and asset map.

@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { createServer } from 'vite';
 import { validateCrossings } from './validate-crossings.mjs';
+import { validateGreenhaven } from './validate-greenhaven.mjs';
 
 const repositoryRoot = process.cwd();
 const vite = await createServer({ root: repositoryRoot, configFile: false, appType: 'custom', server: { middlewareMode: true }, logLevel: 'silent' });
@@ -138,6 +139,7 @@ try {
 
   if (errors.length > 0) throw new Error(`World validation failed:\n${errors.join('\n')}`);
   await validateCrossings(vite, config);
+  await validateGreenhaven(vite, config);
   console.log(`World validation passed: ${WORLD_LAYOUTS.length} chunks, ${placementNames.size} named authored/scatter groups, ${compiled.all.length} colliders, ${config.SPAWNS.length} spawns, ${referencedAssets.size} promoted assets.`);
 } finally {
   await vite.close();

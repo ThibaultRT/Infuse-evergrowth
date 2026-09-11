@@ -4,9 +4,12 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 
 const repositoryRoot = process.cwd();
 const woodlandBridge = process.argv.includes('--woodland-bridge');
+const greenhaven = process.argv.includes('--greenhaven');
+const greenhavenShore = process.argv.includes('--greenhaven-shore');
 const port = 4173;
 const gameUrl = `http://127.0.0.1:${port}/Infuse-evergrowth/`;
 const outputRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -22,6 +25,7 @@ const temporaryRoot = await mkdtemp(path.join(tmpdir(), 'infuse-runtime-smoke-')
 const viteProcess = spawn(process.execPath, [path.join(repositoryRoot, 'node_modules', 'vite', 'bin', 'vite.js'), '--host', '127.0.0.1', '--port', String(port), '--strictPort'], { cwd: repositoryRoot, stdio: 'ignore', windowsHide: true });
 let browserProcess;
 let socket;
+let client;
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function waitForHttp(url, timeoutMs) {
@@ -134,7 +138,7 @@ const gameReadyExpression = `Boolean(
 
 try {
   await waitForHttp(gameUrl, 30000);
-  const debugPort = 9336;
+  const debugPort = await availableDebugPort();
   browserProcess = spawn(browserExecutable, [
     '--headless=new', `--remote-debugging-port=${debugPort}`, `--user-data-dir=${path.join(temporaryRoot, 'browser-profile')}`,
     '--no-first-run', '--no-default-browser-check', '--enable-unsafe-swiftshader', '--disable-background-networking', 'about:blank',
@@ -144,7 +148,7 @@ try {
   const target = await targetResponse.json();
   socket = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
-  const client = new CdpClient(socket);
+  client = new CdpClient(socket);
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable'), client.send('Log.enable')]);
   await client.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   await waitFor(client, gameReadyExpression, 'initial game boot');
@@ -164,7 +168,56 @@ try {
   await waitForArea(client, 1);
   await capture(client, 'runtime-iphone-12-area-a01.png');
 
-  if (woodlandBridge) {
+  if (greenhavenShore) {
+    const fountainStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
+    if (!fountainStats?.includes('A01_Fountain_Central')) throw new Error('The fountain hides the initial hero without fading.');
+    await moveAxis(client, 'x', -30);
+    await moveAxis(client, 'z', -16);
+    await holdKey(client, 'ArrowUp', 'ArrowUp', 1600);
+    await capture(client, 'runtime-iphone-12-greenhaven-shore.png');
+    const shoreStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
+    if (!shoreStats?.includes('A01_Tree_')) throw new Error('Shore pines hide the hero without fading.');
+  } else if (greenhaven) {
+    await moveAxis(client, 'x', -6);
+    await moveAxis(client, 'z', 16);
+    await moveAxis(client, 'x', -23);
+    await capture(client, 'runtime-iphone-12-greenhaven-cottages.png');
+    await moveAxis(client, 'z', 31);
+    await moveAxis(client, 'x', 7.2);
+    await moveAxis(client, 'z', 34);
+    await holdKey(client, 'ArrowDown', 'ArrowDown', 1200);
+    if ((await heroPosition(client)).z > 35.6) throw new Error('The scenic south bridge opened a future area.');
+    await capture(client, 'runtime-iphone-12-greenhaven-south.png');
+    await moveAxis(client, 'z', 31);
+    await moveAxis(client, 'x', -30);
+    await moveAxis(client, 'z', -16);
+    await holdKey(client, 'ArrowUp', 'ArrowUp', 1600);
+    const shore = await heroPosition(client);
+    if (Math.hypot(shore.x + 26, shore.z + 35) < 15.4) throw new Error('The northwest lake is traversable.');
+    await capture(client, 'runtime-iphone-12-greenhaven-shore.png');
+    await moveAxis(client, 'z', -5.5);
+    await moveAxis(client, 'x', 0);
+    await moveAxis(client, 'z', 0);
+    await capture(client, 'runtime-iphone-12-greenhaven-full.png');
+    await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
+    await client.send('Page.reload');
+    await waitFor(client, gameReadyExpression, 'saved Reduced/30 FPS boot');
+    await waitForArea(client, 1);
+    const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
+    if (quality.renderScale !== 0.7 || quality.frameRateLimit !== 30) throw new Error('Rendering preferences did not persist.');
+    await capture(client, 'runtime-iphone-12-greenhaven-reduced.png');
+    const bufferWidth = await evaluate(client, "document.querySelector('#canvas-host canvas').width");
+    if (bufferWidth !== 273) throw new Error(`Reduced rendering buffer is ${bufferWidth}, expected 273.`);
+    await client.send('Network.enable');
+    await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+    await client.send('Network.setBlockedURLs', { urls: ['*greenhaven-landscape.glb*'] });
+    await client.send('Page.reload');
+    await waitFor(client, gameReadyExpression, 'landscape failure fallback boot');
+    await waitForArea(client, 1);
+    await moveAxis(client, 'x', 3);
+    await capture(client, 'runtime-iphone-12-greenhaven-fallback.png');
+    client.errors = client.errors.filter((message) => message.includes('ERR_BLOCKED_BY_CLIENT') === false);
+  } else if (woodlandBridge) {
     await approachWoodlandBridge(client);
     await holdKey(client, 'ArrowUp', 'ArrowUp', 1800);
     const stopped = await heroPosition(client);
@@ -209,11 +262,9 @@ try {
 
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
   if (client.errors.length > 0) throw new Error(`Browser errors:\n${client.errors.join('\n')}`);
-  console.log(`Runtime smoke passed: ${woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
+  console.log(`Runtime smoke passed: ${greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed future bridge, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
 } finally {
-  socket?.close();
-  browserProcess?.kill();
-  viteProcess.kill();
+  await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);
-  await rm(temporaryRoot, { recursive: true, force: true });
+  await rm(temporaryRoot, { recursive: true, force: true, maxRetries: 12, retryDelay: 500 });
 }

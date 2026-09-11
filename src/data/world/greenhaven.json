@@ -1,0 +1,27 @@
+{
+  "seed": 110926,
+  "lake": { "center": [-26, -35], "radius": 15, "bedHeight": -2.2, "waterHeight": 0.08, "channelEdgeZ": -31.5 },
+  "plateau": { "westEdge": -36, "southEdge": 36, "cliffLipWidth": 0.75, "bottomHeight": -7 },
+  "southBridge": { "center": [7.2, 39], "width": 3.4, "length": 6 },
+  "canyon": { "center": [0, 40], "width": 84, "depth": 4, "waterHeight": -6.65 },
+  "westRocks": [
+    { "center": [-37, -29], "radius": 4.3, "height": 9 },
+    { "center": [-38, -20], "radius": 4.5, "height": 11 },
+    { "center": [-37.5, -13], "radius": 3.8, "height": 7.5 },
+    { "center": [-38, 2], "radius": 4.5, "height": 10 },
+    { "center": [-37, 10], "radius": 4.4, "height": 8 },
+    { "center": [-38, 19], "radius": 5, "height": 7 },
+    { "center": [-36.5, 29], "radius": 4.2, "height": 5.5 }
+  ],
+  "plaza": { "center": [0, 4.5], "radius": 6.5 },
+  "roads": [
+    { "name": "A01_Road_WestEast", "points": [[-40, -5.4], [-30, -3], [-19, -5], [-9, 0], [0, 4.5], [14, 4], [25, 3.6], [36, 3.6]], "width": 3.4 },
+    { "name": "A01_Road_North", "points": [[-3, 0], [-3, -7], [3, -15], [9, -21], [10.8, -27]], "width": 3.2 },
+    { "name": "A01_Road_South", "points": [[3, 9], [7, 16], [7, 26], [7.2, 36]], "width": 3.2 },
+    { "name": "A01_Road_VillageLoop", "points": [[-29, -3], [-28, 6], [-26, 15], [-23, 24], [-13, 31], [0, 33], [7, 31], [20, 29], [28, 20], [29, 10], [25, 3.6]], "width": 2.8 },
+    { "name": "A01_Road_Cottages", "points": [[-25, 18], [-18, 17], [-12, 12], [-5, 8]], "width": 2.6 },
+    { "name": "A01_Road_Inn", "points": [[0, -11], [-7, -13], [-15, -16]], "width": 2.3 },
+    { "name": "A01_Road_Smith", "points": [[6, -17], [16, -12], [21, -8]], "width": 2.3 }
+  ],
+  "gardens": [{ "center": [13, 14], "width": 5.2, "depth": 4.6 }, { "center": [-21, 5], "width": 4.3, "depth": 3.5 }]
+}

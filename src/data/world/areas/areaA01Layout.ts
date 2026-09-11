@@ -1,8 +1,19 @@
-import type { AreaWorldLayout } from '../WorldLayout';
+import type { AreaWorldLayout, WorldScatterPlacement } from '../WorldLayout';
 import { A01_A02_TRANSITION } from '../transitions/a01A02Transition';
 import { clearTransitionApproaches, transitionTerrainCutouts } from '../transitionTerrainCutouts';
+import { GREENHAVEN_LAKE, GREENHAVEN_ROADS } from '../greenhaven';
+import terrain from '../greenhaven.json';
 
 const origin = [0, 0, 0] as const;
+const pines = ['nature.greenhavenPineA', 'nature.greenhavenPineB'] as const;
+const clearings = [
+  { center: [terrain.lake.center[0], terrain.lake.center[1]] as const, radius: terrain.lake.radius + 1.8 },
+  { center: [0, 4.5] as const, radius: 8.5 },
+  ...GREENHAVEN_ROADS.flatMap((road) => road.points.map((center) => ({ center, radius: road.width / 2 + 2.5 }))),
+];
+const decorate = (scatter: WorldScatterPlacement): WorldScatterPlacement => ({
+  ...scatter, exclusions: [...clearings, ...scatter.exclusions ?? []],
+});
 
 export const AREA_A01_LAYOUT = {
   kind: 'area',
@@ -14,39 +25,48 @@ export const AREA_A01_LAYOUT = {
   visualSize: { width: 84, depth: 84 },
   terrain: 'meadow',
   terrainCutouts: transitionTerrainCutouts(A01_A02_TRANSITION, origin),
-  roads: [
-    { name: 'A01_Road_WestEast', points: [[-36, -5.4], [-19.8, -2.7], [-7.2, 1.8], [0.9, 4.5], [15.3, 2.7], [28.8, 3.6], [42, 3.6]], width: 5.4, material: 'trail' },
-    { name: 'A01_Road_North', points: [[0.9, 4.5], [4.5, -7.2], [12.6, -18], [10.8, -24], [10.8, -27]], width: 3.6, material: 'trail' },
-    { name: 'A01_Road_South', points: [[0.9, 4.5], [2.7, 14.4], [5.4, 26.1], [7.2, 36]], width: 4.6, material: 'trail' },
-  ],
+  roads: GREENHAVEN_ROADS,
+  surfaces: [GREENHAVEN_LAKE, {
+    name: 'A01_South_CanyonWater', kind: 'water', center: [terrain.canyon.center[0], terrain.canyon.center[1]],
+    size: { width: terrain.canyon.width, depth: terrain.canyon.depth }, elevation: terrain.canyon.waterHeight,
+  }],
   props: [
-    { name: 'A01_Fountain_Central', prop: 'landmark.fountain', position: [0, 0.2, 4.5], rotation: 0.25 },
-    { name: 'A01_House_West', prop: 'village.homeBlueA', position: [-20.7, 0.1, -16.2], rotation: 2.3, scale: 1.12 },
-    { name: 'A01_Tavern_North', prop: 'village.tavernBlue', position: [14.4, 0.1, -12.6], rotation: -2.25, scale: 1.12 },
-    { name: 'A01_House_Southwest', prop: 'village.homeBlueB', position: [-21.6, 0.1, 13.5], rotation: 0.85, scale: 1.08 },
-    { name: 'A01_House_South', prop: 'village.homeBlueA', position: [-16.2, 0.1, 26.1], rotation: 0.18 },
-    { name: 'A01_Blacksmith_East', prop: 'village.blacksmithBlue', position: [21.6, 0.1, 16.2], rotation: -1.3, scale: 1.08 },
-    { name: 'A01_Market_East', prop: 'village.marketBlue', position: [26.1, 0.1, 26.1], rotation: -2.3, scale: 0.94 },
-    { name: 'A01_Well_West', prop: 'village.wellBlue', position: [-9.9, 0.1, 5.4], rotation: 0.4, scale: 0.88 },
-    { name: 'A01_Garden_Fence_N', prop: 'village.woodFence', position: [10.8, 0.2, 10.8], scale: 0.36 },
-    { name: 'A01_Garden_Fence_E', prop: 'village.woodFence', position: [15.3, 0.2, 14.4], rotation: Math.PI / 2, scale: 0.36 },
-    { name: 'A01_Garden_Fence_S', prop: 'village.woodFenceGate', position: [10.8, 0.2, 18], scale: 0.36 },
-    { name: 'A01_Garden_Fence_W', prop: 'village.woodFence', position: [6.3, 0.2, 14.4], rotation: Math.PI / 2, scale: 0.36 },
-    { name: 'A01_Cart', prop: 'prop.wheelbarrow', position: [-7.2, 0.2, 9], rotation: -0.7, scale: 0.9 },
-    { name: 'A01_Lumber', prop: 'prop.lumber', position: [25.2, 0.2, 19.8], rotation: 0.6, scale: 0.84 },
-    { name: 'A01_Crates_01', prop: 'prop.crate', position: [18, 0.2, 20.7], rotation: 0.2, scale: 0.72 },
-    { name: 'A01_Crates_02', prop: 'prop.crateOpen', position: [19.8, 0.2, 22.5], rotation: -0.5, scale: 0.7 },
-    { name: 'A01_FutureGate_West', prop: 'fortress.gate', position: [-40.5, 0.2, -5.4], rotation: Math.PI / 2, scale: 0.72, collision: 'none' },
-    { name: 'A01_FutureBridge_South', prop: 'crossing.bridgeB', position: [7.2, 0.1, 40.5], scale: 0.68, collision: 'none' },
+    { name: 'A01_Landscape', prop: 'terrain.greenhaven', position: [0, 0, 0] },
+    { name: 'A01_Fountain_Central', prop: 'landmark.fountain', position: [0, 0, 4.5], rotation: 0.25 },
+    { name: 'A01_House_West', prop: 'village.warmHomeA', position: [-18, 0, -15], rotation: 2.7, scale: 1.1 },
+    { name: 'A01_Tavern_North', prop: 'village.warmHomeB', position: [20, 0, -10.5], rotation: -2.1, scale: 1.18 },
+    { name: 'A01_House_Southwest', prop: 'village.homeBlueB', position: [-18, 0, 8], rotation: 0.55, scale: 1.08 },
+    { name: 'A01_House_South', prop: 'village.homeBlueA', position: [-17, 0, 25.5], rotation: 0.2, scale: 1.15 },
+    { name: 'A01_Blacksmith_East', prop: 'village.blacksmithBlue', position: [22, 0, 16], rotation: -1.3, scale: 0.94 },
+    { name: 'A01_Market_East', prop: 'village.marketBlue', position: [23, 0, 24], rotation: -2.6, scale: 0.8 },
+    { name: 'A01_Well_West', prop: 'village.wellBlue', position: [-9, 0, 6], scale: 0.7 },
+    { name: 'A01_Garden_Fence_N', prop: 'village.rusticFence', position: [13, 0, 11.3], scale: 0.94 },
+    { name: 'A01_Garden_Fence_E', prop: 'village.rusticFence', position: [16, 0, 14], rotation: Math.PI / 2, scale: 0.8 },
+    { name: 'A01_Garden_Fence_S', prop: 'village.rusticFenceGate', position: [13, 0, 16.7], scale: 0.94 },
+    { name: 'A01_Garden_Fence_W', prop: 'village.rusticFence', position: [10, 0, 14], rotation: Math.PI / 2, scale: 0.8 },
+    { name: 'A01_Cottage_Fence_W', prop: 'village.rusticFence', position: [-24, 0, 4.8], rotation: Math.PI / 2, scale: 0.75 },
+    { name: 'A01_Cottage_Fence_N', prop: 'village.rusticFence', position: [-21, 0, 2.7], scale: 0.8 },
+    { name: 'A01_Inn_Fence_W', prop: 'village.rusticFence', position: [-22, 0, -14], rotation: 1.2, scale: 0.75 },
+    { name: 'A01_Inn_Fence_S', prop: 'village.rusticFenceGate', position: [-18.5, 0, -10.7], rotation: -0.2, scale: 0.8 },
+    { name: 'A01_Cart', prop: 'prop.wheelbarrow', position: [-9, 0, 9], rotation: -0.7, scale: 0.75 },
+    { name: 'A01_Lumber', prop: 'prop.lumber', position: [25.5, 0, 16.7], rotation: 0.6, scale: 0.7 },
+    { name: 'A01_Crates_01', prop: 'prop.crate', position: [19, 0, 22], rotation: 0.2, scale: 0.65 },
+    { name: 'A01_Crates_02', prop: 'prop.crateOpen', position: [19.8, 0, 23.2], rotation: -0.5, scale: 0.65 },
+    { name: 'A01_Inn_Barrel', prop: 'prop.barrel', position: [-14.8, 0, -13], scale: 0.7 },
+    { name: 'A01_Smith_Barrel', prop: 'prop.barrel', position: [17.2, 0, -8], scale: 0.7 },
+    { name: 'A01_Smith_Stone', prop: 'prop.stonePile', position: [24, 0, -9], scale: 0.65 },
+    { name: 'A01_FutureGate_West', prop: 'fortress.gate', position: [-38.5, 0, -5.4], rotation: Math.PI / 2, scale: 0.72, collision: 'none' },
+    { name: 'A01_FutureBridge_South', prop: 'crossing.greenhavenFutureBridge', position: [terrain.southBridge.center[0], 0, terrain.southBridge.center[1]], collision: 'none' },
   ],
   scatters: clearTransitionApproaches([
-    { prefix: 'A01_Tree_West', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 19, bounds: { minX: -34.2, maxX: -25.2, minZ: -32.4, maxZ: 31.5 }, seed: 101, scale: [1, 1.38] },
-    { prefix: 'A01_Tree_North', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 18, bounds: { minX: -24.3, maxX: 34.2, minZ: -34.2, maxZ: -26.1 }, seed: 102, scale: [0.98, 1.34], exclusions: [{ center: [10.8, -32.4], radius: 8 }] },
-    { prefix: 'A01_Tree_South', props: ['nature.pineA', 'nature.pineB', 'nature.pineC'], count: 14, bounds: { minX: -30.6, maxX: 31.5, minZ: 27.9, maxZ: 34.2 }, seed: 103, scale: [0.96, 1.28], exclusions: [{ center: [7.2, 32.4], radius: 8 }] },
-    { prefix: 'A01_Tree_Landmark', props: ['nature.treeCommon1', 'nature.treeCommon3'], count: 5, bounds: { minX: -23.4, maxX: 28.8, minZ: -22.5, maxZ: 24.3 }, seed: 107, scale: [0.82, 1.08], exclusions: [{ center: [0, 4.5], radius: 15 }] },
-    { prefix: 'A01_Bush', props: ['nature.forestBushA', 'nature.forestBushB', 'nature.flowerBush'], count: 18, bounds: { minX: -27, maxX: 30.6, minZ: -24.3, maxZ: 26.1 }, seed: 104, scale: [0.72, 1.15], exclusions: [{ center: [0, 4.5], radius: 15 }] },
-    { prefix: 'A01_Flower', props: ['nature.flowerGroup', 'nature.grassTuft'], count: 18, bounds: { minX: -25.2, maxX: 29.7, minZ: -22.5, maxZ: 24.3 }, seed: 105, scale: [0.7, 1.2], exclusions: [{ center: [0, 4.5], radius: 10 }] },
-    { prefix: 'A01_Rock', props: ['nature.forestRockA', 'nature.forestRockB', 'nature.rockMedium1'], count: 11, bounds: { minX: -32.4, maxX: 32.4, minZ: -32.4, maxZ: 32.4 }, seed: 106, scale: [0.55, 0.95], exclusions: [{ center: [0, 4.5], radius: 18 }] },
+    decorate({ prefix: 'A01_Tree_West', props: pines, count: 25, bounds: { minX: -32, maxX: -28, minZ: -19, maxZ: 32 }, seed: 101, scale: [1, 1.55] }),
+    decorate({ prefix: 'A01_Tree_North', props: pines, count: 27, bounds: { minX: -15, maxX: 32, minZ: -30, maxZ: -23 }, seed: 102, scale: [1.05, 1.65] }),
+    decorate({ prefix: 'A01_Tree_South', props: pines, count: 21, bounds: { minX: -31, maxX: 32, minZ: 30, maxZ: 35 }, seed: 103, scale: [0.8, 1.2] }),
+    decorate({ prefix: 'A01_Tree_East', props: pines, count: 15, bounds: { minX: 29, maxX: 33, minZ: -23, maxZ: 26 }, seed: 108, scale: [0.9, 1.45] }),
+    decorate({ prefix: 'A01_Tree_Landmark', props: pines, count: 12, bounds: { minX: -10, maxX: 26, minZ: -22, maxZ: 30 }, seed: 107, scale: [0.8, 1.15], exclusions: [{ center: [13, 14], radius: 6 }, { center: [20, -10.5], radius: 5 }, { center: [22, 20], radius: 7 }] }),
+    decorate({ prefix: 'A01_Bush', props: ['nature.forestBushA', 'nature.forestBushB', 'nature.flowerBush'], count: 42, bounds: { minX: -29, maxX: 30, minZ: -25, maxZ: 31 }, seed: 104, scale: [0.55, 1] }),
+    decorate({ prefix: 'A01_Flower', props: ['nature.flowerGroup', 'nature.grassTuft'], count: 54, bounds: { minX: -29, maxX: 30, minZ: -25, maxZ: 33 }, seed: 105, scale: [0.55, 1.1] }),
+    decorate({ prefix: 'A01_Rock', props: ['nature.greenhavenBoulder'], count: 34, bounds: { minX: -31, maxX: 32, minZ: -28, maxZ: 33 }, seed: 106, scale: [0.65, 1.2] }),
   ], A01_A02_TRANSITION, origin),
   collision: [],
 } as const satisfies AreaWorldLayout;

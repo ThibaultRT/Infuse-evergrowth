@@ -112,7 +112,7 @@ export class WorldBuilder {
       object.add(createWalkSurfaceView(definition.walkSurface, this.materials.timber, failed));
     }
     const [x, requestedY, z] = placement.position;
-    object.position.set(x, definition.walkSurface ? requestedY : Math.max(requestedY, worldTerrainHeight(layout, x, z) + 0.025), z);
+    object.position.set(x, definition.walkSurface || definition.absoluteElevation ? requestedY : Math.max(requestedY, worldTerrainHeight(layout, x, z) + 0.025), z);
     object.rotation.y = placement.rotation ?? 0;
     object.scale.multiplyScalar(placement.scale ?? 1);
     object.userData = {

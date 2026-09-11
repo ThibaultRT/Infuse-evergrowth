@@ -39,6 +39,8 @@ export type WorldSurfacePlacement = {
   readonly kind: 'water' | 'cliff';
   readonly center: WorldVec2;
   readonly size: WorldSize;
+  /** Optional local X/Z polygon, used for irregular shorelines. */
+  readonly outline?: readonly WorldVec2[];
   readonly rotation?: number;
   readonly elevation?: number;
 };
@@ -162,6 +164,8 @@ export function expandWorldScatter(scatter: WorldScatterPlacement): WorldPropPla
       z = scatter.bounds.minZ + (scatter.bounds.maxZ - scatter.bounds.minZ) * random();
       if (!scatter.exclusions?.some(({ center, radius }) => (x - center[0]) ** 2 + (z - center[1]) ** 2 < radius ** 2)) break;
     }
+    // Dense exclusion zones can exhaust the attempts; never place inside them.
+    if (scatter.exclusions?.some(({ center, radius }) => (x - center[0]) ** 2 + (z - center[1]) ** 2 < radius ** 2)) continue;
     const prop = scatter.props[Math.min(scatter.props.length - 1, Math.floor(random() * scatter.props.length))];
     if (!prop) continue;
     placements.push({

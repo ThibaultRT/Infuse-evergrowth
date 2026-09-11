@@ -18,7 +18,8 @@ export class WorldAssetLibrary {
   async preload(keys: readonly WorldAssetKey[]): Promise<void> {
     await Promise.all([...new Set(keys)].map(async (key) => {
       const definition = this.resolver.resolve(key);
-      if (definition.kind === 'model') await this.loadModel(key);
+      // Keep rejected requests cached; instantiate supplies the playable fallback.
+      if (definition.kind === 'model') await this.loadModel(key).catch(() => undefined);
       else await this.loadTexture(key);
     }));
   }

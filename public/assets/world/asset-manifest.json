@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T06:35:34.404Z",
+  "generatedAt": "2026-09-11T12:34:51.624Z",
   "assets": [
     {
       "key": "crossing.bridgeA",
@@ -26,6 +26,20 @@
       "runtimeDigest": {
         "bytes": 42732,
         "sha256": "3de41bcd3aef1a4a4079f5fabfd30500a63de12b7e2b8c359385e2e6e98cd627"
+      }
+    },
+    {
+      "key": "crossing.greenhavenFutureBridge",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-south-bridge.glb",
+      "runtime": "assets/world/shared/models/greenhaven-south-bridge.glb",
+      "sourceDigest": {
+        "bytes": 42400,
+        "sha256": "aaf9555d7e7c1175dfe558c68a0fd381bde546e232f116aa750849bade66fdb2"
+      },
+      "runtimeDigest": {
+        "bytes": 42400,
+        "sha256": "aaf9555d7e7c1175dfe558c68a0fd381bde546e232f116aa750849bade66fdb2"
       }
     },
     {
@@ -288,6 +302,48 @@
       "runtimeDigest": {
         "bytes": 42172,
         "sha256": "71c02f2fb5cdb81db5c3a56885e4fb65712bafa2f39522517cc3f080d8fe7474"
+      }
+    },
+    {
+      "key": "nature.greenhavenBoulder",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-boulder.glb",
+      "runtime": "assets/world/shared/models/greenhaven-boulder.glb",
+      "sourceDigest": {
+        "bytes": 8192,
+        "sha256": "9f0143f8859c8cefcf05e24e149ca08a8bfd53009fe0e441b41442157888bb0a"
+      },
+      "runtimeDigest": {
+        "bytes": 8192,
+        "sha256": "9f0143f8859c8cefcf05e24e149ca08a8bfd53009fe0e441b41442157888bb0a"
+      }
+    },
+    {
+      "key": "nature.greenhavenPineA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-pine-a.glb",
+      "runtime": "assets/world/shared/models/greenhaven-pine-a.glb",
+      "sourceDigest": {
+        "bytes": 29012,
+        "sha256": "61dacbb414b1de0277032e0481dfaa31d75c31dc7a3be0834fb77258279f4d7d"
+      },
+      "runtimeDigest": {
+        "bytes": 29012,
+        "sha256": "61dacbb414b1de0277032e0481dfaa31d75c31dc7a3be0834fb77258279f4d7d"
+      }
+    },
+    {
+      "key": "nature.greenhavenPineB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-pine-b.glb",
+      "runtime": "assets/world/shared/models/greenhaven-pine-b.glb",
+      "sourceDigest": {
+        "bytes": 29008,
+        "sha256": "b44beef41ddc3a6cf7829ba9e94d7353a0d6a5a9449f217b57c776467fb0bb12"
+      },
+      "runtimeDigest": {
+        "bytes": 29008,
+        "sha256": "b44beef41ddc3a6cf7829ba9e94d7353a0d6a5a9449f217b57c776467fb0bb12"
       }
     },
     {
@@ -616,6 +672,20 @@
       }
     },
     {
+      "key": "terrain.greenhaven",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-landscape.glb",
+      "runtime": "assets/world/shared/models/greenhaven-landscape.glb",
+      "sourceDigest": {
+        "bytes": 3302060,
+        "sha256": "cba5b299ff9edba8ae24ac45e0ca22d6b9603137f150ffe261a1e29daee2b055"
+      },
+      "runtimeDigest": {
+        "bytes": 3302060,
+        "sha256": "cba5b299ff9edba8ae24ac45e0ca22d6b9603137f150ffe261a1e29daee2b055"
+      }
+    },
+    {
       "key": "terrain.meadowColor",
       "source": "textures/leafy_grass_diff_1k.jpg",
       "runtime": "assets/world/shared/textures/terrain-meadow-color.jpg",
@@ -720,6 +790,34 @@
       }
     },
     {
+      "key": "village.rusticFence",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-fence.glb",
+      "runtime": "assets/world/shared/models/greenhaven-fence.glb",
+      "sourceDigest": {
+        "bytes": 10556,
+        "sha256": "14e3b5e6823688576957abfbc4ca6c0f0401b01e3a21908737a3ac79f72fc88c"
+      },
+      "runtimeDigest": {
+        "bytes": 10556,
+        "sha256": "14e3b5e6823688576957abfbc4ca6c0f0401b01e3a21908737a3ac79f72fc88c"
+      }
+    },
+    {
+      "key": "village.rusticFenceGate",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-fence-gate.glb",
+      "runtime": "assets/world/shared/models/greenhaven-fence-gate.glb",
+      "sourceDigest": {
+        "bytes": 12428,
+        "sha256": "fab3056d0d5fb0c4fb65aaea1e34aa10371e5b5aeda5ce979cacb776a24263dc"
+      },
+      "runtimeDigest": {
+        "bytes": 12428,
+        "sha256": "fab3056d0d5fb0c4fb65aaea1e34aa10371e5b5aeda5ce979cacb776a24263dc"
+      }
+    },
+    {
       "key": "village.tavernBlue",
       "source": "kaykit-hexagon/buildings/blue/building_tavern_blue.gltf",
       "runtime": "assets/world/shared/models/village-tavern-blue.glb",
@@ -756,6 +854,34 @@
       "runtimeDigest": {
         "bytes": 148976,
         "sha256": "d1a6890209f06c2a57ef77b09dcffff013b1574c1bd5b925cab63a30493434d3"
+      }
+    },
+    {
+      "key": "village.warmHomeA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-home-a.glb",
+      "runtime": "assets/world/shared/models/greenhaven-home-a.glb",
+      "sourceDigest": {
+        "bytes": 95176,
+        "sha256": "680f5ae4143d54ee8abd7946bf14056e0916ad938e653c158fcf7ed6869f479c"
+      },
+      "runtimeDigest": {
+        "bytes": 95176,
+        "sha256": "680f5ae4143d54ee8abd7946bf14056e0916ad938e653c158fcf7ed6869f479c"
+      }
+    },
+    {
+      "key": "village.warmHomeB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-home-b.glb",
+      "runtime": "assets/world/shared/models/greenhaven-home-b.glb",
+      "sourceDigest": {
+        "bytes": 122212,
+        "sha256": "f0a8a5fb7c452444d3d8f82ae634cff6dd793fd92927443669e8bef50ed2e8e9"
+      },
+      "runtimeDigest": {
+        "bytes": 122212,
+        "sha256": "f0a8a5fb7c452444d3d8f82ae634cff6dd793fd92927443669e8bef50ed2e8e9"
       }
     },
     {

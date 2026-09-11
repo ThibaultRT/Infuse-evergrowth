@@ -143,6 +143,9 @@ function framePreset(preset: string): void {
   if (preset === 'top') {
     controls.target.set(36, 0, -30);
     camera.position.set(36, 210, -29.9);
+  } else if (preset === 'greenhaven') {
+    controls.target.set(-2, 0, -2);
+    camera.position.set(29, 77, 86);
   } else if (preset === 'bridge:A01-A02') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === 'area1-area2')!;
     const portraitDistance = Math.max(1, 0.8 / camera.aspect);
