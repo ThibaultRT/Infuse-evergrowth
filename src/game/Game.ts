@@ -381,7 +381,7 @@ events.on('weaponAttacked', ({ slot, targetId }) => {
   if (profile && target) heroView.playWeaponAttack(slot as WeaponSlotId, new THREE.Vector3().copy(target.position), profile.cooldownSeconds);
 });
 events.on('statGained', ({ stat, amount }) => showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase()));
-events.on('equipmentDropped', showEquipmentDrop);
+events.on('equipmentDropped', (drop) => showEquipmentDrop({ ...drop, copiesRequired: session.progressionSnapshot().equipment.items[drop.itemId].ascend.copiesRequired }));
 events.on('soulDropped', ({ quantity, soulType }) => showSoulDrop(quantity, soulType));
 events.on('bossDefeated', presentBossDefeat);
 events.on('dailyReset', () => showToast('Daily reset · all spawns restored'));
@@ -410,7 +410,7 @@ function applyRenderingQuality(next: RenderingQualitySettings): void {
     statsFrames = 0; statsStartedAt = performance.now(); ui.rendererStats.textContent = 'Measuring renderer…';
   }
 }
-mountGameUi(save, session, { current: () => renderingQuality, apply: applyRenderingQuality }, updateHud, () => entities.forEach((entity) => entity.renderLoot()));
+mountGameUi(session, { current: () => renderingQuality, apply: applyRenderingQuality }, updateHud);
 
 function updateHero(dt: number): void {
   hero.position.copy(gameplay.hero.position);

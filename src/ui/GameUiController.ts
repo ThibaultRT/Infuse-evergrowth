@@ -1,14 +1,13 @@
-import type { SaveData, EquipmentSlotId } from '../types';
+import type { EquipmentSlotId } from '../types';
 import type { GameSession } from '../game/GameSession';
 import type { RenderingQualitySettings } from '../rendering/RenderingQuality';
-import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
-import { equipmentCombatSummary, equipmentSlot } from '../systems/EquipmentSystem';
-import { confirmReset, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showToast, ui } from '../ui';
+import { confirmReset, renderInventory, renderItemDetail, renderProgressionHud, renderSoulCatcher, renderStats, showToast, ui } from '../ui';
 
 /** HTML interaction only. Panels never change the simulation or render loop. */
-export function mountGameUi(state: SaveData, session: GameSession, quality: { current: () => RenderingQualitySettings; apply: (next: RenderingQualitySettings) => void }, updateHud: () => void, refreshLoot: () => void): void {
-const { commands, soulCatcher, events } = session;
-const refreshStats = (): void => renderStats(state, (type) => soulCatcher.soulYield(type));
+export function mountGameUi(session: GameSession, quality: { current: () => RenderingQualitySettings; apply: (next: RenderingQualitySettings) => void }, updateHud: () => void): void {
+const { commands, events } = session;
+const readSnapshot = (): ReturnType<GameSession['progressionSnapshot']> => session.progressionSnapshot();
+const refreshStats = (): void => renderStats(readSnapshot());
 function setStatsPanel(open: boolean): void {
   if (open) closeOtherPanels('stats');
   ui.statsPanel.classList.toggle('visible', open);
@@ -26,7 +25,7 @@ function setInventoryPanel(open: boolean): void {
   if (open) closeOtherPanels('inventory');
   ui.inventoryPanel.classList.toggle('visible', open);
   ui.inventoryPanel.setAttribute('aria-hidden', String(!open));
-  if (open) { showInventoryOverview(0); renderInventory(state.inventory, equipmentCombatSummary(state)); }
+  if (open) { showInventoryOverview(0); renderInventory(readSnapshot()); }
 }
 function renderQualityControls(): void {
   const scale = ui.renderScaleInputs.find((input) => input.value === String(quality.current().renderScale));
@@ -52,20 +51,19 @@ ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
 ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
 let selectedSoulNode: string | null = null;
 let selectedSoulLayer = 1;
-const refreshSoulTree = (): void => { const layer = soulLayer(selectedSoulLayer); renderSoulCatcher(state.soulCatcher, layer?.nodes ?? [], soulEdges(selectedSoulLayer), (id) => soulCatcher.revealed(id), (id) => soulCatcher.canPurchase(id), selectedSoulNode, selectedSoulLayer, SOUL_LAYER_REGISTRY); };
+const refreshSoulTree = (): void => renderSoulCatcher(readSnapshot(), selectedSoulNode, selectedSoulLayer);
 function setSoulCatcherPanel(open: boolean): void {
-  if (open && !soulCatcher.available) { showToast('Defeat area 2 boss to unlock Soul Catcher'); return; }
+  if (open && !readSnapshot().soulCatcher.available) { showToast('Defeat area 2 boss to unlock Soul Catcher'); return; }
   if (open) closeOtherPanels('soul');
   ui.soulCatcherPanel.classList.toggle('visible', open); ui.soulCatcherPanel.setAttribute('aria-hidden', String(!open));
   if (open) refreshSoulTree();
 }
-ui.soulCatcherButton.classList.toggle('locked', !soulCatcher.available);
 ui.soulCatcherButton.addEventListener('click', () => setSoulCatcherPanel(true));
 ui.soulCatcherClose.addEventListener('click', () => setSoulCatcherPanel(false));
 ui.soulCatcherPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.soulCatcherPanel) setSoulCatcherPanel(false); });
-ui.soulLayerTabs.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-soul-layer]'); const layer = Number(button?.dataset.soulLayer); if (!layer || !soulCatcher.layerUnlocked(layer)) return; selectedSoulLayer = layer; selectedSoulNode = null; refreshSoulTree(); });
+ui.soulLayerTabs.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-soul-layer]'); const layer = Number(button?.dataset.soulLayer); if (!layer || !readSnapshot().soulCatcher.layers.find((entry) => entry.layer === layer)?.unlocked) return; selectedSoulLayer = layer; selectedSoulNode = null; refreshSoulTree(); });
 ui.soulNodes.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLElement>('[data-soul-node]'); if (!button?.dataset.soulNode) return; selectedSoulNode = button.dataset.soulNode; refreshSoulTree(); });
-ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (commands.execute({ type: 'purchaseSoulNode', nodeId: button.dataset.purchaseSoul })) { refreshSoulTree(); refreshStats(); updateHud(); refreshLoot(); } });
+ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (commands.execute({ type: 'purchaseSoulNode', nodeId: button.dataset.purchaseSoul })) { updateHud(); } });
 const treePointers = new Map<number, { x: number; y: number }>();
 let treeX = -170, treeY = -190, treeScale = 1, pinchDistance = 0;
 const transformTree = (): void => { ui.soulTree.style.transform = `translate(${treeX}px,${treeY}px) scale(${treeScale})`; };
@@ -85,19 +83,16 @@ ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target =
 ui.resetAttributesButton.addEventListener('click', async () => {
   if (!await confirmReset('Reset all permanent hero attributes? Your equipment and its progress will be kept.')) return;
   commands.execute({ type: 'resetHero', equipment: false });
-  refreshStats();
   updateHud();
   showToast('Permanent attributes reset · equipment kept');
 });
 ui.resetHeroButton.addEventListener('click', async () => {
   if (!await confirmReset('Reset all permanent hero attributes and equipment drops? World progression will be kept.')) return;
   commands.execute({ type: 'resetHero', equipment: true });
-  refreshStats();
-  renderInventory(state.inventory, equipmentCombatSummary(state));
   updateHud();
   showToast('Hero reset · attributes and equipment drops removed');
 });
-ui.resetSoulCatcherButton.addEventListener('click', async () => { if (!await confirmReset('Reset all Soul balances and purchased Soul Catcher nodes?')) return; commands.execute({ type: 'resetSoulCatcher' }); selectedSoulNode = null; selectedSoulLayer = 1; refreshSoulTree(); refreshStats(); updateHud(); refreshLoot(); showToast('Soul Catcher reset'); });
+ui.resetSoulCatcherButton.addEventListener('click', async () => { if (!await confirmReset('Reset all Soul balances and purchased Soul Catcher nodes?')) return; commands.execute({ type: 'resetSoulCatcher' }); selectedSoulNode = null; selectedSoulLayer = 1; updateHud(); showToast('Soul Catcher reset'); });
 ui.settingsPanel.addEventListener('change', (event) => {
   const input = event.target as HTMLInputElement;
   if (input.name === 'render-scale') quality.apply({ ...quality.current(), renderScale: input.value === '0.7' ? 0.7 : 1 });
@@ -119,15 +114,10 @@ function showInventoryOverview(scrollTop: number): void {
 function showInventoryDetail(itemId: string): void {
   const overviewScrollTop = inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : inventoryScroller.scrollTop;
   inventoryView = { view: 'detail', itemId, overviewScrollTop };
-  renderItemDetail(state, state.inventory.items[itemId] ?? null);
+  renderItemDetail(readSnapshot(), itemId);
   ui.inventoryOverview.hidden = true;
   ui.inventoryDetail.hidden = false;
   inventoryScroller.scrollTop = 0;
-}
-function refreshInventory(itemId?: string): void {
-  renderInventory(state.inventory, equipmentCombatSummary(state));
-  if (itemId) renderItemDetail(state, state.inventory.items[itemId] ?? null);
-  updateHud();
 }
 
 ui.inventoryBag.addEventListener('click', (event) => {
@@ -149,33 +139,39 @@ ui.inventoryDetail.addEventListener('click', (event) => {
   if (!itemId) return;
   let equipmentChanged = false;
   if (button.hasAttribute('data-equip')) {
-    const armorSlot = equipmentSlot(itemId);
-    if (armorSlot) { commands.execute({ type: 'equip', itemId, slot: armorSlot }); equipmentChanged = true; }
-    else {
-      const freeSlots = (['hand1', 'orbit1', 'orbit2', 'orbit3'] as const).filter((slot) => state.inventory.equipped[slot] === null && (slot !== 'orbit1' || state.unlockedAreas.includes(2)));
-      if (freeSlots.length === 1) { commands.execute({ type: 'equip', itemId, slot: freeSlots[0] }); equipmentChanged = true; }
-      else { ui.inventorySlotPicker()!.hidden = false; return; }
-    }
+    const entry = readSnapshot().equipment.items[itemId];
+    if (!entry) return;
+    if (entry.autoEquipSlot) { equipmentChanged = commands.execute({ type: 'equip', itemId, slot: entry.autoEquipSlot }); }
+    else { ui.inventorySlotPicker()!.hidden = false; return; }
   }
   if (button.dataset.equipSlot) { commands.execute({ type: 'equip', itemId, slot: button.dataset.equipSlot as EquipmentSlotId }); equipmentChanged = true; }
   if (button.dataset.unequip) { commands.execute({ type: 'unequip', slot: button.dataset.unequip as EquipmentSlotId }); equipmentChanged = true; }
   if (button.hasAttribute('data-ascend')) commands.execute({ type: 'ascend', itemId });
-  refreshInventory(equipmentChanged ? undefined : itemId);
+  updateHud();
   if (equipmentChanged) showInventoryOverview(inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : 0);
 });
 
 
-for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'soulNodePurchased', 'soulCatcherReset', 'equipmentDropped'] as const) events.on(event, () => {
-  if (ui.statsPanel.classList.contains('visible')) refreshStats();
-  if (ui.inventoryPanel.classList.contains('visible')) {
-    renderInventory(state.inventory, equipmentCombatSummary(state));
-    if (inventoryView.view === 'detail') renderItemDetail(state, state.inventory.items[inventoryView.itemId] ?? null);
-  }
-});
-for (const event of ['soulDropped', 'soulNodePurchased', 'soulCatcherReset'] as const) events.on(event, () => {
-  if (ui.soulCatcherPanel.classList.contains('visible')) refreshSoulTree();
-});
+// Coalesce consequences of one command/defeat into one detached snapshot.
+let refreshScheduled = false;
+const refreshProgression = (): void => {
+  if (refreshScheduled) return;
+  refreshScheduled = true;
+  requestAnimationFrame(() => {
+    refreshScheduled = false;
+    const snapshot = readSnapshot();
+    renderProgressionHud(snapshot);
+    if (!snapshot.soulCatcher.layers.find((layer) => layer.layer === selectedSoulLayer)?.unlocked) { selectedSoulLayer = 1; selectedSoulNode = null; }
+    if (ui.statsPanel.classList.contains('visible')) renderStats(snapshot);
+    if (ui.inventoryPanel.classList.contains('visible')) renderInventory(snapshot);
+    if (ui.inventoryPanel.classList.contains('visible') && inventoryView.view === 'detail') {
+      if (snapshot.equipment.items[inventoryView.itemId]) renderItemDetail(snapshot, inventoryView.itemId);
+      else showInventoryOverview(inventoryView.overviewScrollTop);
+    }
+    if (ui.soulCatcherPanel.classList.contains('visible')) renderSoulCatcher(snapshot, selectedSoulNode, selectedSoulLayer);
+  });
+};
+for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated'] as const) events.on(event, refreshProgression);
 renderQualityControls();
-refreshStats();
-renderInventory(state.inventory, equipmentCombatSummary(state));
+renderProgressionHud(readSnapshot());
 }

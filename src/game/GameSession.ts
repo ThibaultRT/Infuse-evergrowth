@@ -7,6 +7,7 @@ import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, hero
 import { ProgressionSystem } from '../systems/ProgressionSystem';
 import { RespawnSystem } from '../systems/RespawnSystem';
 import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
+import { createProgressionSnapshot, type ProgressionSnapshot } from '../systems/ProgressionSnapshot';
 import { GameCommands } from './GameCommands';
 import { GameEvents } from './GameEvents';
 import { GameplayRuntime } from './GameplayRuntime';
@@ -53,6 +54,8 @@ export class GameSession {
   }
 
   persist(): void { this.state.heroHp = this.runtime.hero.hp; this.writeSave(); }
+
+  progressionSnapshot(): ProgressionSnapshot { return createProgressionSnapshot(this.state, this.soulCatcher); }
 
   update(dt: number, movement: Readonly<{ x: number; y: number }>, elapsedSeconds = dt): void {
     this.combat.update(dt);

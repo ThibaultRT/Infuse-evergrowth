@@ -14,6 +14,9 @@ export default defineConfig({
       }
     },
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       injectRegister: false,
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg'],
@@ -36,25 +39,13 @@ export default defineConfig({
           }
         ]
       },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
-        runtimeCaching: [{
-          urlPattern: /\/assets\/quaternius\//,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'quaternius-assets-v1',
-            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            cacheableResponse: { statuses: [0, 200] }
-          }
-        }, {
-          urlPattern: /\/assets\/world\//,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'world-assets-v1',
-            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            cacheableResponse: { statuses: [0, 200] }
-          }
-        }]
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}', 'assets/**/*'],
+        // Vite PWA otherwise assumes everything under assets/ has a hashed name.
+        dontCacheBustURLsMatching: /^assets\/[^/]+-[\w-]{8}\.(?:js|css|svg)$/,
+        // This is a revision inventory, not a request to precache the entire payload.
+        // src/sw.ts separates lazy assets from the app shell before precacheAndRoute.
+        maximumFileSizeToCacheInBytes: 500 * 1024 * 1024,
       }
     })
   ]

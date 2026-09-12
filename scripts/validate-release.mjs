@@ -1,6 +1,8 @@
 import { access, readFile, readdir, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import { readWorkerManifest } from './pwa-manifest.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const dist = join(root, 'dist');
@@ -25,8 +27,25 @@ if (totalBytes >= maximumBytes) throw new Error(`Download payload is ${(totalByt
 const index = await readFile(join(dist, 'index.html'), 'utf8');
 if (!index.includes('/Infuse-evergrowth/')) throw new Error('Built index does not use the GitHub Pages base path.');
 const serviceWorker = await readFile(join(dist, 'sw.js'), 'utf8');
-if (!serviceWorker.includes('quaternius-assets-v1')) throw new Error('Built service worker does not include the Quaternius runtime cache.');
-if (!serviceWorker.includes('world-assets-v1')) throw new Error('Built service worker does not include the typed-world runtime cache.');
+if (!serviceWorker.includes('infuse-assets-v2-')) throw new Error('Built service worker does not include the revisioned asset cache.');
+const { entries: offlineEntries } = readWorkerManifest(serviceWorker);
+const offlineRevisions = new Map(offlineEntries.map(({ url, revision }) => [url, revision]));
+if (offlineRevisions.has('version.json')) throw new Error('The live version check must not be cached.');
+const publicAssets = await filesBelow(join(root, 'public', 'assets'));
+for (const file of publicAssets) {
+  const url = relative(join(root, 'public'), file).replaceAll('\\', '/');
+  const bytes = await readFile(file), revision = createHash('md5').update(bytes).digest('hex');
+  if (offlineRevisions.get(url) !== revision) throw new Error(`Offline revision is missing or stale: ${url}`);
+  const model = url.endsWith('.gltf') ? JSON.parse(bytes.toString('utf8'))
+    : url.endsWith('.glb') ? JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8')) : null;
+  for (const { uri } of [...model?.buffers ?? [], ...model?.images ?? []]) {
+    if (!uri || uri.startsWith('data:')) continue;
+    const dependency = new URL(uri, `https://offline.invalid/${url}`);
+    if (dependency.origin !== 'https://offline.invalid' || !offlineRevisions.has(decodeURIComponent(dependency.pathname.slice(1)))) {
+      throw new Error(`Model dependency is outside offline coverage: ${url} -> ${uri}`);
+    }
+  }
+}
 
 const manifest = JSON.parse(await readFile(join(publicRoot, 'manifest.json'), 'utf8'));
 const declaredFiles = new Set(manifest.assets.flatMap((asset) => [asset.model, ...asset.textures.map((texture) => `${asset.group}/textures/${texture}`)]));
@@ -44,4 +63,5 @@ for (const license of worldManifest.licenses ?? []) await access(join(root, 'pub
 console.log(`Release validation passed: ${files.length} files, ${(totalBytes / 1024 / 1024).toFixed(2)} MiB downloadable payload.`);
 console.log(`Verified ${declaredFiles.size} declared models/textures and ${licenseRecords.size} license records.`);
 console.log(`Verified ${worldManifest.assets.length} typed-world runtime assets and ${(worldManifest.licenses ?? []).length} license files.`);
+console.log(`Verified content revisions and lazy offline coverage for all ${publicAssets.length} public assets, including model sidecars and textures.`);
 console.log(`Largest file: ${relative(dist, files[sizes.indexOf(Math.max(...sizes))])} (${(Math.max(...sizes) / 1024 / 1024).toFixed(2)} MiB).`);

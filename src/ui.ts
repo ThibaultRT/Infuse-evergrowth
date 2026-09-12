@@ -1,15 +1,9 @@
 import './reward-popups.css';
 import { combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon } from './icons';
-import { statAdditiveTotal, statTotal } from './domain/stats/StatSources';
-import { heroSpeedMultiplier, heroCriticalChance, heroCriticalDamageMultiplier, heroBlockChance, heroRawEvasionChance, heroEvasionChance } from './systems/HeroStats';
-import { HERO_SPEED } from './config';
-import { EQUIPMENT_BY_ID, attackProfile, defenseSources, ascendCopies, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel, type InventoryCombatSummary } from './systems/EquipmentSystem';
+import { EQUIPMENT_BY_ID } from './domain/items/EquipmentCatalog';
 import { equipmentIcon } from './equipment-icons';
-import type { AreaDefinition, EquipmentSlotId, InventoryState, OwnedEquipment, SaveData, StatSources } from './types';
-import type { SoulNode } from './domain/soul-catcher';
-import { type SoulLayerMetadata } from './data/soul-catcher';
-import type { SoulType } from './types';
-import { soulCost } from './domain/soul-catcher';
+import type { AreaDefinition, EquipmentSlotId, SoulType } from './types';
+import type { EquipmentSnapshot, ProgressionSnapshot, SoulNodeSnapshot, StatSnapshot } from './systems/ProgressionSnapshot';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app');
@@ -223,60 +217,58 @@ export function showToast(message: string): void {
 }
 
 function sourceLabel(source: string): string { return source.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase()); }
-function renderBreakdown(label: string, stat: StatSources, suffix = '', decimals = false): string {
-  const additiveTotal = statAdditiveTotal(stat), total = statTotal(stat);
-  const format = (value: number): string => decimals ? value.toLocaleString(undefined, { maximumFractionDigits: 3 }) : Math.round(value).toLocaleString();
+function renderBreakdown(label: string, stat: StatSnapshot, suffix = '', decimals = false, scale = 1): string {
+  const additiveTotal = stat.additiveTotal, total = stat.total;
+  const format = (value: number): string => decimals ? (value * scale).toLocaleString(undefined, { maximumFractionDigits: 3 }) : Math.round(value * scale).toLocaleString();
   const adds = Object.entries(stat.additive).filter(([, value]) => value !== 0).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${format(v)}${suffix}</span></div>`).join('');
   const mults = Object.entries(stat.multiplicative).filter(([, value]) => value !== 1).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${v.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span></div>`).join('');
   const base = stat.base !== 0 ? `<div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${format(stat.base)}${suffix}</span></div>` : '';
   return `<section class="stat-breakdown"><div class="stat-row"><span>${label}</span><strong>${format(total)}${suffix}</strong></div>${base}${adds ? `<div class="stat-group-title">Additive</div>${adds}` : ''}<div class="stat-line stat-subtotal"><span>Total</span><span>${format(additiveTotal)}${suffix}</span></div>${mults ? `<div class="stat-group-title">Multiplicative</div>${mults}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${format(total)}${suffix}</strong></div></section>`;
 }
 
-export function renderStats(state: SaveData, soulYield: (type: SoulType) => { base: number; additional: number }): void {
-  const { stats } = state;
+export function renderStats(snapshot: ProgressionSnapshot): void {
+  const { stats } = snapshot;
   const maxHpLabel = `<span class="stat-title-with-icon">${heartIcon(14)} Max HP</span>`;
   const regenLabel = `<span class="stat-title-with-icon">${heartRegenIcon(14)} Health regeneration</span>`;
-  const evasionRawChance = heroRawEvasionChance(stats);
-  const evasionTotal = heroEvasionChance(stats);
+  const evasionRawChance = stats.evasion.rawChance;
+  const evasionTotal = stats.evasion.total;
   const percent = (chance: number): string => `${(chance * 100).toFixed(2)}%`;
   const rawSources = Object.entries(stats.evasion.raw).filter(([, value]) => value !== 0).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>${value.toFixed(2)}</span></div>`).join('');
   const directSources = Object.entries(stats.evasion.directChance).filter(([, value]) => value !== 0).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>+${percent(value)}</span></div>`).join('');
   const evasion = `<section class="stat-breakdown"><div class="stat-row"><span class="stat-title-with-icon">${evasionIcon(14)} Evasion</span><strong>${percent(evasionTotal)}</strong></div>${rawSources ? `<div class="stat-group-title">Raw Evasion</div>${rawSources}` : ''}<div class="stat-line stat-subtotal"><span>Raw total</span><span>${percent(evasionRawChance)}</span></div>${directSources ? `<div class="stat-group-title">Direct Evasion</div>${directSources}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${percent(evasionTotal)}</strong></div></section>`;
-  const percentStat = (stat: StatSources): StatSources => ({ base: stat.base * 100, additive: Object.fromEntries(Object.entries(stat.additive).map(([key, value]) => [key, value * 100])), multiplicative: { ...stat.multiplicative } });
-  const scaled = (label: string, stat: StatSources, effective: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat, '', true)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${effective.toFixed(2)}${suffix}</strong></div>`;
-  const effectiveSpeedMultiplier = heroSpeedMultiplier(stats);
-  const speed = `${renderBreakdown('Speed (raw)', stats.speed, '', true)}<div class="stat-line stat-subtotal"><span>Speed multiplier</span><strong>x${effectiveSpeedMultiplier.toFixed(2)}</strong></div><div class="stat-line stat-total"><span>Effective speed</span><strong>${(HERO_SPEED * effectiveSpeedMultiplier).toFixed(2)} m/s</strong></div>`;
+  const scaled = (label: string, stat: StatSnapshot, effective: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat, '', true)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${effective.toFixed(2)}${suffix}</strong></div>`;
+  const effectiveSpeedMultiplier = stats.speed.multiplier;
+  const speed = `${renderBreakdown('Speed (raw)', stats.speed, '', true)}<div class="stat-line stat-subtotal"><span>Speed multiplier</span><strong>x${effectiveSpeedMultiplier.toFixed(2)}</strong></div><div class="stat-line stat-total"><span>Effective speed</span><strong>${stats.speed.metersPerSecond.toFixed(2)} m/s</strong></div>`;
   const attacks = (['blunt', 'slash', 'piercing'] as const).map((type) => {
-    const profiles = (['hand1', 'orbit1', 'orbit2', 'orbit3'] as const).flatMap((slot) => {
-      const profile = attackProfile(state, slot);
-      return profile?.damageType === type ? [{ slot, profile }] : [];
-    });
+    const profiles = stats.attacks.filter((profile) => profile.damageType === type);
     const label = `${sourceLabel(type)} attack`;
     if (!profiles.length) return renderBreakdown(`${label} · no weapon equipped`, stats.attack[type], '', true);
-    return profiles.map(({ slot, profile }) => renderBreakdown(`${SLOT_LABELS[slot]} · ${label}`, profile.sources, '', true)).join('');
+    return profiles.map(({ slot, sources }) => renderBreakdown(`${SLOT_LABELS[slot]} · ${label}`, sources, '', true)).join('');
   }).join('');
-  const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => { const { base, additional: additions } = soulYield(type); return base + additions > 0 ? `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${base} base + ${additions} Soul Catcher</strong></div>` : ''; }).join('');
-  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), attacks, renderBreakdown('Blunt defence', defenseSources(state, 'blunt'), '', true), renderBreakdown('Slash defence', defenseSources(state, 'slash'), '', true), renderBreakdown('Piercing defence', defenseSources(state, 'piercing'), '', true), renderBreakdown('Blunt resistance', percentStat(stats.damageResistance.blunt), '%'), renderBreakdown('Slash resistance', percentStat(stats.damageResistance.slash), '%'), renderBreakdown('Piercing resistance', percentStat(stats.damageResistance.piercing), '%'), renderBreakdown(regenLabel, stats.regen, ' HP/s'), speed, scaled('Critical hit chance', stats.criticalChance, heroCriticalChance(stats) * 100, '%'), scaled('Critical damage', stats.criticalDamage, (heroCriticalDamageMultiplier(stats) - 1) * 100, '%'), scaled('Block chance', stats.blockChance, heroBlockChance(stats) * 100, '%'), evasion, `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
+  const souls = snapshot.soulCatcher.yields.filter(({ total }) => total > 0).map(({ type, base, additional: additions }) => `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${base} base + ${additions} Soul Catcher</strong></div>`).join('');
+  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), attacks, renderBreakdown('Blunt defence', stats.defense.blunt, '', true), renderBreakdown('Slash defence', stats.defense.slash, '', true), renderBreakdown('Piercing defence', stats.defense.piercing, '', true), renderBreakdown('Blunt resistance', stats.damageResistance.blunt, '%', false, 100), renderBreakdown('Slash resistance', stats.damageResistance.slash, '%', false, 100), renderBreakdown('Piercing resistance', stats.damageResistance.piercing, '%', false, 100), renderBreakdown(regenLabel, stats.regen, ' HP/s'), speed, scaled('Critical hit chance', stats.criticalChance, stats.criticalChance.percent, '%'), scaled('Critical damage', stats.criticalDamage, stats.criticalDamage.bonusPercent, '%'), scaled('Block chance', stats.blockChance, stats.blockChance.percent, '%'), evasion, `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
 }
 
 const soulIcon = (type: SoulType): string => `<span class="soul-icon soul-${type}" aria-hidden="true"></span>`;
-export function renderSoulCatcher(soulCatcher: SaveData['soulCatcher'], nodes: SoulNode[], edges: [string, string][], revealed: (id: string) => boolean, canPurchase: (id: string) => boolean, selectedId: string | null, currentLayer: number, layers: SoulLayerMetadata[]): void {
-  const position = (node: SoulNode): [number, number] => { const angle = node.position.angleDeg * Math.PI / 180; const radius = node.position.radius * 92; return [360 + Math.cos(angle) * radius, 360 + Math.sin(angle) * radius]; };
+export function renderSoulCatcher(snapshot: ProgressionSnapshot, selectedId: string | null, currentLayer: number): void {
+  const { soulCatcher } = snapshot, { layers } = soulCatcher;
+  const layer = layers.find((entry) => entry.layer === currentLayer);
+  const nodes = layer?.nodes ?? [], edges = layer?.edges ?? [];
+  const revealed = (id: string): boolean => nodes.find((node) => node.id === id)?.revealed ?? false;
+  const position = (node: SoulNodeSnapshot): [number, number] => { const angle = node.position.angleDeg * Math.PI / 180; const radius = node.position.radius * 92; return [360 + Math.cos(angle) * radius, 360 + Math.sin(angle) * radius]; };
   ui.soulBalances.innerHTML = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) => `<div aria-label="${sourceLabel(type)} souls: ${soulCatcher.balances[type]}">${soulIcon(type)}<strong>${soulCatcher.balances[type]}</strong></div>`).join('');
-  const next = layers.find((entry) => entry.layer === soulCatcher.highestUnlockedLayer + 1);
-  const target = next?.unlockXp ?? null, previous = layers.find((entry) => entry.layer === soulCatcher.highestUnlockedLayer)?.unlockXp ?? 0;
-  const progress = target === null ? 100 : Math.max(0, Math.min(100, (soulCatcher.xp - previous) / Math.max(1, target - previous) * 100));
+  const target = soulCatcher.nextLayerXp, progress = soulCatcher.progressPercent;
   ui.soulXp.innerHTML = `<div><span>Soul Catcher XP</span><strong>${target === null ? 'MAX LAYER' : `${soulCatcher.xp.toLocaleString()} / ${target.toLocaleString()}`}</strong></div><div class="soul-xp-track"><span style="width:${progress}%"></span></div>`;
-  ui.soulLayerTabs.innerHTML = layers.map((entry) => `<button type="button" data-soul-layer="${entry.layer}" class="${entry.layer === currentLayer ? 'current' : ''}" ${entry.layer > soulCatcher.highestUnlockedLayer ? 'disabled' : ''}>${entry.layer > soulCatcher.highestUnlockedLayer ? '🔒 ' : ''}Layer ${entry.layer}</button>`).join('');
+  ui.soulLayerTabs.innerHTML = layers.map((entry) => `<button type="button" data-soul-layer="${entry.layer}" class="${entry.layer === currentLayer ? 'current' : ''}" ${!entry.unlocked ? 'disabled' : ''}>${!entry.unlocked ? '🔒 ' : ''}Layer ${entry.layer}</button>`).join('');
   const authored = layers.find((entry) => entry.layer === currentLayer)?.authored;
   ui.soulTreeViewport.hidden = !authored; ui.soulDetail.hidden = !authored;
   if (!authored) { ui.soulDetail.hidden = false; ui.soulDetail.innerHTML = '<p class="soul-placeholder">Feature is coming soon!</p>'; ui.soulConnections.innerHTML = ''; ui.soulNodes.innerHTML = ''; return; }
   ui.soulConnections.innerHTML = edges.map(([a, b]) => { const [x1,y1] = position(nodes.find((n) => n.id === a)!); const [x2,y2] = position(nodes.find((n) => n.id === b)!); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${revealed(a) && revealed(b) ? 'revealed' : ''}"/>`; }).join('');
-  ui.soulNodes.innerHTML = nodes.map((node) => { const [x,y] = position(node), isRevealed = revealed(node.id), level = soulCatcher.nodeLevels[node.id] ?? 0, purchasable = canPurchase(node.id); return `<button type="button" class="soul-node ${isRevealed ? 'revealed' : 'mystery'} ${level ? 'purchased' : ''} ${purchasable ? 'purchasable' : ''} ${selectedId === node.id ? 'selected' : ''}" style="left:${x}px;top:${y}px" data-soul-node="${isRevealed ? node.id : ''}">${isRevealed ? `<span class="soul-node-icon">${soulIcon(node.cost.soulType)}</span>${purchasable ? '<span class="soul-upgrade">↑</span>' : ''}<span class="soul-level">${level}/${node.maxLevel}</span>` : '?'}</button>`; }).join('');
+  ui.soulNodes.innerHTML = nodes.map((node) => { const [x,y] = position(node), isRevealed = revealed(node.id), level = node.level, purchasable = node.purchasable; return `<button type="button" class="soul-node ${isRevealed ? 'revealed' : 'mystery'} ${level ? 'purchased' : ''} ${purchasable ? 'purchasable' : ''} ${selectedId === node.id ? 'selected' : ''}" style="left:${x}px;top:${y}px" data-soul-node="${isRevealed ? node.id : ''}">${isRevealed ? `<span class="soul-node-icon">${soulIcon(node.soulType)}</span>${purchasable ? '<span class="soul-upgrade">↑</span>' : ''}<span class="soul-level">${level}/${node.maxLevel}</span>` : '?'}</button>`; }).join('');
   const node = nodes.find((candidate) => candidate.id === selectedId);
   if (!node || !revealed(node.id)) { ui.soulDetail.innerHTML = '<p>Select a revealed node to inspect it.</p>'; return; }
-  const level = soulCatcher.nodeLevels[node.id] ?? 0, maxed = level >= node.maxLevel, cost = soulCost(node, level + 1);
-  ui.soulDetail.innerHTML = `<div><small>${node.id}</small><h3>${node.name}</h3><strong>Level ${level} / ${node.maxLevel}</strong><p>${node.reward.display}</p></div><button type="button" data-purchase-soul="${node.id}" ${!canPurchase(node.id) ? 'disabled' : ''}>${maxed ? 'MAX LEVEL' : `Purchase · ${cost} ${soulIcon(node.cost.soulType)}`}</button>`;
+  const level = node.level, maxed = node.nextCost === null, cost = node.nextCost;
+  ui.soulDetail.innerHTML = `<div><small>${node.id}</small><h3>${node.name}</h3><strong>Level ${level} / ${node.maxLevel}</strong><p>${node.description}</p></div><button type="button" data-purchase-soul="${node.id}" ${!node.purchasable ? 'disabled' : ''}>${maxed ? 'MAX LEVEL' : `Purchase · ${cost} ${soulIcon(node.soulType)}`}</button>`;
 }
 
 export function showSoulDrop(quantity: number, type: SoulType): void {
@@ -285,22 +277,33 @@ export function showSoulDrop(quantity: number, type: SoulType): void {
 }
 
 const SLOT_LABELS: Record<EquipmentSlotId, string> = { hand1: 'Weapon', orbit1: 'Orbit 1', orbit2: 'Orbit 2', orbit3: 'Orbit 3', helmet: 'Helmet', armor: 'Armor', legs: 'Legs', ring: 'Ring' };
-const SLOT_ORDER: EquipmentSlotId[] = ['hand1', 'orbit1', 'orbit2', 'orbit3', 'helmet', 'armor', 'legs', 'ring'];
 const RARITY_ORDER = ['legendary', 'epic', 'rare', 'uncommon', 'common'] as const;
 const DAMAGE_TYPE_ORDER = ['blunt', 'slash', 'piercing'] as const;
 const formatInventoryValue = (value: number): string => value >= 100 ? Math.round(value).toLocaleString() : value.toFixed(value % 1 ? 1 : 0);
 
-function sortInventoryItems(items: OwnedEquipment[]): OwnedEquipment[] {
+function sortInventoryItems(items: EquipmentSnapshot[]): EquipmentSnapshot[] {
   return items.sort((left, right) => {
-    const leftItem = EQUIPMENT_BY_ID.get(left.itemId), rightItem = EQUIPMENT_BY_ID.get(right.itemId);
+    const leftItem = left.definition, rightItem = right.definition;
     const rarityDifference = RARITY_ORDER.indexOf(leftItem?.rarity ?? 'common') - RARITY_ORDER.indexOf(rightItem?.rarity ?? 'common');
     if (rarityDifference) return rarityDifference;
     const typeDifference = DAMAGE_TYPE_ORDER.indexOf(leftItem?.damageType ?? 'blunt') - DAMAGE_TYPE_ORDER.indexOf(rightItem?.damageType ?? 'blunt');
-    return typeDifference || (leftItem?.name ?? left.itemId).localeCompare(rightItem?.name ?? right.itemId);
+    return typeDifference || (leftItem?.name ?? left.owned.itemId).localeCompare(rightItem?.name ?? right.owned.itemId);
   });
 }
 
-export function renderInventory(inventory: InventoryState, summary: InventoryCombatSummary): void {
+export function renderProgressionHud(snapshot: ProgressionSnapshot): void {
+  const { items: inventoryItems, slots } = snapshot.equipment;
+  ui.soulCatcherButton.classList.toggle('locked', !snapshot.soulCatcher.available);
+  ui.quickSlots.forEach((slotEl) => {
+    const slot = slotEl.dataset.slot as EquipmentSlotId;
+    const itemId = slots.find((entry) => entry.slot === slot)?.itemId;
+    const item = itemId ? inventoryItems[itemId]?.definition : undefined;
+    slotEl.innerHTML = item ? `<span>${SLOT_LABELS[slot]}</span>${damageTypeIcon(item.damageType, 19)}` : `<span>${SLOT_LABELS[slot]}</span>`;
+  });
+}
+
+export function renderInventory(snapshot: ProgressionSnapshot): void {
+  const { items: inventoryItems, slots, summary } = snapshot.equipment;
   const primary = [
     ['Total attack', '⚔', summary.totalAttack],
     ['Max HP', heartIcon(23), summary.maxHp],
@@ -310,29 +313,20 @@ export function renderInventory(inventory: InventoryState, summary: InventoryCom
   const affinityRow = (defense: boolean): string => damageTypes.map((type) => `<div class="inventory-affinity" aria-label="${type} ${defense ? 'defence' : 'attack'}: ${formatInventoryValue(defense ? summary.defenseByType[type] : summary.attackByType[type])}">${defense ? damageTypeDefenseIcon(type, 17) : damageTypeIcon(type, 15)}<strong>${formatInventoryValue(defense ? summary.defenseByType[type] : summary.attackByType[type])}</strong><small>${defense ? 'DEF' : 'ATK'}</small></div>`).join('');
   ui.inventorySummary.innerHTML = `<div class="inventory-primary-stats">${primary.map(([label, icon, value]) => `<div class="inventory-primary-stat" aria-label="${label}: ${formatInventoryValue(value)}"><span aria-hidden="true">${icon}</span><strong>${formatInventoryValue(value)}</strong><small>${label}</small></div>`).join('')}</div><div class="inventory-affinities">${affinityRow(false)}${affinityRow(true)}</div>`;
 
-  ui.inventoryEquipped.innerHTML = SLOT_ORDER.map((slot) => {
-    const itemId = inventory.equipped[slot];
-    const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
-    const owned = itemId ? inventory.items[itemId] : undefined;
+  ui.inventoryEquipped.innerHTML = slots.map(({ slot, itemId }) => {
+    const entry = itemId ? inventoryItems[itemId] : undefined;
+    const item = entry?.definition, owned = entry?.owned;
     const art = item && owned ? equipmentIcon(item, owned, 'slot') ?? damageTypeIcon(item.damageType, 25) : '<strong>+</strong>';
     return `<button class="inventory-equip-slot" type="button" data-slot="${slot}"${itemId ? ` data-item-id="${itemId}"` : ''} aria-label="${SLOT_LABELS[slot]}${item ? `, ${item.name}` : ', empty'}"><span>${SLOT_LABELS[slot]}</span>${art}</button>`;
   }).join('');
-  ui.quickSlots.forEach((slotEl) => {
-    const slot = slotEl.dataset.slot as EquipmentSlotId;
-    const itemId = inventory.equipped[slot];
-    const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
-    slotEl.innerHTML = item ? `<span>${SLOT_LABELS[slot]}</span>${damageTypeIcon(item.damageType, 19)}` : `<span>${SLOT_LABELS[slot]}</span>`;
-  });
-  const equippedItemIds = new Set(Object.values(inventory.equipped));
-  const items = Object.values(inventory.items).filter((owned) => !equippedItemIds.has(owned.itemId));
-  const section = (title: string, sectionItems: OwnedEquipment[]): string => sectionItems.length ? `<section class="inventory-bag-section"><h3>${title}</h3><div class="inventory-bag-grid">${sortInventoryItems(sectionItems).map((owned) => {
-    const item = EQUIPMENT_BY_ID.get(owned.itemId);
+  const items = Object.values(inventoryItems).filter((entry) => !entry.equippedSlot);
+  const section = (title: string, sectionItems: EquipmentSnapshot[]): string => sectionItems.length ? `<section class="inventory-bag-section"><h3>${title}</h3><div class="inventory-bag-grid">${sortInventoryItems(sectionItems).map(({ definition: item, owned }) => {
     const itemArt = item ? equipmentIcon(item, owned, 'bag') : null;
     return `<button class="inventory-item rarity-${item?.rarity ?? 'common'}${itemArt ? ' equipment-item' : ''}" type="button" data-item-id="${owned.itemId}" aria-label="${item?.name ?? owned.itemId}, level ${owned.level}, ascend ${owned.ascend}">${itemArt ?? damageTypeIcon(item?.damageType ?? 'blunt', 27)}</button>`;
   }).join('')}</div></section>` : '';
-  const weapons = items.filter((owned) => EQUIPMENT_BY_ID.get(owned.itemId)?.kind === 'weapon');
-  const armor = items.filter((owned) => EQUIPMENT_BY_ID.get(owned.itemId)?.kind === 'armor');
-  const armorClass = (kind: 'helmet' | 'armor' | 'boots'): OwnedEquipment[] => armor.filter(({ itemId }) => { const item = EQUIPMENT_BY_ID.get(itemId); return item?.kind === 'armor' && item.armorClass === kind; });
+  const weapons = items.filter(({ definition }) => definition.kind === 'weapon');
+  const armor = items.filter(({ definition }) => definition.kind === 'armor');
+  const armorClass = (kind: 'helmet' | 'armor' | 'boots'): EquipmentSnapshot[] => armor.filter(({ definition: item }) => { return item?.kind === 'armor' && item.armorClass === kind; });
   ui.inventoryBag.innerHTML = items.length ? section('Weapons', weapons) + section('Helmets', armorClass('helmet')) + section('Armor', armorClass('armor')) + section('Legs', armorClass('boots')) : '<div class="inventory-empty">No equipment found yet.</div>';
 }
 
@@ -343,23 +337,19 @@ export function showBossProgression(bossName: string, destinationName?: string):
   progressionTimer = window.setTimeout(() => { ui.progressionLayer.innerHTML = ''; progressionTimer = null; }, 3200);
 }
 
-export function renderItemDetail(state: SaveData, owned: OwnedEquipment | null): void {
-  const item = owned ? EQUIPMENT_BY_ID.get(owned.itemId) : undefined;
-  if (!owned || !item) { ui.inventoryDetail.innerHTML = ''; return; }
-  const equipped = (Object.keys(state.inventory.equipped) as EquipmentSlotId[]).find((slot) => state.inventory.equipped[slot] === item.id);
-  const value = item.kind === 'weapon' ? equipmentDamage(item, owned) : equipmentDefense(item, owned);
-  const perLevel = equipmentValuePerLevel(item, owned);
-  const afterAscend = equipmentAscendValue(item, owned);
-  const copiesRequired = ascendCopies(item.rarity);
+export function renderItemDetail(snapshot: ProgressionSnapshot, itemId: string): void {
+  const entry = snapshot.equipment.items[itemId];
+  if (!entry) { ui.inventoryDetail.innerHTML = ''; return; }
+  const { definition: item, owned, equippedSlot: equipped, value, perLevel, ascend } = entry;
+  const afterAscend = ascend.value, copiesRequired = ascend.copiesRequired;
   const label = item.kind === 'weapon' ? 'Damage' : 'Defense';
   const itemClass = item.kind === 'weapon' ? item.weaponClass : item.armorClass === 'boots' ? 'legs' : item.armorClass;
   const itemArt = equipmentIcon(item, owned, 'detail') ?? damageTypeIcon(item.damageType, 52);
-  const weaponSlots = (['hand1', 'orbit1', 'orbit2', 'orbit3'] as const).filter((slot) => slot !== 'orbit1' || state.unlockedAreas.includes(2));
-  const slotPicker = item.kind === 'weapon' && !equipped ? `<div class="inventory-slot-picker" hidden data-slot-picker><span>Choose a weapon slot</span><div>${weaponSlots.map((slot) => `<button type="button" data-equip-slot="${slot}" data-item-id="${item.id}"><strong>${SLOT_LABELS[slot]}</strong><small>${state.inventory.equipped[slot] ? 'Replace' : 'Empty'}</small></button>`).join('')}</div></div>` : '';
-  ui.inventoryDetail.innerHTML = `<button class="inventory-back" type="button" data-inventory-back>← Overview</button><div class="item-detail-hero"><div class="weapon-art rarity-${item.rarity}">${itemArt}</div><h3>${item.name}</h3><div class="weapon-meta">${item.rarity} · ${itemClass} · ${damageTypeIcon(item.damageType, 12)} ${item.damageType}</div><strong>Level ${owned.level} · Ascend ${owned.ascend}</strong></div><div class="weapon-values"><span>${label}<strong>${formatInventoryValue(value)}</strong></span><span>Per level<strong>+${formatInventoryValue(perLevel)}</strong></span>${item.kind === 'weapon' ? `<span>Cooldown<strong>${item.attackCooldownSeconds}s</strong></span>` : ''}<span>Type<strong>${damageTypeIcon(item.damageType, 13)} ${item.damageType}</strong></span></div><section class="item-power"><small>Special power</small><p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p></section><section class="ascend-preview"><small>Ascend</small>${afterAscend === null ? `<p>Ascend at ${copiesRequired} copies · ${copiesRequired - owned.level} remaining</p>` : `<p>${label} <strong>${formatInventoryValue(value)} → ${formatInventoryValue(afterAscend)}</strong></p>`}</section>${slotPicker}<div class="weapon-actions">${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : `<button data-equip data-item-id="${item.id}">Equip</button>`}<button data-ascend data-item-id="${item.id}" ${owned.level < copiesRequired ? 'disabled' : ''}>Ascend</button></div>`;
+  const slotPicker = item.kind === 'weapon' && !equipped ? `<div class="inventory-slot-picker" hidden data-slot-picker><span>Choose a weapon slot</span><div>${entry.equipSlots.map(({ slot, itemId }) => `<button type="button" data-equip-slot="${slot}" data-item-id="${item.id}"><strong>${SLOT_LABELS[slot]}</strong><small>${itemId ? 'Replace' : 'Empty'}</small></button>`).join('')}</div></div>` : '';
+  ui.inventoryDetail.innerHTML = `<button class="inventory-back" type="button" data-inventory-back>← Overview</button><div class="item-detail-hero"><div class="weapon-art rarity-${item.rarity}">${itemArt}</div><h3>${item.name}</h3><div class="weapon-meta">${item.rarity} · ${itemClass} · ${damageTypeIcon(item.damageType, 12)} ${item.damageType}</div><strong>Level ${owned.level} · Ascend ${owned.ascend}</strong></div><div class="weapon-values"><span>${label}<strong>${formatInventoryValue(value)}</strong></span><span>Per level<strong>+${formatInventoryValue(perLevel)}</strong></span>${item.kind === 'weapon' ? `<span>Cooldown<strong>${item.attackCooldownSeconds}s</strong></span>` : ''}<span>Type<strong>${damageTypeIcon(item.damageType, 13)} ${item.damageType}</strong></span></div><section class="item-power"><small>Special power</small><p>${owned.ascend === 0 ? 'Hidden power will be unlocked upon Ascend' : 'Power unlocked · ability coming soon'}</p></section><section class="ascend-preview"><small>Ascend</small>${afterAscend === null ? `<p>Ascend at ${copiesRequired} copies · ${ascend.copiesRemaining} remaining</p>` : `<p>${label} <strong>${formatInventoryValue(value)} → ${formatInventoryValue(afterAscend)}</strong></p>`}</section>${slotPicker}<div class="weapon-actions">${equipped ? `<button data-unequip="${equipped}" data-item-id="${item.id}">Unequip</button>` : `<button data-equip data-item-id="${item.id}">Equip</button>`}<button data-ascend data-item-id="${item.id}" ${!ascend.available ? 'disabled' : ''}>Ascend</button></div>`;
 }
 
-const dropQueue: Array<{ itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number }> = [];
+const dropQueue: Array<{ itemId: string; quantity: number; previousLevel: number | null; newLevel: number; ascend: number; copiesRequired: number }> = [];
 let showingDrop = false;
 export function showEquipmentDrop(drop: typeof dropQueue[number]): void {
   dropQueue.push(drop);
@@ -369,7 +359,7 @@ export function showEquipmentDrop(drop: typeof dropQueue[number]): void {
     if (!next) { showingDrop = false; return; }
     showingDrop = true;
     const item = EQUIPMENT_BY_ID.get(next.itemId)!;
-    const copiesRequired = ascendCopies(item.rarity);
+    const copiesRequired = next.copiesRequired;
     ui.equipmentDropLayer.innerHTML = `<div class="equipment-drop rarity-${item.rarity}"><div class="equipment-drop-icon">${equipmentIcon(item, { itemId: item.id, level: next.newLevel, ascend: next.ascend }, 'detail') ?? damageTypeIcon(item.damageType, 48)}</div><div class="equipment-drop-copy"><b>${item.name}</b><strong>+${next.quantity} ${next.quantity === 1 ? 'copy' : 'copies'} <span>(${next.newLevel}/${copiesRequired})</span></strong></div></div>`;
     window.setTimeout(() => { ui.equipmentDropLayer.innerHTML = ''; showingDrop = false; showNext(); }, 3600);
   };

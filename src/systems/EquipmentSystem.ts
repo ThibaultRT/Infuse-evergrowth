@@ -46,9 +46,13 @@ export function equipmentSlot(itemId: string): EquipmentSlotId | null {
   return item?.kind === 'armor' ? ARMOR_SLOT[item.armorClass] : null;
 }
 
+export function equipmentSlotUnlocked(state: SaveData, slot: EquipmentSlotId): boolean {
+  return slot !== 'orbit1' || state.unlockedAreas.includes(2);
+}
+
 export function equip(state: SaveData, itemId: string, slot: EquipmentSlotId): boolean {
   const item = EQUIPMENT_BY_ID.get(itemId);
-  if (!state.inventory.items[itemId] || !item || (slot === 'orbit1' && !state.unlockedAreas.includes(2))) return false;
+  if (!state.inventory.items[itemId] || !item || !equipmentSlotUnlocked(state, slot)) return false;
   const armorSlot = item.kind === 'armor' ? ARMOR_SLOT[item.armorClass] : null;
   if ((armorSlot && slot !== armorSlot) || (!armorSlot && !['hand1', 'orbit1', 'orbit2', 'orbit3'].includes(slot))) return false;
   for (const other of Object.keys(state.inventory.equipped) as EquipmentSlotId[]) if (other !== slot && state.inventory.equipped[other] === itemId) state.inventory.equipped[other] = null;

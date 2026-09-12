@@ -32,6 +32,7 @@ src/rendering + src/ui  Three.js/DOM projections and input adapters
 - `src/game/Game.ts`: browser composition root, visual event bindings, and render loop.
 - `src/game/GameSession.ts`: renderer-independent gameplay lifecycle and system coordination.
 - `src/game/GameCommands.ts`: explicit commands acting on the injected session state.
+- `src/systems/ProgressionSnapshot.ts`: detached, deeply read-only presentation values for Stats, equipped slots, inventory/details/Ascend, and all Soul layers. `GameSession.progressionSnapshot()` reads existing rules without mutating the save. Panels consume this interface instead of saves or rule callbacks.
 - `src/ui/GameUiController.ts`: panel, inventory, Soul Catcher, and settings interactions; no simulation pause state.
 - `src/game/GameEvents.ts`: typed event bus.
 - `src/domain/`: combat, stats, items, spawns, and world values.
@@ -55,6 +56,17 @@ Pure domain, systems, data, and `GameSession` can run without a browser renderer
 - Ascend consumes `threshold - 1` copies, retaining the item and all excess copies.
 - Gameplay continues during panels, DOM confirmations, and camera presentations. Only rendering is unavailable during WebGL context loss; browser background throttling remains platform-controlled.
 - Reduced resolution disables water transmission and uses front faces. Full retains authored transmission and double-sided water.
+- Progression views refresh on panel open or coalesced progression events. The snapshot is not rebuilt in the simulation/render loop; closed panels do not rebuild their DOM. UI selection, scrolling, and tree transforms stay in the UI controller. Commands still validate against current authoritative state.
+
+## Offline assets and updates
+
+`src/sw.ts` uses a Workbox build revision manifest. Only the application shell and UI icons are precached during installation. Every file in `public/assets/` is listed for lazy caching, including world/Quaternius/KayKit assets, standalone models, GLTF buffers, external textures, and embedded GLBs. New asset folders participate automatically. Models' external dependencies must also be shipped and present in that manifest.
+
+Offline coverage means **previously loaded content**, not an automatic download of the whole world. The worker caches successful asset responses as they are requested. Unvisited content and browser-evicted files require a connection; existing playable visual fallbacks still apply. Cache storage failure cannot block a successful network asset load. The worker does not cache HTML error pages as models or textures.
+
+Asset cache keys and network URLs include each file's content revision. Unchanged files survive app releases, while changed files load under a new key on their next request. Activation removes obsolete revisions and this app's entries in the old mutable caches; unrelated caches/scopes are preserved. Current assets have no arbitrary entry-count or age expiry, so GLTF files do not deliberately outlive their dependencies. Browser storage quotas/eviction still apply. Revisions identify build content, not a cryptographic security guarantee.
+
+`version.json` always stays online-only. Worker registration runs independently of that endpoint; first boot waits up to the existing five-second update budget for control before loading assets. Release validation checks every public asset's revision and every GLTF/GLB external dependency. After `npm run build`, `npm run validate:offline` exercises the built worker with isolated Chromium storage, offline reload, and alternate asset releases. The Workbox build summary counts the entire revision inventory, even though only the shell is precached.
 
 ## Review checklist
 

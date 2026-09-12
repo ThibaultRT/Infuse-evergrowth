@@ -185,6 +185,72 @@ try {
   const clock = { now: () => now.getTime(), date: () => new Date(now) };
   const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
 
+  await check('One detached progression snapshot agrees with combat, inventory, and Soul rules', () => {
+    const state = fresh(); state.unlockedAreas.push(2); state.defeatedBosses.push('area2-rare-01');
+    state.soulCatcher.balances.common = 10000;
+    const session = new GameSession(state, new GameEvents(), () => {}, clock);
+    state.stats.attack.blunt = { base: 0, additive: { kills: 25, soulCatcher: 50 }, multiplicative: { soulCatcher: 1.05, equipment: 1.10 } };
+    equipment.applyEquipmentCopies(state, 'hammer-uncommon', 101); equipment.equip(state, 'hammer-uncommon', 'orbit1');
+    const before = structuredClone(state), snapshot = session.progressionSnapshot();
+    assert.deepEqual(state, before, 'Reading a snapshot must not change the save');
+    assert.deepEqual(structuredClone(snapshot), snapshot, 'Snapshot must contain serializable values only');
+    for (const attack of snapshot.stats.attacks) {
+      near(attack.damage, equipment.attackProfile(state, attack.slot).damage);
+      near(attack.sources.total, attack.damage);
+    }
+    near(snapshot.equipment.summary.totalAttack, snapshot.stats.attacks.reduce((sum, attack) => sum + attack.damage, 0));
+    for (const type of ['blunt', 'slash', 'piercing']) near(snapshot.stats.defense[type].total, equipment.equippedDefense(state, type));
+    for (const layer of snapshot.soulCatcher.layers) for (const node of layer.nodes) {
+      assert.equal(node.purchasable, session.soulCatcher.canPurchase(node.id));
+      assert.equal(node.revealed, session.soulCatcher.revealed(node.id));
+    }
+    for (const definition of config.SPAWNS.filter((spawn) => spawn.tier !== 'crystal')) {
+      const yieldValue = snapshot.soulCatcher.yields.find(({ type }) => type === definition.tier);
+      assert.equal(yieldValue.total, session.soulCatcher.yieldFor(definition)?.quantity ?? 0);
+    }
+    state.stats.attack.blunt.multiplicative.equipment = 3; state.inventory.items['hammer-uncommon'].level++;
+    state.soulCatcher.balances.common = 0;
+    assert.equal(snapshot.stats.attacks[0].sources.multiplicative.equipment, 1.1);
+    assert.equal(snapshot.equipment.items['hammer-uncommon'].owned.level, 101);
+    assert.equal(snapshot.soulCatcher.balances.common, 10000);
+    snapshot.stats.attacks[0].sources.additive.kills = -100;
+    snapshot.equipment.items['hammer-common'].definition.name = 'changed snapshot';
+    snapshot.soulCatcher.layers[0].nodes[0].position.radius = -1;
+    assert.equal(state.stats.attack.blunt.additive.kills, 25);
+    assert.notEqual(equipment.EQUIPMENT_BY_ID.get('hammer-common').name, 'changed snapshot');
+    assert.notEqual(SOUL_NODES[0].position.radius, -1);
+  });
+  await check('Snapshots follow equip, Ascend, purchases, layer unlocks, and resets', () => {
+    const state = fresh(), session = new GameSession(state, new GameEvents(), () => {}, clock);
+    equipment.applyEquipmentCopies(state, 'sword-common', 101);
+    let snapshot = session.progressionSnapshot();
+    assert.equal(snapshot.equipment.items['sword-common'].equipSlots.some(({ slot }) => slot === 'orbit1'), false);
+    assert.equal(snapshot.soulCatcher.available, false);
+    assert.ok(snapshot.soulCatcher.yields.every(({ total }) => total === 0));
+    state.unlockedAreas.push(2); state.defeatedBosses.push('area2-rare-01');
+    assert.equal(session.commands.execute({ type: 'equip', itemId: 'sword-common', slot: 'orbit1' }), true);
+    const preview = session.progressionSnapshot().equipment.items['sword-common'];
+    assert.equal(session.commands.execute({ type: 'ascend', itemId: 'sword-common' }), true);
+    snapshot = session.progressionSnapshot();
+    assert.equal(snapshot.equipment.items['sword-common'].owned.level, 2);
+    near(snapshot.equipment.items['sword-common'].value, preview.ascend.value);
+    assert.equal(snapshot.equipment.items['sword-common'].equippedSlot, 'orbit1');
+    const root = snapshot.soulCatcher.layers[0].nodes.find(({ revealed }) => revealed);
+    state.soulCatcher.balances.common = 1000000; state.soulCatcher.xp = 84291;
+    assert.equal(session.commands.execute({ type: 'purchaseSoulNode', nodeId: root.id }), true);
+    snapshot = session.progressionSnapshot();
+    assert.equal(snapshot.soulCatcher.layers[0].nodes.find(({ id }) => id === root.id).level, 1);
+    assert.equal(snapshot.soulCatcher.layers[1].unlocked, true);
+    assert.equal(snapshot.soulCatcher.xp, state.soulCatcher.xp);
+    session.commands.execute({ type: 'resetSoulCatcher' });
+    snapshot = session.progressionSnapshot();
+    assert.equal(snapshot.soulCatcher.layers[1].unlocked, false);
+    assert.equal(snapshot.soulCatcher.balances.common, 0);
+    assert.ok(snapshot.soulCatcher.layers.flatMap(({ nodes }) => nodes).every(({ level }) => level === 0));
+    session.commands.execute({ type: 'resetHero', equipment: true });
+    assert.equal(session.progressionSnapshot().equipment.items['sword-common'], undefined);
+  });
+
   await check('Complete weapon attack sums additions before multiplying every source', () => {
     const state = fresh();
     const item = equipment.EQUIPMENT_BY_ID.get('hammer-common');

@@ -1,6 +1,6 @@
 # Code review
 
-Reviewed on 2026-09-12, starting from `fd8a033`. Initial fixes are included in **0.72.1**; the approved follow-up is implemented in **0.73.0**. Scope: gameplay/runtime, saves, equipment and Soul Catcher, input/UI, rendering and asset loading, and build/PWA configuration.
+Reviewed on 2026-09-12, starting from `fd8a033`. Initial fixes are included in **0.72.1**; approved follow-ups are implemented in **0.73.0** and **0.74.0**. Scope: gameplay/runtime, saves, equipment and Soul Catcher, input/UI, rendering and asset loading, and build/PWA configuration.
 
 ## 1. Fixed
 
@@ -26,23 +26,28 @@ Reviewed on 2026-09-12, starting from `fd8a033`. Initial fixes are included in *
 - **One previous save is recoverable (point 7).** Writes retain a validated previous primary; corrupt current JSON falls back to that backup. A corrupt primary cannot replace a good backup, and non-finite state is not written. Tabs deliberately overwrite each other: the last successful writer wins. Save schema remains v18 and migrations v7–v18 remain supported. [save.ts](src/save.ts)
 - **Supporting stat projections agree.** Multiple percentage nodes no longer overwrite each other; levels add within one upgrade and separate upgrades multiply. Combat and Stats share weapon/armor breakdowns, effective chance/speed rules, and Soul Catcher yield calculations. Open panels refresh when progression changes. These changes support points 1 and 5 and address part of original point 6. [SoulCatcherSystem.ts](src/systems/SoulCatcherSystem.ts), [HeroStats.ts](src/systems/HeroStats.ts)
 
+### Approved snapshot and offline follow-up (0.74.0)
+
+- **One typed progression snapshot feeds presentation (point 6).** Stats sources/totals and effective values, independent equipped attacks, inventory/details/Ascend, equip choices, Soul balances/yields, node costs/availability, and layer progress now come through `GameSession.progressionSnapshot()`. Values are detached from saves and authored definitions and deeply read-only in TypeScript. Existing systems/domain functions retain the rules; panels no longer calculate progression or receive live save state/callbacks. Progression events coalesce panel refreshes, including boss/gate and Soul layer unlocks. Save schema remains v18. [ProgressionSnapshot.ts](src/systems/ProgressionSnapshot.ts), [GameUiController.ts](src/ui/GameUiController.ts)
+- **Offline coverage and asset updates are explicit (point 8).** All 260 public assets and their model dependencies have content revisions. The shell is precached; world, Quaternius, KayKit, and `assets/models/` files cache as requested. Previously loaded content works offline. Changed bytes get a new cache/network key; unchanged files survive releases; obsolete revisions and scoped legacy entries are removed. A failed version endpoint does not prevent worker registration. No full-world download is added to startup. [sw.ts](src/sw.ts), [version.ts](src/version.ts), [offline policy](ARCHITECTURE.md#offline-assets-and-updates)
+
 ## 2. Improvements requiring your supervision
 
 Outstanding decisions retain their original point numbers. The approved items above are implemented.
 
 - **Point 3 — Orbit-slot unlock sequence.** Only Orbit 1 is gated by Area 2; Orbit 2 and Orbit 3 are available from the start. Confirm this is intentional or define each slot's unlock condition in one shared rule. [EquipmentSystem.ts](src/systems/EquipmentSystem.ts), [save.ts](src/save.ts), [ui.ts](src/ui.ts)
-- **Point 6 — A consolidated progression snapshot.** The duplicated combat/Soul yield calculations and multiplier stacking are addressed. A single typed snapshot spanning all stat, equipment, and Soul tree presentation could simplify future layers; decide whether to introduce that larger interface as content grows. Current views use shared functions and explicitly passed state. [ui.ts](src/ui.ts), [SoulCatcherSystem.ts](src/systems/SoulCatcherSystem.ts)
-- **Point 8 — Deliberate asset updates and offline coverage.** The PWA still uses fixed-name `CacheFirst` caches for mutable world/Quaternius URLs, and `assets/models/` lacks an explicit offline cache. Define versioning and offline coverage before changing the caching policy. The optimized rare enemy has a new URL, but this does not resolve the broader policy. [vite.config.ts](vite.config.ts), [version.ts](src/version.ts)
 - **Point 9 — Release workflow validation.** CI builds but does not run `validate:release`; broad content validation and gameplay coverage remain planned. Agree on the longer-term test setup and CI checks. The focused regression script now also verifies the approved changes. [deploy-pages.yml](.github/workflows/deploy-pages.yml), [0-gameplay-remarks.md](0-gameplay-remarks.md)
 
 ## Verification
 
-- **Passed:** 28 focused regression checks, including the exact 202.125 attack example, independent weapon schedules, Ascend purchase-order equivalence for every item, injected-save isolation, recovery/write failures, last-writer-wins tabs, and renderer-free combat/respawn/reset flows.
+- **Passed:** 30 focused regression checks, including the exact 202.125 attack example, independent weapon schedules, Ascend purchase-order equivalence for every item, injected-save isolation, recovery/write failures, last-writer-wins tabs, renderer-free combat/respawn/reset flows, and snapshot isolation/command parity.
 - **Passed:** strict TypeScript/Vite production build; world layout, crossings, asset promotion, and release validation. The existing JavaScript chunk/public-icon build warnings remain.
 - **Passed in an isolated Chromium profile:** 390×844 at DPR 3; continuous movement with inventory/settings/Soul Catcher open; touch selection; level 101 → level 2 Ascend; live Stats sources; non-blocking reset confirmation; Reduced buffer 546×1181; saved quality restoration and missing-texture fallback.
 - **Visual evidence:** [Stats](authoring/generated/captures/review-approved-stats.png), [Ascend](authoring/generated/captures/review-approved-ascend.png), [rare model comparison](authoring/generated/captures/review-rare-lods.png), [Full water](authoring/generated/captures/review-water-full.png), [Reduced water](authoring/generated/captures/review-water-reduced.png). These local captures are ignored by Git.
 - **Passed:** existing gate smoke test, covering closed/unlocked crossing and return A01 → A02 → A01.
-- Release payload: **92.39 MiB**, down from **149.91 MiB** before the approved optimizations.
+- **Passed for 0.74.0:** production offline reload with HTTP cache cleared; retrieval of all 260 warmed public assets with networking unavailable; mobile Ascend/equip/Stats and live Soul layer unlock; changed-file refresh, unchanged-file reuse, obsolete/legacy cleanup, HTML-error rejection, and unrelated-cache preservation. [offline smoke](scripts/validate-offline.mjs)
+- **0.74.0 visual evidence:** [Stats](authoring/generated/captures/progression-snapshot-stats.png), [Ascend](authoring/generated/captures/progression-snapshot-ascend.png), [Soul Catcher](authoring/generated/captures/progression-snapshot-souls.png), [offline world](authoring/generated/captures/progression-offline-world.png). These local captures are ignored by Git.
+- Release payload: **92.42 MiB**, down from **149.91 MiB** before the approved optimizations. The 0.74.0 shell precache is **1.88 MiB**; public asset bytes download as requested.
 - Actual iPhone frame times and the 20-second representative load target remain unverified; desktop emulation is not device-performance evidence.
 
 ## 3. High-impact performance improvements

@@ -17,7 +17,11 @@ export class SoulCatcherSystem {
     return soulEdges(layer).some(([a, b]) => (a === nodeId && this.level(b) > 0) || (b === nodeId && this.level(a) > 0));
   }
   canPurchase(nodeId: string): boolean { const node = SOUL_NODE_BY_ID.get(nodeId); if (!this.available || !node || !this.revealed(nodeId)) return false; const level = this.level(nodeId); return level < node.maxLevel && this.state.soulCatcher.balances[node.cost.soulType] >= soulCost(node, level + 1); }
-  yieldFor(definition: SpawnDefinition): { soulType: SoulType; quantity: number } | null { if (!this.available || definition.tier === 'crystal' || !this.soulDropUnlocked(definition.tier)) return null; const soulType = definition.tier as SoulType; return { soulType, quantity: 1 + this.effectTotal('soulDropAdditive', (effect) => 'soulType' in effect && effect.soulType === soulType) }; }
+  yieldFor(definition: SpawnDefinition): { soulType: SoulType; quantity: number } | null {
+    if (definition.tier === 'crystal') return null;
+    const { total } = this.soulYield(definition.tier);
+    return total > 0 ? { soulType: definition.tier, quantity: total } : null;
+  }
   grant(definition: SpawnDefinition): { soulType: SoulType; quantity: number } | null { const drop = this.yieldFor(definition); if (!drop) return null; this.state.soulCatcher.balances[drop.soulType] += drop.quantity; this.events.emit('soulDropped', { sourceId: definition.id, ...drop }); this.persist(); return drop; }
   purchase(nodeId: string): boolean {
     const node = SOUL_NODE_BY_ID.get(nodeId); if (!node || !this.canPurchase(nodeId)) return false;
@@ -35,7 +39,11 @@ export class SoulCatcherSystem {
   resistance(type: DamageType): number { return Math.max(0, Math.min(1, statTotal(this.state.stats.damageResistance[type]))); }
   respawnDivisor(tier: Tier): number { return tier === 'uncommon' ? Math.max(1, this.effectTotal('enemyRespawnDivisor', (effect) => 'tier' in effect && effect.tier === tier, true)) : 1; }
   equipmentQuantity(rarity: EquipmentRarity): number { return 1 + this.effectTotal('equipmentQuantityAdditive', (effect) => 'equipmentRarity' in effect && effect.equipmentRarity === rarity); }
-  soulYield(type: SoulType): { unlocked: boolean; base: number; additional: number } { return { unlocked: this.soulDropUnlocked(type), base: this.soulDropUnlocked(type) ? 1 : 0, additional: this.effectTotal('soulDropAdditive', (effect) => 'soulType' in effect && effect.soulType === type) }; }
+  soulYield(type: SoulType): { unlocked: boolean; base: number; additional: number; total: number } {
+    const unlocked = this.available && this.soulDropUnlocked(type), base = unlocked ? 1 : 0;
+    const additional = unlocked ? this.effectTotal('soulDropAdditive', (effect) => 'soulType' in effect && effect.soulType === type) : 0;
+    return { unlocked, base, additional, total: base + additional };
+  }
   syncEffects(): void { this.projectEffects(); }
   private soulDropUnlocked(type: string): boolean { return type === 'common' || SOUL_NODES.some((node) => this.level(node.id) > 0 && node.reward.effects.some((effect) => effect.type === 'unlockSoulDrop' && effect.soulType === type)); }
   private effectTotal(type: SoulEffect['type'], matches: (effect: SoulEffect) => boolean = () => true, multiply = false): number { let total = multiply ? 1 : 0; for (const node of SOUL_NODES) for (const effect of node.reward.effects) if (effect.type === type && matches(effect)) { const value = 'amountPerLevel' in effect ? effect.amountPerLevel * this.level(node.id) : 'divisorPerLevel' in effect ? effect.divisorPerLevel ** this.level(node.id) : 0; total = multiply ? total * value : total + value; } return total; }
