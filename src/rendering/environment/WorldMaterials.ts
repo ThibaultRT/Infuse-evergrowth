@@ -19,16 +19,19 @@ async function tiledMaterial(
   repeat: number,
   tint: number,
 ): Promise<THREE.MeshStandardMaterial> {
-  const [sourceMap, sourceNormal] = await Promise.all([assets.loadTexture(colorKey), assets.loadTexture(normalKey)]);
-  const map = sourceMap.clone();
-  const normalMap = sourceNormal.clone();
+  const load = async (key: typeof colorKey | typeof normalKey): Promise<THREE.Texture | null> => {
+    try { return (await assets.loadTexture(key)).clone(); }
+    catch (error) { console.warn(`World texture ${key} unavailable; using an untextured material.`, error); return null; }
+  };
+  const [map, normalMap] = await Promise.all([load(colorKey), load(normalKey)]);
   for (const texture of [map, normalMap]) {
+    if (!texture) continue;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(repeat, repeat);
     texture.needsUpdate = true;
   }
-  map.colorSpace = THREE.SRGBColorSpace;
+  if (map) map.colorSpace = THREE.SRGBColorSpace;
   return new THREE.MeshStandardMaterial({ map, normalMap, normalScale: new THREE.Vector2(0.4, 0.4), color: tint, roughness: 0.92, metalness: 0 });
 }
 

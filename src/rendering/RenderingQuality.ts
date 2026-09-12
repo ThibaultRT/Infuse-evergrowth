@@ -26,9 +26,10 @@ export function loadRenderingQuality(): RenderingQualitySettings {
 }
 
 export function saveRenderingQuality(settings: RenderingQualitySettings): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); }
+  catch (error) { console.warn('Graphics settings could not be saved to this device.', error); }
 }
 
 export function effectivePixelRatio(settings: RenderingQualitySettings): number {
-  return Math.min(devicePixelRatio * settings.renderScale, 2);
+  return Math.min(devicePixelRatio, 2) * settings.renderScale;
 }

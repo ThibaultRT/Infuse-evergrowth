@@ -182,8 +182,9 @@ function showGain(amount: string, stat: string): void {
   const element = document.createElement('div');
   const healthStat = stat === 'HP' || stat === 'HP/S';
   const evasionStat = stat === 'EVASION';
-  const gainIcon = stat === 'HP/S' ? heartRegenIcon(13) : stat === 'HP' ? heartIcon(13) : evasionStat ? evasionIcon(13) : bluntHammerIcon(13);
-  element.className = `gain-pop ${healthStat ? 'hp' : evasionStat ? 'evasion' : 'blunt'}`;
+  const gainIcon = stat === 'HP/S' ? heartRegenIcon(13) : stat === 'HP' ? heartIcon(13) : evasionStat ? evasionIcon(13)
+    : stat === 'SPEED' ? '<span aria-label="Speed">SPD</span>' : damageTypeIcon(stat === 'SLASH' ? 'slash' : stat === 'PIERCING' ? 'piercing' : 'blunt', 13);
+  element.className = `gain-pop ${healthStat ? 'hp' : stat.toLowerCase()}`;
   element.innerHTML = `<strong>+${amount}</strong>${gainIcon}`;
   element.style.opacity = '0'; element.style.transform = 'translateY(8px)'; ui.gainStack.append(element); gainItems.unshift(element);
   requestAnimationFrame(() => { layoutGainItems(); element.style.opacity = '1'; });
@@ -208,7 +209,7 @@ function renderBreakdown(label: string, stat: StatSources, suffix = '', decimals
   const additiveTotal = statAdditiveTotal(stat), total = statTotal(stat);
   const format = (value: number): string => decimals ? value.toFixed(2) : Math.round(value).toLocaleString();
   const adds = Object.entries(stat.additive).filter(([, value]) => value !== 0).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${format(v)}${suffix}</span></div>`).join('');
-  const mults = Object.entries(stat.multiplicative).filter(([, value]) => value !== 1).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${format(v)}</span></div>`).join('');
+  const mults = Object.entries(stat.multiplicative).filter(([, value]) => value !== 1).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${v.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span></div>`).join('');
   const base = stat.base !== 0 ? `<div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${format(stat.base)}${suffix}</span></div>` : '';
   return `<section class="stat-breakdown"><div class="stat-row"><span>${label}</span><strong>${format(total)}${suffix}</strong></div>${base}${adds ? `<div class="stat-group-title">Additive</div>${adds}` : ''}<div class="stat-line stat-subtotal"><span>Total</span><span>${format(additiveTotal)}${suffix}</span></div>${mults ? `<div class="stat-group-title">Multiplicative</div>${mults}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${format(total)}${suffix}</strong></div></section>`;
 }

@@ -1,4 +1,4 @@
-import { heroDamage, heroRegen, maxHeroHp, save } from '../save';
+import { heroDamage, heroRegen, maxHeroHp, save, statTotal } from '../save';
 import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { ascendCopies, ascendOwnedEquipment, canAscend, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel } from '../domain/items/EquipmentProgression';
@@ -68,7 +68,7 @@ export function ascend(itemId: string): boolean {
 }
 
 export function equippedDefense(type: DamageType): number {
-  return save.stats.defense[type].additive.soulCatcher + (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
+  return statTotal(save.stats.defense[type]) + (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
     const itemId = save.inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
     const owned = itemId ? save.inventory.items[itemId] : undefined;

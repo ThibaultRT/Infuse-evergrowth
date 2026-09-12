@@ -79,8 +79,8 @@ export class GameplayRuntime {
     this.hero = {
       position: { x: area.originX, y: 0, z: area.originZ },
       hp: options.heroHp,
-      dead: false,
-      respawnRemaining: 0,
+      dead: options.heroHp <= 0,
+      respawnRemaining: options.heroHp <= 0 ? options.heroRespawnSeconds : 0,
       moving: false,
       facing: 0
     };

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { quaterniusAssets, type AssetLoader } from './AssetLoader';
-import { disposeOwnedObject } from './RenderingResourceDisposal';
+import { disposeClonedSkeletons, disposeOwnedObject } from './RenderingResourceDisposal';
 
 const ANIMATIONS = 'animations/UAL1_Standard.glb';
 const ARM_BONES = ['clavicle', 'upperarm', 'lowerarm', 'hand', 'thumb', 'index', 'middle', 'ring', 'pinky'] as const;
@@ -52,7 +52,7 @@ export abstract class AnimatedHumanoidView {
         this.assets.cloneSkinnedScene(path),
         this.assets.load(ANIMATIONS)
       ]);
-      if (this.disposed) return;
+      if (this.disposed) { disposeClonedSkeletons(model); return; }
       this.model = model;
       this.hands.left = model.getObjectByName('hand_l') ?? null;
       this.hands.right = model.getObjectByName('hand_r') ?? null;
@@ -127,6 +127,7 @@ export abstract class AnimatedHumanoidView {
       this.mixer?.uncacheRoot(this.model);
       this.limbMixers.left?.uncacheRoot(this.model);
       this.limbMixers.right?.uncacheRoot(this.model);
+      disposeClonedSkeletons(this.model);
     }
     this.disposeFallback();
     this.root.clear();

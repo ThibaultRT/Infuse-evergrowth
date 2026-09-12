@@ -13,10 +13,13 @@ export class InputController {
   ) {
     addEventListener('keydown', this.onKeyDown);
     addEventListener('keyup', this.onKeyUp);
+    addEventListener('blur', () => this.reset());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.reset(); });
     joystick.addEventListener('pointerdown', this.onPointerDown);
     joystick.addEventListener('pointermove', this.onPointerMove);
     joystick.addEventListener('pointerup', this.onPointerEnd);
     joystick.addEventListener('pointercancel', this.onPointerEnd);
+    joystick.addEventListener('lostpointercapture', this.onPointerEnd);
   }
 
   get movement(): MovementInput {
@@ -31,15 +34,23 @@ export class InputController {
   }
 
   reset(): void {
+    this.keys.clear();
+    this.resetJoystick();
+  }
+
+  private resetJoystick(): void {
+    const pointer = this.joystickPointer;
     this.joystickPointer = null;
     this.joystickX = 0;
     this.joystickY = 0;
     this.joystickKnob.style.transform = 'translate(-50%, -50%)';
+    if (pointer !== null && this.joystick.hasPointerCapture(pointer)) this.joystick.releasePointerCapture(pointer);
   }
 
   private readonly onKeyDown = (event: KeyboardEvent): void => { this.keys.add(event.code); };
   private readonly onKeyUp = (event: KeyboardEvent): void => { this.keys.delete(event.code); };
   private readonly onPointerDown = (event: PointerEvent): void => {
+    if (this.joystickPointer !== null) return;
     this.joystickPointer = event.pointerId;
     this.joystick.setPointerCapture(event.pointerId);
   };
@@ -57,5 +68,7 @@ export class InputController {
     this.joystickY = y / radius;
     this.joystickKnob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
   };
-  private readonly onPointerEnd = (): void => { this.reset(); };
+  private readonly onPointerEnd = (event: PointerEvent): void => {
+    if (event.pointerId === this.joystickPointer) this.resetJoystick();
+  };
 }

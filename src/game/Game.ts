@@ -113,7 +113,14 @@ const gameplay = new GameplayRuntime({
   enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS,
   enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN
 });
-const persistGame = (): void => { save.heroHp = gameplay.hero.hp; persist(); };
+let saveFailureShown = false;
+const persistGame = (): void => {
+  save.heroHp = gameplay.hero.hp;
+  if (!persist() && !saveFailureShown) {
+    saveFailureShown = true;
+    showToast('Saving is unavailable. Progress will be lost when this page closes.');
+  }
+};
 const commands = new GameCommands(save, gameplay, events, persistGame);
 const soulCatcher = new SoulCatcherSystem(save, events, persistGame);
 const progression = new ProgressionSystem(save, events, persistGame, Math.random, (rarity) => soulCatcher.equipmentQuantity(rarity));

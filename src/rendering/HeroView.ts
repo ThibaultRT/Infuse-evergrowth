@@ -4,6 +4,7 @@ import { AnimatedHumanoidView, type HumanoidHand } from './AnimatedHumanoidView'
 import type { InventoryState, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { makeWeaponVisual } from './WeaponVisuals';
+import { disposeOwnedObject } from './RenderingResourceDisposal';
 
 const RANGER = 'characters/models/Male_Ranger.gltf';
 
@@ -39,16 +40,29 @@ export class HeroView extends AnimatedHumanoidView {
 
   syncEquipment(inventory: InventoryState): void {
     this.inventory = inventory;
-    this.weaponRoots.left.clear(); this.weaponRoots.right.clear();
+    this.clearWeapons();
     const held = EQUIPMENT_BY_ID.get(inventory.equipped.hand1 ?? '');
     if (held?.kind === 'weapon') this.weaponRoots.right.add(makeWeaponVisual(held.weaponClass, held.rarity));
-    this.orbitRoot.clear(); this.orbitWeapons = {};
     for (const [index, slot] of (['orbit1', 'orbit2', 'orbit3'] as const).entries()) {
       const item = EQUIPMENT_BY_ID.get(inventory.equipped[slot] ?? '');
       if (item?.kind !== 'weapon') continue;
       const weapon = makeWeaponVisual(item.weaponClass, item.rarity); weapon.scale.setScalar(.85);
       this.orbitRoot.add(weapon); this.orbitWeapons[slot] = weapon; weapon.userData.orbitIndex = index;
     }
+  }
+
+  private clearWeapons(): void {
+    for (const root of [this.weaponRoots.left, this.weaponRoots.right, this.orbitRoot]) {
+      disposeOwnedObject(root);
+      root.clear();
+    }
+    this.orbitWeapons = {};
+    this.orbitFlights = {};
+  }
+
+  override dispose(): void {
+    this.clearWeapons();
+    super.dispose();
   }
 
   playWeaponAttack(slot: WeaponSlotId, target: THREE.Vector3, duration: number): void {
