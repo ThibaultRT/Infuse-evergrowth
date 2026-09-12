@@ -4,6 +4,7 @@ import type { SavedSpawnState, SpawnDefinition, TierConfig } from '../types';
 
 /** Owns persistent per-life spawner transitions and rerolls. */
 export class RespawnSystem {
+  constructor(private readonly random = Math.random) {}
   defeat(state: SavedSpawnState, tier: TierConfig, now: number, baseRespawnMs: number, nextResetMs: number): void {
     state.killsToday += 1;
     state.defeatedAt = now;
@@ -19,6 +20,6 @@ export class RespawnSystem {
   reroll(state: SavedSpawnState, definition: SpawnDefinition): void {
     state.respawnAt = null;
     state.defeatedAt = null;
-    state.roll = rollSpawn(definition);
+    state.roll = rollSpawn(definition, this.random);
   }
 }

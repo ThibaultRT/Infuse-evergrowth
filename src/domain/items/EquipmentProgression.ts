@@ -48,7 +48,8 @@ export function ascendOwnedEquipment(item: EquipmentDefinition, owned: OwnedEqui
   if (!canAscend(item, owned)) return owned;
   return {
     ...owned,
-    level: Math.max(1, owned.level - ascendCopies(item.rarity)),
+    // The threshold includes the retained item; only the other copies are consumed.
+    level: owned.level - ascendCopies(item.rarity) + 1,
     ascend: owned.ascend + 1
   };
 }

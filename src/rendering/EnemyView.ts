@@ -4,6 +4,7 @@ import { makeHumanoid } from '../visuals';
 import { AnimatedHumanoidView } from './AnimatedHumanoidView';
 import { fitModelToHeight, gameModelAssets } from './AssetLoader';
 import { disposeOwnedObject } from './RenderingResourceDisposal';
+import { configureModelLod } from './ModelLod';
 
 const OUTFIT_BY_TIER: Record<Exclude<Tier, 'crystal'>, string> = {
   common: 'Male_Peasant',
@@ -46,9 +47,10 @@ export class EnemyView extends AnimatedHumanoidView {
 
   private async loadRareModel(): Promise<void> {
     try {
-      const model = await gameModelAssets.cloneScene('enemies/enemy-rare.glb');
+      const model = await gameModelAssets.cloneScene('enemies/enemy-rare-lods-v1.glb');
       if (this.isDisposed) return;
       fitModelToHeight(model, 2.7 / SCALE_BY_TIER.rare);
+      configureModelLod(model);
       model.traverse((child) => { if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; } });
       this.model = model;
       this.disposeFallback();

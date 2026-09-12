@@ -1,5 +1,6 @@
 import { Box3, LoadingManager, Object3D, Vector3 } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
 export class AssetLoader {
@@ -7,7 +8,7 @@ export class AssetLoader {
   private readonly cache = new Map<string, Promise<GLTF>>();
 
   constructor(manager?: LoadingManager, private readonly assetRoot = 'assets/quaternius/') {
-    this.loader = new GLTFLoader(manager);
+    this.loader = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
   }
 
   url(path: string): string {

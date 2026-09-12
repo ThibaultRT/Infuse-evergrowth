@@ -1,7 +1,7 @@
 import { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID, SOUL_NODES, soulEdges } from '../data/soul-catcher';
 import { soulCost, soulPurchaseXp, type SoulEffect } from '../domain/soul-catcher';
 import type { GameEvents } from '../game/GameEvents';
-import { statTotal } from '../save';
+import { statTotal } from '../domain/stats/StatSources';
 import type { DamageType, EquipmentRarity, SaveData, SoulType, SpawnDefinition, Tier } from '../types';
 
 const AREA_TWO_BOSS_ID = 'area2-rare-01';
@@ -47,7 +47,12 @@ export class SoulCatcherSystem {
   private apply(effect: SoulEffect, level: number): void {
     if (!('amountPerLevel' in effect)) return; const value = effect.amountPerLevel * level;
     if (effect.type === 'evasionChanceAdditive') { this.state.stats.evasion.directChance.soulCatcher += value; return; }
-    if (effect.type === 'attackPercentAdditive') { this.state.stats.attack[effect.damageType].multiplicative.soulCatcher = 1 + value; return; }
+    if (effect.type === 'attackPercentAdditive') {
+      const multipliers = this.state.stats.attack[effect.damageType].multiplicative;
+      // Levels add within one upgrade; separate upgrades multiply with each other.
+      multipliers.soulCatcher = (multipliers.soulCatcher ?? 1) * (1 + value);
+      return;
+    }
     const stat = effect.type === 'damageResistancePercentAdditive' ? this.state.stats.damageResistance[effect.damageType] : effect.type === 'maxHpAdditive' ? this.state.stats.maxHp : effect.type === 'regenAdditive' ? this.state.stats.regen : effect.type === 'speedRawAdditive' ? this.state.stats.speed : effect.type === 'criticalChanceRawAdditive' ? this.state.stats.criticalChance : effect.type === 'criticalDamageRawAdditive' ? this.state.stats.criticalDamage : effect.type === 'blockChanceRawAdditive' ? this.state.stats.blockChance : effect.type === 'attackAdditive' ? this.state.stats.attack[effect.damageType] : effect.type === 'defenceAdditive' ? this.state.stats.defense[effect.damageType] : null;
     if (stat) stat.additive.soulCatcher += value;
   }

@@ -112,9 +112,9 @@ try {
   });
   await check('Flat defense includes every persistent source before adding armor', () => {
     Object.assign(persistence.save, fresh());
-    assert.equal(equipment.equippedDefense('blunt'), 0);
+    assert.equal(equipment.equippedDefense(persistence.save, 'blunt'), 0);
     persistence.save.stats.defense.blunt = { base: 3, additive: { kills: 4, other: 5, soulCatcher: 6 }, multiplicative: { other: 2 } };
-    assert.equal(equipment.equippedDefense('blunt'), 36);
+    assert.equal(equipment.equippedDefense(persistence.save, 'blunt'), 36);
   });
   await check('Reduced resolution is 70% of Full on DPR 1, 2 and 3 screens', () => {
     for (const dpr of [1, 2, 3]) {
@@ -171,6 +171,205 @@ try {
     assert.equal(textureDisposed, true);
     assert.equal(geometryDisposed, false);
     mesh.geometry.dispose(); mesh.material.dispose();
+  });
+  const [{ GameSession }, { GameEvents }, { SoulCatcherSystem }, { SOUL_NODES }, { ascendOwnedEquipment, canAscend }, { configureModelLod }, { applyWorldMaterialQuality }] = await Promise.all([
+    vite.ssrLoadModule('/src/game/GameSession.ts'), vite.ssrLoadModule('/src/game/GameEvents.ts'), vite.ssrLoadModule('/src/systems/SoulCatcherSystem.ts'),
+    vite.ssrLoadModule('/src/data/soul-catcher/index.ts'), vite.ssrLoadModule('/src/domain/items/EquipmentProgression.ts'),
+    vite.ssrLoadModule('/src/rendering/ModelLod.ts'), vite.ssrLoadModule('/src/rendering/environment/WorldMaterials.ts'),
+  ]);
+  const memory = () => {
+    const values = new Map();
+    return { values, getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+  };
+  const primary = 'infuse-evergrowth-save-v18', backup = 'infuse-evergrowth-save-backup';
+  const clock = { now: () => now.getTime(), date: () => new Date(now) };
+  const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
+
+  await check('Complete weapon attack sums additions before multiplying every source', () => {
+    const state = fresh();
+    const item = equipment.EQUIPMENT_BY_ID.get('hammer-common');
+    equipment.EQUIPMENT_BY_ID.set(item.id, { ...item, baseDamage: 100 });
+    try {
+      state.stats.attack.blunt = { base: 0, additive: { kills: 25, soulCatcher: 50 }, multiplicative: { soulCatcher: 1.05, equipment: 1.10 } };
+      const profile = equipment.attackProfile(state, 'hand1');
+      assert.equal(profile.sources.additive.equippedWeapon, 100);
+      assert.equal(persistence.statAdditiveTotal(profile.sources), 175);
+      near(persistence.statMultiplierTotal(profile.sources), 1.155);
+      near(profile.damage, 202.125);
+      assert.equal(state.stats.attack.blunt.additive.equippedWeapon, undefined, 'Projection must not save or double-count weapon damage');
+    } finally { equipment.EQUIPMENT_BY_ID.set(item.id, item); }
+  });
+  await check('Matching equipped weapons retain separate per-slot attack damage', () => {
+    const state = fresh(); state.unlockedAreas.push(2);
+    state.stats.attack.blunt = { base: 0, additive: { kills: 25, soulCatcher: 50 }, multiplicative: { soulCatcher: 1.05, equipment: 1.10 } };
+    equipment.applyEquipmentCopies(state, 'hammer-uncommon', 1);
+    equipment.equip(state, 'hammer-uncommon', 'orbit1');
+    near(equipment.attackProfile(state, 'hand1').damage, (75 + 15) * 1.155);
+    near(equipment.attackProfile(state, 'orbit1').damage, (75 + 75) * 1.155);
+    near(equipment.equipmentCombatSummary(state).totalAttack, (90 + 150) * 1.155);
+  });
+  await check('Equipped armor is included before persistent defense multipliers', () => {
+    const state = fresh(); const armor = equipment.EQUIPMENT.find((item) => item.kind === 'armor');
+    state.stats.defense[armor.damageType] = { base: 3, additive: { kills: 4 }, multiplicative: { other: 2 } };
+    const { owned } = equipment.applyEquipmentCopies(state, armor.id, 2);
+    assert.equal(equipment.equip(state, armor.id, equipment.equipmentSlot(armor.id)), true);
+    assert.equal(equipment.equippedDefense(state, armor.damageType), (7 + equipment.equipmentDefense(armor, owned)) * 2);
+  });
+  await check('Soul percentage upgrades stack without overwriting another node and reset cleanly', () => {
+    const state = fresh(); const events = new GameEvents();
+    const node = SOUL_NODES.find((n) => n.reward.effects.some((e) => e.type === 'attackPercentAdditive' && e.damageType === 'blunt'));
+    const second = { ...node, id: 'review-percent-node', reward: { effects: [{ type: 'attackPercentAdditive', damageType: 'blunt', amountPerLevel: .1 }] } };
+    SOUL_NODES.push(second);
+    try {
+      state.soulCatcher.nodeLevels[node.id] = 5; state.soulCatcher.nodeLevels[second.id] = 1;
+      state.stats.attack.blunt.multiplicative.equipment = 1.2;
+      const souls = new SoulCatcherSystem(state, events, () => {});
+      near(persistence.statMultiplierTotal(state.stats.attack.blunt), 1.05 * 1.1 * 1.2);
+      souls.syncEffects();
+      near(persistence.statMultiplierTotal(state.stats.attack.blunt), 1.05 * 1.1 * 1.2);
+      souls.reset();
+      near(persistence.statMultiplierTotal(state.stats.attack.blunt), 1.2);
+    } finally { SOUL_NODES.pop(); }
+  });
+  await check('Ascend carries excess copies regardless of acquisition order for every item', () => {
+    for (const item of equipment.EQUIPMENT) {
+      const threshold = equipment.ascendCopies(item.rarity);
+      const owned = { itemId: item.id, level: threshold - 1, ascend: 0 };
+      assert.equal(canAscend(item, owned), false);
+      owned.level = threshold;
+      assert.equal(ascendOwnedEquipment(item, owned).level, 1);
+      const first = ascendOwnedEquipment(item, { ...owned, level: threshold + 1 });
+      const second = ascendOwnedEquipment(item, owned); second.level++;
+      assert.deepEqual(first, second);
+      const collectThenAscend = { ...owned, level: threshold * 3 + 50 };
+      let early = ascendOwnedEquipment(item, owned); early.level += threshold * 2 + 50;
+      let late = collectThenAscend;
+      while (canAscend(item, early)) early = ascendOwnedEquipment(item, early);
+      while (canAscend(item, late)) late = ascendOwnedEquipment(item, late);
+      assert.deepEqual(early, late);
+    }
+  });
+  await check('Commands and reset helpers mutate only the injected session', () => {
+    const globalBefore = structuredClone(persistence.save), first = fresh(), second = fresh();
+    const session = new GameSession(first, new GameEvents(), () => {}, clock, () => .99);
+    equipment.applyEquipmentCopies(first, 'sword-common', 101);
+    assert.equal(session.commands.execute({ type: 'equip', itemId: 'sword-common', slot: 'hand1' }), true);
+    assert.equal(session.commands.execute({ type: 'ascend', itemId: 'sword-common' }), true);
+    assert.equal(first.inventory.items['sword-common'].level, 2);
+    first.stats.maxHp.additive.kills = 123;
+    session.commands.execute({ type: 'resetHero', equipment: true });
+    assert.deepEqual(first.inventory, second.inventory);
+    assert.equal(first.stats.maxHp.additive.kills, 0);
+    assert.deepEqual(persistence.save, globalBefore);
+  });
+  await check('Resetting attributes reapplies owned Soul bonuses before clamping and saving HP', () => {
+    const state = fresh();
+    const hpNode = SOUL_NODES.find(n => n.reward.effects.some(e => e.type === 'maxHpAdditive'));
+    state.soulCatcher.nodeLevels[hpNode.id] = 1;
+    state.stats.maxHp.additive.kills = 500;
+    state.heroHp = 500;
+    let storedHp = 0;
+    const session = new GameSession(state, new GameEvents(), () => { storedHp = state.heroHp; }, clock, () => .99);
+    session.commands.execute({ type: 'resetHero', equipment: false });
+    const expected = persistence.statTotal(state.stats.maxHp);
+    assert.ok(expected > config.BASE_HERO_MAX_HP);
+    assert.equal(session.runtime.hero.hp, expected); assert.equal(storedHp, expected);
+    session.commands.execute({ type: 'resetSoulCatcher' });
+    assert.equal(storedHp, config.BASE_HERO_MAX_HP);
+  });
+  await check('Hand and orbit weapons keep independent cooldowns in the session', () => {
+    const state = fresh(); state.unlockedAreas.push(2);
+    for (const id of ['hammer-uncommon', 'sword-common', 'spear-common']) equipment.applyEquipmentCopies(state, id, 1);
+    equipment.equip(state, 'hammer-uncommon', 'orbit1'); equipment.equip(state, 'sword-common', 'orbit2'); equipment.equip(state, 'spear-common', 'orbit3');
+    const events = new GameEvents(), hits = [];
+    const session = new GameSession(state, events, () => {}, clock, () => .99);
+    const crystal = session.runtime.spawnById.get(spawnId); crystal.hp = 10000000;
+    session.runtime.hero.position = { ...crystal.position };
+    events.on('weaponAttacked', ({slot}) => hits.push(slot));
+    session.update(.01, { x: 0, y: 0 }); assert.deepEqual(hits, ['hand1']);
+    for (let i=0; i<40; i++) session.update(.05, { x:0, y:0 });
+    for (const slot of ['hand1','orbit1','orbit2','orbit3']) assert.ok(hits.includes(slot));
+    assert.ok(hits.filter(s=>s==='orbit2').length > hits.filter(s=>s==='orbit1').length);
+  });
+  await check('One backup survives a corrupt primary and rotates only from valid saves', () => {
+    const storage = memory(), state = fresh();
+    state.stats.attack.blunt.additive.kills = 10;
+    assert.equal(persistence.persist(state, storage, now), true);
+    state.stats.attack.blunt.additive.kills = 20;
+    persistence.persist(state, storage, now);
+    assert.equal(JSON.parse(storage.getItem(backup)).stats.attack.blunt.additive.kills, 10);
+    storage.setItem(primary, '{truncated');
+    const recovered = persistence.loadSave(storage, now);
+    assert.equal(recovered.stats.attack.blunt.additive.kills, 10);
+    recovered.stats.attack.blunt.additive.kills = 15;
+    persistence.persist(recovered, storage, now);
+    assert.equal(JSON.parse(storage.getItem(backup)).stats.attack.blunt.additive.kills, 10);
+    storage.setItem(backup, 'null');
+    assert.equal(persistence.loadSave(storage, now).stats.attack.blunt.additive.kills, 15);
+    assert.equal(storage.values.size, 2);
+  });
+  await check('Failed backup writes preserve the current save and non-finite states are rejected', () => {
+    const storage = memory(), state = fresh(); persistence.persist(state, storage, now);
+    const before = storage.getItem(primary);
+    state.stats.maxHp.additive.kills = 10;
+    assert.equal(persistence.persist(state, { ...storage, setItem: () => { throw new Error('Storage full'); } }, now), false);
+    assert.equal(storage.getItem(primary), before);
+    state.stats.maxHp.additive.kills = Infinity;
+    assert.equal(persistence.persist(state, storage, now), false);
+    assert.equal(storage.getItem(primary), before);
+  }, 2);
+  await check('Concurrent tabs deliberately allow the last valid writer to win', () => {
+    const storage = memory(), first = fresh(), second = fresh();
+    first.stats.attack.blunt.additive.kills = 50; second.stats.attack.blunt.additive.kills = 7;
+    persistence.persist(first, storage, now); persistence.persist(second, storage, now);
+    assert.equal(persistence.loadSave(storage, now).stats.attack.blunt.additive.kills, 7);
+    assert.equal(JSON.parse(storage.getItem(backup)).stats.attack.blunt.additive.kills, 50);
+  });
+  await check('Defeat, boss gates, rewards, and revival run without a renderer', () => {
+    const state = fresh(), events = new GameEvents(); let writes = 0, bossEvents = 0, defeatedEvents = 0;
+    const session = new GameSession(state, events, () => writes++, clock, () => .99);
+    const boss = session.runtime.spawnById.get(config.AREAS[0].bossSpawnId);
+    session.runtime.hero.position = { ...boss.position }; state.stats.attack.blunt.additive.kills = 1000000;
+    boss.hp = 1;
+    events.on('bossDefeated', ({ openedGateIds }) => { bossEvents++; assert.ok(openedGateIds.length > 0); });
+    events.on('enemyDefeated', () => defeatedEvents++);
+    session.update(.05, { x: 0, y: 0 });
+    assert.equal(boss.alive, false); assert.equal(bossEvents, 1); assert.equal(defeatedEvents, 1);
+    assert.ok(state.defeatedBosses.includes(boss.id)); assert.ok(state.unlockedAreas.includes(2));
+    assert.equal(state.spawns[boss.id].killsToday, 1); assert.ok(state.spawns[boss.id].respawnAt > now.getTime());
+    const roll = structuredClone(state.spawns[boss.id].roll);
+    session.update(.05, { x: 0, y: 0 }); assert.equal(bossEvents, 1); assert.deepEqual(state.spawns[boss.id].roll, roll);
+    state.spawns[boss.id].respawnAt = now.getTime() - 1; session.reviveDueSpawns();
+    assert.equal(boss.alive, true); assert.equal(boss.hp, state.spawns[boss.id].roll.maxHp); assert.ok(writes > 0);
+  });
+  await check('Death, regeneration and midnight reset preserve the session lifecycle', () => {
+    const state = fresh(), events = new GameEvents(); let resurrected = 0;
+    const session = new GameSession(state, events, () => {}, clock, () => .99);
+    events.on('heroResurrected', () => resurrected++);
+    session.damageHero(1000000, 'blunt'); assert.equal(session.runtime.hero.dead, true); assert.equal(state.heroHp, 0);
+    session.update(.05, { x: 0, y: 0 }, 5);
+    assert.equal(resurrected, 1); assert.equal(session.runtime.hero.hp, persistence.statTotal(state.stats.maxHp));
+    session.runtime.hero.hp = 1; session.update(.05, { x: 0, y: 0 }); assert.ok(session.runtime.hero.hp > 1);
+    state.spawns[spawnId].killsToday = 9; state.dailyKey = '2026-09-11';
+    const owned = structuredClone(state.inventory); session.resetAtMidnightIfNeeded();
+    assert.equal(state.spawns[spawnId].killsToday, 0); assert.deepEqual(state.inventory, owned);
+    assert.equal(state.dailyKey, persistence.localDailyKey(now));
+  });
+  await check('Reduced water avoids transmission while switching back restores Full', () => {
+    const water = new THREE.MeshPhysicalMaterial({ transmission: .16, side: THREE.DoubleSide, transparent: true, opacity: .84 });
+    applyWorldMaterialQuality({ water }, .7); assert.equal(water.transmission, 0); assert.equal(water.side, THREE.FrontSide);
+    applyWorldMaterialQuality({ water }, 1); assert.equal(water.transmission, .16); assert.equal(water.side, THREE.DoubleSide);
+    assert.equal(water.opacity, .84); water.dispose();
+  });
+  await check('Rare LOD thresholds switch one detail level with hysteresis', () => {
+    const model = new THREE.Group();
+    for (const distance of [0, 26]) { const child = new THREE.Group(); child.userData.lodDistance = distance; model.add(child); }
+    configureModelLod(model); const lod = model.getObjectByName('DistanceLOD');
+    const camera = new THREE.PerspectiveCamera(); model.updateMatrixWorld(true);
+    for (const [distance, level] of [[20, 0], [30, 1], [45, 1], [25, 1], [22, 0]]) {
+      camera.position.z = distance; camera.updateMatrixWorld(true); lod.update(camera);
+      assert.equal(lod.getCurrentLevel(), level); assert.equal(lod.children.filter((child) => child.visible).length, 1);
+    }
   });
   await check('Storage access failures keep the game running and prevent overwriting unread progress', () => {
     mockGlobal('localStorage', { get: () => { throw new Error('Simulated storage denied'); } });

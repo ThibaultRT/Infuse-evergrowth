@@ -1,11 +1,12 @@
-import { heroDamage, heroRegen, maxHeroHp, save, statTotal } from '../save';
-import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId } from '../types';
+import { heroRegen, maxHeroHp } from './HeroStats';
+import { statTotal } from '../domain/stats/StatSources';
+import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId, SaveData, StatSources } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { ascendCopies, ascendOwnedEquipment, canAscend, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel } from '../domain/items/EquipmentProgression';
 
 export { EQUIPMENT, EQUIPMENT_BY_ID, ascendCopies, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel };
 
-export type AttackProfile = { itemId: string; damage: number; damageType: DamageType; cooldownSeconds: number };
+export type AttackProfile = { itemId: string; damage: number; damageType: DamageType; cooldownSeconds: number; sources: StatSources };
 export type InventoryCombatSummary = {
   totalAttack: number;
   maxHp: number;
@@ -18,21 +19,23 @@ export type InventoryCombatSummary = {
  * Runtime equipment orchestration. Static definitions and progression math live
  * in the item domain; this system only connects them to persistent player state.
  */
-export function attackProfile(hand: WeaponSlotId): AttackProfile | null {
-  const itemId = save.inventory.equipped[hand];
+export function attackProfile(state: SaveData, hand: WeaponSlotId): AttackProfile | null {
+  const itemId = state.inventory.equipped[hand];
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
-  const owned = itemId ? save.inventory.items[itemId] : undefined;
-  return item?.kind === 'weapon' && owned
-    ? { itemId: item.id, damage: equipmentDamage(item, owned) + heroDamage(item.damageType), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds }
-    : null;
+  const owned = itemId ? state.inventory.items[itemId] : undefined;
+  if (item?.kind !== 'weapon' || !owned) return null;
+  // Each independently scheduled hit contains its own weapon's additive damage.
+  const stat = state.stats.attack[item.damageType];
+  const sources = { ...stat, additive: { ...stat.additive, equippedWeapon: equipmentDamage(item, owned) } };
+  return { itemId: item.id, damage: statTotal(sources), damageType: item.damageType, cooldownSeconds: item.attackCooldownSeconds, sources };
 }
 
-export function applyEquipmentCopies(itemId: string, quantity: number): { previousLevel: number | null; owned: OwnedEquipment } {
-  const previous = save.inventory.items[itemId];
+export function applyEquipmentCopies(state: SaveData, itemId: string, quantity: number): { previousLevel: number | null; owned: OwnedEquipment } {
+  const previous = state.inventory.items[itemId];
   const owned = previous ?? { itemId, level: 0, ascend: 0 };
   const previousLevel = previous?.level ?? null;
   owned.level += quantity;
-  save.inventory.items[itemId] = owned;
+  state.inventory.items[itemId] = owned;
   return { previousLevel, owned };
 }
 
@@ -43,52 +46,58 @@ export function equipmentSlot(itemId: string): EquipmentSlotId | null {
   return item?.kind === 'armor' ? ARMOR_SLOT[item.armorClass] : null;
 }
 
-export function equip(itemId: string, slot: EquipmentSlotId): boolean {
+export function equip(state: SaveData, itemId: string, slot: EquipmentSlotId): boolean {
   const item = EQUIPMENT_BY_ID.get(itemId);
-  if (!save.inventory.items[itemId] || !item || (slot === 'orbit1' && !save.unlockedAreas.includes(2))) return false;
+  if (!state.inventory.items[itemId] || !item || (slot === 'orbit1' && !state.unlockedAreas.includes(2))) return false;
   const armorSlot = item.kind === 'armor' ? ARMOR_SLOT[item.armorClass] : null;
   if ((armorSlot && slot !== armorSlot) || (!armorSlot && !['hand1', 'orbit1', 'orbit2', 'orbit3'].includes(slot))) return false;
-  for (const other of Object.keys(save.inventory.equipped) as EquipmentSlotId[]) if (other !== slot && save.inventory.equipped[other] === itemId) save.inventory.equipped[other] = null;
-  save.inventory.equipped[slot] = itemId;
+  for (const other of Object.keys(state.inventory.equipped) as EquipmentSlotId[]) if (other !== slot && state.inventory.equipped[other] === itemId) state.inventory.equipped[other] = null;
+  state.inventory.equipped[slot] = itemId;
   return true;
 }
 
-export function unequip(hand: EquipmentSlotId): string | null {
-  const itemId = save.inventory.equipped[hand];
-  save.inventory.equipped[hand] = null;
+export function unequip(state: SaveData, hand: EquipmentSlotId): string | null {
+  const itemId = state.inventory.equipped[hand];
+  state.inventory.equipped[hand] = null;
   return itemId;
 }
 
-export function ascend(itemId: string): boolean {
-  const owned = save.inventory.items[itemId];
+export function ascend(state: SaveData, itemId: string): boolean {
+  const owned = state.inventory.items[itemId];
   const item = EQUIPMENT_BY_ID.get(itemId);
   if (!owned || !item || !canAscend(item, owned)) return false;
-  save.inventory.items[itemId] = ascendOwnedEquipment(item, owned);
+  state.inventory.items[itemId] = ascendOwnedEquipment(item, owned);
   return true;
 }
 
-export function equippedDefense(type: DamageType): number {
-  return statTotal(save.stats.defense[type]) + (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
-    const itemId = save.inventory.equipped[slot];
+export function equippedDefense(state: SaveData, type: DamageType): number {
+  return statTotal(defenseSources(state, type));
+}
+
+export function defenseSources(state: SaveData, type: DamageType): StatSources {
+  const armor = (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
+    const itemId = state.inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
-    const owned = itemId ? save.inventory.items[itemId] : undefined;
+    const owned = itemId ? state.inventory.items[itemId] : undefined;
     return total + (item?.damageType === type && owned ? equipmentDefense(item, owned) : 0);
   }, 0);
+  const stat = state.stats.defense[type];
+  return { ...stat, additive: { ...stat.additive, equippedArmor: armor } };
 }
 
 /** Plain-value projection of the authoritative equipment and hero stat rules used by combat. */
-export function equipmentCombatSummary(): InventoryCombatSummary {
+export function equipmentCombatSummary(state: SaveData): InventoryCombatSummary {
   const damageTypes: DamageType[] = ['blunt', 'slash', 'piercing'];
   const attackByType: Record<DamageType, number> = { blunt: 0, slash: 0, piercing: 0 };
   for (const slot of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
-    const profile = attackProfile(slot);
+    const profile = attackProfile(state, slot);
     if (profile) attackByType[profile.damageType] += profile.damage;
   }
-  const defenseByType = Object.fromEntries(damageTypes.map((type) => [type, equippedDefense(type)])) as Record<DamageType, number>;
+  const defenseByType = Object.fromEntries(damageTypes.map((type) => [type, equippedDefense(state, type)])) as Record<DamageType, number>;
   return {
     totalAttack: damageTypes.reduce((total, type) => total + attackByType[type], 0),
-    maxHp: maxHeroHp(),
-    regenPerSecond: heroRegen(),
+    maxHp: maxHeroHp(state.stats),
+    regenPerSecond: heroRegen(state.stats),
     attackByType,
     defenseByType
   };

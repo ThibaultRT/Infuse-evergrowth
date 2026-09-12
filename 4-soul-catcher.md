@@ -246,6 +246,8 @@ Represent these as source-aware multiplicative attack contributions rather than 
 
 At level 5, the corresponding Soul Catcher contribution is +5% for that damage type only.
 
+Apply all percentage sources after adding base, kills, Soul Catcher flat bonuses, and the attacking weapon. Separate multiplier sources multiply with each other. For example, `(25 + 50 + 100) × 1.05 × 1.10 = 202.125`. Each hand/orbit weapon has its own typed hit and Stats breakdown; matching weapons do not add their damage to each other's hits. Levels within one percentage node add to that node's percentage; separate nodes combine multiplicatively.
+
 Do not create an all-damage wildcard node/effect.
 
 ## Percentage damage resistance

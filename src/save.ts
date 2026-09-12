@@ -1,13 +1,13 @@
-import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, EVASION_CHANCE_CAP, EVASION_RAW_SCALE, EVASION_RAW_TARGET, HERO_BLOCK_CHANCE_PERCENT, HERO_CRITICAL_CHANCE_PERCENT, HERO_CRITICAL_DAMAGE_PERCENT, HERO_SPEED, SPEED_MAX_MULTIPLIER, SPEED_RAW_SCALE, SPEED_RAW_TARGET, SPAWNS } from './config';
+import { AREAS, BASE_HERO_BLOCK_CHANCE_RAW, BASE_HERO_BLUNT_ATTACK, BASE_HERO_CRITICAL_CHANCE_RAW, BASE_HERO_CRITICAL_DAMAGE_RAW, BASE_HERO_MAX_HP, BASE_HERO_REGEN, BASE_HERO_SPEED_RAW, SPAWNS } from './config';
 import { EQUIPMENT_BY_ID } from './domain/items/EquipmentCatalog';
-import { logarithmicChance, logarithmicStat, rawEvasionChance, totalEvasionChance } from './domain/combat/HeroStats';
-import { speedMultiplier } from './domain/stats/Speed';
+import { statTotal } from './domain/stats/StatSources';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID } from './data/soul-catcher';
 import { soulCost, soulPurchaseXp } from './domain/soul-catcher';
-import type { DamageType, EvasionSources, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
+import type { EvasionSources, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
 const SAVE_KEY = 'infuse-evergrowth-save-v18';
+const BACKUP_KEY = 'infuse-evergrowth-save-backup';
 const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v17', 'infuse-evergrowth-save-v16', 'infuse-evergrowth-save-v15', 'infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
@@ -178,7 +178,15 @@ function normalizeEvasion(value: unknown): EvasionSources {
 }
 
 export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Date()): SaveData {
-  const fresh: SaveData = {
+  // A corrupt primary must not mask the last working save or supported legacy saves.
+  for (const key of [SAVE_KEY, BACKUP_KEY, ...PREVIOUS_SAVE_KEYS]) {
+    try {
+      const raw = storage.getItem(key);
+      const restored = raw ? decodeSave(raw, now) : null;
+      if (restored) return restored;
+    } catch { /* Unavailable storage is handled by the browser adapter. */ }
+  }
+  return {
     version: 18,
     dailyKey: localDailyKey(now),
     currentAreaId: 1,
@@ -190,11 +198,12 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     spawns: emptySpawnState(),
     soulCatcher: { balances: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 }, nodeLevels: {}, unlockAnnouncementSeen: false, xp: 0, highestUnlockedLayer: 1 }
   };
+}
+
+function decodeSave(raw: string, now: Date): SaveData | null {
   try {
-    const raw = storage.getItem(SAVE_KEY) ?? PREVIOUS_SAVE_KEYS.map((key) => storage.getItem(key)).find(Boolean);
-    if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (![7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(parsed.version ?? 0) || !parsed.stats) return fresh;
+    if (!parsed || ![7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(parsed.version ?? 0) || !parsed.stats || typeof parsed.stats !== 'object' || Array.isArray(parsed.stats)) return null;
     const areaIds = new Set(AREAS.map((area) => area.id));
     const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
     const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
@@ -225,7 +234,7 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
       soulCatcher: normalizeSoulCatcher(parsed.soulCatcher)
     };
   } catch {
-    return fresh;
+    return null;
   }
 }
 
@@ -248,29 +257,29 @@ function normalizeSoulCatcher(value: unknown): SaveData['soulCatcher'] {
 }
 
 export const save = loadSave();
-export function persist(): boolean {
-  browserSaveStorage.setItem(SAVE_KEY, JSON.stringify(save));
-  return !storageFailed;
+/** Retains one validated previous save; concurrent tabs deliberately use last-write-wins. */
+export function persist(state: SaveData = save, storage: SaveStorage = browserSaveStorage, now = new Date()): boolean {
+  try {
+    const next = JSON.stringify(state, (_key, value: unknown) => {
+      if (typeof value === 'number' && !Number.isFinite(value)) throw new Error('Cannot save a non-finite number.');
+      return value;
+    });
+    const previous = storage.getItem(SAVE_KEY);
+    if (previous && decodeSave(previous, now)) storage.setItem(BACKUP_KEY, previous);
+    else {
+      const backup = storage.getItem(BACKUP_KEY);
+      if (!backup || !decodeSave(backup, now)) storage.setItem(BACKUP_KEY, next);
+    }
+    storage.setItem(SAVE_KEY, next);
+    return storage !== browserSaveStorage || !storageFailed;
+  } catch (error) {
+    console.warn('Progress could not be saved to this device.', error);
+    return false;
+  }
 }
-export function resetPermanentStats(): void { save.stats = freshStats(); }
-export function resetHeroProgress(): void {
-  save.stats = freshStats();
-  save.inventory = freshInventory();
+export function resetPermanentStats(state: SaveData): void { state.stats = freshStats(); }
+export function resetHeroProgress(state: SaveData): void {
+  state.stats = freshStats();
+  state.inventory = freshInventory();
 }
-export function statAdditiveTotal(stat: StatSources): number { return stat.base + Object.values(stat.additive).reduce((a, b) => a + b, 0); }
-export function statMultiplierTotal(stat: StatSources): number { return Object.values(stat.multiplicative).reduce((a, b) => a * b, 1); }
-export function statTotal(stat: StatSources): number { return statAdditiveTotal(stat) * statMultiplierTotal(stat); }
-export function maxHeroHp(): number { return statTotal(save.stats.maxHp); }
-export function heroDamage(type: DamageType): number { return statTotal(save.stats.attack[type]); }
-export function heroRegen(): number { return statTotal(save.stats.regen); }
-export function heroSpeedMultiplier(): number {
-  const rawMultiplier = speedMultiplier(statAdditiveTotal(save.stats.speed), SPEED_RAW_SCALE, SPEED_RAW_TARGET, SPEED_MAX_MULTIPLIER);
-  return rawMultiplier * statMultiplierTotal(save.stats.speed);
-}
-export function heroSpeed(): number { return HERO_SPEED * heroSpeedMultiplier(); }
-export function heroCriticalChance(): number { return logarithmicChance(statTotal(save.stats.criticalChance), HERO_CRITICAL_CHANCE_PERCENT); }
-export function heroCriticalDamageMultiplier(): number { return 1 + logarithmicStat(statTotal(save.stats.criticalDamage), HERO_CRITICAL_DAMAGE_PERCENT) / 100; }
-export function heroBlockChance(): number { return logarithmicChance(statTotal(save.stats.blockChance), HERO_BLOCK_CHANCE_PERCENT); }
-
-export function heroRawEvasionChance(): number { return rawEvasionChance(Object.values(save.stats.evasion.raw).reduce((sum, value) => sum + value, 0), EVASION_RAW_SCALE, EVASION_RAW_TARGET, EVASION_CHANCE_CAP); }
-export function heroEvasionChance(): number { return totalEvasionChance(heroRawEvasionChance(), Object.values(save.stats.evasion.directChance), EVASION_CHANCE_CAP); }
+export { statAdditiveTotal, statMultiplierTotal, statTotal } from './domain/stats/StatSources';

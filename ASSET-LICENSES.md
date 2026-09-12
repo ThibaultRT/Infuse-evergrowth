@@ -133,3 +133,12 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - The timber lookout reuses Quaternius's [Small Watch Tower](https://poly.pizza/m/CygapExMf5), from [Ultimate Fantasy RTS](https://quaternius.com/packs/ultimatefantasyrts.html), released under CC0 1.0. Downloaded September 11, 2026 from `https://static.poly.pizza/8bec6466-329a-4f83-99d9-600a00e2c437.glb`; source SHA-256: `697dbc949daa279858e3e4ebed1b3039137bfb9e5be97d783be323a7786dd27f`.
 - Its pointed roof reuses `roof-point.glb` from Kenney's [Fantasy Town Kit](https://kenney.nl/assets/fantasy-town-kit), CC0 1.0, already in the local asset library. The source archive SHA-256 is `1a7530c09f4d2fa2cdee259876f089334f8b1f27fa86a0c4f54ef86cdd8676ef`. The supplied notice is retained as `shared/licenses/kenney-fantasy-town-cc0.txt`.
 - Reproduction: `scripts/world-assets/export-highwood.py` exports seven self-contained, vertex-colored GLBs and the editable `authoring/local/highwood/highwood.blend`. Imports are isolated from other open Blender scenes; only the selected authored scene is exported. The lookout is batched to one material with its roof, and source hashes are checked before conversion.
+
+## Rare enemy runtime LODs
+
+- File: `public/assets/models/enemies/enemy-rare-lods-v1.glb`.
+- Source: project-owner rare-enemy artwork, formerly `public/assets/models/enemies/enemy-rare.glb`; preserved in Git at `e238e13`. Source SHA-256: `1d96ad64ae629fd58c46b34431915c3d2ce8d9111a2b86fdd0f59fcbbbe7a6ae`.
+- Processing: Blender 5.2.1 weld/decimation and high-poly tangent-normal baking for two LODs; glTF Transform 4.5.0 deduplication/pruning/packaging, 1024px WebP maps (quality 90), and Meshopt compression. Original color/roughness/metallic detail is retained and resized; normals are baked per LOD. No new third-party artwork.
+- Budgets: 29,790 / 9,930 triangles; camera distances 0 / 26 meters with 10% hysteresis; 1.66 MiB total versus 59.21 MiB source. Runtime SHA-256: `cc9d2dd45a995992f7a84f07c47202cc53881d3da8a145ff4017f3fd079c4903`.
+- Reproduction: [asset pipeline instructions](scripts/model-assets/README.md), [Blender bake](scripts/model-assets/bake-rare-enemy.py), [glTF packaging](scripts/model-assets/optimize-rare-enemy.mjs).
+- Usage: same project-owned/user-supplied permission as the original rare enemy. The high-poly source and bake intermediates stay outside the release payload.

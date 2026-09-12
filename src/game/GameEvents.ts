@@ -1,11 +1,11 @@
 import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SoulType } from '../types';
 
 export type GameEventMap = {
-  enemyDamaged: { enemyId: string; amount: number; damageType: DamageType; itemId: string };
+  enemyDamaged: { enemyId: string; amount: number; damageType: DamageType; itemId: string; slot: import('../types').WeaponSlotId };
   weaponAttacked: { slot: import('../types').EquipmentSlotId; targetId: string; damageType: DamageType; itemId: string };
   enemyDefeated: { enemyId: string };
   enemyRespawned: { enemyId: string };
-  bossDefeated: { bossId: string; areaId: number };
+  bossDefeated: { bossId: string; areaId: number; openedGateIds: string[] };
   heroDamaged: { amount: number; damageType: CombatAffinity; blocked: boolean };
   heroDefeated: undefined;
   heroResurrected: { areaId: number };
@@ -25,6 +25,7 @@ export type GameEventMap = {
   soulCatcherXpGained: { amount: number; total: number };
   soulCatcherLayerUnlocked: { layer: number };
   heroEvaded: { damageType: CombatAffinity };
+  dailyReset: undefined;
 };
 
 type Listener<T> = (event: T) => void;

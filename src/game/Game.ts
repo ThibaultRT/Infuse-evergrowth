@@ -1,50 +1,31 @@
 import * as THREE from 'three';
-import {
-  AREAS,
-  BASE_RESPAWN_MS,
-  ENEMY_AGGRO_RADIUS_METERS,
-  ENEMY_ATTACK_COOLDOWN,
-  ENEMY_ATTACK_RANGE_METERS,
-  ENEMY_POSITIONING_RANGE_METERS,
-  ENEMY_LEASH_RADIUS_METERS,
-  HERO_ATTACK_RANGE_METERS,
-  HERO_RESPAWN_DELAY_MS,
-  BLOCKED_DAMAGE_MULTIPLIER,
-  WORLD_CONNECTIONS,
-  SPAWNS,
-  TIER_CONFIG,
-  areaById,
-  VISUAL_STREAMING,
-} from '../config';
+import { AREAS, WORLD_CONNECTIONS, SPAWNS, TIER_CONFIG, areaById, VISUAL_STREAMING } from '../config';
 import { combatAffinityIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon, shieldIcon, weaponClassIcon } from '../icons';
-import { emptySpawnState, heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed, localDailyKey, maxHeroHp, nextLocalMidnightMs, persist, save } from '../save';
-import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SpawnDefinition, TierConfig, WeaponSlotId, WorldConnection } from '../types';
-import { renderEnemyAffinities, renderInventory, renderItemDetail, renderSoulCatcher, renderStats, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
+import { persist, save } from '../save';
+import { maxHeroHp } from '../systems/HeroStats';
+import { GameSession } from './GameSession';
+import { mountGameUi } from '../ui/GameUiController';
+import type { CombatAffinity, DamageType, LootType, SpawnDefinition, TierConfig, WeaponSlotId, WorldConnection } from '../types';
+import { renderEnemyAffinities, showBossProgression, showEquipmentDrop, showSoulDrop, showStatGain, showToast, ui } from '../ui';
 import { makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
 import { CameraController } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
-import { EQUIPMENT_BY_ID, attackProfile, equipmentCombatSummary, equipmentSlot, equippedDefense } from '../systems/EquipmentSystem';
+import { EQUIPMENT_BY_ID, attackProfile } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { HeroView } from '../rendering/HeroView';
 import { EnemyView } from '../rendering/EnemyView';
 import { EffectManager } from '../rendering/EffectManager';
-import { CombatSystem } from '../systems/CombatSystem';
-import { RespawnSystem } from '../systems/RespawnSystem';
 import { WorldUiManager } from '../rendering/WorldUiManager';
-import { GameplayRuntime, type RuntimeSpawn } from './GameplayRuntime';
+import { type RuntimeSpawn } from './GameplayRuntime';
 import { EnvironmentOcclusionManager } from '../rendering/EnvironmentOcclusionManager';
-import { ProgressionSystem } from '../systems/ProgressionSystem';
-import { GameCommands } from './GameCommands';
 import { browserClock } from './PlatformAdapters';
-import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
-import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
 import { WorldVisualStreamingManager, type VisualChunkProvider } from '../rendering/environment/WorldVisualStreamingManager';
 import { WORLD_LAYOUTS } from '../data/world';
 import { WorldAssetLibrary } from '../rendering/environment/WorldAssetLibrary';
 import { ProductionWorldAssetResolver } from '../rendering/environment/WorldVisualAssetCatalog';
-import { createWorldMaterials } from '../rendering/environment/WorldMaterials';
+import { createWorldMaterials, applyWorldMaterialQuality } from '../rendering/environment/WorldMaterials';
 import { WorldBuilder, type WorldChunkView } from '../rendering/environment/WorldBuilder';
 import { createLayoutVisualProvider } from '../rendering/environment/LayoutVisualProvider';
 
@@ -66,7 +47,7 @@ let rendererContextAvailable = true;
 renderer.domElement.addEventListener('webglcontextlost', (event) => {
   event.preventDefault();
   rendererContextAvailable = false;
-  showToast('Graphics paused while the display recovers. Progress is safe.');
+  showToast('Display recovering. Gameplay continues.');
 });
 renderer.domElement.addEventListener('webglcontextrestored', () => {
   rendererContextAvailable = true;
@@ -75,59 +56,16 @@ renderer.domElement.addEventListener('webglcontextrestored', () => {
 });
 const effects = new EffectManager(scene);
 const worldUi = new WorldUiManager(camera, renderer.domElement, ui.world);
-const cooldown = (slot: 'hand1' | 'orbit1' | 'orbit2' | 'orbit3'): number => attackProfile(slot)?.cooldownSeconds ?? 0;
-const combat = new CombatSystem({
-  orbit1: cooldown('orbit1') * .25,
-  orbit2: cooldown('orbit2') * .5,
-  orbit3: cooldown('orbit3') * .75
-});
-const respawns = new RespawnSystem();
-let normalizedExpiredSpawn = false;
-for (const definition of SPAWNS) {
-  const state = save.spawns[definition.id];
-  if (state.respawnAt && state.respawnAt <= browserClock.now()) {
-    respawns.reroll(state, definition);
-    normalizedExpiredSpawn = true;
-  }
-}
-if (normalizedExpiredSpawn) persist();
-const gameplay = new GameplayRuntime({
-  areas: AREAS,
-  connections: WORLD_CONNECTIONS,
-  unlockedAreas: save.unlockedAreas,
-  spawns: SPAWNS.map((definition) => ({
-    definition,
-    tier: TIER_CONFIG[definition.tier],
-    maxHp: save.spawns[definition.id].roll.maxHp,
-    alive: !save.spawns[definition.id].respawnAt,
-    damage: definition.attackDamage,
-    damageType: areaById(definition.areaId).enemyWeapon
-  })),
-  currentAreaId: save.currentAreaId,
-  heroHp: Math.min(save.heroHp, maxHeroHp()),
-  heroSpeed: heroSpeed(),
-  heroRespawnSeconds: HERO_RESPAWN_DELAY_MS / 1000,
-  enemyAggroRadius: ENEMY_AGGRO_RADIUS_METERS,
-  enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS,
-  enemyAttackRange: ENEMY_ATTACK_RANGE_METERS,
-  enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS,
-  enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN
-});
 let saveFailureShown = false;
-const persistGame = (): void => {
-  save.heroHp = gameplay.hero.hp;
-  if (!persist() && !saveFailureShown) {
+const session = new GameSession(save, events, () => {
+  if (!persist(save) && !saveFailureShown) {
     saveFailureShown = true;
     showToast('Saving is unavailable. Progress will be lost when this page closes.');
   }
-};
-const commands = new GameCommands(save, gameplay, events, persistGame);
-const soulCatcher = new SoulCatcherSystem(save, events, persistGame);
-const progression = new ProgressionSystem(save, events, persistGame, Math.random, (rarity) => soulCatcher.equipmentQuantity(rarity));
-events.on('heroProgressReset', () => soulCatcher.syncEffects());
-const syncHeroSpeed = (): void => gameplay.setHeroSpeed(heroSpeed());
-events.on('statGained', ({ stat }) => { if (stat === 'speed') syncHeroSpeed(); });
-for (const event of ['equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'soulNodePurchased', 'soulCatcherReset', 'heroProgressReset'] as const) events.on(event, syncHeroSpeed);
+});
+const gameplay = session.runtime;
+const soulCatcher = session.soulCatcher;
+const persistGame = (): void => session.persist();
 events.on('soulCatcherLayerUnlocked', ({ layer }) => showToast(`Soul Catcher Layer ${layer} unlocked!`));
 let renderingQuality = loadRenderingQuality();
 renderer.setPixelRatio(effectivePixelRatio(renderingQuality));
@@ -279,67 +217,30 @@ class SpawnEntity {
     this.targetUi.classList.toggle('hidden', !this.presentationActive || !this.alive);
   }
 
-  setAlive(value: boolean): void {
-    gameplay.setSpawnAlive(this.def.id, value, value ? save.spawns[this.def.id].roll.maxHp : undefined);
-    if (value) {
-      this.deathPresentationRemaining = 0;
-      this.crystalView?.reset();
-      this.renderLoot();
-    }
+  presentRespawn(): void {
+    this.deathPresentationRemaining = 0;
+    this.crystalView?.reset();
+    this.renderLoot();
     this.renderHealth();
     this.syncTransform();
     this.syncAreaVisibility();
   }
 
-  forceRespawn(): void { this.setAlive(true); }
-  resetAfterHeroDefeat(): void {
-    this.renderHealth();
-    this.syncTransform();
-  }
+  resetAfterHeroDefeat(): void { this.renderHealth(); this.syncTransform(); }
   distanceToHero(): number { return gameplay.distanceFromHero(this.state.position); }
 
-  receiveDamage(amount: number, type: DamageType, itemId: string, slot: WeaponSlotId): void {
-    if (!this.alive || this.def.areaId !== currentAreaId) return;
-    const affinityAmount = combat.heroAttackDamage(amount, type, this.weakness);
-    events.emit('enemyDamaged', { enemyId: this.def.id, amount: affinityAmount, damageType: type, itemId });
+  presentDamage(amount: number, type: DamageType, itemId: string, slot: WeaponSlotId): void {
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
-    worldUi.addCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), `<span>-${Math.round(affinityAmount)}</span>${weaponCombatIcon(itemId)}`, false, WEAPON_DAMAGE_TEXT_OFFSET[slot]);
-    const result = gameplay.damageSpawn(this.def.id, affinityAmount);
-    if (!result) return;
+    worldUi.addCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), `<span>-${Math.round(amount)}</span>${weaponCombatIcon(itemId)}`, false, WEAPON_DAMAGE_TEXT_OFFSET[slot]);
     this.renderHealth();
-    if (result.defeated) this.defeat();
   }
 
-  defeat(): void {
+  presentDefeat(): void {
     this.enemyView?.playDeath();
     this.crystalView?.playDeath();
     this.deathPresentationRemaining = this.crystalView ? .45 : 1.1;
-    const result = progression.defeat(this.def, this.config, gameplay.hero, AREAS, WORLD_CONNECTIONS, browserClock.now(), BASE_RESPAWN_MS / soulCatcher.respawnDivisor(this.def.tier), nextLocalMidnightMs(browserClock.date()));
-    const { stat, amount } = result.reward;
-    const soul = soulCatcher.grant(this.def);
     this.syncAreaVisibility();
-    showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase());
-    if (soul) showSoulDrop(soul.quantity, soul.soulType);
-    if (result.boss) presentBossDefeat(result.boss);
-    if (result.drop) {
-      showEquipmentDrop(result.drop);
-      renderInventory(save.inventory, equipmentCombatSummary());
-    }
-    renderStats(save.stats);
-  }
-
-  update(): void {
-    if (!this.alive) {
-      const state = save.spawns[this.def.id];
-      if (respawns.reviveIfDue(state, this.def, browserClock.now())) {
-        this.setAlive(true);
-        events.emit('enemyRespawned', { enemyId: this.def.id });
-        persistGame();
-      }
-      return;
-    }
-    this.syncTransform();
   }
 
   syncTransform(): void {
@@ -391,7 +292,8 @@ class GateEntity {
 const gateEntities = WORLD_CONNECTIONS.map((gate) => new GateEntity(gate));
 
 const worldAssetLibrary = new WorldAssetLibrary(new ProductionWorldAssetResolver());
-const worldBuilder = createWorldMaterials(worldAssetLibrary).then((materials) => new WorldBuilder(worldAssetLibrary, materials));
+const worldMaterials = createWorldMaterials(worldAssetLibrary).then((materials) => { applyWorldMaterialQuality(materials, renderingQuality.renderScale); return materials; });
+const worldBuilder = worldMaterials.then((materials) => new WorldBuilder(worldAssetLibrary, materials));
 const visualProviders: VisualChunkProvider[] = WORLD_LAYOUTS.map((layout) => {
   const gate = layout.kind === 'transition' ? gateEntities.find((candidate) => candidate.def.id === layout.connectionId) : undefined;
   return createLayoutVisualProvider(layout, worldBuilder, {
@@ -469,242 +371,46 @@ const respawnIndicators: RespawnIndicator[] = respawnSpawnerMembers.map((members
   return { members, center, element, progress, timer };
 });
 
-function resetAtMidnightIfNeeded(): void {
-  const key = localDailyKey(browserClock.date());
-  if (save.dailyKey === key) return;
-  save.dailyKey = key;
-  save.spawns = emptySpawnState();
-  entities.forEach((entity) => entity.forceRespawn());
-  persistGame();
-  showToast('Daily reset · all spawns restored');
-}
-
-function resetSpawnCooldowns(): void {
-  let resetCount = 0;
-  entities.forEach((entity) => {
-    const state = save.spawns[entity.def.id];
-    if (!state.respawnAt) return;
-    respawns.reroll(state, entity.def);
-    entity.forceRespawn();
-    events.emit('enemyRespawned', { enemyId: entity.def.id });
-    resetCount += 1;
-  });
-  persistGame();
-  showToast(resetCount === 0 ? 'No spawn cooldowns active' : `Spawned ${resetCount} target${resetCount === 1 ? '' : 's'}`);
-}
-
-function damageHero(amount: number, type: CombatAffinity): void {
-  if (gameplay.hero.dead) return;
-  if (combat.rollChance(heroEvasionChance())) {
-    events.emit('heroEvaded', { damageType: type });
-    showEvadedCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)));
-    return;
-  }
-  const defendedAmount = combat.enemyAttackDamage(amount, type, equippedDefense, (damageType) => soulCatcher.resistance(damageType));
-  const blocked = combat.rollChance(heroBlockChance());
-  const reducedAmount = defendedAmount * (blocked ? BLOCKED_DAMAGE_MULTIPLIER : 1);
-  events.emit('heroDamaged', { amount: reducedAmount, damageType: type, blocked });
-  showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), reducedAmount, type, true, blocked);
-  const defeated = gameplay.damageHero(reducedAmount);
-  persistGame();
-  updateHud();
-  if (!defeated) return;
-  heroDeathHidden = false;
-  hero.visible = true;
-  heroView.playDeath();
-  events.emit('heroDefeated', undefined);
-  input.reset();
+const entityById = new Map(entities.map((entity) => [entity.def.id, entity]));
+events.on('enemyDamaged', ({ enemyId, amount, damageType, itemId, slot }) => entityById.get(enemyId)?.presentDamage(amount, damageType, itemId, slot));
+events.on('enemyDefeated', ({ enemyId }) => entityById.get(enemyId)?.presentDefeat());
+events.on('enemyRespawned', ({ enemyId }) => entityById.get(enemyId)?.presentRespawn());
+events.on('weaponAttacked', ({ slot, targetId }) => {
+  const profile = attackProfile(save, slot as WeaponSlotId);
+  const target = gameplay.spawnById.get(targetId);
+  if (profile && target) heroView.playWeaponAttack(slot as WeaponSlotId, new THREE.Vector3().copy(target.position), profile.cooldownSeconds);
+});
+events.on('statGained', ({ stat, amount }) => showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase()));
+events.on('equipmentDropped', showEquipmentDrop);
+events.on('soulDropped', ({ quantity, soulType }) => showSoulDrop(quantity, soulType));
+events.on('bossDefeated', presentBossDefeat);
+events.on('dailyReset', () => showToast('Daily reset · all spawns restored'));
+events.on('heroEvaded', () => showEvadedCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0))));
+events.on('heroDamaged', ({ amount, damageType, blocked }) => showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, damageType, true, blocked));
+events.on('heroDefeated', () => {
+  heroDeathHidden = false; hero.visible = true; heroView.playDeath(); input.reset();
   entities.forEach((entity) => entity.resetAfterHeroDefeat());
   showToast('Defeated · respawning in 5 seconds');
-}
+});
+events.on('heroResurrected', () => {
+  hero.position.copy(gameplay.hero.position); hero.visible = true; heroDeathHidden = false;
+  cameraController.returnToHero(); effects.resurrection(hero.position);
+});
+events.on('heroProgressReset', () => heroView.syncEquipment(save.inventory));
+events.on('areaEntered', ({ areaId }) => completeContinuousAreaEntry(areaId));
+for (const event of ['soulNodePurchased', 'soulCatcherReset'] as const) events.on(event, () => entities.forEach((entity) => entity.renderLoot()));
 
-function autoAttack(): void {
-  if (gameplay.hero.dead || cameraController.isScripted) return;
-  for (const hand of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
-    if (!combat.ready(hand)) continue;
-    const profile = attackProfile(hand);
-    if (!profile) continue;
-    const target = combat.nearestTarget(entities.filter((entity) => entity.def.areaId === currentAreaId), HERO_ATTACK_RANGE_METERS);
-    if (!target) continue;
-    combat.schedule(hand, profile.cooldownSeconds);
-    heroView.playWeaponAttack(hand, target.root.position, profile.cooldownSeconds);
-    events.emit('weaponAttacked', { slot: hand, targetId: target.def.id, damageType: profile.damageType, itemId: profile.itemId });
-    const critical = combat.rollChance(heroCriticalChance());
-    target.receiveDamage(profile.damage * (critical ? heroCriticalDamageMultiplier() : 1), profile.damageType, profile.itemId, hand);
-    const direction = target.root.position.clone().sub(hero.position);
-    if (hand === 'hand1' && direction.lengthSq() > 0) {
-      gameplay.hero.facing = Math.atan2(direction.x, direction.z);
-      heroView.setFacing(gameplay.hero.facing);
-    }
-  }
-}
-
-function setStatsPanel(open: boolean): void {
-  if (open) closeOtherPanels('stats');
-  ui.statsPanel.classList.toggle('visible', open);
-  ui.statsPanel.setAttribute('aria-hidden', String(!open));
-  if (open) renderStats(save.stats);
-}
-function closeOtherPanels(except: 'stats' | 'inventory' | 'settings' | 'soul'): void {
-  for (const [name, panel] of [['stats', ui.statsPanel], ['inventory', ui.inventoryPanel], ['settings', ui.settingsPanel], ['soul', ui.soulCatcherPanel]] as const) {
-    if (name === except) continue;
-    panel.classList.remove('visible');
-    panel.setAttribute('aria-hidden', 'true');
-  }
-}
-function setInventoryPanel(open: boolean): void {
-  if (open) closeOtherPanels('inventory');
-  ui.inventoryPanel.classList.toggle('visible', open);
-  ui.inventoryPanel.setAttribute('aria-hidden', String(!open));
-  if (open) { showInventoryOverview(0); renderInventory(save.inventory, equipmentCombatSummary()); }
-}
-function renderQualityControls(): void {
-  const scale = ui.settingsPanel.querySelector<HTMLInputElement>(`input[name="render-scale"][value="${renderingQuality.renderScale}"]`);
-  const frameRate = ui.settingsPanel.querySelector<HTMLInputElement>(`input[name="frame-rate"][value="${renderingQuality.frameRateLimit}"]`);
-  if (scale) scale.checked = true;
-  if (frameRate) frameRate.checked = true;
-  ui.rendererStatsToggle.checked = renderingQuality.showStats;
-  ui.rendererStatsOption.hidden = !import.meta.env.DEV;
-  ui.rendererStats.classList.toggle('visible', import.meta.env.DEV && renderingQuality.showStats);
-}
-function setSettingsPanel(open: boolean): void {
-  if (open) closeOtherPanels('settings');
-  ui.settingsPanel.classList.toggle('visible', open);
-  ui.settingsPanel.setAttribute('aria-hidden', String(!open));
-  if (open) renderQualityControls();
-}
 function applyRenderingQuality(next: RenderingQualitySettings): void {
   renderingQuality = next;
   saveRenderingQuality(next);
+  void worldMaterials.then((materials) => applyWorldMaterialQuality(materials, renderingQuality.renderScale));
   resizeViewport();
-  renderQualityControls();
+  ui.rendererStats.classList.toggle('visible', import.meta.env.DEV && next.showStats);
   if (import.meta.env.DEV && next.showStats) {
-    statsFrames = 0;
-    statsStartedAt = performance.now();
-    ui.rendererStats.textContent = 'Measuring renderer…';
+    statsFrames = 0; statsStartedAt = performance.now(); ui.rendererStats.textContent = 'Measuring renderer…';
   }
 }
-ui.statsButton.addEventListener('click', () => setStatsPanel(true));
-ui.spawnButton.addEventListener('click', resetSpawnCooldowns);
-ui.statsClose.addEventListener('click', () => setStatsPanel(false));
-ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.statsPanel) setStatsPanel(false); });
-ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
-ui.inventoryClose.addEventListener('click', () => setInventoryPanel(false));
-ui.inventoryPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.inventoryPanel) setInventoryPanel(false); });
-let selectedSoulNode: string | null = null;
-let selectedSoulLayer = 1;
-const refreshSoulTree = (): void => { const layer = soulLayer(selectedSoulLayer); renderSoulCatcher(layer?.nodes ?? [], soulEdges(selectedSoulLayer), (id) => soulCatcher.revealed(id), (id) => soulCatcher.canPurchase(id), selectedSoulNode, selectedSoulLayer, SOUL_LAYER_REGISTRY); };
-function setSoulCatcherPanel(open: boolean): void {
-  if (open && !soulCatcher.available) { showToast('Defeat area 2 boss to unlock Soul Catcher'); return; }
-  if (open) closeOtherPanels('soul');
-  ui.soulCatcherPanel.classList.toggle('visible', open); ui.soulCatcherPanel.setAttribute('aria-hidden', String(!open));
-  if (open) refreshSoulTree();
-}
-ui.soulCatcherButton.classList.toggle('locked', !soulCatcher.available);
-ui.soulCatcherButton.addEventListener('click', () => setSoulCatcherPanel(true));
-ui.soulCatcherClose.addEventListener('click', () => setSoulCatcherPanel(false));
-ui.soulCatcherPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.soulCatcherPanel) setSoulCatcherPanel(false); });
-ui.soulLayerTabs.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-soul-layer]'); const layer = Number(button?.dataset.soulLayer); if (!layer || !soulCatcher.layerUnlocked(layer)) return; selectedSoulLayer = layer; selectedSoulNode = null; refreshSoulTree(); });
-ui.soulNodes.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLElement>('[data-soul-node]'); if (!button?.dataset.soulNode) return; selectedSoulNode = button.dataset.soulNode; refreshSoulTree(); });
-ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (soulCatcher.purchase(button.dataset.purchaseSoul)) { gameplay.hero.hp = Math.min(gameplay.hero.hp, maxHeroHp()); refreshSoulTree(); renderStats(save.stats); updateHud(); entities.forEach((entity) => entity.renderLoot()); } });
-const treePointers = new Map<number, { x: number; y: number }>();
-let treeX = -170, treeY = -190, treeScale = 1, pinchDistance = 0;
-const transformTree = (): void => { ui.soulTree.style.transform = `translate(${treeX}px,${treeY}px) scale(${treeScale})`; };
-ui.soulTreeViewport.addEventListener('pointerdown', (event) => { treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); ui.soulTreeViewport.setPointerCapture(event.pointerId); });
-ui.soulTreeViewport.addEventListener('pointermove', (event) => {
-  const previous = treePointers.get(event.pointerId); if (!previous) return;
-  treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); const points = [...treePointers.values()];
-  if (points.length === 1) { treeX += event.clientX - previous.x; treeY += event.clientY - previous.y; }
-  else { const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); if (pinchDistance) treeScale = THREE.MathUtils.clamp(treeScale * distance / pinchDistance, .55, 1.6); pinchDistance = distance; }
-  transformTree();
-});
-const endTreePointer = (event: PointerEvent): void => { treePointers.delete(event.pointerId); pinchDistance = 0; };
-ui.soulTreeViewport.addEventListener('pointerup', endTreePointer); ui.soulTreeViewport.addEventListener('pointercancel', endTreePointer); transformTree();
-ui.settingsButton.addEventListener('click', () => setSettingsPanel(true));
-ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
-ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
-ui.resetAttributesButton.addEventListener('click', () => {
-  if (!window.confirm('Reset all permanent hero attributes? Your equipment and its progress will be kept.')) return;
-  commands.execute({ type: 'resetHero', equipment: false });
-  renderStats(save.stats);
-  updateHud();
-  showToast('Permanent attributes reset · equipment kept');
-});
-ui.resetHeroButton.addEventListener('click', () => {
-  if (!window.confirm('Reset all permanent hero attributes and equipment drops? World progression will be kept.')) return;
-  commands.execute({ type: 'resetHero', equipment: true });
-  heroView.syncEquipment(save.inventory);
-  renderStats(save.stats);
-  renderInventory(save.inventory, equipmentCombatSummary());
-  updateHud();
-  showToast('Hero reset · attributes and equipment drops removed');
-});
-ui.resetSoulCatcherButton.addEventListener('click', () => { if (!window.confirm('Reset all Soul balances and purchased Soul Catcher nodes?')) return; soulCatcher.reset(); selectedSoulNode = null; selectedSoulLayer = 1; refreshSoulTree(); renderStats(save.stats); updateHud(); entities.forEach((entity) => entity.renderLoot()); showToast('Soul Catcher reset'); });
-ui.settingsPanel.addEventListener('change', (event) => {
-  const input = event.target as HTMLInputElement;
-  if (input.name === 'render-scale') applyRenderingQuality({ ...renderingQuality, renderScale: input.value === '0.7' ? 0.7 : 1 });
-  if (input.name === 'frame-rate') applyRenderingQuality({ ...renderingQuality, frameRateLimit: input.value === '30' ? 30 : 60 });
-  if (input === ui.rendererStatsToggle) applyRenderingQuality({ ...renderingQuality, showStats: input.checked });
-});
-type InventoryViewState =
-  | { view: 'overview'; scrollTop: number }
-  | { view: 'detail'; itemId: string; overviewScrollTop: number };
-let inventoryView: InventoryViewState = { view: 'overview', scrollTop: 0 };
-const inventoryScroller = ui.inventoryOverview.closest<HTMLElement>('.inventory-sheet')!;
-
-function showInventoryOverview(scrollTop: number): void {
-  inventoryView = { view: 'overview', scrollTop };
-  ui.inventoryOverview.hidden = false;
-  ui.inventoryDetail.hidden = true;
-  requestAnimationFrame(() => { inventoryScroller.scrollTop = scrollTop; });
-}
-function showInventoryDetail(itemId: string): void {
-  const overviewScrollTop = inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : inventoryScroller.scrollTop;
-  inventoryView = { view: 'detail', itemId, overviewScrollTop };
-  renderItemDetail(save.inventory.items[itemId] ?? null);
-  ui.inventoryOverview.hidden = true;
-  ui.inventoryDetail.hidden = false;
-  inventoryScroller.scrollTop = 0;
-}
-function refreshInventory(itemId?: string): void {
-  renderInventory(save.inventory, equipmentCombatSummary());
-  if (itemId) renderItemDetail(save.inventory.items[itemId] ?? null);
-  updateHud();
-}
-
-ui.inventoryBag.addEventListener('click', (event) => {
-  const item = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
-  if (item?.dataset.itemId) showInventoryDetail(item.dataset.itemId);
-});
-ui.inventoryEquipped.addEventListener('click', (event) => {
-  const item = (event.target as HTMLElement).closest<HTMLElement>('[data-item-id]');
-  if (item?.dataset.itemId) showInventoryDetail(item.dataset.itemId);
-});
-ui.inventoryDetail.addEventListener('click', (event) => {
-  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
-  if (!button) return;
-  if (button.hasAttribute('data-inventory-back')) {
-    showInventoryOverview(inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : 0);
-    return;
-  }
-  const itemId = button.dataset.itemId;
-  if (!itemId) return;
-  let equipmentChanged = false;
-  if (button.hasAttribute('data-equip')) {
-    const armorSlot = equipmentSlot(itemId);
-    if (armorSlot) { commands.execute({ type: 'equip', itemId, slot: armorSlot }); equipmentChanged = true; }
-    else {
-      const freeSlots = (['hand1', 'orbit1', 'orbit2', 'orbit3'] as const).filter((slot) => save.inventory.equipped[slot] === null && (slot !== 'orbit1' || save.unlockedAreas.includes(2)));
-      if (freeSlots.length === 1) { commands.execute({ type: 'equip', itemId, slot: freeSlots[0] }); equipmentChanged = true; }
-      else { ui.inventoryDetail.querySelector<HTMLElement>('[data-slot-picker]')!.hidden = false; return; }
-    }
-  }
-  if (button.dataset.equipSlot) { commands.execute({ type: 'equip', itemId, slot: button.dataset.equipSlot as EquipmentSlotId }); equipmentChanged = true; }
-  if (button.dataset.unequip) { commands.execute({ type: 'unequip', slot: button.dataset.unequip as EquipmentSlotId }); equipmentChanged = true; }
-  if (button.hasAttribute('data-ascend')) commands.execute({ type: 'ascend', itemId });
-  refreshInventory(equipmentChanged ? undefined : itemId);
-  if (equipmentChanged) showInventoryOverview(inventoryView.view === 'detail' ? inventoryView.overviewScrollTop : 0);
-});
+mountGameUi(save, session, { current: () => renderingQuality, apply: applyRenderingQuality }, updateHud, () => entities.forEach((entity) => entity.renderLoot()));
 
 function updateHero(dt: number): void {
   hero.position.copy(gameplay.hero.position);
@@ -718,14 +424,12 @@ function updateHero(dt: number): void {
     }
     return;
   }
-  if (cameraController.isScripted) { heroView.update(dt, false); return; }
   heroView.setFacing(gameplay.hero.facing);
   heroView.update(dt, gameplay.hero.moving);
 }
 
-function completeContinuousAreaEntry(targetAreaId: number, connectionId: string): void {
+function completeContinuousAreaEntry(targetAreaId: number): void {
   currentAreaId = targetAreaId;
-  commands.execute({ type: 'enterArea', areaId: targetAreaId, connectionId });
   renderEnemyAffinities(areaById(targetAreaId));
   syncAreaVisibility();
   persistGame();
@@ -785,12 +489,12 @@ function updateRespawnIndicators(): void {
 }
 
 function updateHud(): void {
-  const maxHp = maxHeroHp();
+  const maxHp = maxHeroHp(save.stats);
   ui.hpText.textContent = `${Math.round(gameplay.hero.hp)} / ${Math.round(maxHp)}`;
   ui.hpBar.style.width = `${gameplay.hero.hp / maxHp * 100}%`;
   const attackHud = { hand1: ui.hand1Stat, orbit1: ui.orbit1Stat, orbit2: ui.orbit2Stat, orbit3: ui.orbit3Stat };
   for (const slot of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
-    const profile = attackProfile(slot);
+    const profile = attackProfile(save, slot);
     attackHud[slot].innerHTML = profile
       ? `${Math.round(profile.damage)} ${damageTypeIcon(profile.damageType, 12)}`
       : '—';
@@ -814,8 +518,8 @@ window.visualViewport?.addEventListener('resize', resizeViewport);
 resizeViewport();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    resetAtMidnightIfNeeded();
-    entities.forEach((entity) => entity.update());
+    session.resetAtMidnightIfNeeded();
+    session.reviveDueSpawns();
   }
 });
 
@@ -825,8 +529,6 @@ let previous = performance.now();
 let lastRenderedAt = 0;
 let statsStartedAt = performance.now();
 let statsFrames = 0;
-let midnightAccumulator = 0;
-let healthPersistAccumulator = 0;
 function frame(now: number): void {
   requestAnimationFrame(frame);
   const minimumFrameMs = 1000 / renderingQuality.frameRateLimit;
@@ -835,37 +537,13 @@ function frame(now: number): void {
   const elapsedSeconds = (now - previous) / 1000;
   const dt = Math.min(elapsedSeconds, .05);
   previous = now;
-  combat.update(dt);
-  midnightAccumulator += dt;
-  healthPersistAccumulator += dt;
-  if (midnightAccumulator >= 1) {
-    midnightAccumulator = 0;
-    resetAtMidnightIfNeeded();
-  }
-  if (healthPersistAccumulator >= 1) { healthPersistAccumulator = 0; persistGame(); }
-
-  const runtimeEvents = gameplay.update(dt, commands.movement({ type: 'move', ...input.movement }), !cameraController.isScripted, elapsedSeconds);
-  for (const event of runtimeEvents) {
-    if (event.type === 'enemyAttack') damageHero(event.amount, event.damageType);
-    else if (event.type === 'areaEntered') completeContinuousAreaEntry(event.areaId, event.connectionId);
-    else {
-      gameplay.hero.hp = maxHeroHp();
-      hero.position.copy(gameplay.hero.position);
-      hero.visible = true;
-      heroDeathHidden = false;
-      cameraController.returnToHero();
-      effects.resurrection(hero.position);
-      events.emit('heroResurrected', { areaId: event.areaId });
-    }
-  }
+  session.update(dt, input.movement, elapsedSeconds);
   updateHero(dt);
   visualStreaming.update(currentAreaId, gameplay.hero.position);
   syncEnemyPresentations();
   updateGates(dt);
-  if (!cameraController.isScripted) entities.forEach((entity) => entity.update());
-  autoAttack();
+  entities.forEach((entity) => entity.syncTransform());
   entities.forEach((entity) => entity.updateView(dt));
-  if (!gameplay.hero.dead) gameplay.hero.hp = Math.min(maxHeroHp(), gameplay.hero.hp + heroRegen() * dt);
   cameraController.update(dt, now);
   environmentOcclusion.update(hero.position, dt);
   updateHud();
@@ -889,8 +567,6 @@ function frame(now: number): void {
   }
 }
 
-renderStats(save.stats);
-renderInventory(save.inventory, equipmentCombatSummary());
 renderEnemyAffinities(areaById(currentAreaId));
 updateHud();
 persistGame();

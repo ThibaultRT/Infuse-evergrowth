@@ -1,6 +1,7 @@
 import type { GameEvents } from '../game/GameEvents';
 import type { RuntimeHero } from '../game/GameplayRuntime';
-import { statTotal } from '../save';
+import { statTotal } from '../domain/stats/StatSources';
+import { applyEquipmentCopies } from './EquipmentSystem';
 import type { AreaDefinition, SaveData, SpawnDefinition, WorldConnection } from '../types';
 import { rollEquipmentDrop } from './EquipmentDropSystem';
 import { RespawnSystem } from './RespawnSystem';
@@ -43,11 +44,7 @@ export class ProgressionSystem {
     let drop: DefeatResult['drop'] = null;
     if (itemId) {
       const quantity = this.equipmentQuantity(EQUIPMENT_BY_ID.get(itemId)!.rarity);
-      const previous = this.state.inventory.items[itemId];
-      const owned = previous ?? { itemId, level: 0, ascend: 0 };
-      const previousLevel = previous?.level ?? null;
-      owned.level += quantity;
-      this.state.inventory.items[itemId] = owned;
+      const { previousLevel, owned } = applyEquipmentCopies(this.state, itemId, quantity);
       drop = { sourceId: definition.id, areaId: definition.areaId, itemId, quantity, previousLevel, newLevel: owned.level, ascend: owned.ascend };
       this.events.emit('equipmentDropped', drop);
     }
@@ -62,7 +59,7 @@ export class ProgressionSystem {
         this.events.emit('gateUnlocked', { gateId: gate.id });
       }
       boss = { bossId: definition.id, areaId: area.id, openedGateIds: opened.map((gate) => gate.id) };
-      this.events.emit('bossDefeated', { bossId: definition.id, areaId: area.id });
+      this.events.emit('bossDefeated', boss);
     }
     this.state.heroHp = hero.hp;
     this.persist();

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { TerrainProfile } from '../../data/world/WorldLayout';
 import { WorldAssetLibrary } from './WorldAssetLibrary';
+import type { RenderScale } from '../RenderingQuality';
 
 export type WorldMaterialSet = {
   readonly terrain: Readonly<Record<TerrainProfile, THREE.MeshStandardMaterial>>;
@@ -11,6 +12,16 @@ export type WorldMaterialSet = {
   readonly lockedGate: THREE.MeshStandardMaterial;
   readonly timber: THREE.MeshStandardMaterial;
 };
+
+/** Reduced mode avoids transmission's extra scene pass; Full restores the authored look. */
+export function applyWorldMaterialQuality(materials: WorldMaterialSet, renderScale: RenderScale): void {
+  const transmission = renderScale === .7 ? 0 : .16;
+  const side = renderScale === .7 ? THREE.FrontSide : THREE.DoubleSide;
+  if (materials.water.transmission === transmission && materials.water.side === side) return;
+  materials.water.transmission = transmission;
+  materials.water.side = side;
+  materials.water.needsUpdate = true;
+}
 
 async function tiledMaterial(
   assets: WorldAssetLibrary,
