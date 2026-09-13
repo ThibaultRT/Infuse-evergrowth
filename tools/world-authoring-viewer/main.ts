@@ -27,7 +27,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x93b8cf);
-scene.fog = new THREE.Fog(0x93b8cf, 120, 260);
+scene.fog = new THREE.Fog(0x93b8cf, 300, 500);
 scene.add(new THREE.HemisphereLight(0xeaf8ff, 0x526044, 2.3));
 const sun = new THREE.DirectionalLight(0xfff2d4, 2.7);
 sun.position.set(-50, 90, 35);
@@ -153,8 +153,8 @@ function selectObject(object: THREE.Object3D | null): void {
 function framePreset(preset: string): void {
   const layout = WORLD_LAYOUTS.find((candidate) => candidate.id === preset);
   if (preset === 'top') {
-    controls.target.set(36, 0, -30);
-    camera.position.set(36, 210, -29.9);
+    controls.target.set(36, 0, 0);
+    camera.position.set(36, 250, 0.1);
   } else if (preset === 'greenhaven') {
     controls.target.set(-2, 0, -2);
     camera.position.set(29, 77, 86);
@@ -170,6 +170,16 @@ function framePreset(preset: string): void {
   } else if (preset === 'fallen-keep:portrait') {
     controls.target.set(73, 0, -13);
     camera.position.set(80, 24, 14);
+  } else if (preset === 'area4') {
+    controls.target.set(36, 0, 50);
+    camera.position.set(48, 105, 151);
+  } else if (preset === 'area4:portrait') {
+    controls.target.set(36, 1, 75);
+    camera.position.set(44, 20, 56);
+  } else if (preset === 'bridge:A01-A04' || preset === 'bridge:A03-A04') {
+    const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === (preset === 'bridge:A01-A04' ? 'area1-area4' : 'area3-area4'))!;
+    controls.target.set(bridge.x, 0, bridge.z + 6);
+    camera.position.set(bridge.x + 12, 22, bridge.z + 26);
   } else if (preset === 'bridge:A01-A02') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === 'area1-area2')!;
     const portraitDistance = Math.max(1, 0.8 / camera.aspect);
@@ -187,8 +197,8 @@ function framePreset(preset: string): void {
       layout.origin[2] + distance * direction.z,
     );
   } else {
-    controls.target.set(36, 0, -30);
-    camera.position.set(145, 135, 92);
+    controls.target.set(36, 0, 10);
+    camera.position.set(54, 190, 170);
   }
   camera.lookAt(controls.target);
   controls.update();

@@ -2,6 +2,7 @@ import balance from './data/balance.json';
 import area1 from './data/areas/area-1.json';
 import area2 from './data/areas/area-2.json';
 import area3 from './data/areas/area-3.json';
+import area4 from './data/areas/area-4.json';
 import connections from './data/areas/connections.json';
 import { AREA_WORLD_LAYOUTS, TRANSITION_WORLD_LAYOUTS, WORLD_LAYOUTS } from './data/world';
 import { compileWorldCollision } from './domain/world/WorldCollisionCompiler';
@@ -9,7 +10,7 @@ import { compileWorldWalkSurfaces } from './domain/world/WorldWalkSurfaceCompile
 import type { AreaDefinition, CombatAffinity, SpawnDefinition, Tier, TierConfig, WorldConnection } from './types';
 
 const tierBalance = balance.enemy.tiers;
-const areaData = { areas: [area1, area2, area3], connections };
+const areaData = { areas: [area1, area2, area3, area4], connections };
 const compiledCollision = compileWorldCollision(WORLD_LAYOUTS);
 const compiledWalkSurfaces = compileWorldWalkSurfaces(WORLD_LAYOUTS);
 const colorNumber = (hex: string): number => Number.parseInt(hex.replace('#', ''), 16);

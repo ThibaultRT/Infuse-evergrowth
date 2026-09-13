@@ -12,6 +12,7 @@ const greenhaven = process.argv.includes('--greenhaven');
 const greenhavenShore = process.argv.includes('--greenhaven-shore');
 const highwood = process.argv.includes('--highwood');
 const fallenKeep = process.argv.includes('--fallen-keep');
+const area4 = process.argv.includes('--area4');
 const port = 4173;
 const gameUrl = `http://127.0.0.1:${port}/Infuse-evergrowth/`;
 const outputRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -116,7 +117,7 @@ async function holdKey(client, code, key, milliseconds) {
 async function capture(client, file) {
   const screenshot = await client.send('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
   await writeFile(path.join(outputRoot, file), Buffer.from(screenshot.data, 'base64'));
-  if (fallenKeep) console.log(`Captured ${file}`);
+  if (fallenKeep || area4) console.log(`Captured ${file}`);
 }
 
 async function waitForArea(client, areaId) {
@@ -207,7 +208,64 @@ try {
   await waitForArea(client, 1);
   await capture(client, 'runtime-iphone-12-area-a01.png');
 
-  if (fallenKeep) {
+  if (area4) {
+    await moveAxis(client, 'x', 7.2);
+    await moveAxis(client, 'z', 33);
+    await holdKey(client, 'ArrowDown', 'ArrowDown', 900);
+    if ((await heroPosition(client)).area !== 1) throw new Error('Area 4 opened before the boss unlock.');
+    await capture(client, 'runtime-iphone-12-area4-locked.png');
+    // Simulate a returning save whose boss victory predates the new routes.
+    await evaluate(client, `(() => {
+      const key = 'infuse-evergrowth-save-v18';
+      const saved = JSON.parse(localStorage.getItem(key));
+      saved.defeatedBosses.push('area3-epic-01');
+      localStorage.setItem(key, JSON.stringify(saved));
+    })()`);
+    await reloadPage(client);
+    await waitFor(client, gameReadyExpression, 'existing Area 3 victory normalization');
+    await waitForArea(client, 1);
+    await moveAxis(client, 'x', 7.2);
+    await moveAxis(client, 'z', 43);
+    await waitForArea(client, 4);
+    await capture(client, 'runtime-iphone-12-area4-forged-deck.png');
+    await moveAxis(client, 'z', 56);
+    await moveAxis(client, 'x', 36);
+    await moveAxis(client, 'z', 70);
+    await capture(client, 'runtime-iphone-12-area4-throne.png');
+    await moveAxis(client, 'z', 60);
+    await moveAxis(client, 'x', 86);
+    await moveAxis(client, 'z', 43);
+    await capture(client, 'runtime-iphone-12-area4-timber-deck.png');
+    await moveAxis(client, 'z', 30);
+    await waitForArea(client, 3);
+    await capture(client, 'runtime-iphone-12-area4-keep-south-gate.png');
+    await moveAxis(client, 'z', 53);
+    await waitForArea(client, 4);
+    await moveAxis(client, 'x', 7.2);
+    await moveAxis(client, 'z', 32);
+    await waitForArea(client, 1);
+    await moveAxis(client, 'z', 53);
+    await waitForArea(client, 4);
+    await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
+    await reloadPage(client);
+    await waitFor(client, gameReadyExpression, 'Area 4 saved Reduced/30 FPS boot');
+    await waitForArea(client, 4);
+    const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
+    if (quality.renderScale !== .7 || quality.frameRateLimit !== 30) throw new Error('Area 4 quality settings did not persist.');
+    if (await evaluate(client, "document.querySelector('#canvas-host canvas').width") !== 273) throw new Error('Area 4 reduced drawing buffer is incorrect.');
+    await capture(client, 'runtime-iphone-12-area4-reduced.png');
+    await client.send('Network.enable');
+    await client.send('Network.setCacheDisabled', { cacheDisabled: true });
+    await client.send('Network.setBlockedURLs', { urls: ['*assets/world/*'] });
+    await reloadPage(client);
+    await waitFor(client, gameReadyExpression, 'Area 4 with world assets unavailable');
+    await waitForArea(client, 4);
+    const before = await heroPosition(client);
+    await holdKey(client, 'ArrowRight', 'ArrowRight', 300);
+    if ((await heroPosition(client)).x <= before.x) throw new Error('Area 4 asset-free blockout is not playable.');
+    await capture(client, 'runtime-iphone-12-area4-fallback.png');
+    client.errors = client.errors.filter((message) => !message.includes('ERR_BLOCKED_BY_CLIENT'));
+  } else if (fallenKeep) {
     await moveAxis(client, 'x', 6);
     await moveAxis(client, 'z', 3.6);
     await moveAxis(client, 'x', 48);
@@ -386,7 +444,7 @@ try {
 
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
   if (client.errors.length > 0) throw new Error(`Browser errors:\n${client.errors.join('\n')}`);
-  console.log(`Runtime smoke passed: ${fallenKeep ? 'Fallen Keep gates, chapel/barracks interiors, south wall, persisted Reduced/30 FPS, terrain fallback' : highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed future bridge, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
+  console.log(`Runtime smoke passed: ${area4 ? 'Area 4 locked/unlocked bridges, both directions, existing boss victory, throne, saved Reduced/30 FPS and missing world assets' : fallenKeep ? 'Fallen Keep gates, chapel/barracks interiors, south wall, persisted Reduced/30 FPS, terrain fallback' : highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed south gate, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

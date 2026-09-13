@@ -7,6 +7,8 @@ import type { WorldMaterialSet } from './WorldMaterials';
 import { compileWorldCollision } from '../../domain/world/WorldCollisionCompiler';
 import { walkSurfaceHeight } from '../../domain/world/WorldWalkSurface';
 import { createWalkSurfaceView } from './WorldWalkSurfaceView';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import type { BlockoutMaterial, WorldBlockoutPart } from '../../data/world/area4';
 
 export type WorldBuildMode = 'runtime' | 'inspection';
 
@@ -56,7 +58,10 @@ export class WorldBuilder {
 
   async prefetch(layout: AnyWorldLayout): Promise<void> {
     const placements = [...layout.props, ...layout.scatters.flatMap(expandWorldScatter)];
-    await this.assets.preload(placements.map((placement) => WORLD_PROP_CATALOG[placement.prop].asset));
+    await this.assets.preload(placements.flatMap((placement) => {
+      const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
+      return definition.asset ? [definition.asset] : [];
+    }));
   }
 
   async build(layout: AnyWorldLayout, mode: WorldBuildMode = 'runtime'): Promise<WorldChunkView> {
@@ -98,7 +103,7 @@ export class WorldBuilder {
 
   private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode): Promise<THREE.Object3D> {
     const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
-    const model = await this.assets.instantiate(definition.asset, placement.name);
+    const model = definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
     const object = definition.walkSurface ? new THREE.Group() : model;
     object.name = placement.name;
     if (definition.walkSurface) {
@@ -109,7 +114,8 @@ export class WorldBuilder {
         model.geometry.dispose();
         for (const material of Array.isArray(model.material) ? model.material : [model.material]) material.dispose();
       }
-      object.add(createWalkSurfaceView(definition.walkSurface, this.materials.timber, failed));
+      const deckMaterial = definition.blockout ? this.materials.blockout[definition.blockout[0].material] : this.materials.timber;
+      object.add(createWalkSurfaceView(definition.walkSurface, deckMaterial, failed || Boolean(definition.blockout)));
     }
     const [x, requestedY, z] = placement.position;
     object.position.set(x, definition.walkSurface || definition.absoluteElevation ? requestedY : Math.max(requestedY, worldTerrainHeight(layout, x, z) + 0.025), z);
@@ -125,6 +131,31 @@ export class WorldBuilder {
       inspectionMode: mode === 'inspection',
     };
     return object;
+  }
+
+  private createBlockout(parts: readonly WorldBlockoutPart[]): THREE.Group {
+    const root = new THREE.Group();
+    const batches = new Map<BlockoutMaterial, THREE.BufferGeometry[]>();
+    for (const part of parts) {
+      const geometry = part.kind === 'cylinder'
+        ? new THREE.CylinderGeometry(part.size[0] / 2, part.size[0] / 2, part.size[1], 8)
+        : new THREE.BoxGeometry(...part.size);
+      geometry.rotateY(part.rotation ?? 0);
+      geometry.translate(...part.position);
+      const batch = batches.get(part.material) ?? [];
+      batch.push(geometry);
+      batches.set(part.material, batch);
+    }
+    for (const [material, geometries] of batches) {
+      const merged = mergeGeometries(geometries);
+      for (const geometry of geometries) geometry.dispose();
+      const mesh = new THREE.Mesh(merged, this.materials.blockout[material]);
+      mesh.castShadow = material !== 'lava';
+      mesh.receiveShadow = true;
+      mesh.userData.worldOwnedGeometry = true;
+      root.add(mesh);
+    }
+    return root;
   }
 
   private addLockedGateVisual(view: WorldChunkView, layout: TransitionWorldLayout): void {

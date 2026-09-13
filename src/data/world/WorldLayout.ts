@@ -4,8 +4,8 @@ import type { WorldPropKey } from './WorldPropCatalog';
 
 export type WorldBounds = { readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number };
 export type WorldSize = { readonly width: number; readonly depth: number };
-export type TerrainProfile = 'meadow' | 'forest' | 'cobble' | 'transition-meadow' | 'transition-fortress';
-export type RoadMaterial = 'trail' | 'cobble' | 'water';
+export type TerrainProfile = 'meadow' | 'forest' | 'cobble' | 'transition-meadow' | 'transition-fortress' | 'ash' | 'rift';
+export type RoadMaterial = 'trail' | 'cobble' | 'water' | 'ash';
 
 export type WorldPropPlacement = {
   readonly name: string;
@@ -36,7 +36,7 @@ export type WorldRoadPlacement = {
 
 export type WorldSurfacePlacement = {
   readonly name: string;
-  readonly kind: 'water' | 'cliff';
+  readonly kind: 'water' | 'cliff' | 'abyss';
   readonly center: WorldVec2;
   readonly size: WorldSize;
   /** Optional local X/Z polygon, used for irregular shorelines. */

@@ -57,7 +57,7 @@ export async function validateCrossings(vite, config) {
     vite.ssrLoadModule('/src/data/world/index.ts'),
     vite.ssrLoadModule('/src/domain/world/WorldPlacement.ts'),
   ]);
-  const create = (areaId, unlockedAreas = [1, 2, 3]) => new GameplayRuntime({
+  const create = (areaId, unlockedAreas = config.AREAS.map((area) => area.id)) => new GameplayRuntime({
     areas: config.AREAS, connections: config.WORLD_CONNECTIONS, unlockedAreas,
     spawns: [], currentAreaId: areaId, heroHp: 100, heroSpeed: config.HERO_SPEED,
     heroRespawnSeconds: 1, enemyAggroRadius: 10, enemyLeashRadius: 15,
@@ -71,11 +71,12 @@ export async function validateCrossings(vite, config) {
     const direction = Math.sign(connection.axis === 'x' ? target.originX - source.originX : target.originZ - source.originZ);
     const runtime = create(sourceId);
     runtime.hero.position = { x: connection.x, y: 0, z: connection.z };
-    runtime.hero.position[connection.axis] -= direction * 11;
+    const reach = connection.areaBId === 4 ? 17 : 11;
+    runtime.hero.position[connection.axis] -= direction * reach;
     const input = connection.axis === 'x' ? { x: direction, y: 0 } : { x: 0, y: -direction };
     const events = [];
     let maximumHeight = 0;
-    for (let frame = 0; frame < Math.ceil(22 / config.HERO_SPEED * fps); frame++) {
+    for (let frame = 0; frame < Math.ceil(reach * 2 / config.HERO_SPEED * fps); frame++) {
       const before = { ...runtime.hero.position };
       events.push(...runtime.update(1 / fps, input, true));
       const position = runtime.hero.position;

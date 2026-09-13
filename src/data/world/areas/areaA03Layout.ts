@@ -1,6 +1,14 @@
 import { createWallRun, type AreaWorldLayout } from '../WorldLayout';
 import { FALLEN_KEEP_CLIFF_CUTOUTS, FALLEN_KEEP_ENCOUNTER_SPOTS, FALLEN_KEEP_ROADS } from '../fallenKeep';
 import areaContent from '../../areas/area-3.json';
+import { AREA4_SPEC } from '../area4';
+import keep from '../fallen-keep.json';
+import { A03_A04_TRANSITION } from '../transitions/area4RiftTransition';
+import { clearTransitionApproaches } from '../transitionTerrainCutouts';
+
+const southGateX = AREA4_SPEC.crossings.fallenKeepLocalX;
+const southGateScale = 1;
+const southGateHalfWidth = keep.gate.width * southGateScale / 2;
 
 const clearings = [
   ...FALLEN_KEEP_ENCOUNTER_SPOTS.map(({ center, radius }) => ({ center, radius: radius + 1 })),
@@ -18,7 +26,7 @@ export const AREA_A03_LAYOUT = {
     { name: 'A03_Mosswater_Riverbed', center: [0, -37.5], size: { width: 84, depth: 8.5 }, elevation: 0 },
     ...FALLEN_KEEP_CLIFF_CUTOUTS,
   ],
-  roads: FALLEN_KEEP_ROADS,
+  roads: [...FALLEN_KEEP_ROADS, { name: 'A03_SouthGate_Approach', points: [[southGateX, 29], [southGateX, 33]], width: 3.4, material: 'cobble' }],
   encounterSpots: FALLEN_KEEP_ENCOUNTER_SPOTS,
   props: [
     { name: 'A03_Weathered_Courts', prop: 'terrain.fallenKeep', position: [0, 0, 0] },
@@ -38,12 +46,14 @@ export const AREA_A03_LAYOUT = {
     { name: 'A03_Burnt_Tree_East', prop: 'nature.highwoodBareA', position: [30, 0, 1], scale: 0.78 },
     { name: 'A03_Pine_Southwest', prop: 'nature.highwoodPineA', position: [-30, 0, 29], scale: 0.7 },
     ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'ruin.curtainA', brokenProp: 'ruin.curtainB', brokenEvery: 2, from: [35.5, -23.8], to: [35.5, 34.72], moduleLength: 14, scale: 1.08 }),
-    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainB', brokenProp: 'ruin.curtainA', brokenEvery: 3, from: [-22.5, 35.5], to: [25, 35.5], moduleLength: 14, scale: 1.08 }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainB', from: [-22.5, 35.5], to: [southGateX - southGateHalfWidth, 35.5], moduleLength: keep.wall.width, scale: 1.08, alignment: 'end' }),
+    ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainA', from: [southGateX + southGateHalfWidth, 35.5], to: [25, 35.5], moduleLength: keep.wall.width, scale: 1.08, alignment: 'start', startIndex: 3 }),
+    { name: 'A03_SouthGate', prop: 'ruin.gate', position: [southGateX, 0, 35.5], scale: southGateScale },
     { name: 'A03_Corner_SE', prop: 'ruin.cornerTower', position: [35.807, 0, 29.645], rotation: Math.PI / 6, scale: 1.1 },
   ],
-  scatters: [
+  scatters: clearTransitionApproaches([
     { prefix: 'A03_Masonry_Debris', props: ['ruin.rubbleHalf', 'ruin.rubbleLarge'], count: 28, bounds: { minX: -30, maxX: 31, minZ: -29, maxZ: 30 }, seed: 301, scale: [0.18, 0.4], exclusions: clearings },
     { prefix: 'A03_Weeds', props: ['nature.grassTuft', 'nature.forestBushA'], count: 36, bounds: { minX: -32, maxX: 32, minZ: -30, maxZ: 32 }, seed: 302, scale: [0.35, 0.65], exclusions: clearings },
-  ],
+  ], A03_A04_TRANSITION, [72, 0, 0]),
   collision: [],
 } as const satisfies AreaWorldLayout;

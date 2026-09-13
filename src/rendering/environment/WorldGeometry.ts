@@ -6,9 +6,9 @@ import { highwoodGroundHeight } from '../../data/world/highwood';
 import { fallenKeepGroundHeight } from '../../data/world/fallenKeep';
 
 export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number): number {
-  if (layout.kind === 'transition') return 0;
   let height: number;
-  if (layout.areaId === 2) height = highwoodGroundHeight();
+  if (layout.kind === 'transition' || layout.areaId === 4) height = 0;
+  else if (layout.areaId === 2) height = highwoodGroundHeight();
   else if (layout.areaId === 3) height = fallenKeepGroundHeight();
   else height = greenhavenGroundHeight(x, z);
 
@@ -96,7 +96,7 @@ export function createWorldRoad(layout: AnyWorldLayout, road: WorldRoadPlacement
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
-  const material = road.material === 'trail' ? materials.trail : road.material === 'cobble' ? materials.cobble : materials.water;
+  const material = road.material === 'trail' ? materials.trail : road.material === 'cobble' ? materials.cobble : road.material === 'ash' ? materials.ashTrail : materials.water;
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = road.name;
   mesh.receiveShadow = true;
@@ -109,7 +109,7 @@ export function createWorldSurface(surface: WorldSurfacePlacement, materials: Wo
     ? new THREE.ShapeGeometry(new THREE.Shape(surface.outline.map(([x, z]) => new THREE.Vector2(x, -z))))
     : new THREE.PlaneGeometry(surface.size.width, surface.size.depth);
   geometry.rotateX(-Math.PI / 2);
-  const mesh = new THREE.Mesh(geometry, surface.kind === 'water' ? materials.water : materials.cliff);
+  const mesh = new THREE.Mesh(geometry, surface.kind === 'water' ? materials.water : surface.kind === 'abyss' ? materials.abyss : materials.cliff);
   mesh.name = surface.name;
   mesh.position.set(surface.center[0], surface.elevation ?? 0.05, surface.center[1]);
   mesh.rotation.y = surface.rotation ?? 0;

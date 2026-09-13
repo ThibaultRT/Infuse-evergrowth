@@ -18,9 +18,12 @@ the same transforms. Never treat an edited GLB or mesh bounds as gameplay author
 | Area A01 | 72 × 72 m | 84 × 84 m | X/Z `-36..36` | X/Z `-42..42` | `(0,0,0)` |
 | Area A02 | 144 × 48 m | 156 × 60 m | X `-72..72`, Z `-24..24` | X `-78..78`, Z `-30..30` | `(36,0,-60)` |
 | Area A03 | 72 × 72 m | 84 × 84 m | X/Z `-36..36` | X/Z `-42..42` | `(72,0,0)` |
+| Area A04 | 144 × 48 m | 156 × 60 m | X `-72..72`, Z `-24..24` | X `-78..78`, Z `-30..30` | `(36,0,60)` |
 | A01/A02 transition | — | 84 × 12 m | — | X `-42..42`, Z `-6..6` | `(0,0,-36)` |
 | A01/A03 transition | — | 12 × 84 m | — | X `-6..6`, Z `-42..42` | `(36,0,0)` |
 | A02/A03 transition | — | 84 × 12 m | — | X `-42..42`, Z `-6..6` | `(72,0,-36)` |
+| A01/A04 transition | — | 84 × 30 m | — | X `-42..42`, Z `-15..15` | `(0,0,36)` |
+| A03/A04 transition | — | 84 × 30 m | — | X `-42..42`, Z `-15..15` | `(72,0,36)` |
 
 Area A02 spans the combined width of A01 and A03. Visual aprons overlap; there is no
 additional empty gap between playable chunks.
@@ -32,12 +35,21 @@ area root moves. The semantic prop's floor profile raises actors to Y=1.65 and
 lowers them at the banks, independently of visual loading. Its hinged doors keep
 the existing Area A01 boss unlock requirement.
 
-Area A03 is completely enclosed by a ruined wall. The A01/A03 transition owns its
+Area A03 is enclosed by a ruined wall with three gate openings. The A01/A03 transition owns its
 west wall and gate. The A02/A03 fortified river transition owns its north wall,
-bridge and gate. Area A03 owns the east and south walls. Broken-looking wall pieces
-remain collidable; only the two authored gates are traversable.
+bridge and gate. Area A03 owns the east and south walls and the new south gate at
+local X=14. Broken-looking wall pieces remain collidable; only the three authored
+gates are traversable. The A03/A04 transition owns the timber bridge and its lock.
 
-Its ruined masonry now uses `fallen-keep.json` for both Blender dimensions and
+Area A04 is an untextured burned-forest blockout. The rift occupies world Z=36..48
+within its northern band, keeping all existing area roots fixed. Both new area seams
+remain at Z=36, at the north bank. The 3.4 m-wide bridge walk profiles run Z=33..51,
+with a 12 m deck at Y=0.6 and 3 m approaches returning to Y=0. Their world X values
+are 7.2 (A01) and 86 (A03). Both require the Area A03 boss victory, including victories
+already recorded in supported saves. `area4-blockout.json` owns the dimensions;
+`area4.md` describes the final asset handoff and remaining decisions.
+
+Area A03's ruined masonry uses `fallen-keep.json` for both Blender dimensions and
 semantic collision. Corner towers add a round footprint to the two wall arms.
 Roofless house, chapel and keep shells have wall-segment proxies so their interiors
 can be entered. Seven `A03_Encounter_*` clearings are reserved for later spawn
@@ -56,9 +68,11 @@ The readable sources are:
 src/data/world/areas/areaA01Layout.ts
 src/data/world/areas/areaA02Layout.ts
 src/data/world/areas/areaA03Layout.ts
+src/data/world/areas/areaA04Layout.ts
 src/data/world/transitions/a01A02Transition.ts
 src/data/world/transitions/a01A03Transition.ts
 src/data/world/transitions/a02A03Transition.ts
+src/data/world/transitions/area4RiftTransition.ts
 src/data/world/WorldPropCatalog.ts
 ```
 
@@ -80,7 +94,7 @@ npm run authoring:world:build-debug
 This writes `authoring/generated/debug/assembled-world-debug.glb` and verifies it by
 reading it back. The file includes:
 
-- all six visual chunks in world context;
+- all nine visual chunks in world context;
 - stable area, transition and prop names;
 - named `COLLIDER_*` helpers generated from compiled collision;
 - spawn and gate-clearance helper groups;
@@ -93,7 +107,7 @@ from it.
 
 ## Runtime chunks
 
-The runtime currently uses `LayoutVisualProvider` for all six chunks and retains the
+The runtime currently uses `LayoutVisualProvider` for all nine chunks and retains the
 existing `WorldVisualStreamingManager`. Each built root stays local and the provider
 applies the layout world root. `StreamedGlbVisualProvider` remains available if a
 measured device profile later justifies baking an accepted chunk; a baked GLB may
@@ -120,4 +134,5 @@ npm run validate:release
 
 Validation covers the fixed spatial contract, stable names, asset promotion,
 deterministic collision, spawn overlap, unlocked gate centerlines, locked barriers,
-and the complete non-gate Area A03 perimeter.
+the complete non-gate Area A03 perimeter, both rift crossings, abyss containment,
+and existing/new boss unlock persistence.

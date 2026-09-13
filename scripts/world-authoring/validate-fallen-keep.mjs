@@ -33,6 +33,7 @@ export async function validateFallenKeep(vite, config) {
     ...config.SPAWNS.filter((spawn) => spawn.areaId === 3).map((spawn) => ({ id: spawn.id, x: spawn.x - area.originX, z: spawn.z - area.originZ })),
     ...layout.encounterSpots.map((spot) => ({ id: spot.id, x: spot.center[0], z: spot.center[1] })),
     { id: 'north gate landing', x: 7.2, z: -32 },
+    { id: 'south gate landing', x: 14, z: 33 },
     { id: 'west cottage interior', x: -17, z: 25 },
     { id: 'east cottage interior', x: 27, z: 24 },
     { id: 'guardhouse interior', x: -27, z: -5.5 },

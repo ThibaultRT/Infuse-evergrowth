@@ -117,10 +117,11 @@ function inspectDebugGlb(buffer) {
   const document = JSON.parse(buffer.subarray(20, 20 + jsonLength).toString('utf8').trim());
   const names = new Set((document.nodes ?? []).map((node) => node.name).filter(Boolean));
   const required = [
-    'area_A01', 'area_A02', 'area_A03',
+    'area_A01', 'area_A02', 'area_A03', 'area_A04',
     'transition_A01-A02', 'transition_A01-A03', 'transition_A02-A03',
+    'transition_A01-A04', 'transition_A03-A04', 'A04_Ancient_Throne', 'A01_A04_Bridge', 'A03_A04_Bridge',
     'A03_Corner_NW', 'A03_Corner_NE', 'A03_Corner_SE', 'A03_Corner_SW',
-    'A03_WestGate', 'A03_NorthGate',
+    'A03_WestGate', 'A03_NorthGate', 'A03_SouthGate',
   ];
   const missing = required.filter((name) => !names.has(name));
   if (missing.length > 0) throw new Error(`Debug GLB is missing stable nodes: ${missing.join(', ')}`);
@@ -144,9 +145,14 @@ try {
   await waitForReady(client);
 
   await capture(client, path.join(capturesRoot, 'general-layout.png'), 'world', 1440, 900);
+  await capture(client, path.join(capturesRoot, 'world-layout-area4-hires.png'), 'world', 3840, 3200);
   await capture(client, path.join(capturesRoot, 'area1-target-layout.png'), 'greenhaven', 1280, 1100);
   await capture(client, path.join(capturesRoot, 'area2-target-layout.png'), 'highwood', 1600, 1000);
   await capture(client, path.join(capturesRoot, 'area3-target-layout.png'), 'fallen-keep', 1280, 1100);
+  await capture(client, path.join(capturesRoot, 'area4-blockout.png'), 'area4', 1600, 1000);
+  await capture(client, path.join(capturesRoot, 'iphone-12-area-a04.png'), 'area4:portrait', 390, 844);
+  await capture(client, path.join(capturesRoot, 'iphone-12-forged-rift-bridge.png'), 'bridge:A01-A04', 390, 844);
+  await capture(client, path.join(capturesRoot, 'iphone-12-timber-rift-bridge.png'), 'bridge:A03-A04', 390, 844);
   await evaluate(client, "document.querySelector('#spawns').checked=true; document.querySelector('#spawns').dispatchEvent(new Event('change'));");
   await capture(client, path.join(capturesRoot, 'area3-encounter-spots.png'), 'fallen-keep', 1280, 1100);
   await evaluate(client, "document.querySelector('#spawns').checked=false; document.querySelector('#spawns').dispatchEvent(new Event('change'));");
@@ -164,7 +170,7 @@ try {
   const debugPath = path.join(debugRoot, 'assembled-world-debug.glb');
   await rename(downloaded, debugPath);
   const inspection = inspectDebugGlb(await readFile(debugPath));
-  console.log(`Captured thirteen world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
+  console.log(`Captured eighteen world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

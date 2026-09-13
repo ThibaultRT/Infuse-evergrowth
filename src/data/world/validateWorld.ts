@@ -23,7 +23,10 @@ export function validateWorldLayouts(layouts: readonly AnyWorldLayout[]): WorldV
       placementNames.add(qualified);
       const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
       if (!definition) { issues.push({ severity: 'error', message: `${qualified} uses unknown prop ${placement.prop}.` }); continue; }
-      if (!WORLD_ASSET_DEFINITIONS[definition.asset]) issues.push({ severity: 'error', message: `${qualified} uses unresolvable asset ${definition.asset}.` });
+      if (definition.asset && !WORLD_ASSET_DEFINITIONS[definition.asset]) issues.push({ severity: 'error', message: `${qualified} uses unresolvable asset ${definition.asset}.` });
+      for (const part of definition.blockout ?? []) {
+        if (part.size.some((size) => !Number.isFinite(size) || size <= 0)) issues.push({ severity: 'error', message: `${qualified} has invalid blockout dimensions.` });
+      }
       if ((placement.scale ?? 1) <= 0) issues.push({ severity: 'error', message: `${qualified} has a non-positive scale.` });
       if (definition.walkSurface) {
         const { width, profile } = definition.walkSurface;

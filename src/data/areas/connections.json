@@ -21,5 +21,21 @@
     "areaBId": 3,
     "requiredUnlockedAreaId": 3,
     "visualStyle": "ruined-fortress-gate"
+  },
+  {
+    "id": "area1-area4",
+    "areaAId": 1,
+    "areaBId": 4,
+    "requiredUnlockedAreaId": 4,
+    "unlockOnBossOfAreaId": 3,
+    "visualStyle": "forged-rift-gate"
+  },
+  {
+    "id": "area3-area4",
+    "areaAId": 3,
+    "areaBId": 4,
+    "requiredUnlockedAreaId": 4,
+    "unlockOnBossOfAreaId": 3,
+    "visualStyle": "timber-rift-gate"
   }
 ]

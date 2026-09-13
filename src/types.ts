@@ -32,7 +32,7 @@ export type AreaDefinition = {
   name: string;
   originX: number;
   originZ: number;
-  bossSpawnId: string;
+  bossSpawnId: string | null;
   enemyWeapon: CombatAffinity;
   enemyWeakness: CombatAffinity;
   environmentTheme: string;
@@ -54,7 +54,7 @@ export type WorldConnection = {
   barrierDepth?: number;
   requiredUnlockedAreaId: number;
   unlockOnBossOfAreaId?: number;
-  visualStyle: 'lake-gate' | 'ruined-fortress-gate';
+  visualStyle: 'lake-gate' | 'ruined-fortress-gate' | 'forged-rift-gate' | 'timber-rift-gate';
 };
 
 export type SavedSpawnState = {

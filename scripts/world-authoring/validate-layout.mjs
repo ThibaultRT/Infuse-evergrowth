@@ -6,6 +6,7 @@ import { validateCrossings } from './validate-crossings.mjs';
 import { validateGreenhaven } from './validate-greenhaven.mjs';
 import { validateHighwood } from './validate-highwood.mjs';
 import { validateFallenKeep } from './validate-fallen-keep.mjs';
+import { validateArea4 } from './validate-area4.mjs';
 
 const repositoryRoot = process.cwd();
 const vite = await createServer({ root: repositoryRoot, configFile: false, appType: 'custom', server: { middlewareMode: true }, logLevel: 'silent' });
@@ -33,11 +34,14 @@ try {
     ['area:A01', { origin: [0, 0, 0], visual: [84, 84], playable: [72, 72] }],
     ['area:A02', { origin: [36, 0, -60], visual: [156, 60], playable: [144, 48] }],
     ['area:A03', { origin: [72, 0, 0], visual: [84, 84], playable: [72, 72] }],
+    ['area:A04', { origin: [36, 0, 60], visual: [156, 60], playable: [144, 48] }],
     ['transition:A01-A02', { origin: [0, 0, -36], visual: [84, 12] }],
     ['transition:A01-A03', { origin: [36, 0, 0], visual: [12, 84] }],
     ['transition:A02-A03', { origin: [72, 0, -36], visual: [84, 12] }],
+    ['transition:A01-A04', { origin: [0, 0, 36], visual: [84, 30] }],
+    ['transition:A03-A04', { origin: [72, 0, 36], visual: [84, 30] }],
   ]);
-  check(WORLD_LAYOUTS.length === expected.size, `Expected six world chunks, found ${WORLD_LAYOUTS.length}.`);
+  check(WORLD_LAYOUTS.length === expected.size, `Expected ${expected.size} world chunks, found ${WORLD_LAYOUTS.length}.`);
   for (const layout of WORLD_LAYOUTS) {
     const contract = expected.get(layout.id);
     check(Boolean(contract), `Unexpected world chunk ${layout.id}.`);
@@ -58,7 +62,7 @@ try {
       placementNames.add(placement.name);
       const definition = WORLD_PROP_CATALOG[placement.prop];
       check(Boolean(definition), `Unknown prop key ${placement.prop}.`);
-      if (definition) referencedAssets.add(definition.asset);
+      if (definition?.asset) referencedAssets.add(definition.asset);
     }
   }
 
@@ -99,7 +103,7 @@ try {
       { side: 'west', from: -18.4, to: 25.03, point: (offset) => ({ x: 36, z: offset }), gate: (offset) => Math.abs(offset - 3.6) < 5.9 },
       { side: 'east', from: -23.8, to: 19.6, point: (offset) => ({ x: 107.5, z: offset }) },
       { side: 'north', from: -25.8, to: 19.6, point: (offset) => ({ x: 72 + offset, z: -34.3 }), gate: (offset) => Math.abs(offset - 7.2) < 5.9 },
-      { side: 'south', from: -22.5, to: 25, point: (offset) => ({ x: 72 + offset, z: 35.5 }) },
+      { side: 'south', from: -22.5, to: 25, point: (offset) => ({ x: 72 + offset, z: 35.5 }), gate: (offset) => Math.abs(offset - 14) < 1.725 },
     ];
     for (const span of straightSpans) {
       for (let offset = span.from; offset <= span.to; offset += 0.5) {
@@ -108,8 +112,8 @@ try {
       }
     }
     const wallColliders = compiled.all.filter((shape) => shape.kind === 'rectangle' && shape.sourcePlacementName?.startsWith('A03_CurtainWall_'));
-    const expectedWallModules = new Map([['West', 4], ['North', 3], ['East', 4], ['South', 4]]);
-    check(wallColliders.length === 15, `Expected 15 authored A03 wall modules, found ${wallColliders.length}.`);
+    const expectedWallModules = new Map([['West', 4], ['North', 3], ['East', 4], ['South', 3]]);
+    check(wallColliders.length === 14, `Expected 14 authored A03 wall modules, found ${wallColliders.length}.`);
     for (const [side, expectedCount] of expectedWallModules) {
       const sideColliders = wallColliders.filter((shape) => shape.sourcePlacementName?.startsWith(`A03_CurtainWall_${side}_`));
       check(sideColliders.length === expectedCount, `Expected ${expectedCount} A03 ${side.toLowerCase()} wall modules, found ${sideColliders.length}.`);
@@ -133,7 +137,7 @@ try {
   check(collisionMath.circleOverlapsWorldCollision({ x: 0.9, z: 0 }, 0.2, { id: 'test', sourceChunkId: 'test', kind: 'rectangle', x: 0, z: 0, width: 2, depth: 1, rotation: Math.PI / 4 }), 'Oriented-rectangle collision check failed.');
   check(collisionMath.circleOverlapsWorldCollision({ x: 1.1, z: 0 }, 0.2, { id: 'test', sourceChunkId: 'test', kind: 'circle', x: 0, z: 0, radius: 1 }), 'Circle collision check failed.');
 
-  for (const id of [1, 2, 3]) {
+  for (const id of config.AREAS.map((area) => area.id)) {
     const areaData = JSON.parse(await readFile(path.join(repositoryRoot, 'src', 'data', 'areas', `area-${id}.json`), 'utf8'));
     check(!('worldOrigin' in areaData), `area-${id}.json still duplicates worldOrigin.`);
     check(!('size' in areaData), `area-${id}.json still duplicates playable size.`);
@@ -145,6 +149,7 @@ try {
   await validateGreenhaven(vite, config);
   await validateHighwood(vite, config);
   await validateFallenKeep(vite, config);
+  await validateArea4(vite, config);
   console.log(`World validation passed: ${WORLD_LAYOUTS.length} chunks, ${placementNames.size} named authored/scatter groups, ${compiled.all.length} colliders, ${config.SPAWNS.length} spawns, ${referencedAssets.size} promoted assets.`);
 } finally {
   await vite.close();

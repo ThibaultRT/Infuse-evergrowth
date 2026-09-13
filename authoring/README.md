@@ -114,7 +114,8 @@ The capture command also produces `woodland-bridge.png` and
 Area A01 follows `Layout.png` within its unchanged 72 × 72 m playable footprint:
 a northwest lake cove, west rock escarpment, southern canyon, fountain plaza,
 branching stone lanes, a southern village loop, cottage gardens and pine clusters.
-The west and south future exits remain closed by the existing world boundary.
+The west future exit remains closed by the existing world boundary. Its south exit
+now crosses the Area 4 rift through the forged-bridge blockout.
 
 `src/data/world/greenhaven.json` owns the lake/rock footprints, plateau dimensions,
 roads, plaza, gardens and scenic bridge dimensions. The pure layout and the Blender
@@ -183,8 +184,10 @@ fallback. These browser checks do not replace real iPhone profiling.
 Area A03 follows the ruined castle in `Layout.png`: shattered ramparts on all four
 sides, hollow corner towers, blue gatehouse banner remnants, a roofless keep and
 chapel, small destroyed houses, a barracks, and connected stone courts. Its 72 × 72 m
-playable footprint, root, two gate connections, existing spawn IDs and progression
-are retained. Walking remains at Y=0; paving is a cosmetic surface dressing.
+playable footprint, root, existing gate connections and spawn IDs are retained.
+A third gate now opens south to Area 4; both new rift crossings require its existing
+boss victory. Walking remains at Y=0 away from the authored bridge approaches;
+paving is a cosmetic surface dressing.
 
 `src/data/world/fallen-keep.json` owns masonry dimensions, building wall segments,
 roads, outer cliff dimensions and seven reserved encounter spots. The Blender
@@ -216,6 +219,26 @@ asset budget. `authoring:world:capture` adds `area3-target-layout.png` and
 walks both gates, the chapel and barracks, checks the south barrier, and exercises
 saved Reduced/30 FPS and missing-terrain fallback. These browser captures are not
 a substitute for real iPhone performance measurements.
+
+## Area 4 blockout
+
+`area4.md` is the construction plan and asset handoff brief. `Layout-area4.png` is
+the all-area concept reference. Area 4 is currently flat ash ground, a lowered
+12 m rift band, two simple bridge silhouettes, a 5.4 m throne, charred tree markers
+and three impassable lava markers. It has no enemies or rewards yet.
+
+`area4-blockout.json` owns dimensions, and the two transition placements own their
+rendering, rails, locks and floor profiles. Procedural semantic prop definitions
+use untextured, material-batched box/cylinder parts so the slice needs no new GLBs
+or texture downloads. Replace their presentation after the major asset review;
+keep collision renderer-independent. The A01 canyon water and old scenic bridge
+are retired from its layout, and the A03 south wall has a real gate opening.
+
+`authoring:world:capture` includes the 3840 × 3200 `world-layout-area4-hires.png`, `area4-blockout.png`,
+`iphone-12-area-a04.png` and both portrait rift bridges. The assembled debug GLB
+now contains nine chunks. Run `authoring:world:smoke-runtime -- --area4` to walk
+both bridges each way, verify the lock and old boss-victory backfill, and inspect
+portrait Full/Reduced, persisted 30 FPS and missing-world-assets behavior.
 
 ## Ownership
 

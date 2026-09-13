@@ -5,9 +5,10 @@ import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_S
 import { GREENHAVEN_COLLISION } from './greenhaven';
 import { HIGHWOOD_COLLISION } from './highwood';
 import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_WALL_COLLISION, fallenKeepShellCollision } from './fallenKeep';
+import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, RIFT_BRIDGE_GATE, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
 
-export type WorldPropDefinition = {
-  readonly asset: WorldAssetKey;
+export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never }
+  | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[] }) & {
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
   readonly absoluteElevation?: boolean;
@@ -21,6 +22,15 @@ const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): 
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
 
 export const WORLD_PROP_CATALOG = {
+  'blockout.forgedBridge': { blockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR, gate: RIFT_BRIDGE_GATE },
+  'blockout.ruinedTimberBridge': { blockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR, gate: RIFT_BRIDGE_GATE },
+  'blockout.throne': { blockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true },
+  'blockout.lavaPool': { blockout: [{ kind: 'cylinder', size: [2, 0.04, 2], position: [0, 0.02, 0], material: 'lava' }], collision: [circle(1)], absoluteElevation: true },
+  'blockout.charredTree': { blockout: [
+    { size: [0.5, 4, 0.5], position: [0, 2, 0], material: 'ash' },
+    { size: [2.4, 0.25, 0.25], position: [0.6, 2.8, 0], material: 'ash' },
+    { size: [0.2, 0.2, 1.6], position: [0, 3.4, -0.4], material: 'ash' },
+  ], collision: [circle(0.35)], cameraOccluder: true },
   'terrain.fallenKeep': { asset: 'terrain.fallenKeep', collision: [], absoluteElevation: true },
   'ruin.curtainA': occludingProp('ruin.curtainA', FALLEN_KEEP_WALL_COLLISION),
   'ruin.curtainB': occludingProp('ruin.curtainB', FALLEN_KEEP_WALL_COLLISION),

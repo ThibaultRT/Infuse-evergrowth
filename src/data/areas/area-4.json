@@ -1,0 +1,9 @@
+{
+  "id": 4,
+  "name": "Area 4",
+  "environmentTheme": "burned-forest",
+  "enemyWeapon": "slash",
+  "enemyWeakness": "pierce",
+  "bossSpawnId": null,
+  "spawns": []
+}

@@ -4,6 +4,8 @@ import { statTotal } from './domain/stats/StatSources';
 import { rollSpawn } from './domain/spawning/SpawnRoll';
 import { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID } from './data/soul-catcher';
 import { soulCost, soulPurchaseXp } from './domain/soul-catcher';
+import { WORLD_CONNECTIONS } from './config';
+import { bossUnlockedConnections } from './domain/world/GateUnlocks';
 import type { EvasionSources, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
 
 const SAVE_KEY = 'infuse-evergrowth-save-v18';
@@ -207,6 +209,11 @@ function decodeSave(raw: string, now: Date): SaveData | null {
     const areaIds = new Set(AREAS.map((area) => area.id));
     const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
     const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
+    const defeatedBosses = Array.isArray(parsed.defeatedBosses) ? parsed.defeatedBosses.filter((id): id is string => typeof id === 'string' && spawnIds.has(id)) : [];
+    // New routes honor already-earned boss victories; no replay or reroll is required.
+    for (const connection of bossUnlockedConnections(AREAS, WORLD_CONNECTIONS, defeatedBosses)) {
+      if (!unlockedAreas.includes(connection.requiredUnlockedAreaId)) unlockedAreas.push(connection.requiredUnlockedAreaId);
+    }
     const requestedArea = parsed.currentAreaId ?? 1;
     const stats: PlayerStats = {
       maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
@@ -226,7 +233,7 @@ function decodeSave(raw: string, now: Date): SaveData | null {
       dailyKey: localDailyKey(now),
       currentAreaId: typeof requestedArea === 'number' && areaIds.has(requestedArea) && unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
-      defeatedBosses: Array.isArray(parsed.defeatedBosses) ? parsed.defeatedBosses.filter((id): id is string => typeof id === 'string' && spawnIds.has(id)) : [],
+      defeatedBosses,
       heroHp: (parsed.version ?? 0) >= 12 && Number.isFinite(parsed.heroHp) ? Math.max(0, Math.min(Number(parsed.heroHp), maxHp)) : maxHp,
       stats,
       inventory: migrateInventory(parsed.inventory, unlockedAreas),

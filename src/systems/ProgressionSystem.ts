@@ -6,6 +6,7 @@ import type { AreaDefinition, SaveData, SpawnDefinition, WorldConnection } from 
 import { rollEquipmentDrop } from './EquipmentDropSystem';
 import { RespawnSystem } from './RespawnSystem';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
+import { bossUnlockedConnections } from '../domain/world/GateUnlocks';
 
 export type DefeatResult = {
   reward: { stat: import('../types').LootType; amount: number };
@@ -53,7 +54,7 @@ export class ProgressionSystem {
     let boss: DefeatResult['boss'] = null;
     if (definition.isBoss && area?.bossSpawnId === definition.id && !this.state.defeatedBosses.includes(definition.id)) {
       this.state.defeatedBosses.push(definition.id);
-      const opened = gates.filter((gate) => gate.unlockOnBossOfAreaId === area.id);
+      const opened = bossUnlockedConnections(areas, gates, [definition.id]);
       for (const gate of opened) {
         if (!this.state.unlockedAreas.includes(gate.requiredUnlockedAreaId)) this.state.unlockedAreas.push(gate.requiredUnlockedAreaId);
         this.events.emit('gateUnlocked', { gateId: gate.id });

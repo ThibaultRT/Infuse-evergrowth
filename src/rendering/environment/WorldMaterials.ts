@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { TerrainProfile } from '../../data/world/WorldLayout';
 import { WorldAssetLibrary } from './WorldAssetLibrary';
 import type { RenderScale } from '../RenderingQuality';
+import type { BlockoutMaterial } from '../../data/world/area4';
 
 export type WorldMaterialSet = {
   readonly terrain: Readonly<Record<TerrainProfile, THREE.MeshStandardMaterial>>;
@@ -11,6 +12,9 @@ export type WorldMaterialSet = {
   readonly cliff: THREE.MeshStandardMaterial;
   readonly lockedGate: THREE.MeshStandardMaterial;
   readonly timber: THREE.MeshStandardMaterial;
+  readonly blockout: Readonly<Record<BlockoutMaterial, THREE.MeshStandardMaterial>>;
+  readonly ashTrail: THREE.MeshStandardMaterial;
+  readonly abyss: THREE.MeshStandardMaterial;
 };
 
 /** Reduced mode avoids transmission's extra scene pass; Full restores the authored look. */
@@ -57,13 +61,24 @@ export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<W
   transitionMeadow.color.setHex(0xaebf91);
   const transitionFortress = cobble.clone();
   transitionFortress.color.setHex(0xa9a294);
+  const abyss = new THREE.MeshStandardMaterial({ color: 0x08080e, roughness: 1 });
   return {
-    terrain: { meadow, forest, cobble, 'transition-meadow': transitionMeadow, 'transition-fortress': transitionFortress },
+    terrain: { meadow, forest, cobble, 'transition-meadow': transitionMeadow, 'transition-fortress': transitionFortress,
+      ash: new THREE.MeshStandardMaterial({ color: 0x49403c, roughness: 1 }), rift: abyss },
     trail,
     cobble,
     water: new THREE.MeshPhysicalMaterial({ color: 0x3e94a0, emissive: 0x163b40, emissiveIntensity: 0.3, roughness: 0.2, transmission: 0.16, transparent: true, opacity: 0.84, side: THREE.DoubleSide }),
     cliff: new THREE.MeshStandardMaterial({ color: 0x6f7569, roughness: 0.96 }),
     lockedGate: new THREE.MeshStandardMaterial({ color: 0x5a3020, roughness: 0.82, metalness: 0.05 }),
     timber: new THREE.MeshStandardMaterial({ color: 0x977047, roughness: 0.86 }),
+    ashTrail: new THREE.MeshStandardMaterial({ color: 0x8c7a69, roughness: 1 }),
+    abyss,
+    blockout: {
+      ash: new THREE.MeshStandardMaterial({ color: 0x242326, roughness: 1 }),
+      stone: new THREE.MeshStandardMaterial({ color: 0x8d8582, roughness: 1 }),
+      iron: new THREE.MeshStandardMaterial({ color: 0x46525a, roughness: 0.7, metalness: 0.5 }),
+      timber: new THREE.MeshStandardMaterial({ color: 0x785438, roughness: 1 }),
+      lava: new THREE.MeshStandardMaterial({ color: 0xff691c, emissive: 0xff3a08, emissiveIntensity: 0.75, roughness: 1 }),
+    },
   };
 }
