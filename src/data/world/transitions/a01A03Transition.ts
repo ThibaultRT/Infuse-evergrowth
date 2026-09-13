@@ -1,4 +1,5 @@
 import type { TransitionWorldLayout } from '../WorldLayout';
+import { RIFT_NORTH_Z, area4RiftCutout } from '../area4';
 
 export const A01_A03_TRANSITION = {
   kind: 'transition',
@@ -9,6 +10,7 @@ export const A01_A03_TRANSITION = {
   origin: [36, 0, 0],
   visualSize: { width: 12, depth: 84 },
   terrain: 'transition-fortress',
+  terrainCutouts: [area4RiftCutout('A01_A03_South_Rift', [36, 0, 0])],
   axis: 'x',
   crossingCenter: 3.6,
   crossingWidth: 7,
@@ -16,16 +18,15 @@ export const A01_A03_TRANSITION = {
     { name: 'A01_A03_GateRoad', points: [[-6, 3.6], [0, 3.6], [6, 3.6]], width: 6.2, material: 'cobble' },
   ],
   props: [
-    // Keep two standard-scale modules on each side of the gate. The inner modules
+    // The inner standard-scale modules
     // are tangent to its visible faces at z=-2.28 and z=9.48; the outer modules
-    // continue edge-to-edge into the asymmetric corner pieces.
+    // continue into the asymmetric corners; the south corner now meets the rift.
     { name: 'A03_CurtainWall_West_001', prop: 'ruin.curtainA', position: [0, 0, -24.96], rotation: -Math.PI / 2, scale: 1.08 },
     { name: 'A03_CurtainWall_West_002', prop: 'ruin.curtainA', position: [0, 0, -9.84], rotation: -Math.PI / 2, scale: 1.08 },
     { name: 'A03_CurtainWall_West_003', prop: 'ruin.curtainA', position: [0, 0, 17.04], rotation: -Math.PI / 2, scale: 1.08 },
-    { name: 'A03_CurtainWall_West_004', prop: 'ruin.curtainA', position: [0, 0, 32.16], rotation: -Math.PI / 2, scale: 1.08 },
     { name: 'A03_WestGate', prop: 'ruin.gate', position: [0, 0, 3.6], rotation: Math.PI / 2, scale: 0.84 },
     { name: 'A03_Corner_NW', prop: 'ruin.cornerTower', position: [-0.307, 0, -28.445], rotation: 7 * Math.PI / 6, scale: 1.1 },
-    { name: 'A03_Corner_SW', prop: 'ruin.cornerTower', position: [3.486, 0, 35.807], rotation: 5 * Math.PI / 3, scale: 1.1 },
+    { name: 'A03_Corner_SW', prop: 'ruin.cornerTower', position: [3.486, 0, RIFT_NORTH_Z + 0.307], rotation: 5 * Math.PI / 3, scale: 1.1 },
   ],
   scatters: [],
   collision: [

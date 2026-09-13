@@ -71,7 +71,7 @@ export async function validateCrossings(vite, config) {
     const direction = Math.sign(connection.axis === 'x' ? target.originX - source.originX : target.originZ - source.originZ);
     const runtime = create(sourceId);
     runtime.hero.position = { x: connection.x, y: 0, z: connection.z };
-    const reach = connection.areaBId === 4 ? 17 : 11;
+    const reach = 11;
     runtime.hero.position[connection.axis] -= direction * reach;
     const input = connection.axis === 'x' ? { x: direction, y: 0 } : { x: 0, y: -direction };
     const events = [];

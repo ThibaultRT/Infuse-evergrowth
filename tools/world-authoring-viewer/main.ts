@@ -178,8 +178,8 @@ function framePreset(preset: string): void {
     camera.position.set(44, 20, 56);
   } else if (preset === 'bridge:A01-A04' || preset === 'bridge:A03-A04') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === (preset === 'bridge:A01-A04' ? 'area1-area4' : 'area3-area4'))!;
-    controls.target.set(bridge.x, 0, bridge.z + 6);
-    camera.position.set(bridge.x + 12, 22, bridge.z + 26);
+    controls.target.set(bridge.x, 0, bridge.z);
+    camera.position.set(bridge.x + 12, 22, bridge.z + 20);
   } else if (preset === 'bridge:A01-A02') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === 'area1-area2')!;
     const portraitDistance = Math.max(1, 0.8 / camera.aspect);

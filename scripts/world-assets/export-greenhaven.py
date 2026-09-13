@@ -9,10 +9,15 @@ import json
 import math
 import os
 import random
+import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 with open(os.path.join(ROOT, 'src/data/world/greenhaven.json')) as file:
     spec = json.load(file)
+with open(os.path.join(ROOT, 'src/data/world/area4-blockout.json')) as file:
+    area4 = json.load(file)
+rift_north = area4['rift']['seamZ'] - area4['rift']['depth'] / 2
+landscape_only = '--landscape-only' in sys.argv
 random.seed(spec['seed'])
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -35,6 +40,8 @@ class Batch:
         self.name, self.vertices, self.faces, self.colors = name, [], [], []
 
     def face(self, points, tint):
+        if self.name in ['A01_HandLaidStonework', 'A01_MeadowAndGardens'] and max(p[2] for p in points) >= rift_north:
+            return
         start = len(self.vertices)
         # Blender Z up -> runtime Y up, north is negative runtime Z.
         self.vertices.extend((x, -z, y) for x, y, z in points)
@@ -87,13 +94,12 @@ for mass in spec['westRocks']:
         theta = random.random() * math.tau
         rock(cliffs, x + math.cos(theta)*r*0.58, z + math.sin(theta)*r*0.58, r*0.36, -0.4, h*random.uniform(0.3, 0.55))
 
-# The southern escarpment drops away from the playable plateau. Its future bridge
-# is only scenery; the existing world boundary still closes this edge.
-edge = spec['plateau']['southEdge']
+# The southern escarpment follows the shared rift's north bank, inside A01.
+edge = rift_north
 bottom = spec['plateau']['bottomHeight']
 for index in range(39):
     x = -37 + index * 1.9
-    if abs(x - spec['southBridge']['center'][0]) < spec['southBridge']['width']/2 + 0.7:
+    if abs(x - area4['crossings']['greenhavenX']) < area4['bridge']['width']/2 + 2.7:
         continue
     rock(cliffs, x, edge + 1.3 + random.uniform(-0.2, 0.5), random.uniform(1.5, 2.2), bottom, -bottom + random.uniform(-0.25, 0.4))
     if index % 2 == 0:
@@ -246,6 +252,11 @@ def export_objects(filename, objects):
 
 landscape=[batch.finish() for batch in [cliffs,stones,plants]]
 export_objects('greenhaven-landscape.glb',landscape)
+if landscape_only:
+    source = os.path.join(ROOT, 'authoring/local/greenhaven/greenhaven-landscape.blend')
+    os.makedirs(os.path.dirname(source), exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(filepath=source)
+    sys.exit(0)
 export_objects('greenhaven-south-bridge.glb',[future_bridge.finish()])
 
 boulder=Batch('Greenhaven_MossyBoulders')

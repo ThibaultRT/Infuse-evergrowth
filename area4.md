@@ -2,6 +2,9 @@
 
 ## Direction
 
+The working region name remains **Area 4 / Burned Forest**; choosing a separate lore
+name is not required for the environment pass.
+
 Area 4 occupies the south of the world, spanning Areas 1 and 3 in the same way
 Area 2 spans their north. Its north edge is one continuous rift, crossed by two
 distinct bridges from the existing areas' south gates. The old `Layout.png` label
@@ -30,6 +33,8 @@ Area 4 construction. It is a blockout reference; it does not depict final Area 4
 - [x] Compile bridge floor profiles, rails, locks, rift barriers, throne and pool
   footprints from renderer-neutral authored values. Lava is impassable in this slice.
 - [x] Add viewer cameras, portrait captures and deterministic traversal/save checks.
+- [x] Normalize both rift transitions to A01/A02: a 12 m span centered on Z=36,
+  3 m approaches, shared collision/floors, and the A03 south wall/gate at Z=30.
 
 This slice adds no encounters, boss, loot, damage-over-time, falling, bridge collapse,
 particles or final environment models. The concept depicts the intended art pass;
@@ -47,21 +52,36 @@ header is provisional until encounters are authored.
 | Area 3 | Root `(72,0,0)`; playable 72 × 72 m |
 | Area 4 | Root `(36,0,60)`; playable 144 × 48 m; visual 156 × 60 m |
 | Area 4 playable bounds | X `-36..108`, Z `36..84` |
-| Rift | World Z `36..48`; nominal 12 m span, floor Y `-10` |
-| Solid Area 4 ground | Begins at world Z `48`; 36 m of playable depth remains south of the rift |
+| Combined Areas 1 + 3 width | Playable X `-36..108` = 144 m; visual X `-42..114` = 156 m |
+| Both transition chunks | Visual 84 × 12 m; local Z `-6..6`; world Z `30..42` |
+| Rift | World Z `30..42`; 12 m span, floor Y `-10`; 6 m into each adjacent area |
+| Solid Area 4 ground | Begins at world Z `42`; 42 m of playable depth remains south of the rift |
 | Area 1 crossing | World X `7.2`; transition root `(0,0,36)` |
 | Area 3 crossing | World X `86` (A03 local X `14`); transition root `(72,0,36)` |
-| Both bridge decks | 3.4 m clear width, 12 m span at Y `0.6`, plus 3 m approaches at each end |
-| Both complete walk profiles | World Z `33..51`; Y `0` at both landings |
-| Area 3 south gate | A03 local `(14,0,35.5)`; existing ruined-gate module, scale 1 |
+| Both bridge decks | 3.4 m clear width, world Z `30..42` at Y `0.6`, midpoint at Z `36` |
+| Both complete walk profiles | World Z `27..45`; 3 m approach at each end, Y `0` at both landings |
+| Area 3 south wall/gate | Gate A03 local `(14,0,30)`, world `(86,0,30)`; existing ruined-gate module, scale 1 |
 | Throne | A04 local `(0,0,15)`, world `(36,0,75)`; 3.6 × 3.6 m footprint, 5.4 m tall |
 
-The area ownership seam is at the north bank, world Z `36`, rather than the bridge
-midpoint. This keeps the existing continuous-area movement mechanism and does not
-move the old areas. Crossing into Area 4 therefore happens as the actor enters the
-rift span. The two transition chunks meet at world X `36`; they own separate halves
-of the abyss. Existing northern cliff outcrops are retained as blockout scenery;
-the next terrain pass must reconcile their exact silhouettes with the final bridges.
+The area ownership seam remains at world Z `36`, now at the deck midpoint as for
+A01/A02. Each transition supplies the same compiled collision and walk surfaces to
+both adjacent areas, so the hero stays at Y `0.6` when ownership changes. The rift
+occupies 6 m of Areas 1 and 3 and 6 m of Area 4 without moving any root or expanding
+an area. The two transition chunks meet at world X `36` and own separate halves of
+the abyss.
+
+Area 3's south wall/gate moves north to the rift edge at Z `30`; its corner joins
+move with it and the east/west curtain runs shorten. Existing encounters and reserved
+clearings remain reachable. The northern landscapes, southern paths and scatter
+meet the new bank, while all overlapping terrain (including the A01/A03 apron)
+uses the shared rift cutout. Detailed bank silhouettes remain part of the final art pass.
+
+Area 4 does not exceed the combined authored width of Areas 1 and 3. Each northern
+area is 72 m playable / 84 m visual, and their roots meet at X `36`; Area 4 therefore
+matches their combined 144 m playable width and 156 m visual width exactly. The
+slight side protrusion in the overview screenshot comes from the nearer Area 4 plane
+appearing wider in perspective, not from a bounds mismatch, so no width change is
+required.
 
 `src/data/world/area4-blockout.json` owns dimensions and reserved locations. Named
 placements in `areaA04Layout.ts` and `area4RiftTransition.ts` own transforms. Never
@@ -81,42 +101,92 @@ current-area field already represent this content extension.
 
 ## Next implementation slices
 
-1. **Confirm the blockout and asset dimensions.** Walk the southern loop, judge travel
-   distance and portrait sightlines, then settle bridge span, clearance, height,
-   throne scale and Area 4 depth before modeling. Expanding the area later is possible,
-   but would require revisiting the routes and encounter spacing.
-2. **Prepare the three major assets ahead of integration.** Produce separate forged
-   skeletal bridge, ruined timber bridge and ancient throne models against the
-   contracts below. Review renders beside a 1.8 m human reference. Hand over editable
-   sources, optimized GLBs, dimensions, materials and provenance as one package.
-3. **Build terrain and the rift banks.** Add ash/charcoal ground, jagged northern and
+1. **Verify the approved blockout dimensions.** Walk the southern loop and check travel
+   distance and portrait sightlines without changing the confirmed 144 × 48 m playable
+   footprint or 5.4 m throne height. Any later expansion would require revisiting the
+   routes and encounter spacing.
+2. **Approve the major-asset concepts.** Produce a few 2D directions for the skeletal
+   bridge, ruined timber bridge and ancient throne. A close, freely licensed online
+   asset may be proposed instead when its style and dimensions genuinely fit; record
+   its source and license and obtain approval before adopting it.
+3. **Model the approved concepts.** Build the selected assets in Blender, or adapt an
+   approved free asset, against the contracts below. Review renders beside a 1.8 m
+   human reference and obtain a second approval before preparing optimized GLBs.
+4. **Build terrain and the rift banks.** Add ash/charcoal ground, jagged northern and
    southern lips, dark abyss depth, small lava basins and clear readable paths.
    Reconcile the old Greenhaven/Fallen Keep cliff geometry and A04 terrain cutouts.
    Keep Y=0 walkable ground and reserve the routes/clearings. Avoid a large lava river.
-4. **Integrate the approved major assets.** Replace each placeholder presentation at
-   its existing named placement. Retain semantic collision and authored walk profiles;
+5. **Integrate the approved major assets.** Add the approved assets to the asset
+   library and replace each placeholder presentation at its existing named placement.
+   Retain semantic collision and authored walk profiles;
    update the shared spec first if a reviewed asset needs different dimensions.
    Verify both bridge landings, gate opening and throne occlusion with actual movement.
-5. **Dress the burned forest.** Prepare a small set of scorched trunks, stumps, fallen
+6. **Dress the burned forest.** Prepare a small set of scorched trunks, stumps, fallen
    logs and basalt rocks. Use restrained deterministic scatter with exclusions around
    paths, pools, gates, spawn spaces and the throne. Keep a playable visual fallback.
-6. **Author gameplay in a separate content pass.** Agree encounters, affinities, boss,
+7. **Author gameplay in a later, separate content pass.** Agree encounters, affinities, boss,
    rewards and any throne interaction. Add stable spawn IDs and authored HP/damage/
-   reward ranges in `src/data/areas/area-4.json`. Decide lava/fall rules before adding
-   systems or save fields. Any new save shape needs full versioned migration.
-7. **Polish and validate.** Add restrained ember/light effects only after profiling.
+   reward ranges in `src/data/areas/area-4.json`. Lava remains blocked by authored
+   collision; damage or other lava mechanics require a separate decision. Any new save
+   shape needs full versioned migration.
+8. **Polish and validate.** Add restrained ember/light effects only after profiling.
    Check Full/Reduced and Smooth/30 FPS, offline revisits, loading fallback and a real
    iPhone 12-class device before considering the environment finished.
 
 ## Major asset handoff
 
-Preparing these assets in advance is recommended **after** the dimensions are
-accepted. Rendering can then adopt them without redesigning traversal.
+Slice 1 is verified by the user. For slice 2, the user selected **S2 — Rib vault**
+and **W2 — Scorched patchwork** from the local concept set under
+`authoring/local/area4/concepts/slice-2-v1/`. The throne will use a separate
+user-supplied 2D reference. Gate additions are being reviewed before modeling.
+
+### Gates for the selected bridges
+
+Both crossings already have a functional connection lock; their current two-bar
+visual is a placeholder. Replace that presentation with one operable gate at each
+northern entrance, driven by the existing Area 3 boss unlock. Do not add a second
+lock, a new unlock requirement, or gate-specific persistent state.
+
+- **S2 / Area 1:** a bone-framed, forged-metal double gate with its feet planted in
+  Area 1's land at the beginning of the north approach. The proposed gate plane is
+  world `(7.2, 0, 27)`, before the 3 m ramp; the rib-vault span begins at Z=30.
+  Gate leaves open toward the Area 1 land side and park outside the 3.4 m clear lane.
+  Author the land gate as a separate module matching S2's real-bone/metal theme.
+- **W2 / Area 3:** fit substantial iron-braced timber double doors into the existing
+  ruined masonry gateway. Use its normalized world centre `(86, 0, 30)`, 14 m module width,
+  3.45 m opening and established stone/arch appearance. The wall/gate module is one
+  asset; W2 is a separate bridge with no gate. Offset hinges on the inland face
+  must leave the full 3.4 m route clear when open. Fit the leaf bottoms and swing
+  to the Y=0.6 deck floor at the opening, where the north ramp ends; do not change
+  the authored floor profile.
+
+Show both closed and open states in the revised concepts. Doors, hinge offsets,
+land contacts and side closures must agree with the authored collision and must
+not allow walking around a locked gate. The gate concepts still require visual
+review; the selected bridge designs and approved walk profiles remain fixed.
+
+During integration, each transition should own its gate and its separate bridge.
+Move `A03_SouthGate` into the A03/A04 transition at its normalized world placement while
+Area 3 keeps the surrounding curtain-wall runs. Define the gate's position once
+and derive both its presentation and lock proxy from it. Remove the old
+bridge-owned lock when adding the real gate, so one crossing has one blocking
+gate. Reuse the existing named hinged-leaf mechanism and connection-open state.
+The ownership/lock relocation is part of integration, not a completed runtime
+change in this concept slice.
+
+### Delivery contract
+
+Prepare these assets only after their 2D concepts are approved. Blender models then
+receive a second approval before asset-library integration. An appropriately styled,
+freely licensed online asset can replace the modeling step only after its fit, license
+and provenance are reviewed and approved.
 
 | Asset | Art brief | Required fit |
 | --- | --- | --- |
-| Forged skeletal bridge | Dark forged metal; rib/bone-inspired arches and structural details; readable from portrait camera | 3.4 m uninterrupted clear deck, 12 m level span, 3 m approach each end; local +Z along crossing; no ribs inside clearance |
-| Ruined timber bridge | Predominantly weathered wood and ropes; broken outer boards/rails, dangling beams, visible strain | Same floor envelope initially; damage remains outside a continuous central route; any sag requires an agreed authored floor profile |
+| Skeletal bridge — selected S2 | A long real-bone rib vault with a vertebral ridge and dark forged-metal reinforcement; readable from portrait camera | 3.4 m uninterrupted clear deck, 12 m level span, 3 m approach each end; local +Z along crossing; no ribs inside clearance; separate land gate |
+| S2 land gate | Real-bone jambs/frame and substantial forged-metal hinged leaves matching the selected bridge | Feet on Area 1's land before the north ramp; open leaves outside the 3.4 m clear lane |
+| Ruined timber bridge — selected W2 | Charred timber with weathered replacement boards, rope lashings and damaged outer rails; all damage is cosmetic | Same floor envelope initially; continuous central route; no gate on the bridge; visual sag must match the authored floor profile |
+| Area 3 wall/gate module | Existing ruined masonry gateway fitted with iron-braced timber hinged doors | Preserve the Z=30 wall join, 3.45 m opening and Y=0.6 floor at the north deck edge; at least 3.4 m clear when open; separate from W2 |
 | Ancient ruined throne | One heavy stone seat, broad arms, fractured back and worn carving; mysterious rather than faction-branded | 3.6 × 3.6 m footprint, approximately 5.4 m total height; compare with 1.8 m person; faces local -Z toward the approaches |
 
 For each asset supply:
@@ -145,20 +215,23 @@ Raw sources belong in ignored `authoring/local/area4/`, backed up outside Git.
 Promote accepted runtime assets through `world-assets.json` and the asset manifest;
 record provenance in `ASSET-LICENSES.md`. The concept PNG stays outside `public/`.
 
-## Open questions
+## Resolved decisions
 
-| Decision | Recommendation / impact |
+| Decision | Resolution / impact |
 | --- | --- |
-| Final name | Keep “Area 4 / Burned Forest” until a name is chosen. |
-| Region size | Start with the mirrored 144 × 48 m footprint; confirm that 36 m of land depth gives enough room before detailed terrain or encounters. |
-| Unlock rule | Confirm the working Area 3 boss requirement for both bridges, or choose a later shortcut rule. |
-| Skeletal material | Bone-shaped forged metal as the main structure; decide whether real bone is present and whose remains it evokes. |
-| Bridge damage and sag | Cosmetic damage with a reliably walkable core for this game; physical collapse/falling would be a separate feature. |
-| Throne scale and meaning | Start with 5.4 m overall height; decide whether “3× human” instead refers to the seated species' body scale, which could change seat proportions. |
-| Throne placement and interaction | Southern landmark facing the arrivals; decide whether it is only scenery, a boss backdrop or a future progression interaction. |
-| Lava behavior | Keep small pools impassable during blockout; decide later between barriers, damage zones and other mechanics. |
-| Encounters and rewards | Define enemies, boss, affinities, spacing and loot in the dedicated content pass. |
-| Asset delivery | Confirm creator/tooling, source backup location and who approves the three major assets before integration. |
+| Region name | Keep **Area 4 / Burned Forest** as the working name; a separate lore name can wait. |
+| Region size | Keep the 144 × 48 m playable and 156 × 60 m visual footprints. The depth is approved, and the width exactly matches the combined Areas 1 and 3 bounds; the screenshot's apparent side protrusion is not an authored-width error. |
+| Unlock rule | Defeating Area 3 boss `area3-epic-01` opens both Area 4 bridges. |
+| Transition convention | Match A01/A02: seam Z=36 at midspan, rift/decks Z=30..42, approaches Z=27..45; shared collision/floors. Move A03's south wall to Z=30, keeping all area roots and footprints fixed. |
+| Skeletal material | Use real bones, with a long rib-cage silhouette plausibly belonging to a dragon-scale creature; forged metal may reinforce the structure. |
+| Bridge concepts | User selected S2 — Rib vault and W2 — Scorched patchwork. Review their added gates before modeling; the user will supply the throne reference separately. |
+| Gate placement and asset split | S2 receives a matching gate planted on Area 1's land before its approach. W2 uses doors integrated into the existing Area 3 wall/gate module, with the bridge as a separate asset. Both use the existing shared progression unlock. |
+| Bridge damage and sag | Damage is cosmetic only. Preserve a continuous collision-supported route and do not create any hole large enough to fall through. |
+| Throne scale | Fix the throne at 5.4 m overall height; this dimension takes precedence over interpreting “3× human” as an exact anatomical scale. |
+| Throne placement and interaction | Keep it centered in the southern landmark position at A04 local `(0,0,15)`. It is cosmetic scenery only, with no boss or progression interaction. |
+| Lava behavior | Give every lava pool authored collision so the hero cannot run on it. Lava damage and other mechanics are not part of this decision. |
+| Encounters and rewards | Out of scope for the environment work; author them later as a separate content pass. |
+| Asset delivery | Approve several 2D concepts first, then model the selection in Blender, approve the model again, and only then integrate it into the asset library. A suitable free online asset may replace modeling after fit, license, provenance and approval checks. |
 
 ## Verification and review
 
@@ -175,8 +248,10 @@ The viewer has A04 layout, throne and both bridge cameras. Generated evidence go
 under ignored `authoring/generated/captures/`; `area4-blockout.png` shows the actual
 construction slice and `world-layout-area4-hires.png` is the full high-resolution
 world overview. Validation covers locked/unlocked traversal both ways at 30/60
-FPS, off-centre crossing, bridge rail containment, the continuous abyss barrier,
+FPS, off-centre crossing, shared floor continuity at the Z=36 seam, rail containment
+on both sides, the continuous Z=30..42 abyss barrier in all three adjacent areas,
 reachable clearings, one boss opening both connections, existing-save backfill and
-Area 4 reloads. Browser smoke walks the southern loop and checks portrait views,
-saved Reduced/30 FPS and playability without world assets. Browser emulation does
+Area 4 reloads and the moved A03 wall/corner joins. Browser smoke walks the southern
+loop and both bridges in Full and saved Reduced/30 FPS, captures both sides of the
+seam and landings, and crosses with world assets unavailable. Browser emulation does
 not establish real iPhone load time, memory or frame-rate performance.

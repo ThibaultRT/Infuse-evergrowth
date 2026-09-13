@@ -38,8 +38,8 @@ try {
     ['transition:A01-A02', { origin: [0, 0, -36], visual: [84, 12] }],
     ['transition:A01-A03', { origin: [36, 0, 0], visual: [12, 84] }],
     ['transition:A02-A03', { origin: [72, 0, -36], visual: [84, 12] }],
-    ['transition:A01-A04', { origin: [0, 0, 36], visual: [84, 30] }],
-    ['transition:A03-A04', { origin: [72, 0, 36], visual: [84, 30] }],
+    ['transition:A01-A04', { origin: [0, 0, 36], visual: [84, 12] }],
+    ['transition:A03-A04', { origin: [72, 0, 36], visual: [84, 12] }],
   ]);
   check(WORLD_LAYOUTS.length === expected.size, `Expected ${expected.size} world chunks, found ${WORLD_LAYOUTS.length}.`);
   for (const layout of WORLD_LAYOUTS) {
@@ -99,21 +99,22 @@ try {
   const keep = config.AREAS.find((area) => area.id === 3);
   check(Boolean(keep), 'Area 3 is missing.');
   if (keep) {
+    const perimeter = keep.collision.filter((shape) => /^A03_(CurtainWall_|Corner_|(?:West|North|South)Gate$)/.test(shape.sourcePlacementName ?? ''));
     const straightSpans = [
-      { side: 'west', from: -18.4, to: 25.03, point: (offset) => ({ x: 36, z: offset }), gate: (offset) => Math.abs(offset - 3.6) < 5.9 },
-      { side: 'east', from: -23.8, to: 19.6, point: (offset) => ({ x: 107.5, z: offset }) },
+      { side: 'west', from: -18.4, to: 30, point: (offset) => ({ x: 36, z: offset }), gate: (offset) => Math.abs(offset - 3.6) < 5.9 },
+      { side: 'east', from: -23.8, to: 30, point: (offset) => ({ x: 107.5, z: offset }) },
       { side: 'north', from: -25.8, to: 19.6, point: (offset) => ({ x: 72 + offset, z: -34.3 }), gate: (offset) => Math.abs(offset - 7.2) < 5.9 },
-      { side: 'south', from: -22.5, to: 25, point: (offset) => ({ x: 72 + offset, z: 35.5 }), gate: (offset) => Math.abs(offset - 14) < 1.725 },
+      { side: 'south', from: -36, to: 35.5, point: (offset) => ({ x: 72 + offset, z: 30 }), gate: (offset) => Math.abs(offset - 14) < 1.725 },
     ];
     for (const span of straightSpans) {
       for (let offset = span.from; offset <= span.to; offset += 0.5) {
         if (span.gate?.(offset)) continue;
-        check(keep.collision.some((shape) => !shape.activation && collisionMath.circleOverlapsWorldCollision(span.point(offset), 0.45, shape)), `Area 3 perimeter gap at ${span.side}:${offset}.`);
+        check(perimeter.some((shape) => collisionMath.circleOverlapsWorldCollision(span.point(offset), 0.45, shape)), `Area 3 masonry perimeter gap at ${span.side}:${offset}.`);
       }
     }
     const wallColliders = compiled.all.filter((shape) => shape.kind === 'rectangle' && shape.sourcePlacementName?.startsWith('A03_CurtainWall_'));
-    const expectedWallModules = new Map([['West', 4], ['North', 3], ['East', 4], ['South', 3]]);
-    check(wallColliders.length === 14, `Expected 14 authored A03 wall modules, found ${wallColliders.length}.`);
+    const expectedWallModules = new Map([['West', 3], ['North', 3], ['East', 3], ['South', 3]]);
+    check(wallColliders.length === 12, `Expected 12 authored A03 wall modules, found ${wallColliders.length}.`);
     for (const [side, expectedCount] of expectedWallModules) {
       const sideColliders = wallColliders.filter((shape) => shape.sourcePlacementName?.startsWith(`A03_CurtainWall_${side}_`));
       check(sideColliders.length === expectedCount, `Expected ${expectedCount} A03 ${side.toLowerCase()} wall modules, found ${sideColliders.length}.`);

@@ -2,6 +2,7 @@ import spec from './area4-blockout.json';
 import type { CollisionProxy } from '../../domain/world/WorldCollision';
 import type { WorldWalkSurface } from '../../domain/world/WorldWalkSurface';
 import type { WorldVec3 } from '../../domain/world/WorldPlacement';
+import type { WorldTerrainCutout } from './WorldLayout';
 
 export type BlockoutMaterial = 'ash' | 'stone' | 'iron' | 'timber' | 'lava';
 export type WorldBlockoutPart = {
@@ -14,6 +15,17 @@ export type WorldBlockoutPart = {
 
 export const AREA4_SPEC = spec;
 export const AREA4_ORIGIN: WorldVec3 = [spec.origin[0], spec.origin[1], spec.origin[2]];
+export const RIFT_NORTH_Z = spec.rift.seamZ - spec.rift.depth / 2;
+export const RIFT_SOUTH_Z = spec.rift.seamZ + spec.rift.depth / 2;
+
+/** All overlapping area/apron terrain yields to the same seam-centered rift. */
+export function area4RiftCutout(name: string, origin: WorldVec3): WorldTerrainCutout {
+  return {
+    name, center: [AREA4_ORIGIN[0] - origin[0], spec.rift.seamZ - origin[2]],
+    size: { width: spec.rift.halfWidth * 2, depth: spec.rift.depth }, elevation: spec.rift.floorY - 0.1,
+  };
+}
+
 const bridge = spec.bridge;
 const halfDeck = bridge.deckLength / 2;
 const halfLength = halfDeck + bridge.approachLength;

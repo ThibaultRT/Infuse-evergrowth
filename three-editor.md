@@ -22,8 +22,8 @@ the same transforms. Never treat an edited GLB or mesh bounds as gameplay author
 | A01/A02 transition | — | 84 × 12 m | — | X `-42..42`, Z `-6..6` | `(0,0,-36)` |
 | A01/A03 transition | — | 12 × 84 m | — | X `-6..6`, Z `-42..42` | `(36,0,0)` |
 | A02/A03 transition | — | 84 × 12 m | — | X `-42..42`, Z `-6..6` | `(72,0,-36)` |
-| A01/A04 transition | — | 84 × 30 m | — | X `-42..42`, Z `-15..15` | `(0,0,36)` |
-| A03/A04 transition | — | 84 × 30 m | — | X `-42..42`, Z `-15..15` | `(72,0,36)` |
+| A01/A04 transition | — | 84 × 12 m | — | X `-42..42`, Z `-6..6` | `(0,0,36)` |
+| A03/A04 transition | — | 84 × 12 m | — | X `-42..42`, Z `-6..6` | `(72,0,36)` |
 
 Area A02 spans the combined width of A01 and A03. Visual aprons overlap; there is no
 additional empty gap between playable chunks.
@@ -38,15 +38,22 @@ the existing Area A01 boss unlock requirement.
 Area A03 is enclosed by a ruined wall with three gate openings. The A01/A03 transition owns its
 west wall and gate. The A02/A03 fortified river transition owns its north wall,
 bridge and gate. Area A03 owns the east and south walls and the new south gate at
-local X=14. Broken-looking wall pieces remain collidable; only the three authored
+local `(14,0,30)`. The south wall and both southern corner joins meet the rift's
+north edge at Z=30; the east/west curtain runs end at those corners. Broken-looking
+wall pieces remain collidable; only the three authored
 gates are traversable. The A03/A04 transition owns the timber bridge and its lock.
 
-Area A04 is an untextured burned-forest blockout. The rift occupies world Z=36..48
-within its northern band, keeping all existing area roots fixed. Both new area seams
-remain at Z=36, at the north bank. The 3.4 m-wide bridge walk profiles run Z=33..51,
-with a 12 m deck at Y=0.6 and 3 m approaches returning to Y=0. Their world X values
+Area A04 is an untextured burned-forest blockout. Both rift transitions follow the
+A01/A02 convention: world Z=30..42, centered on the unchanged seam at Z=36. The rift
+extends 6 m into Areas A01/A03 and 6 m into A04. Each 3.4 m-wide bridge has a 12 m
+deck at Y=0.6 centered on the seam and 3 m approaches reaching Y=0 at Z=27 and Z=45.
+Transition collision and walk surfaces are shared with both adjacent areas, so
+ownership changes at midspan without a height jump. All area roots and footprints
+stay fixed. A04's solid ground begins at Z=42. Their world X values
 are 7.2 (A01) and 86 (A03). Both require the Area A03 boss victory, including victories
-already recorded in supported saves. `area4-blockout.json` owns the dimensions;
+already recorded in supported saves. Overlapping terrain, including the A01/A03
+apron, yields to the same rift cutout; the two northern landscape GLBs follow its
+north bank. `area4-blockout.json` owns the dimensions;
 `area4.md` describes the final asset handoff and remaining decisions.
 
 Area A03's ruined masonry uses `fallen-keep.json` for both Blender dimensions and

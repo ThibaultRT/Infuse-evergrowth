@@ -62,12 +62,23 @@ class CdpClient {
       if (message.method === 'Page.loadEventFired') this.pageLoads++;
       if (message.method === 'Log.entryAdded' && message.params.entry?.level === 'error') this.errors.push(message.params.entry.text);
     });
+    webSocket.addEventListener('close', () => {
+      for (const pending of this.pending.values()) pending.reject(new Error('Smoke browser connection closed.'));
+      this.pending.clear();
+    });
   }
 
   send(method, params = {}) {
     const id = this.nextId++;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      const timeout = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new Error(`Timed out waiting for smoke browser command: ${method}`));
+      }, 30000);
+      this.pending.set(id, {
+        resolve: (result) => { clearTimeout(timeout); resolve(result); },
+        reject: (error) => { clearTimeout(timeout); reject(error); },
+      });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -137,7 +148,8 @@ async function moveAxis(client, axis, destination) {
   for (let attempt = 0; attempt < 35; attempt++) {
     const position = await heroPosition(client);
     const delta = destination - position[axis];
-    if (Math.abs(delta) < 0.2) return;
+    // Diagnostics round to 0.1 m; allow that rounding around the minimum key tap.
+    if (Math.abs(delta) <= 0.25) return;
     const key = axis === 'x' ? delta > 0 ? 'ArrowRight' : 'ArrowLeft' : delta > 0 ? 'ArrowDown' : 'ArrowUp';
     await holdKey(client, key, key, Math.max(35, Math.min(800, Math.abs(delta) / 7.6 * 1000)));
   }
@@ -210,9 +222,10 @@ try {
 
   if (area4) {
     await moveAxis(client, 'x', 7.2);
-    await moveAxis(client, 'z', 33);
+    await moveAxis(client, 'z', 27);
     await holdKey(client, 'ArrowDown', 'ArrowDown', 900);
-    if ((await heroPosition(client)).area !== 1) throw new Error('Area 4 opened before the boss unlock.');
+    const locked = await heroPosition(client);
+    if (locked.area !== 1 || locked.z >= 30) throw new Error('Area 4 opened before the boss unlock.');
     await capture(client, 'runtime-iphone-12-area4-locked.png');
     // Simulate a returning save whose boss victory predates the new routes.
     await evaluate(client, `(() => {
@@ -225,26 +238,37 @@ try {
     await waitFor(client, gameReadyExpression, 'existing Area 3 victory normalization');
     await waitForArea(client, 1);
     await moveAxis(client, 'x', 7.2);
-    await moveAxis(client, 'z', 43);
+    await moveAxis(client, 'z', 27);
+    await capture(client, 'runtime-iphone-12-area4-forged-north-landing.png');
+    await moveAxis(client, 'z', 33);
+    await waitForArea(client, 1);
+    await capture(client, 'runtime-iphone-12-area4-forged-north-deck.png');
+    await moveAxis(client, 'z', 37);
     await waitForArea(client, 4);
     await capture(client, 'runtime-iphone-12-area4-forged-deck.png');
+    await moveAxis(client, 'z', 45);
+    await capture(client, 'runtime-iphone-12-area4-forged-south-landing.png');
     await moveAxis(client, 'z', 56);
     await moveAxis(client, 'x', 36);
     await moveAxis(client, 'z', 70);
     await capture(client, 'runtime-iphone-12-area4-throne.png');
     await moveAxis(client, 'z', 60);
     await moveAxis(client, 'x', 86);
-    await moveAxis(client, 'z', 43);
+    await moveAxis(client, 'z', 45);
+    await capture(client, 'runtime-iphone-12-area4-timber-south-landing.png');
+    await moveAxis(client, 'z', 39);
     await capture(client, 'runtime-iphone-12-area4-timber-deck.png');
-    await moveAxis(client, 'z', 30);
+    await moveAxis(client, 'z', 33);
     await waitForArea(client, 3);
+    await capture(client, 'runtime-iphone-12-area4-timber-north-deck.png');
+    await moveAxis(client, 'z', 27);
     await capture(client, 'runtime-iphone-12-area4-keep-south-gate.png');
-    await moveAxis(client, 'z', 53);
+    await moveAxis(client, 'z', 46);
     await waitForArea(client, 4);
     await moveAxis(client, 'x', 7.2);
-    await moveAxis(client, 'z', 32);
+    await moveAxis(client, 'z', 26);
     await waitForArea(client, 1);
-    await moveAxis(client, 'z', 53);
+    await moveAxis(client, 'z', 46);
     await waitForArea(client, 4);
     await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
     await reloadPage(client);
@@ -253,6 +277,18 @@ try {
     const quality = await evaluate(client, `JSON.parse(localStorage.getItem('infuse-rendering-quality-v1'))`);
     if (quality.renderScale !== .7 || quality.frameRateLimit !== 30) throw new Error('Area 4 quality settings did not persist.');
     if (await evaluate(client, "document.querySelector('#canvas-host canvas').width") !== 273) throw new Error('Area 4 reduced drawing buffer is incorrect.');
+    await moveAxis(client, 'x', 86);
+    await moveAxis(client, 'z', 39);
+    await capture(client, 'runtime-iphone-12-area4-timber-reduced.png');
+    await moveAxis(client, 'z', 26);
+    await waitForArea(client, 3);
+    await moveAxis(client, 'z', 46);
+    await waitForArea(client, 4);
+    await moveAxis(client, 'x', 7.2);
+    await moveAxis(client, 'z', 26);
+    await waitForArea(client, 1);
+    await moveAxis(client, 'z', 39);
+    await waitForArea(client, 4);
     await capture(client, 'runtime-iphone-12-area4-reduced.png');
     await client.send('Network.enable');
     await client.send('Network.setCacheDisabled', { cacheDisabled: true });
@@ -263,6 +299,11 @@ try {
     const before = await heroPosition(client);
     await holdKey(client, 'ArrowRight', 'ArrowRight', 300);
     if ((await heroPosition(client)).x <= before.x) throw new Error('Area 4 asset-free blockout is not playable.');
+    await moveAxis(client, 'x', 7.2);
+    await moveAxis(client, 'z', 26);
+    await waitForArea(client, 1);
+    await moveAxis(client, 'z', 39);
+    await waitForArea(client, 4);
     await capture(client, 'runtime-iphone-12-area4-fallback.png');
     client.errors = client.errors.filter((message) => !message.includes('ERR_BLOCKED_BY_CLIENT'));
   } else if (fallenKeep) {
@@ -289,12 +330,11 @@ try {
     await moveAxis(client, 'x', 72);
     await moveAxis(client, 'z', 22);
     await capture(client, 'runtime-iphone-12-keep-barracks.png');
-    await moveAxis(client, 'x', 81.2);
-    await moveAxis(client, 'z', 28.5);
+    await moveAxis(client, 'x', 78.5);
+    await moveAxis(client, 'z', 28);
     await moveAxis(client, 'x', 80);
-    await moveAxis(client, 'z', 34);
     await holdKey(client, 'ArrowDown', 'ArrowDown', 1300);
-    if ((await heroPosition(client)).z > 35.2) throw new Error('The ruined south wall is traversable.');
+    if ((await heroPosition(client)).z > 29.1) throw new Error('The ruined south wall is traversable.');
     await capture(client, 'runtime-iphone-12-keep-south-wall.png');
     await evaluate(client, `document.getElementById('settings-button').click(); document.querySelector('input[name="render-scale"][value="0.7"]').click(); document.querySelector('input[name="frame-rate"][value="30"]').click(); document.getElementById('settings-close').click();`);
     await reloadPage(client);
@@ -364,13 +404,17 @@ try {
     await moveAxis(client, 'z', 16);
     await moveAxis(client, 'x', -23);
     await capture(client, 'runtime-iphone-12-greenhaven-cottages.png');
-    await moveAxis(client, 'z', 31);
+    await moveAxis(client, 'z', 29);
+    await moveAxis(client, 'x', 0);
+    await moveAxis(client, 'z', 26);
     await moveAxis(client, 'x', 7.2);
-    await moveAxis(client, 'z', 34);
+    await moveAxis(client, 'z', 27);
     await holdKey(client, 'ArrowDown', 'ArrowDown', 1200);
-    if ((await heroPosition(client)).z > 35.6) throw new Error('The scenic south bridge opened a future area.');
+    if ((await heroPosition(client)).z > 29.5) throw new Error('The south rift bridge opened before the boss unlock.');
     await capture(client, 'runtime-iphone-12-greenhaven-south.png');
-    await moveAxis(client, 'z', 31);
+    await moveAxis(client, 'z', 26);
+    await moveAxis(client, 'x', 0);
+    await moveAxis(client, 'z', 29);
     await moveAxis(client, 'x', -30);
     await moveAxis(client, 'z', -16);
     await holdKey(client, 'ArrowUp', 'ArrowUp', 1600);

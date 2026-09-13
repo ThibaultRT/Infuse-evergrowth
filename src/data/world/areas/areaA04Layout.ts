@@ -1,20 +1,20 @@
-import { AREA4_ORIGIN, AREA4_SPEC } from '../area4';
+import { AREA4_ORIGIN, AREA4_SPEC, RIFT_SOUTH_Z, area4RiftCutout } from '../area4';
 import type { AreaWorldLayout, WorldPropPlacement } from '../WorldLayout';
 
-const { rift, crossings, throne, lavaPools } = AREA4_SPEC;
+const { bridge, crossings, throne, lavaPools } = AREA4_SPEC;
 const westLanding = crossings.greenhavenX - AREA4_ORIGIN[0];
 const eastLanding = 72 + crossings.fallenKeepLocalX - AREA4_ORIGIN[0];
-const landZ = rift.northZ + rift.depth - AREA4_ORIGIN[2];
+const landingZ = RIFT_SOUTH_Z + bridge.approachLength - AREA4_ORIGIN[2];
 const trees: readonly (readonly [number, number])[] = [[-64, -5], [-61, 14], [-44, 18], [-41, -7], [-18, -6], [-12, 18], [13, 18], [20, -6], [36, 16], [62, -6], [65, 16], [-57, -7]];
 
 export const AREA_A04_LAYOUT = {
   kind: 'area', id: 'area:A04', areaId: 4, name: 'Area 4 — Burned Forest',
   origin: AREA4_ORIGIN, playableSize: AREA4_SPEC.playableSize, visualSize: AREA4_SPEC.visualSize,
   terrain: 'ash',
-  terrainCutouts: [{ name: 'A04_North_Rift', center: [0, (-AREA4_SPEC.visualSize.depth / 2 + landZ) / 2], size: { width: AREA4_SPEC.visualSize.width, depth: landZ + AREA4_SPEC.visualSize.depth / 2 }, elevation: rift.floorY - 0.1 }],
+  terrainCutouts: [area4RiftCutout('A04_North_Rift', AREA4_ORIGIN)],
   roads: [
-    { name: 'A04_West_Approach', points: [[westLanding, landZ + 3], [westLanding, -4], [-14, 2], [0, 4]], width: 3.4, material: 'ash' },
-    { name: 'A04_East_Approach', points: [[eastLanding, landZ + 3], [eastLanding, -3], [26, 3], [0, 4]], width: 3.4, material: 'ash' },
+    { name: 'A04_West_Approach', points: [[westLanding, landingZ], [westLanding, -4], [-14, 2], [0, 4]], width: bridge.width, material: 'ash' },
+    { name: 'A04_East_Approach', points: [[eastLanding, landingZ], [eastLanding, -3], [26, 3], [0, 4]], width: bridge.width, material: 'ash' },
     { name: 'A04_Throne_Approach', points: [[0, 4], [0, 10]], width: 4, material: 'ash' },
   ],
   encounterSpots: [

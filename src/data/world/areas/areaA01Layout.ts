@@ -4,6 +4,7 @@ import { clearTransitionApproaches, transitionTerrainCutouts } from '../transiti
 import { GREENHAVEN_LAKE, GREENHAVEN_ROADS } from '../greenhaven';
 import terrain from '../greenhaven.json';
 import { A01_A04_TRANSITION } from '../transitions/area4RiftTransition';
+import { RIFT_NORTH_Z, area4RiftCutout } from '../area4';
 
 const origin = [0, 0, 0] as const;
 const pines = ['nature.greenhavenPineA', 'nature.greenhavenPineB'] as const;
@@ -13,7 +14,8 @@ const clearings = [
   ...GREENHAVEN_ROADS.flatMap((road) => road.points.map((center) => ({ center, radius: road.width / 2 + 2.5 }))),
 ];
 const decorate = (scatter: WorldScatterPlacement): WorldScatterPlacement => ({
-  ...scatter, exclusions: [...clearings, ...scatter.exclusions ?? []],
+  ...scatter, bounds: { ...scatter.bounds, maxZ: Math.min(scatter.bounds.maxZ, RIFT_NORTH_Z - 1) },
+  exclusions: [...clearings, ...scatter.exclusions ?? []],
 });
 
 export const AREA_A01_LAYOUT = {
@@ -25,7 +27,7 @@ export const AREA_A01_LAYOUT = {
   playableSize: { width: 72, depth: 72 },
   visualSize: { width: 84, depth: 84 },
   terrain: 'meadow',
-  terrainCutouts: transitionTerrainCutouts(A01_A02_TRANSITION, origin),
+  terrainCutouts: [...transitionTerrainCutouts(A01_A02_TRANSITION, origin), area4RiftCutout('A01_South_Rift', origin)],
   roads: GREENHAVEN_ROADS,
   surfaces: [GREENHAVEN_LAKE],
   props: [
@@ -56,9 +58,9 @@ export const AREA_A01_LAYOUT = {
     { name: 'A01_FutureGate_West', prop: 'fortress.gate', position: [-38.5, 0, -5.4], rotation: Math.PI / 2, scale: 0.72, collision: 'none' },
   ],
   scatters: clearTransitionApproaches(clearTransitionApproaches([
-    decorate({ prefix: 'A01_Tree_West', props: pines, count: 25, bounds: { minX: -32, maxX: -28, minZ: -19, maxZ: 32 }, seed: 101, scale: [1, 1.55] }),
+    decorate({ prefix: 'A01_Tree_West', props: pines, count: 25, bounds: { minX: -32, maxX: -28, minZ: -19, maxZ: RIFT_NORTH_Z - 2 }, seed: 101, scale: [1, 1.55] }),
     decorate({ prefix: 'A01_Tree_North', props: pines, count: 27, bounds: { minX: -15, maxX: 32, minZ: -30, maxZ: -23 }, seed: 102, scale: [1.05, 1.65] }),
-    decorate({ prefix: 'A01_Tree_South', props: pines, count: 21, bounds: { minX: -31, maxX: 32, minZ: 30, maxZ: 35 }, seed: 103, scale: [0.8, 1.2] }),
+    decorate({ prefix: 'A01_Tree_South', props: pines, count: 21, bounds: { minX: -31, maxX: 32, minZ: RIFT_NORTH_Z - 3, maxZ: RIFT_NORTH_Z - 1 }, seed: 103, scale: [0.8, 1.2] }),
     decorate({ prefix: 'A01_Tree_East', props: pines, count: 15, bounds: { minX: 29, maxX: 33, minZ: -23, maxZ: 26 }, seed: 108, scale: [0.9, 1.45] }),
     decorate({ prefix: 'A01_Tree_Landmark', props: pines, count: 12, bounds: { minX: -10, maxX: 26, minZ: -22, maxZ: 30 }, seed: 107, scale: [0.8, 1.15], exclusions: [{ center: [13, 14], radius: 6 }, { center: [20, -10.5], radius: 5 }, { center: [22, 20], radius: 7 }] }),
     decorate({ prefix: 'A01_Bush', props: ['nature.forestBushA', 'nature.forestBushB', 'nature.flowerBush'], count: 42, bounds: { minX: -29, maxX: 30, minZ: -25, maxZ: 31 }, seed: 104, scale: [0.55, 1] }),

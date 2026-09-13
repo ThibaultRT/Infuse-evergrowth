@@ -12,6 +12,7 @@ import os
 import random
 import re
 import struct
+import sys
 import zipfile
 from mathutils import Vector
 
@@ -20,6 +21,10 @@ OUTPUT = os.path.join(ROOT, 'public/assets/world/shared/models')
 LOCAL = os.path.join(ROOT, 'authoring/local/fallen-keep')
 with open(os.path.join(ROOT, 'src/data/world/fallen-keep.json')) as file:
     spec = json.load(file)
+with open(os.path.join(ROOT, 'src/data/world/area4-blockout.json')) as file:
+    area4 = json.load(file)
+rift_north = area4['rift']['seamZ'] - area4['rift']['depth'] / 2
+landscape_only = '--landscape-only' in sys.argv
 scene = bpy.data.scenes.new('FallenKeep_Authored')
 bpy.context.window.scene = scene
 scene.unit_settings.system = 'METRIC'
@@ -48,6 +53,8 @@ class Batch:
         self.name, self.vertices, self.faces, self.colors = name, [], [], []
 
     def face(self, points, tint):
+        if self.name in ['A03_WornPavingAndCourts', 'A03_MossAndDryWeeds'] and max(p[2] for p in points) >= rift_north:
+            return
         start = len(self.vertices)
         self.vertices.extend((x, -z, y) for x, y, z in points)
         self.faces.append(tuple(range(start, start + len(points))))
@@ -67,6 +74,8 @@ class Batch:
 
 exports = []
 def export(filename, objects):
+    if landscape_only and filename != 'fallen-keep-landscape.glb':
+        return
     bpy.ops.object.select_all(action='DESELECT')
     for ob in objects:
         ob.select_set(True)
@@ -249,7 +258,7 @@ soil_texture=soil_material.node_tree.nodes.new('ShaderNodeTexImage')
 soil_texture.image=soil_image
 soil_material.node_tree.links.new(soil_texture.outputs['Color'],soil_shader.inputs['Base Color'])
 ground_batch=Batch('A03_AshenGround')
-ground_batch.face([(-35.5,.077,-33.4),(-35.5,.077,37),(37,.077,37),(37,.077,-33.4)],'ffffff')
+ground_batch.face([(-35.5,.077,-33.4),(-35.5,.077,rift_north),(37,.077,rift_north),(37,.077,-33.4)],'ffffff')
 ground=ground_batch.finish()
 ground.data.materials.clear(); ground.data.materials.append(soil_material)
 uv=ground.data.uv_layers.new(name='UVMap')
@@ -282,12 +291,16 @@ for ix in range(57):
                 dx=rng.uniform(-.2,.2); dz=rng.uniform(-.2,.2); h=rng.uniform(.15,.4)
                 plants.face([(x+dx-.06,.08,z+dz),(x+dx,h,z+dz),(x+dx+.06,.08,z+dz)],'77734d')
 
-# The outer apron is scenery only, outside the sealed playable enclosure.
+# The south cliff follows the shared rift edge and leaves its bridge lane clear.
 for side in ['east','south']:
     cliff=spec['outerCliff']
     for i in range(cliff['rockCount']):
         along=cliff['rockStart']+i*cliff['rockStep']
-        x,z=(cliff['rockCenter'],along) if side=='east' else (along,cliff['rockCenter'])
+        if side == 'east' and along > rift_north:
+            continue
+        if side == 'south' and abs(along - area4['crossings']['fallenKeepLocalX']) < area4['bridge']['width']/2 + 2.2:
+            continue
+        x,z=(cliff['rockCenter'],along) if side=='east' else (along,rift_north + cliff['rockCenter'] - cliff['edge'])
         rx,rz=(2.7,1.7) if side=='east' else (1.7,2.7)
         ring=[(x+math.cos(j*math.pi/4)*rx*rng.uniform(.85,1.1),z+math.sin(j*math.pi/4)*rz*rng.uniform(.85,1.1)) for j in range(8)]
         top=[(u,rng.uniform(-.18,.32),v) for u,v in ring]
@@ -300,6 +313,11 @@ for side in ['east','south']:
                 cliffs.face([lower[j],upper[j],upper[k],lower[k]],rng.choice(STONE))
 landscape=[ground,paving.finish(),plants.finish(),cliffs.finish()]
 export('fallen-keep-landscape.glb',landscape)
+if landscape_only:
+    source_file = os.path.join(LOCAL, 'fallen-keep-landscape.blend')
+    bpy.data.libraries.write(source_file, {scene}, fake_user=True, compress=True)
+    print('FALLEN_KEEP_LANDSCAPE_EXPORT', exports, flush=True)
+    sys.exit(0)
 
 # Reuse the free asset found during the source review, with its actual UV palette.
 archive_path=os.path.join(LOCAL,'source/kenney_castle-kit.zip')

@@ -22,6 +22,11 @@
   Blender MCP. It verifies the source archive and exports ten self-contained GLBs,
   plus `authoring/local/fallen-keep/fallen-keep.blend`. The local creative scene and
   source archive are not shipped.
+- Area 4 seam normalization regenerates only the landscape with `--landscape-only`.
+  The north rift edge comes from `area4-blockout.json`; paving stops there and the
+  cliff leaves the timber crossing clear. The separate local source is
+  `authoring/local/fallen-keep/fallen-keep-landscape.blend`. No new third-party assets
+  or licenses are introduced.
 
 ## Quaternius
 
@@ -122,6 +127,7 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - The landscape, pines, boulder, low timber fences, and closed southern bridge were procedurally authored for this project in Blender from the owner's `Layout.png` reference. They contain portable vertex colors and no external texture dependencies.
 - `greenhaven-home-a.glb` and `greenhaven-home-b.glb` are warm-roof palette variants of Kay Lousberg's CC0 KayKit Hexagon homes, derived from the already-promoted `keep-home-red-a.glb` and `keep-home-red-b.glb`. Geometry, pivots and scale are preserved; the modified palette is embedded. The upstream license remains under `public/assets/world/licenses/`.
 - Reproduction: `scripts/world-assets/export-greenhaven.py` reads `src/data/world/greenhaven.json` and writes the nine runtime GLBs plus an editable local scene at `authoring/local/greenhaven/greenhaven.blend`. The local `.blend` is not shipped.
+- The Area 4 rift bank also reads `area4-blockout.json`. Use `--landscape-only` to rebuild its cliff/paving/foliage without rewriting the other models; this saves `authoring/local/greenhaven/greenhaven-landscape.blend`. The regenerated landscape retains the same project-owned provenance.
 - The existing project-supplied fountain and woodland bridge retain their original provenance above.
 
 ## Highwood terrain and woodland

@@ -3,11 +3,12 @@ import { readFile } from 'node:fs/promises';
 
 /** Check traversable interiors, encounter clearings and unchanged existing spawns. */
 export async function validateFallenKeep(vite, config) {
-  const [{ AREA_A03_LAYOUT: layout }, { circleOverlapsWorldCollision }, { worldTerrainHeight }, { expandWorldScatter }] = await Promise.all([
+  const [{ AREA_A03_LAYOUT: layout }, { circleOverlapsWorldCollision }, { worldTerrainHeight }, { expandWorldScatter }, { worldWalkHeight }] = await Promise.all([
     vite.ssrLoadModule('/src/data/world/areas/areaA03Layout.ts'),
     vite.ssrLoadModule('/src/domain/world/CollisionMath.ts'),
     vite.ssrLoadModule('/src/rendering/environment/WorldGeometry.ts'),
     vite.ssrLoadModule('/src/data/world/WorldLayout.ts'),
+    vite.ssrLoadModule('/src/domain/world/WorldWalkSurface.ts'),
   ]);
   const area = config.AREAS.find((candidate) => candidate.id === 3);
   const columns = 141, step = .5, minimum = -35;
@@ -17,7 +18,7 @@ export async function validateFallenKeep(vite, config) {
   for (let i = 0; i < open.length; i++) {
     const local = pointAt(i), world = { x: local.x + area.originX, z: local.z + area.originZ };
     open[i] = Number(!area.collision.some((shape) => !shape.activation && circleOverlapsWorldCollision(world, .5, shape)));
-    if (open[i]) assert.equal(worldTerrainHeight(layout, local.x, local.z), 0, 'Keep paving must agree with the simulation floor.');
+    if (open[i] && worldWalkHeight(area.walkSurfaces, world) === 0) assert.equal(worldTerrainHeight(layout, local.x, local.z), 0, 'Keep paving must agree with the simulation floor away from the bridge.');
   }
   const start = indexOf({ x: -34, z: 3.6 });
   assert.ok(open[start], 'West gate landing is blocked.');
@@ -33,7 +34,7 @@ export async function validateFallenKeep(vite, config) {
     ...config.SPAWNS.filter((spawn) => spawn.areaId === 3).map((spawn) => ({ id: spawn.id, x: spawn.x - area.originX, z: spawn.z - area.originZ })),
     ...layout.encounterSpots.map((spot) => ({ id: spot.id, x: spot.center[0], z: spot.center[1] })),
     { id: 'north gate landing', x: 7.2, z: -32 },
-    { id: 'south gate landing', x: 14, z: 33 },
+    { id: 'south gate landing', x: 14, z: 27 },
     { id: 'west cottage interior', x: -17, z: 25 },
     { id: 'east cottage interior', x: 27, z: 24 },
     { id: 'guardhouse interior', x: -27, z: -5.5 },

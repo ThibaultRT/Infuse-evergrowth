@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T19:52:28.507Z",
+  "generatedAt": "2026-09-13T12:44:23.589Z",
   "assets": [
     {
       "key": "crossing.bridgeA",
@@ -847,12 +847,12 @@
       "source": "assets/world/shared/models/fallen-keep-landscape.glb",
       "runtime": "assets/world/shared/models/fallen-keep-landscape.glb",
       "sourceDigest": {
-        "bytes": 592560,
-        "sha256": "9ac3bbcf18e5144a8448c68f6df5fe8c03e2438743b1048ebd59fa66c44fafae"
+        "bytes": 562276,
+        "sha256": "0410fde6307251fcff717b2126cdf66a812616b79abf56b58d9c1d2e409b33c6"
       },
       "runtimeDigest": {
-        "bytes": 592560,
-        "sha256": "9ac3bbcf18e5144a8448c68f6df5fe8c03e2438743b1048ebd59fa66c44fafae"
+        "bytes": 562276,
+        "sha256": "0410fde6307251fcff717b2126cdf66a812616b79abf56b58d9c1d2e409b33c6"
       }
     },
     {
@@ -887,12 +887,12 @@
       "source": "assets/world/shared/models/greenhaven-landscape.glb",
       "runtime": "assets/world/shared/models/greenhaven-landscape.glb",
       "sourceDigest": {
-        "bytes": 3302060,
-        "sha256": "cba5b299ff9edba8ae24ac45e0ca22d6b9603137f150ffe261a1e29daee2b055"
+        "bytes": 3102016,
+        "sha256": "6996cbd2de1f632961ce581afabbc24c664b8eb94e995f01a11fc5393d2e9634"
       },
       "runtimeDigest": {
-        "bytes": 3302060,
-        "sha256": "cba5b299ff9edba8ae24ac45e0ca22d6b9603137f150ffe261a1e29daee2b055"
+        "bytes": 3102016,
+        "sha256": "6996cbd2de1f632961ce581afabbc24c664b8eb94e995f01a11fc5393d2e9634"
       }
     },
     {

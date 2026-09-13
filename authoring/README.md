@@ -231,14 +231,36 @@ and three impassable lava markers. It has no enemies or rewards yet.
 rendering, rails, locks and floor profiles. Procedural semantic prop definitions
 use untextured, material-batched box/cylinder parts so the slice needs no new GLBs
 or texture downloads. Replace their presentation after the major asset review;
-keep collision renderer-independent. The A01 canyon water and old scenic bridge
-are retired from its layout, and the A03 south wall has a real gate opening.
+keep collision renderer-independent. Both 84 × 12 m transitions span world Z=30..42,
+with the 12 m decks centered on the unchanged seam at Z=36. Their 3 m approaches
+reach dry land at Z=27 and Z=45. Collision and floor profiles are compiled into
+both adjacent areas, as for A01/A02. Area roots, connection IDs and save v18 stay fixed.
+
+The rift reaches 6 m into Areas 1 and 3. All overlapping terrain uses its shared
+cutout, including the A01/A03 apron. The A03 south wall/gate sits at Z=30, with
+shorter east/west runs and relocated corner joins; its enclosure fits without an
+area extension. The southern roads/scatter and both landscape exports meet the
+new bank. A01's old canyon water and scenic bridge remain retired.
+
+To rebuild just the affected landscapes, preserving other runtime models and the
+previous full local creative scenes, run:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-greenhaven.py -- --landscape-only
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-fallen-keep.py -- --landscape-only
+```
+
+Both exporters read the shared rift dimensions and save separate `*-landscape.blend`
+sources under their local directories. Apply glTF Transform dedup/prune to the two
+landscape GLBs, then run `npm run authoring:assets:promote -- terrain.greenhaven terrain.fallenKeep`.
 
 `authoring:world:capture` includes the 3840 × 3200 `world-layout-area4-hires.png`, `area4-blockout.png`,
 `iphone-12-area-a04.png` and both portrait rift bridges. The assembled debug GLB
 now contains nine chunks. Run `authoring:world:smoke-runtime -- --area4` to walk
-both bridges each way, verify the lock and old boss-victory backfill, and inspect
-portrait Full/Reduced, persisted 30 FPS and missing-world-assets behavior.
+both bridges each way in Full and persisted Reduced/30 FPS, verify the lock and old
+boss-victory backfill, and inspect both sides of the seam, landings and missing-world-assets
+traversal. World validation checks the Z=30..42 barrier in all three areas, continuous
+Z=27..45 floors and the complete A03 perimeter, including its moved corner joins.
 
 ## Ownership
 

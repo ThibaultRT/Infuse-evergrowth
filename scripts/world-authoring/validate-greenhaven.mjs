@@ -38,7 +38,7 @@ export async function validateGreenhaven(vite, config) {
     { id: 'north bridge approach', x: 10.8, z: -27 },
     { id: 'east gate approach', x: 33, z: 3.6 },
     { id: 'west scenic gate', x: -34, z: -5.4 },
-    { id: 'south scenic bridge', x: 7.2, z: 34 },
+    { id: 'south rift bridge landing', x: 7.2, z: 27 },
   ];
   for (const destination of destinations) assert.ok(reached.has(indexOf(destination)), `Greenhaven strands ${destination.id}.`);
   for (const scatter of layout.scatters) {
