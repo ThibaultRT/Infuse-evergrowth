@@ -9,6 +9,7 @@ import { walkSurfaceHeight } from '../../domain/world/WorldWalkSurface';
 import { createWalkSurfaceView } from './WorldWalkSurfaceView';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { BlockoutMaterial, WorldBlockoutPart } from '../../data/world/area4';
+import { createArea4Ground, createLavaBasin, createRiftBanks } from './Area4TerrainView';
 
 export type WorldBuildMode = 'runtime' | 'inspection';
 
@@ -69,8 +70,14 @@ export class WorldBuilder {
     const view = new WorldChunkView(layout);
     const terrain = new THREE.Group();
     terrain.name = `${layout.id.replace(':', '_')}_TerrainAndRoads`;
-    terrain.add(createWorldTerrain(layout, this.materials.terrain[layout.terrain]));
-    for (const road of layout.roads) terrain.add(createWorldRoad(layout, road, this.materials));
+    if (layout.kind === 'area' && layout.areaId === 4) {
+      terrain.add(createArea4Ground(layout, this.materials.area4.ground));
+    } else {
+      // Rift transitions contain banks and a black closure, with no terrain mesh.
+      if (layout.terrain !== 'rift') terrain.add(createWorldTerrain(layout, this.materials.terrain[layout.terrain]));
+      for (const road of layout.roads) terrain.add(createWorldRoad(layout, road, this.materials));
+    }
+    if (layout.riftBanks) terrain.add(createRiftBanks(layout.riftBanks, layout.origin[0], this.materials.area4));
     for (const surface of layout.surfaces ?? []) terrain.add(createWorldSurface(surface, this.materials));
     view.root.add(terrain);
 
@@ -103,7 +110,8 @@ export class WorldBuilder {
 
   private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode): Promise<THREE.Object3D> {
     const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
-    let model = definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
+    let model = definition.procedural === 'lava-basin' ? createLavaBasin(this.materials.area4)
+      : definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
     const failed = Boolean(model.userData.worldAssetFallback);
     if (failed && definition.fallbackBlockout) {
       if (model instanceof THREE.Mesh) {

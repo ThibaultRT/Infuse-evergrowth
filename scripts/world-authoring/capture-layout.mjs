@@ -9,6 +9,7 @@ import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 const repositoryRoot = process.cwd();
 const area4BridgesOnly = process.argv.includes('--area4-bridges');
 const area4ThroneOnly = process.argv.includes('--area4-throne');
+const area4TerrainOnly = process.argv.includes('--area4-terrain');
 const viewerPort = 4174;
 const viewerUrl = `http://127.0.0.1:${viewerPort}`;
 const capturesRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -122,6 +123,7 @@ function inspectDebugGlb(buffer) {
     'area_A01', 'area_A02', 'area_A03', 'area_A04',
     'transition_A01-A02', 'transition_A01-A03', 'transition_A02-A03',
     'transition_A01-A04', 'transition_A03-A04', 'A04_Ancient_Throne', 'A01_A04_Bridge', 'A03_A04_Bridge',
+    'A04_AshAndCharcoalGround', 'A01_A04_NorthBank_Depth', 'A03_A04_SouthBank_Depth', 'A04_Lava_West',
     'A03_Corner_NW', 'A03_Corner_NE', 'A03_Corner_SE', 'A03_Corner_SW',
     'A03_WestGate', 'A03_NorthGate', 'A03_SouthGate',
   ];
@@ -146,7 +148,17 @@ try {
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
-  if (area4ThroneOnly) {
+  if (area4TerrainOnly) {
+    await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
+    await capture(client, path.join(capturesRoot, 'area4-terrain.png'), 'area4', 1600, 1000);
+    await capture(client, path.join(capturesRoot, 'area4-rift-banks.png'), 'area4:rift', 1600, 1000);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area4-rift-depth.png'), 'area4:rift-depth', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area4-lava.png'), 'area4:lava', 390, 844);
+    for (const [id, name] of [['A01-A04', 's2'], ['A03-A04', 'w2']]) {
+      await capture(client, path.join(capturesRoot, `iphone-12-area4-${name}-terrain.png`), `bridge:${id}`, 390, 844);
+    }
+    console.log('Captured Area 4 terrain, continuous rift banks, dark depth, lava and both portrait bridge landings.');
+  } else if (area4ThroneOnly) {
     await capture(client, path.join(capturesRoot, 'area4-throne.png'), 'area4:throne', 1100, 900);
     await capture(client, path.join(capturesRoot, 'iphone-12-area4-throne.png'), 'area4:throne', 390, 844);
     console.log('Captured the supplied throne in-world and at the iPhone 12 portrait viewport.');

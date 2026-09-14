@@ -8,8 +8,9 @@ import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_W
 import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
 import { AREA4_LAND_GATE, AREA4_LAND_GATE_COLLISION, AREA4_LAND_GATE_FALLBACK, AREA4_WALL_GATE, AREA4_WALL_GATE_COLLISION, AREA4_WALL_GATE_FALLBACK } from './area4Bridges';
 
-export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never }
-  | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[] }) & {
+export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never; readonly procedural?: never }
+  | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[]; readonly procedural?: never }
+  | { readonly asset?: never; readonly blockout?: never; readonly procedural: 'lava-basin' }) & {
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
   readonly absoluteElevation?: boolean;
@@ -29,7 +30,7 @@ export const WORLD_PROP_CATALOG = {
   'crossing.area4BoneGate': { asset: 'crossing.area4BoneGate', fallbackBlockout: AREA4_LAND_GATE_FALLBACK, collision: AREA4_LAND_GATE_COLLISION, gate: AREA4_LAND_GATE, absoluteElevation: true, cameraOccluder: true },
   'ruin.area4SouthGate': { asset: 'ruin.area4SouthGate', fallbackBlockout: AREA4_WALL_GATE_FALLBACK, collision: AREA4_WALL_GATE_COLLISION, gate: AREA4_WALL_GATE, absoluteElevation: true, cameraOccluder: true },
   'ruin.ancientThrone': { asset: 'ruin.ancientThrone', fallbackBlockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true, absoluteElevation: true },
-  'blockout.lavaPool': { blockout: [{ kind: 'cylinder', size: [2, 0.04, 2], position: [0, 0.02, 0], material: 'lava' }], collision: [circle(1)], absoluteElevation: true },
+  'terrain.lavaBasin': { procedural: 'lava-basin', collision: [circle(1)], absoluteElevation: true },
   'blockout.charredTree': { blockout: [
     { size: [0.5, 4, 0.5], position: [0, 2, 0], material: 'ash' },
     { size: [2.4, 0.25, 0.25], position: [0.6, 2.8, 0], material: 'ash' },

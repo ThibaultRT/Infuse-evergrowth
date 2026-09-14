@@ -175,6 +175,17 @@ function framePreset(preset: string): void {
   } else if (preset === 'area4') {
     controls.target.set(36, 0, 50);
     camera.position.set(48, 105, 151);
+  } else if (preset === 'area4:rift') {
+    controls.target.set(36, -2, 36);
+    camera.position.set(48, 51, 102);
+  } else if (preset === 'area4:rift-depth') {
+    controls.target.set(18, -5, 35);
+    camera.position.set(24, 8, 50);
+  } else if (preset === 'area4:lava') {
+    const pool = AREA4_SPEC.lavaPools[0];
+    const x = AREA4_SPEC.origin[0] + pool.center[0], z = AREA4_SPEC.origin[2] + pool.center[1];
+    controls.target.set(x, 0, z);
+    camera.position.set(x + 5, 9, z + 9);
   } else if (preset === 'area4:throne') {
     const layout = WORLD_LAYOUTS.find((chunk) => chunk.id === 'area:A04')!;
     const throne = layout.props.find((prop) => prop.name === 'A04_Ancient_Throne')!;

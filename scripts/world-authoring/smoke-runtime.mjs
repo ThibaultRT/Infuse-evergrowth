@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
@@ -222,7 +222,8 @@ try {
 
   if (area4) {
     await moveAxis(client, 'x', 7.2);
-    await moveAxis(client, 'z', 27);
+    // Stop before the closed land gate; its plane at Z=27 is not reachable yet.
+    await moveAxis(client, 'z', 26);
     await holdKey(client, 'ArrowDown', 'ArrowDown', 900);
     const locked = await heroPosition(client);
     if (locked.area !== 1 || locked.z >= 30) throw new Error('Area 4 opened before the boss unlock.');
@@ -252,6 +253,17 @@ try {
     await moveAxis(client, 'x', 36);
     await moveAxis(client, 'z', 70);
     await capture(client, 'runtime-iphone-12-area4-throne.png');
+    await moveAxis(client, 'z', 60);
+    const terrainSpec = JSON.parse(await readFile(path.join(repositoryRoot, 'src/data/world/area4-blockout.json'), 'utf8'));
+    const lava = terrainSpec.lavaPools[0];
+    const lavaX = terrainSpec.origin[0] + lava.center[0], lavaZ = terrainSpec.origin[2] + lava.center[1];
+    await moveAxis(client, 'x', lavaX - lava.radius - 1);
+    await moveAxis(client, 'z', lavaZ);
+    await holdKey(client, 'ArrowRight', 'ArrowRight', 900);
+    const stopped = await heroPosition(client);
+    // Diagnostics round X/Z to 0.1 m; retain tolerance around the 0.45 m hero radius.
+    if (Math.hypot(stopped.x - lavaX, stopped.z - lavaZ) < lava.radius + .35) throw new Error('The hero entered the lava basin.');
+    await capture(client, 'runtime-iphone-12-area4-lava.png');
     await moveAxis(client, 'z', 60);
     await moveAxis(client, 'x', 86);
     await moveAxis(client, 'z', 45);

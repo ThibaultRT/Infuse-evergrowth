@@ -1,6 +1,6 @@
-import { AREA4_SPEC } from '../area4';
+import { AREA4_SPEC, area4RiftLip } from '../area4';
 import { AREA4_LAND_GATE_Z, AREA4_WALL_GATE_Z } from '../area4Bridges';
-import type { TransitionWorldLayout } from '../WorldLayout';
+import type { TransitionWorldLayout, WorldRiftBank } from '../WorldLayout';
 
 /** Like A01/A02, the deck and rift straddle the unchanged area seam. */
 export function area4RiftTransition(source: 1 | 3): TransitionWorldLayout {
@@ -13,13 +13,22 @@ export function area4RiftTransition(source: 1 | 3): TransitionWorldLayout {
   const maxX = source === 1 ? 36 : 42;
   const left = center - bridge.width / 2;
   const right = center + bridge.width / 2;
+  const bankSamples = new Set([minX, maxX, center - bridge.width / 2 - 0.55, center + bridge.width / 2 + 0.55]);
+  // Global sampling and exact shared endpoints prevent a crack at world X=36.
+  for (let x = Math.ceil((minX + sourceX) / rift.bankStep) * rift.bankStep; x < maxX + sourceX; x += rift.bankStep) bankSamples.add(x - sourceX);
+  const banks: readonly WorldRiftBank[] = [false, true].map((south) => ({
+    name: `${prefix}_${south ? 'South' : 'North'}Bank`, landZ: (south ? 1 : -1) * rift.depth / 2,
+    edge: [...bankSamples].sort((a, b) => a - b).map((x) => [x, area4RiftLip(x + sourceX, south) - rift.seamZ] as const),
+    bottomY: rift.floorY, darknessY: rift.darknessY, palette: south ? 'ash' : source === 1 ? 'meadow' : 'stone',
+  }));
   return {
     kind: 'transition', id: `transition:A0${source}-A04`, connectionId: `area${source}-area4`, areaIds: [source, 4],
     name: source === 1 ? 'Greenhaven–Area 4 Forged Bridge' : 'Fallen Keep–Area 4 Ruined Timber Bridge',
     origin: [sourceX, 0, rift.seamZ], visualSize: { width: 84, depth: rift.depth }, terrain: 'rift',
     axis: 'z', crossingCenter: center, crossingWidth: bridge.width, barrierDepth: rift.depth,
-    terrainCutouts: [{ name: `${prefix}_BelowBanks`, center: [0, 0], size: { width: 84, depth: rift.depth }, elevation: rift.floorY - 0.1 }],
+    terrainCutouts: [{ name: `${prefix}_BelowBanks`, center: [0, 0], size: { width: 84, depth: rift.depth }, elevation: rift.floorY - 0.1, open: true }],
     roads: [],
+    riftBanks: banks,
     surfaces: [{ name: `${prefix}_Abyss`, kind: 'abyss', center: [(minX + maxX) / 2, 0], size: { width: maxX - minX, depth: rift.depth }, elevation: rift.floorY }],
     props: [
       { name: `${prefix}_Bridge`, prop: source === 1 ? 'crossing.area4SkeletalBridge' : 'crossing.area4TimberBridge', position: [center, 0, 0] },

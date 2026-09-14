@@ -3,9 +3,10 @@ import type { TerrainProfile } from '../../data/world/WorldLayout';
 import { WorldAssetLibrary } from './WorldAssetLibrary';
 import type { RenderScale } from '../RenderingQuality';
 import type { BlockoutMaterial } from '../../data/world/area4';
+import { createArea4Materials, type Area4MaterialSet } from './Area4TerrainView';
 
 export type WorldMaterialSet = {
-  readonly terrain: Readonly<Record<TerrainProfile, THREE.MeshStandardMaterial>>;
+  readonly terrain: Readonly<Record<TerrainProfile, THREE.MeshStandardMaterial | THREE.MeshBasicMaterial>>;
   readonly trail: THREE.MeshStandardMaterial;
   readonly cobble: THREE.MeshStandardMaterial;
   readonly water: THREE.MeshPhysicalMaterial;
@@ -14,7 +15,8 @@ export type WorldMaterialSet = {
   readonly timber: THREE.MeshStandardMaterial;
   readonly blockout: Readonly<Record<BlockoutMaterial, THREE.MeshStandardMaterial>>;
   readonly ashTrail: THREE.MeshStandardMaterial;
-  readonly abyss: THREE.MeshStandardMaterial;
+  readonly abyss: THREE.MeshBasicMaterial;
+  readonly area4: Area4MaterialSet;
 };
 
 /** Reduced mode avoids transmission's extra scene pass; Full restores the authored look. */
@@ -61,10 +63,12 @@ export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<W
   transitionMeadow.color.setHex(0xaebf91);
   const transitionFortress = cobble.clone();
   transitionFortress.color.setHex(0xa9a294);
-  const abyss = new THREE.MeshStandardMaterial({ color: 0x08080e, roughness: 1 });
+  const abyss = new THREE.MeshBasicMaterial({ color: 0x000000, fog: false, toneMapped: false });
+  const area4 = createArea4Materials();
   return {
     terrain: { meadow, forest, cobble, 'transition-meadow': transitionMeadow, 'transition-fortress': transitionFortress,
-      ash: new THREE.MeshStandardMaterial({ color: 0x49403c, roughness: 1 }), rift: abyss },
+      ash: area4.ground, rift: abyss },
+    area4,
     trail,
     cobble,
     water: new THREE.MeshPhysicalMaterial({ color: 0x3e94a0, emissive: 0x163b40, emissiveIntensity: 0.3, roughness: 0.2, transmission: 0.16, transparent: true, opacity: 0.84, side: THREE.DoubleSide }),

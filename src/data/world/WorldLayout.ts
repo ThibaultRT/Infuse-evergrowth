@@ -51,6 +51,17 @@ export type WorldTerrainCutout = {
   readonly size: WorldSize;
   readonly rotation?: number;
   readonly elevation: number;
+  /** Remove the surface entirely; the owning transition supplies the abyss walls. */
+  readonly open?: boolean;
+};
+
+export type WorldRiftBank = {
+  readonly name: string;
+  readonly landZ: number;
+  readonly edge: readonly WorldVec2[];
+  readonly bottomY: number;
+  readonly darknessY: number;
+  readonly palette: 'meadow' | 'stone' | 'ash';
 };
 
 export type ExplicitCollisionVolume = CollisionProxy & {
@@ -67,6 +78,7 @@ type WorldLayoutBase = {
   readonly terrainCutouts?: readonly WorldTerrainCutout[];
   readonly roads: readonly WorldRoadPlacement[];
   readonly surfaces?: readonly WorldSurfacePlacement[];
+  readonly riftBanks?: readonly WorldRiftBank[];
   readonly props: readonly WorldPropPlacement[];
   readonly scatters: readonly WorldScatterPlacement[];
   readonly collision: readonly ExplicitCollisionVolume[];

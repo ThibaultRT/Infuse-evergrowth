@@ -1,11 +1,18 @@
 import * as THREE from 'three';
-import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement } from '../../data/world/WorldLayout';
+import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement, WorldTerrainCutout } from '../../data/world/WorldLayout';
 import type { WorldMaterialSet } from './WorldMaterials';
 import { greenhavenGroundHeight } from '../../data/world/greenhaven';
 import { highwoodGroundHeight } from '../../data/world/highwood';
 import { fallenKeepGroundHeight } from '../../data/world/fallenKeep';
 
-export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number): number {
+function insideCutout(cutout: WorldTerrainCutout, x: number, z: number): boolean {
+  const rotation = cutout.rotation ?? 0;
+  const dx = x - cutout.center[0], dz = z - cutout.center[1];
+  return Math.abs(Math.cos(rotation) * dx - Math.sin(rotation) * dz) <= cutout.size.width / 2
+    && Math.abs(Math.sin(rotation) * dx + Math.cos(rotation) * dz) <= cutout.size.depth / 2;
+}
+
+function terrainHeight(layout: AnyWorldLayout, x: number, z: number, includeOpen: boolean): number {
   let height: number;
   if (layout.kind === 'transition' || layout.areaId === 4) height = 0;
   else if (layout.areaId === 2) height = highwoodGroundHeight();
@@ -13,16 +20,15 @@ export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number)
   else height = greenhavenGroundHeight(x, z);
 
   for (const cutout of layout.terrainCutouts ?? []) {
-    const rotation = cutout.rotation ?? 0;
-    const dx = x - cutout.center[0];
-    const dz = z - cutout.center[1];
-    const localX = Math.cos(rotation) * dx - Math.sin(rotation) * dz;
-    const localZ = Math.sin(rotation) * dx + Math.cos(rotation) * dz;
-    if (Math.abs(localX) <= cutout.size.width / 2 && Math.abs(localZ) <= cutout.size.depth / 2) {
+    if ((includeOpen || !cutout.open) && insideCutout(cutout, x, z)) {
       height = Math.min(height, cutout.elevation);
     }
   }
   return height;
+}
+
+export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number): number {
+  return terrainHeight(layout, x, z, true);
 }
 
 export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Material): THREE.Mesh {
@@ -47,9 +53,12 @@ export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Mater
   const uvs: number[] = [];
   const indices: number[] = [];
   for (const [row, z] of zs.entries()) for (const [column, x] of xs.entries()) {
-    positions.push(x, worldTerrainHeight(layout, x, z), z);
+    // An open cutout has no sloping sides or lit floor. Keep the adjoining land
+    // at its original height right up to the transition-owned rock face.
+    positions.push(x, terrainHeight(layout, x, z, false), z);
     uvs.push(x / layout.visualSize.width + 0.5, 0.5 - z / layout.visualSize.depth);
     if (row === zs.length - 1 || column === xs.length - 1) continue;
+    if (layout.terrainCutouts?.some((cutout) => cutout.open && insideCutout(cutout, (x + xs[column + 1]) / 2, (z + zs[row + 1]) / 2))) continue;
     const i = row * xs.length + column;
     indices.push(i, i + xs.length, i + 1, i + 1, i + xs.length, i + xs.length + 1);
   }
@@ -65,9 +74,13 @@ export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Mater
   return mesh;
 }
 
-export function createWorldRoad(layout: AnyWorldLayout, road: WorldRoadPlacement, materials: WorldMaterialSet): THREE.Mesh {
+export function sampleWorldRoad(road: WorldRoadPlacement): THREE.Vector3[] {
   const curve = new THREE.CatmullRomCurve3(road.points.map(([x, z]) => new THREE.Vector3(x, 0, z)), false, 'centripetal');
-  const samples = curve.getPoints(Math.max(10, (road.points.length - 1) * 8));
+  return curve.getPoints(Math.max(10, (road.points.length - 1) * 8));
+}
+
+export function createWorldRoad(layout: AnyWorldLayout, road: WorldRoadPlacement, materials: WorldMaterialSet): THREE.Mesh {
+  const samples = sampleWorldRoad(road);
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
@@ -113,7 +126,7 @@ export function createWorldSurface(surface: WorldSurfacePlacement, materials: Wo
   mesh.name = surface.name;
   mesh.position.set(surface.center[0], surface.elevation ?? 0.05, surface.center[1]);
   mesh.rotation.y = surface.rotation ?? 0;
-  mesh.receiveShadow = true;
+  mesh.receiveShadow = surface.kind !== 'abyss';
   mesh.userData.worldOwnedGeometry = true;
   return mesh;
 }

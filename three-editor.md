@@ -44,8 +44,9 @@ north edge at Z=30; the east/west curtain runs end at those corners. Broken-look
 wall pieces remain collidable; only the three authored
 gates are traversable. Each Area 4 gate owns its connection's single lock proxy.
 
-Area A04 is an untextured burned-forest blockout. Both rift transitions follow the
-A01/A02 convention: world Z=30..42, centered on the unchanged seam at Z=36. The rift
+Area A04 has flat charcoal/ash terrain, blended paths and three small lava basins.
+Tree markers remain blockouts until the forest-dressing pass. Both rift transitions
+follow the A01/A02 convention: world Z=30..42, centered on the unchanged seam at Z=36. The rift
 extends 6 m into Areas A01/A03 and 6 m into A04. Each 3.4 m-wide bridge has a 12 m
 deck at Y=0.6 centered on the seam and 3 m approaches reaching Y=0 at Z=27 and Z=45.
 Transition collision and walk surfaces are shared with both adjacent areas, so
@@ -60,6 +61,15 @@ Both open inland with 3.4 m clearance, using the existing connection state.
 `area4-blockout.json` owns the floor dimensions and `area4-bridges.json` owns gate
 details shared by the Blender exporter and semantic collision;
 `area4.md` describes the final asset handoff and remaining decisions.
+
+Open rift cutouts omit the overlapping terrain surface entirely, including the
+A01/A03 apron. Transition-local `riftBanks` derive fractured lips from the shared
+world-space profile, meet at X=36 and leave the bridge landings clear. Rock faces
+fade to black by Y=-14 and end at an unlit black closure at Y=-48. Neither lighting
+nor sky fog reveals a floor. The two landscape GLBs no longer contain shallow
+southern cliff shelves. All walkable ground remains Y=0. Lava basin geometry stays
+within its named prop's unit circle, scaled by the shared pool radius for both
+rendering and collision. No gameplay heights are read from this geometry.
 
 `A04_Ancient_Throne` uses the supplied throne GLB at local `(0,0,15)`, world
 `(36,0,75)`. Uniform scale is baked into the mesh: height 5.4 m, ground Y=0,

@@ -291,26 +291,23 @@ for ix in range(57):
                 dx=rng.uniform(-.2,.2); dz=rng.uniform(-.2,.2); h=rng.uniform(.15,.4)
                 plants.face([(x+dx-.06,.08,z+dz),(x+dx,h,z+dz),(x+dx+.06,.08,z+dz)],'77734d')
 
-# The south cliff follows the shared rift edge and leaves its bridge lane clear.
-for side in ['east','south']:
-    cliff=spec['outerCliff']
-    for i in range(cliff['rockCount']):
-        along=cliff['rockStart']+i*cliff['rockStep']
-        if side == 'east' and along > rift_north:
-            continue
-        if side == 'south' and abs(along - area4['crossings']['fallenKeepLocalX']) < area4['bridge']['width']/2 + 2.2:
-            continue
-        x,z=(cliff['rockCenter'],along) if side=='east' else (along,rift_north + cliff['rockCenter'] - cliff['edge'])
-        rx,rz=(2.7,1.7) if side=='east' else (1.7,2.7)
-        ring=[(x+math.cos(j*math.pi/4)*rx*rng.uniform(.85,1.1),z+math.sin(j*math.pi/4)*rz*rng.uniform(.85,1.1)) for j in range(8)]
-        top=[(u,rng.uniform(-.18,.32),v) for u,v in ring]
-        middle=[(x+(u-x)*rng.uniform(.8,1.1),-2.1+rng.uniform(-.4,.3),z+(v-z)*rng.uniform(.85,1.1)) for u,v in ring]
-        low=[(x+(u-x)*.82,cliff['base']-.2,z+(v-z)*.82) for u,v in ring]
-        cliffs.face(top[::-1],rng.choice(MOSS))
-        for lower,upper in [(low,middle),(middle,top)]:
-            for j in range(8):
-                k=(j+1)%8
-                cliffs.face([lower[j],upper[j],upper[k],lower[k]],rng.choice(STONE))
+# The Area 4 transition owns the south bank; retain only the eastern plinth.
+cliff=spec['outerCliff']
+for i in range(cliff['rockCount']):
+    along=cliff['rockStart']+i*cliff['rockStep']
+    if along + 1.9 > rift_north:
+        continue
+    x,z=cliff['rockCenter'],along
+    rx,rz=2.7,1.7
+    ring=[(x+math.cos(j*math.pi/4)*rx*rng.uniform(.85,1.1),z+math.sin(j*math.pi/4)*rz*rng.uniform(.85,1.1)) for j in range(8)]
+    top=[(u,rng.uniform(-.18,.32),v) for u,v in ring]
+    middle=[(x+(u-x)*rng.uniform(.8,1.1),-2.1+rng.uniform(-.4,.3),z+(v-z)*rng.uniform(.85,1.1)) for u,v in ring]
+    low=[(x+(u-x)*.82,cliff['base']-.2,z+(v-z)*.82) for u,v in ring]
+    cliffs.face(top[::-1],rng.choice(MOSS))
+    for lower,upper in [(low,middle),(middle,top)]:
+        for j in range(8):
+            k=(j+1)%8
+            cliffs.face([lower[j],upper[j],upper[k],lower[k]],rng.choice(STONE))
 landscape=[ground,paving.finish(),plants.finish(),cliffs.finish()]
 export('fallen-keep-landscape.glb',landscape)
 if landscape_only:

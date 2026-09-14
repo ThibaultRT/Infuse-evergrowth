@@ -22,8 +22,18 @@ export const RIFT_SOUTH_Z = spec.rift.seamZ + spec.rift.depth / 2;
 export function area4RiftCutout(name: string, origin: WorldVec3): WorldTerrainCutout {
   return {
     name, center: [AREA4_ORIGIN[0] - origin[0], spec.rift.seamZ - origin[2]],
-    size: { width: spec.rift.halfWidth * 2, depth: spec.rift.depth }, elevation: spec.rift.floorY - 0.1,
+    size: { width: spec.rift.halfWidth * 2, depth: spec.rift.depth }, elevation: spec.rift.floorY - 0.1, open: true,
   };
+}
+
+/** A continuous world-space fracture, including across the two streaming owners.
+ * Lips project only into the blocked rift; walkable banks and bridge lanes stay flat. */
+export function area4RiftLip(worldX: number, south: boolean): number {
+  const crossingDistance = Math.min(Math.abs(worldX - spec.crossings.greenhavenX), Math.abs(worldX - (72 + spec.crossings.fallenKeepLocalX)));
+  const clearance = Math.max(0, Math.min(1, (crossingDistance - spec.bridge.width / 2 - 0.55) / 1.8));
+  const phase = south ? 4.7 : 0;
+  const fracture = 0.5 + 0.23 * Math.sin(worldX * 1.73 + phase) + 0.17 * Math.sin(worldX * 4.13 + phase) + 0.1 * Math.sin(worldX * 0.29);
+  return (south ? RIFT_SOUTH_Z : RIFT_NORTH_Z) + (south ? -1 : 1) * spec.rift.lipInset * fracture * clearance;
 }
 
 const bridge = spec.bridge;

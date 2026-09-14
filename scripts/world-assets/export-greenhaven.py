@@ -94,16 +94,8 @@ for mass in spec['westRocks']:
         theta = random.random() * math.tau
         rock(cliffs, x + math.cos(theta)*r*0.58, z + math.sin(theta)*r*0.58, r*0.36, -0.4, h*random.uniform(0.3, 0.55))
 
-# The southern escarpment follows the shared rift's north bank, inside A01.
-edge = rift_north
-bottom = spec['plateau']['bottomHeight']
-for index in range(39):
-    x = -37 + index * 1.9
-    if abs(x - area4['crossings']['greenhavenX']) < area4['bridge']['width']/2 + 2.7:
-        continue
-    rock(cliffs, x, edge + 1.3 + random.uniform(-0.2, 0.5), random.uniform(1.5, 2.2), bottom, -bottom + random.uniform(-0.25, 0.4))
-    if index % 2 == 0:
-        rock(cliffs, x, edge + 4.5, random.uniform(1.1, 1.8), bottom - 0.3, random.uniform(1.6, 3.7))
+# The Area 4 transitions own the full fractured south bank and dark depth.
+# No shallow canyon rocks remain underneath their bridges.
 
 # Shore stones remain on the water side of the circular impassable footprint.
 lake = spec['lake']

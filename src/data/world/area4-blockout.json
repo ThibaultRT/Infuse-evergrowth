@@ -2,7 +2,7 @@
   "origin": [36, 0, 60],
   "playableSize": { "width": 144, "depth": 48 },
   "visualSize": { "width": 156, "depth": 60 },
-  "rift": { "seamZ": 36, "depth": 12, "floorY": -10, "halfWidth": 78 },
+  "rift": { "seamZ": 36, "depth": 12, "floorY": -48, "darknessY": -14, "halfWidth": 78, "lipInset": 1.65, "bankStep": 1.3 },
   "bridge": { "width": 3.4, "deckLength": 12, "approachLength": 3, "deckHeight": 0.6, "railThickness": 0.22 },
   "crossings": { "greenhavenX": 7.2, "fallenKeepLocalX": 14 },
   "throne": { "center": [0, 15], "width": 4.9, "depth": 3.7, "height": 5.4, "humanHeight": 1.8 },

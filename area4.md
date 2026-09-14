@@ -21,7 +21,7 @@ request. [High-resolution world overview](Layout-area4-blockout-hires.png) is a
 separate **3840 × 3200** render of the actual four-area layout, including the basic
 Area 4 construction. It is a blockout reference; it does not depict final Area 4 art.
 
-## Current construction slice
+## Construction status
 
 - [x] Register Area 4 and both south connections in the existing layout/runtime graph.
 - [x] Use a flat, untextured ash playground with a lowered rift and two traversable
@@ -35,9 +35,13 @@ Area 4 construction. It is a blockout reference; it does not depict final Area 4
 - [x] Add viewer cameras, portrait captures and deterministic traversal/save checks.
 - [x] Normalize both rift transitions to A01/A02: a 12 m span centered on Z=36,
   3 m approaches, shared collision/floors, and the A03 south wall/gate at Z=30.
+- [x] Build slice 4 terrain: charcoal/ash ground, blended readable paths, fractured
+  north/south rift banks fading into black, and three small crusted lava basins.
+  Retire the old shallow southern cliff rocks from both northern landscapes.
 
 Slice 1 is verified. S2/W2, their gates and the user-supplied throne are integrated
-as slice 2 models; the terrain, trees and lava pools remain blockouts. This work adds no
+as slice 2 models. Slice 4 terrain and lava are implemented; trees remain blockouts
+until the forest-dressing pass. This work adds no
 encounters, boss, loot, damage-over-time, falling, bridge collapse or particles.
 Area 4's unused enemy affinity header is provisional until encounters are authored.
 
@@ -54,7 +58,7 @@ Area 4's unused enemy affinity header is provisional until encounters are author
 | Area 4 playable bounds | X `-36..108`, Z `36..84` |
 | Combined Areas 1 + 3 width | Playable X `-36..108` = 144 m; visual X `-42..114` = 156 m |
 | Both transition chunks | Visual 84 × 12 m; local Z `-6..6`; world Z `30..42` |
-| Rift | World Z `30..42`; 12 m span, floor Y `-10`; 6 m into each adjacent area |
+| Rift | World Z `30..42`; 12 m span, rock fades to black by Y `-14`, unlit black closure at Y `-48`; 6 m into each adjacent area |
 | Solid Area 4 ground | Begins at world Z `42`; 42 m of playable depth remains south of the rift |
 | Area 1 crossing | World X `7.2`; transition root `(0,0,36)` |
 | Area 3 crossing | World X `86` (A03 local X `14`); transition root `(72,0,36)` |
@@ -75,7 +79,10 @@ Area 3's south wall/gate moves north to the rift edge at Z `30`; its corner join
 move with it and the east/west curtain runs shorten. Existing encounters and reserved
 clearings remain reachable. The northern landscapes, southern paths and scatter
 meet the new bank, while all overlapping terrain (including the A01/A03 apron)
-uses the shared rift cutout. Detailed bank silhouettes remain part of the final art pass.
+uses the shared open rift cutout. Both transition owners now provide jagged bank
+lips and fractured faces, with matching endpoints at world X=36. Lips project only
+into the blocked rift and flatten around the bridge lanes. Ground stays at Y=0;
+the northern separation reads as an earthquake chasm with no visible bottom.
 
 Area 4 does not exceed the combined authored width of Areas 1 and 3. Each northern
 area is 72 m playable / 84 m visual, and their roots meet at X `36`; Area 4 therefore
@@ -118,6 +125,9 @@ current-area field already represent this content extension.
    southern lips, dark abyss depth, small lava basins and clear readable paths.
    Reconcile the old Greenhaven/Fallen Keep cliff geometry and A04 terrain cutouts.
    Keep Y=0 walkable ground and reserve the routes/clearings. Avoid a large lava river.
+   **Implemented:** the production builder generates the terrain from shared layouts.
+   Ash paths follow the existing authored curves; the three lava basins retain their
+   original blocked circles. No ground height, bridge profile or save shape changed.
 5. **Integrate the approved major assets.** Add the approved assets to the asset
    library and replace each placeholder presentation at its existing named placement.
    Retain semantic collision and authored walk profiles;
@@ -257,7 +267,8 @@ record provenance in `ASSET-LICENSES.md`. The concept PNG stays outside `public/
 | Throne placement and interaction | Keep it centered in the southern landmark position at A04 local `(0,0,15)`. It is cosmetic scenery only, with no boss or progression interaction. |
 | Lava behavior | Give every lava pool authored collision so the hero cannot run on it. Lava damage and other mechanics are not part of this decision. |
 | Encounters and rewards | Out of scope for the environment work; author them later as a separate content pass. |
-| Asset delivery | S2/W2 and the supplied throne are integrated. Joint visual review is ready; terrain and forest dressing remain later slices. |
+| Asset delivery | S2/W2 and the supplied throne are integrated. Slice 4 terrain is implemented; forest dressing remains a later slice. |
+| Rift depth | Keep Area 4 walkable ground at Y=0. Fractured banks fade into unlit black depth with no visible floor; the existing two bridges retain their placements. |
 
 ## Verification and review
 
@@ -271,6 +282,14 @@ Captures live under `authoring/generated/captures/`. The earlier restricted-brow
 crash was resolved by running the local capture outside the sandbox.
 Real-device performance verification remains part of the final environment pass.
 
+`npm run authoring:world:capture -- --area4-terrain` captures the terrain overview,
+continuous rift banks, close portrait depth, lava basin and both bridge landings.
+The terrain validator checks open cutouts, black depth, matching bank seams, flat
+ground and lava containment; it is included in world/release validation. The pass
+uses about 18.5k procedural triangles and one generated 256px texture, with no new
+downloaded assets or shader/decoder dependencies. Old Greenhaven/Fallen Keep south
+cliff meshes are removed from their reproducible landscape exports.
+
 Broader review commands for that pass:
 
 ```bash
@@ -282,8 +301,9 @@ npm run build
 npm run validate:release
 ```
 
-The viewer has A04 layout, throne and both bridge cameras. Generated evidence goes
-under ignored `authoring/generated/captures/`; `area4-blockout.png` shows the actual
+The viewer has A04 layout, throne, rift bank/depth, lava and both bridge cameras.
+Generated evidence goes under ignored `authoring/generated/captures/`;
+`area4-blockout.png` shows the actual
 construction slice and `world-layout-area4-hires.png` is the full high-resolution
 world overview. Validation covers locked/unlocked traversal both ways at 30/60
 FPS, off-centre crossing, shared floor continuity at the Z=36 seam, rail containment

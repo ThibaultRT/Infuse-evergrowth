@@ -24,7 +24,7 @@ npm run preview
 npm run validate:release
 ```
 
-There is no test runner yet. Do not edit `dist/` or dependencies. Before committing, review `git diff` and `git status`, increment `package.json` with appropriate semantic versioning, and commit on the current branch. The Vite production base is `/Infuse-evergrowth/`.
+There is no test runner yet. Do not edit `dist/` or dependencies. World-generation validation must not require an AI agent to perform live gameplay sessions; use deterministic checks, manual inspection, and human playtesting instead. Before committing, review `git diff` and `git status`, increment `package.json` with appropriate semantic versioning, and commit on the current branch. The Vite production base is `/Infuse-evergrowth/`.
 
 ## Architecture
 

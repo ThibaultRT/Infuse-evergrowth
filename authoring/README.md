@@ -83,6 +83,8 @@ authoring/generated/captures/iphone-12-area-a03.png
 authoring/generated/debug/assembled-world-debug.glb
 ```
 
+World validation remains human-led and manual-first. Browser smoke tests are tools for a human reviewer, not a requirement that an AI agent play the game live during world generation. Prefer deterministic validators, inspection, and manual playtesting over token-heavy live gameplay sessions.
+
 The assembled GLB contains stable prop names and `COLLIDER_*` helpers. It is for
 inspection in Three.js Editor or other glTF tools and never ships as the runtime
 world. If `A03_Corner_SW` needs a 90-degree rotation, change that named entry in its
@@ -223,9 +225,10 @@ a substitute for real iPhone performance measurements.
 ## Area 4 environment
 
 `area4.md` is the construction plan and asset handoff brief. `Layout-area4.png` is
-the all-area concept reference. Area 4 is currently flat ash ground, a lowered
-12 m rift band, the approved S2/W2 bridge models, the supplied 5.4 m throne, charred
-tree markers and three impassable lava markers. It has no enemies or rewards yet.
+the all-area concept reference. Area 4 has flat charcoal/ash ground with blended
+paths, a deep dark 12 m rift, the approved S2/W2 bridge models, the supplied 5.4 m
+throne, charred tree markers and three impassable crusted lava basins. It has no
+enemies or rewards yet.
 
 `area4-blockout.json` owns dimensions, and the two transition placements own their
 rendering, rails, locks and floor profiles. Each bridge is a separate GLB from its
@@ -242,6 +245,22 @@ cutout, including the A01/A03 apron. The A03 south wall/gate sits at Z=30, with
 shorter east/west runs and relocated corner joins; its enclosure fits without an
 area extension. The southern roads/scatter and both landscape exports meet the
 new bank. A01's old canyon water and scenic bridge remain retired.
+
+Slice 4 replaces the northern landscapes' shallow south cliff rocks with
+transition-owned fractured banks. Shared `riftBanks` keep their roots local and
+their world X=36 join continuous. Open terrain cutouts remove the underlying
+surface; bank faces fade to black by Y=-14, above an unlit black closure at Y=-48.
+The abyss ignores light, exposure and sky fog. The walkable land stays at Y=0.
+`Area4TerrainView.ts` builds the ash grain, flat routes and small lava crusts
+without an asset request, so the terrain remains available during loading failure.
+The three lava placements retain their original semantic circle footprints.
+
+Use `npm run authoring:world:capture -- --area4-terrain` for six focused captures:
+terrain, continuous banks, portrait abyss depth, lava and both bridge landings.
+The viewer includes matching bank, depth and lava presets. The world validator
+also checks missing rift surfaces, dark depth, shared bank endpoints, flat ground,
+lava containment and a 21k triangle budget (currently about 18.5k plus one 256px
+generated texture). Runtime `--area4` smoke also walks into the lava boundary.
 
 To rebuild just the affected landscapes, preserving other runtime models and the
 previous full local creative scenes, run:

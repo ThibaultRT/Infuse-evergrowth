@@ -127,7 +127,7 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - The landscape, pines, boulder, low timber fences, and closed southern bridge were procedurally authored for this project in Blender from the owner's `Layout.png` reference. They contain portable vertex colors and no external texture dependencies.
 - `greenhaven-home-a.glb` and `greenhaven-home-b.glb` are warm-roof palette variants of Kay Lousberg's CC0 KayKit Hexagon homes, derived from the already-promoted `keep-home-red-a.glb` and `keep-home-red-b.glb`. Geometry, pivots and scale are preserved; the modified palette is embedded. The upstream license remains under `public/assets/world/licenses/`.
 - Reproduction: `scripts/world-assets/export-greenhaven.py` reads `src/data/world/greenhaven.json` and writes the nine runtime GLBs plus an editable local scene at `authoring/local/greenhaven/greenhaven.blend`. The local `.blend` is not shipped.
-- The Area 4 rift bank also reads `area4-blockout.json`. Use `--landscape-only` to rebuild its cliff/paving/foliage without rewriting the other models; this saves `authoring/local/greenhaven/greenhaven-landscape.blend`. The regenerated landscape retains the same project-owned provenance.
+- The Area 4 rift cutoff also reads `area4-blockout.json`. Use `--landscape-only` to rebuild its remaining cliffs/paving/foliage without rewriting the other models; this saves `authoring/local/greenhaven/greenhaven-landscape.blend`. The regenerated landscape retains the same project-owned provenance. The transitions now supply the deep southern banks.
 - The existing project-supplied fountain and woodland bridge retain their original provenance above.
 
 ## Highwood terrain and woodland
@@ -156,6 +156,13 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Processing: glTF Transform weld/simplify/dedup/prune; 31,608 triangles reduced to 14,900. All three original 1024 × 1024 JPEG maps are preserved unchanged. Uniform scaling is baked to 5.4 m tall, centred at ground level, with the original seat facing -Z. Runtime size: 948,856 bytes (0.90 MiB), one material, no added decoder dependencies.
 - Reproduction: `scripts/world-assets/prepare-area4-throne.mjs --tool-root <gltf-transform installation root>` and `npm run authoring:assets:promote -- ruin.ancientThrone`. The local build report records bounds and source/runtime/texture hashes.
 - Usage: user-supplied artwork included with the project owner's permission for Infuse: Evergrowth; no broader redistribution license is asserted.
+
+## Area 4 terrain and Rift banks
+
+- Source: project-authored procedural geometry, vertex colors and one 256px ash-grain texture in `src/rendering/environment/Area4TerrainView.ts`, driven by the renderer-neutral Area 4 layouts and dimensions. No third-party textures, models or generated-image references are used in this terrain pass.
+- Content: flat charcoal/ash ground and paths, fractured rift banks with unlit dark depth, and three small lava basins within the existing collision footprints. Ground and bank geometry are reproducible in the production builder and assembled debug GLB.
+- The Greenhaven and Fallen Keep landscape GLBs were regenerated without their shallow southern cliff rocks. Their existing sources and provenance are unchanged; reproduction uses each existing Blender exporter with `--landscape-only`, followed by glTF Transform dedup/prune and manifest promotion.
+- Usage: authored for Infuse: Evergrowth under the project owner's direction.
 
 ## Rare enemy runtime LODs
 
