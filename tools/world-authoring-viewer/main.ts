@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { SPAWNS, WORLD_CONNECTIONS } from '../../src/config';
 import { WORLD_LAYOUTS } from '../../src/data/world';
+import { AREA4_SPEC } from '../../src/data/world/area4';
 import { validateWorldLayouts } from '../../src/data/world/validateWorld';
 import { compileWorldCollision } from '../../src/domain/world/WorldCollisionCompiler';
 import type { WorldCollisionShape } from '../../src/domain/world/WorldCollision';
@@ -174,6 +175,13 @@ function framePreset(preset: string): void {
   } else if (preset === 'area4') {
     controls.target.set(36, 0, 50);
     camera.position.set(48, 105, 151);
+  } else if (preset === 'area4:throne') {
+    const layout = WORLD_LAYOUTS.find((chunk) => chunk.id === 'area:A04')!;
+    const throne = layout.props.find((prop) => prop.name === 'A04_Ancient_Throne')!;
+    const x = layout.origin[0] + throne.position[0], z = layout.origin[2] + throne.position[2];
+    const distance = Math.max(1, 0.7 / camera.aspect);
+    controls.target.set(x, AREA4_SPEC.throne.height * 0.42, z);
+    camera.position.set(x + 7 * distance, 3 + 6 * distance, z - 12 * distance);
   } else if (preset === 'area4:portrait') {
     controls.target.set(36, 1, 75);
     camera.position.set(44, 20, 56);

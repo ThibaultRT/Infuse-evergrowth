@@ -149,6 +149,14 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Reproduction: `scripts/world-assets/export-area4-bridges.py`, then `scripts/world-assets/optimize-area4-bridges.mjs --tool-root <gltf-transform installation root>` and the promotion commands in `authoring/README.md`. Editable source: `authoring/local/area4/models/area4-s2-w2.blend`; it is not shipped.
 - Usage: authored for Infuse: Evergrowth under the project owner's direction. No new third-party assets were introduced.
 
+## Area 4 supplied throne
+
+- File: `public/assets/world/shared/models/area4-throne.glb`.
+- Source: `Throne-area4.glb`, supplied directly by the project owner for implementation. Original SHA-256: `79121ec376e754c6ca76cc762f200fd975acae135e40822dd5b535b99eb7e5de`. The unchanged source is retained under `authoring/local/area4/throne/Throne-area4-source.glb`.
+- Processing: glTF Transform weld/simplify/dedup/prune; 31,608 triangles reduced to 14,900. All three original 1024 × 1024 JPEG maps are preserved unchanged. Uniform scaling is baked to 5.4 m tall, centred at ground level, with the original seat facing -Z. Runtime size: 948,856 bytes (0.90 MiB), one material, no added decoder dependencies.
+- Reproduction: `scripts/world-assets/prepare-area4-throne.mjs --tool-root <gltf-transform installation root>` and `npm run authoring:assets:promote -- ruin.ancientThrone`. The local build report records bounds and source/runtime/texture hashes.
+- Usage: user-supplied artwork included with the project owner's permission for Infuse: Evergrowth; no broader redistribution license is asserted.
+
 ## Rare enemy runtime LODs
 
 - File: `public/assets/models/enemies/enemy-rare-lods-v1.glb`.

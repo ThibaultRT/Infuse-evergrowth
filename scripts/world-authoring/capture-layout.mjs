@@ -8,6 +8,7 @@ import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 
 const repositoryRoot = process.cwd();
 const area4BridgesOnly = process.argv.includes('--area4-bridges');
+const area4ThroneOnly = process.argv.includes('--area4-throne');
 const viewerPort = 4174;
 const viewerUrl = `http://127.0.0.1:${viewerPort}`;
 const capturesRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -145,7 +146,11 @@ try {
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
-  if (area4BridgesOnly) {
+  if (area4ThroneOnly) {
+    await capture(client, path.join(capturesRoot, 'area4-throne.png'), 'area4:throne', 1100, 900);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area4-throne.png'), 'area4:throne', 390, 844);
+    console.log('Captured the supplied throne in-world and at the iPhone 12 portrait viewport.');
+  } else if (area4BridgesOnly) {
     for (const [id, name] of [['A01-A04', 's2'], ['A03-A04', 'w2']]) {
       await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(false)');
       await capture(client, path.join(capturesRoot, `area4-${name}-gate-closed.png`), `gate:${id}`, 1100, 900);

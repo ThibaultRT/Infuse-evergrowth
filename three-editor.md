@@ -61,6 +61,12 @@ Both open inland with 3.4 m clearance, using the existing connection state.
 details shared by the Blender exporter and semantic collision;
 `area4.md` describes the final asset handoff and remaining decisions.
 
+`A04_Ancient_Throne` uses the supplied throne GLB at local `(0,0,15)`, world
+`(36,0,75)`. Uniform scale is baked into the mesh: height 5.4 m, ground Y=0,
+root scale 1 and front -Z. Its natural proportions occupy 4.887 × 3.657 m;
+the shared spec reserves a 4.9 × 3.7 m collision footprint, including the lava
+apron. The model and fallback both use that same placement and occlusion tag.
+
 Area A03's ruined masonry uses `fallen-keep.json` for both Blender dimensions and
 semantic collision. Corner towers add a round footprint to the two wall arms.
 Roofless house, chapel and keep shells have wall-segment proxies so their interiors

@@ -1,4 +1,5 @@
 {
+  "ruin.ancientThrone": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-throne.glb", "runtime": "assets/world/shared/models/area4-throne.glb", "baseScale": 1, "castShadow": true},
   "crossing.area4SkeletalBridge": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-s2-rib-vault.glb", "runtime": "assets/world/shared/models/area4-s2-rib-vault.glb", "baseScale": 1, "castShadow": true},
   "crossing.area4BoneGate": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-s2-land-gate.glb", "runtime": "assets/world/shared/models/area4-s2-land-gate.glb", "baseScale": 1, "castShadow": true},
   "crossing.area4TimberBridge": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-w2-timber-bridge.glb", "runtime": "assets/world/shared/models/area4-w2-timber-bridge.glb", "baseScale": 1, "castShadow": true},

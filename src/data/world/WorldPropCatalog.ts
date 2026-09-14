@@ -28,7 +28,7 @@ export const WORLD_PROP_CATALOG = {
   'crossing.area4TimberBridge': { asset: 'crossing.area4TimberBridge', fallbackBlockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
   'crossing.area4BoneGate': { asset: 'crossing.area4BoneGate', fallbackBlockout: AREA4_LAND_GATE_FALLBACK, collision: AREA4_LAND_GATE_COLLISION, gate: AREA4_LAND_GATE, absoluteElevation: true, cameraOccluder: true },
   'ruin.area4SouthGate': { asset: 'ruin.area4SouthGate', fallbackBlockout: AREA4_WALL_GATE_FALLBACK, collision: AREA4_WALL_GATE_COLLISION, gate: AREA4_WALL_GATE, absoluteElevation: true, cameraOccluder: true },
-  'blockout.throne': { blockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true },
+  'ruin.ancientThrone': { asset: 'ruin.ancientThrone', fallbackBlockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true, absoluteElevation: true },
   'blockout.lavaPool': { blockout: [{ kind: 'cylinder', size: [2, 0.04, 2], position: [0, 0.02, 0], material: 'lava' }], collision: [circle(1)], absoluteElevation: true },
   'blockout.charredTree': { blockout: [
     { size: [0.5, 4, 0.5], position: [0, 2, 0], material: 'ash' },

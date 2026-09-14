@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-13T17:43:06.544Z",
+  "generatedAt": "2026-09-14T05:08:41.821Z",
   "assets": [
     {
       "key": "crossing.area4BoneGate",
@@ -638,6 +638,20 @@
       "runtimeDigest": {
         "bytes": 36196,
         "sha256": "f05c7cfe4c5f42691acac674febf7518314d8c15e3ba409bbb1422185a060bee"
+      }
+    },
+    {
+      "key": "ruin.ancientThrone",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-throne.glb",
+      "runtime": "assets/world/shared/models/area4-throne.glb",
+      "sourceDigest": {
+        "bytes": 948856,
+        "sha256": "1723d43767d7511ed32af071d9b8cd0a30f89f426c672ea979af546766623c3e"
+      },
+      "runtimeDigest": {
+        "bytes": 948856,
+        "sha256": "1723d43767d7511ed32af071d9b8cd0a30f89f426c672ea979af546766623c3e"
       }
     },
     {

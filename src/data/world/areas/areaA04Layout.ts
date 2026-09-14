@@ -22,7 +22,7 @@ export const AREA_A04_LAYOUT = {
     { id: 'A04_Clearing_Throne', name: 'Throne approach', center: [0, 8], radius: 3 },
   ],
   props: [
-    { name: 'A04_Ancient_Throne', prop: 'blockout.throne', position: [throne.center[0], 0, throne.center[1]] },
+    { name: 'A04_Ancient_Throne', prop: 'ruin.ancientThrone', position: [throne.center[0], 0, throne.center[1]] },
     ...lavaPools.map((pool): WorldPropPlacement => ({ name: pool.id, prop: 'blockout.lavaPool', position: [pool.center[0], 0, pool.center[1]], scale: pool.radius })),
     ...trees.map(([x, z], index): WorldPropPlacement => ({ name: `A04_CharredTree_${String(index + 1).padStart(2, '0')}`, prop: 'blockout.charredTree', position: [x, 0, z], scale: 0.8 + (index % 3) * 0.2, rotation: index * 1.7 })),
   ],

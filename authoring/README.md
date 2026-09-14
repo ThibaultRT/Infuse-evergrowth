@@ -224,7 +224,7 @@ a substitute for real iPhone performance measurements.
 
 `area4.md` is the construction plan and asset handoff brief. `Layout-area4.png` is
 the all-area concept reference. Area 4 is currently flat ash ground, a lowered
-12 m rift band, the approved S2/W2 bridge models, a 5.4 m throne blockout, charred
+12 m rift band, the approved S2/W2 bridge models, the supplied 5.4 m throne, charred
 tree markers and three impassable lava markers. It has no enemies or rewards yet.
 
 `area4-blockout.json` owns dimensions, and the two transition placements own their
@@ -278,8 +278,25 @@ The S2 rib vault has a separate occlusion group so fading its overhead bones doe
 not fade the walking deck. W2 reuses the shipped masonry unchanged.
 Run `node scripts/world-authoring/validate-area4-bridges.mjs` for focused asset,
 hinge, floor and lock checks, and `npm run authoring:world:capture -- --area4-bridges`
-for six bridge/gate captures without the full world export. The user requested
-the full environment review after the separately supplied throne is modeled.
+for six bridge/gate captures without the full world export.
+
+The user-supplied `Throne-area4.glb` is preserved as
+`authoring/local/area4/throne/Throne-area4-source.glb`. Reproduce its runtime export:
+
+```powershell
+node scripts/world-assets/prepare-area4-throne.mjs --tool-root '<gltf-transform installation root>'
+npm run authoring:assets:promote -- ruin.ancientThrone
+npm run authoring:world:capture -- --area4-throne
+```
+
+The exporter checks the original hash, simplifies to 14,900 triangles, retains all
+three original 1K textures, and bakes uniform scale to the shared 5.4 m height.
+The 0.90 MiB GLB has a ground-centred local root and faces -Z. Its 4.887 × 3.657 m
+visual extent fits the revised 4.9 × 3.7 m authored footprint. The unchanged
+`A04_Ancient_Throne` placement supplies collision and occlusion; the previous
+semantic throne remains a loading fallback. No gameplay interaction is added.
+The throne capture option writes `area4-throne.png` and
+`iphone-12-area4-throne.png` using the production world builder.
 
 ## Ownership
 
