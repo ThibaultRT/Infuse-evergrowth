@@ -50,7 +50,6 @@ export const AREA_A03_LAYOUT = {
     ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'ruin.curtainA', brokenProp: 'ruin.curtainB', brokenEvery: 2, from: [35.5, -23.8], to: [35.5, southWallZ - 9], moduleLength: keep.wall.width, scale: 1.08, alignment: 'start' }),
     ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainB', from: [-22.5, southWallZ], to: [southGateX - southGateHalfWidth, southWallZ], moduleLength: keep.wall.width, scale: 1.08, alignment: 'end' }),
     ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainA', from: [southGateX + southGateHalfWidth, southWallZ], to: [25, southWallZ], moduleLength: keep.wall.width, scale: 1.08, alignment: 'start', startIndex: 3 }),
-    { name: 'A03_SouthGate', prop: 'ruin.gate', position: [southGateX, 0, southWallZ], scale: southGateScale },
     { name: 'A03_Corner_SE', prop: 'ruin.cornerTower', position: [35.807, 0, southWallZ - 5.855], rotation: Math.PI / 6, scale: 1.1 },
   ],
   scatters: clearTransitionApproaches([

@@ -36,10 +36,10 @@ Area 4 construction. It is a blockout reference; it does not depict final Area 4
 - [x] Normalize both rift transitions to A01/A02: a 12 m span centered on Z=36,
   3 m approaches, shared collision/floors, and the A03 south wall/gate at Z=30.
 
-This slice adds no encounters, boss, loot, damage-over-time, falling, bridge collapse,
-particles or final environment models. The concept depicts the intended art pass;
-the runtime currently contains geometric placeholders. Area 4's unused enemy affinity
-header is provisional until encounters are authored.
+Slice 1 is verified. S2/W2 and their gates are now integrated as the first slice 2
+models; the terrain, throne, trees and lava remain blockouts. This work adds no
+encounters, boss, loot, damage-over-time, falling, bridge collapse or particles.
+Area 4's unused enemy affinity header is provisional until encounters are authored.
 
 ## Spatial contract
 
@@ -60,7 +60,8 @@ header is provisional until encounters are authored.
 | Area 3 crossing | World X `86` (A03 local X `14`); transition root `(72,0,36)` |
 | Both bridge decks | 3.4 m clear width, world Z `30..42` at Y `0.6`, midpoint at Z `36` |
 | Both complete walk profiles | World Z `27..45`; 3 m approach at each end, Y `0` at both landings |
-| Area 3 south wall/gate | Gate A03 local `(14,0,30)`, world `(86,0,30)`; existing ruined-gate module, scale 1 |
+| S2 land gate | World `(7.2,0,27)`; separate bone/iron module before the north ramp |
+| Area 3 south wall/gate | Transition-local `(14,0,-6)`, world `(86,0,30)`; existing masonry with inland hinges at world Z=29.3, scale 1 |
 | Throne | A04 local `(0,0,15)`, world `(36,0,75)`; 3.6 × 3.6 m footprint, 5.4 m tall |
 
 The area ownership seam remains at world Z `36`, now at the deck midpoint as for
@@ -110,8 +111,9 @@ current-area field already represent this content extension.
    asset may be proposed instead when its style and dimensions genuinely fit; record
    its source and license and obtain approval before adopting it.
 3. **Model the approved concepts.** Build the selected assets in Blender, or adapt an
-   approved free asset, against the contracts below. Review renders beside a 1.8 m
-   human reference and obtain a second approval before preparing optimized GLBs.
+   approved free asset, against the contracts below. S2/W2 and their gates were
+   authorized for direct modeling and integration; review them together with the
+   throne after the user supplies its 2D reference.
 4. **Build terrain and the rift banks.** Add ash/charcoal ground, jagged northern and
    southern lips, dark abyss depth, small lava basins and clear readable paths.
    Reconcile the old Greenhaven/Fallen Keep cliff geometry and A04 terrain cutouts.
@@ -138,48 +140,54 @@ current-area field already represent this content extension.
 Slice 1 is verified by the user. For slice 2, the user selected **S2 — Rib vault**
 and **W2 — Scorched patchwork** from the local concept set under
 `authoring/local/area4/concepts/slice-2-v1/`. The throne will use a separate
-user-supplied 2D reference. Gate additions are being reviewed before modeling.
+user-supplied 2D reference. The revised gate concepts under
+`authoring/local/area4/concepts/slice-2-gates-v1/` were accepted for direct 3D
+implementation. Both bridges and their gates are now shipped in the asset library.
+The user requested focused integration checks now and one joint visual review
+after the throne is modeled.
 
 ### Gates for the selected bridges
 
-Both crossings already have a functional connection lock; their current two-bar
-visual is a placeholder. Replace that presentation with one operable gate at each
-northern entrance, driven by the existing Area 3 boss unlock. Do not add a second
-lock, a new unlock requirement, or gate-specific persistent state.
+Both crossings have one operable gate at the northern entrance, driven by the
+existing Area 3 boss unlock. The old bridge-owned lock has been removed; the
+separate gate placement owns its presentation and lock proxy. No gate-specific
+persistent state or new unlock requirement was added.
 
 - **S2 / Area 1:** a bone-framed, forged-metal double gate with its feet planted in
-  Area 1's land at the beginning of the north approach. The proposed gate plane is
+  Area 1's land at the beginning of the north approach. The gate plane is
   world `(7.2, 0, 27)`, before the 3 m ramp; the rib-vault span begins at Z=30.
   Gate leaves open toward the Area 1 land side and park outside the 3.4 m clear lane.
-  Author the land gate as a separate module matching S2's real-bone/metal theme.
+  The land gate is a separate module matching S2's real-bone/metal theme.
 - **W2 / Area 3:** fit substantial iron-braced timber double doors into the existing
   ruined masonry gateway. Use its normalized world centre `(86, 0, 30)`, 14 m module width,
   3.45 m opening and established stone/arch appearance. The wall/gate module is one
   asset; W2 is a separate bridge with no gate. Offset hinges on the inland face
-  must leave the full 3.4 m route clear when open. Fit the leaf bottoms and swing
-  to the Y=0.6 deck floor at the opening, where the north ramp ends; do not change
-  the authored floor profile.
+  leave the full 3.4 m route clear when open. The leaf bottoms follow the ramp
+  height at the inland door plane, Z=29.3; the deck still reaches Y=0.6 at Z=30.
 
-Show both closed and open states in the revised concepts. Doors, hinge offsets,
-land contacts and side closures must agree with the authored collision and must
-not allow walking around a locked gate. The gate concepts still require visual
-review; the selected bridge designs and approved walk profiles remain fixed.
-
-During integration, each transition should own its gate and its separate bridge.
-Move `A03_SouthGate` into the A03/A04 transition at its normalized world placement while
-Area 3 keeps the surrounding curtain-wall runs. Define the gate's position once
-and derive both its presentation and lock proxy from it. Remove the old
-bridge-owned lock when adding the real gate, so one crossing has one blocking
-gate. Reuse the existing named hinged-leaf mechanism and connection-open state.
-The ownership/lock relocation is part of integration, not a completed runtime
-change in this concept slice.
+Each transition owns its gate and separate bridge. `A03_SouthGate` now belongs to
+the A03/A04 transition at the same normalized world placement; Area 3 keeps the
+surrounding curtain-wall runs. The existing named hinged-leaf mechanism opens
+both pairs inland. `area4-bridges.json` supplies the gate dimensions and hinge
+offsets used by Blender and semantic collision. Loading failures retain blockout
+decks, rails, gateway frames and the existing locked-bar fallback.
 
 ### Delivery contract
 
-Prepare these assets only after their 2D concepts are approved. Blender models then
-receive a second approval before asset-library integration. An appropriately styled,
-freely licensed online asset can replace the modeling step only after its fit, license
-and provenance are reviewed and approved.
+S2/W2 and the two gates were modeled and integrated under the user's direct
+authorization. The throne remains unchanged pending its supplied 2D reference.
+Any future third-party replacement still needs fit, license and provenance review.
+
+The editable source is `authoring/local/area4/models/area4-s2-w2.blend`.
+`export-area4-bridges.py` and `optimize-area4-bridges.mjs` reproduce the four
+self-contained, vertex-colored GLBs. Their combined runtime size is 2.09 MiB:
+
+| Model | Triangles | Materials | MiB |
+| --- | ---: | ---: | ---: |
+| S2 rib vault | 11,532 | 2 | 0.81 |
+| S2 land gate | 2,768 | 2 | 0.20 |
+| W2 timber bridge | 9,694 | 1 | 0.70 |
+| W2 wall/gate | 5,732 | 3 | 0.39 |
 
 | Asset | Art brief | Required fit |
 | --- | --- | --- |
@@ -224,16 +232,27 @@ record provenance in `ASSET-LICENSES.md`. The concept PNG stays outside `public/
 | Unlock rule | Defeating Area 3 boss `area3-epic-01` opens both Area 4 bridges. |
 | Transition convention | Match A01/A02: seam Z=36 at midspan, rift/decks Z=30..42, approaches Z=27..45; shared collision/floors. Move A03's south wall to Z=30, keeping all area roots and footprints fixed. |
 | Skeletal material | Use real bones, with a long rib-cage silhouette plausibly belonging to a dragon-scale creature; forged metal may reinforce the structure. |
-| Bridge concepts | User selected S2 — Rib vault and W2 — Scorched patchwork. Review their added gates before modeling; the user will supply the throne reference separately. |
+| Bridge concepts | S2 — Rib vault and W2 — Scorched patchwork, including the revised gates, are modeled and integrated. The user will supply the throne reference separately. |
 | Gate placement and asset split | S2 receives a matching gate planted on Area 1's land before its approach. W2 uses doors integrated into the existing Area 3 wall/gate module, with the bridge as a separate asset. Both use the existing shared progression unlock. |
 | Bridge damage and sag | Damage is cosmetic only. Preserve a continuous collision-supported route and do not create any hole large enough to fall through. |
 | Throne scale | Fix the throne at 5.4 m overall height; this dimension takes precedence over interpreting “3× human” as an exact anatomical scale. |
 | Throne placement and interaction | Keep it centered in the southern landmark position at A04 local `(0,0,15)`. It is cosmetic scenery only, with no boss or progression interaction. |
 | Lava behavior | Give every lava pool authored collision so the hero cannot run on it. Lava damage and other mechanics are not part of this decision. |
 | Encounters and rewards | Out of scope for the environment work; author them later as a separate content pass. |
-| Asset delivery | Approve several 2D concepts first, then model the selection in Blender, approve the model again, and only then integrate it into the asset library. A suitable free online asset may replace modeling after fit, license, provenance and approval checks. |
+| Asset delivery | S2/W2 were authorized for direct modeling and integration. Defer the joint environment review until the user-supplied throne is modeled. |
 
 ## Verification and review
+
+Focused bridge checks: `node scripts/world-authoring/validate-area4-bridges.mjs`
+checks packed assets, actual hinge clearance, visual deck/profile agreement and
+locked/unlocked traversal. It is also included in the full world validator.
+`npm run authoring:world:capture -- --area4-bridges` captures only the two gates
+closed/open and the two portrait bridge views. The current session's headless
+browser capture crashed; Blender export previews are saved as
+`authoring/generated/captures/area4-{s2,w2}-model-preview.png` instead.
+Full world/device verification is deferred to the joint throne review.
+
+Broader review commands for that pass:
 
 ```bash
 npm run authoring:viewer

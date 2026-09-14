@@ -15,6 +15,7 @@ declare global {
   interface Window {
     __WORLD_AUTHORING_READY__?: boolean;
     __WORLD_AUTHORING_CAMERA__?: (preset: string) => void;
+    __WORLD_AUTHORING_GATES__?: (open: boolean) => void;
   }
 }
 
@@ -176,6 +177,12 @@ function framePreset(preset: string): void {
   } else if (preset === 'area4:portrait') {
     controls.target.set(36, 1, 75);
     camera.position.set(44, 20, 56);
+  } else if (preset === 'gate:A01-A04' || preset === 'gate:A03-A04') {
+    const layout = WORLD_LAYOUTS.find((chunk) => chunk.id === `transition:${preset.slice(5)}`)!;
+    const gate = layout.props.find((prop) => prop.name === 'A01_A04_LandGate' || prop.name === 'A03_SouthGate')!;
+    const x = layout.origin[0] + gate.position[0], z = layout.origin[2] + gate.position[2];
+    controls.target.set(x, 1.8, z + 3);
+    camera.position.set(x - 10, 11, z - 18);
   } else if (preset === 'bridge:A01-A04' || preset === 'bridge:A03-A04') {
     const bridge = WORLD_CONNECTIONS.find((connection) => connection.id === (preset === 'bridge:A01-A04' ? 'area1-area4' : 'area3-area4'))!;
     controls.target.set(bridge.x, 0, bridge.z);
@@ -221,6 +228,9 @@ async function loadWorld(): Promise<void> {
     const builder = new WorldBuilder(assets, materials);
     const views = await Promise.all(WORLD_LAYOUTS.map(async (layout) => builder.build(layout, 'inspection')));
     if (generation !== loadingGeneration) return;
+    window.__WORLD_AUTHORING_GATES__ = (open) => {
+      for (const view of views) if (view.layout.kind === 'transition') view.setOpen(open);
+    };
     for (const view of views) {
       world.add(view.root);
       const label = document.createElement('label');

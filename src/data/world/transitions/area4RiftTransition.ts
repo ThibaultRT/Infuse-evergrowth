@@ -1,4 +1,5 @@
 import { AREA4_SPEC } from '../area4';
+import { AREA4_LAND_GATE_Z, AREA4_WALL_GATE_Z } from '../area4Bridges';
 import type { TransitionWorldLayout } from '../WorldLayout';
 
 /** Like A01/A02, the deck and rift straddle the unchanged area seam. */
@@ -20,7 +21,10 @@ export function area4RiftTransition(source: 1 | 3): TransitionWorldLayout {
     terrainCutouts: [{ name: `${prefix}_BelowBanks`, center: [0, 0], size: { width: 84, depth: rift.depth }, elevation: rift.floorY - 0.1 }],
     roads: [],
     surfaces: [{ name: `${prefix}_Abyss`, kind: 'abyss', center: [(minX + maxX) / 2, 0], size: { width: maxX - minX, depth: rift.depth }, elevation: rift.floorY }],
-    props: [{ name: `${prefix}_Bridge`, prop: source === 1 ? 'blockout.forgedBridge' : 'blockout.ruinedTimberBridge', position: [center, 0, 0] }],
+    props: [
+      { name: `${prefix}_Bridge`, prop: source === 1 ? 'crossing.area4SkeletalBridge' : 'crossing.area4TimberBridge', position: [center, 0, 0] },
+      { name: source === 1 ? 'A01_A04_LandGate' : 'A03_SouthGate', prop: source === 1 ? 'crossing.area4BoneGate' : 'ruin.area4SouthGate', position: [center, 0, source === 1 ? AREA4_LAND_GATE_Z : AREA4_WALL_GATE_Z] },
+    ],
     scatters: [],
     collision: [
       { id: `${prefix}_Rift_West`, kind: 'rectangle', center: [(minX + left) / 2, 0], width: left - minX, depth: rift.depth },

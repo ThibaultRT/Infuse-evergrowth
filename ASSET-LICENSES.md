@@ -140,6 +140,15 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Its pointed roof reuses `roof-point.glb` from Kenney's [Fantasy Town Kit](https://kenney.nl/assets/fantasy-town-kit), CC0 1.0, already in the local asset library. The source archive SHA-256 is `1a7530c09f4d2fa2cdee259876f089334f8b1f27fa86a0c4f54ef86cdd8676ef`. The supplied notice is retained as `shared/licenses/kenney-fantasy-town-cc0.txt`.
 - Reproduction: `scripts/world-assets/export-highwood.py` exports seven self-contained, vertex-colored GLBs and the editable `authoring/local/highwood/highwood.blend`. Imports are isolated from other open Blender scenes; only the selected authored scene is exported. The lookout is batched to one material with its roof, and source hashes are checked before conversion.
 
+## Area 4 S2/W2 bridges and gates
+
+- Files: `public/assets/world/shared/models/area4-s2-rib-vault.glb`, `area4-s2-land-gate.glb`, `area4-w2-timber-bridge.glb`, and `area4-w2-wall-gate.glb`.
+- Source: project-authored Blender models following the owner's approved S2/W2 bridge and gate concepts. The concept images are retained under `authoring/local/area4/concepts/`; no concept textures are included in the runtime assets.
+- The W2 wall/gate reuses the project's existing `fallen-keep-gate.glb` masonry unchanged, adding timber leaves and forged hardware. The source hash is recorded in `authoring/local/area4/models/source-manifest.json`.
+- Processing: shared renderer-neutral bridge/gate dimensions, vertex colors, batched static geometry, named hinge pivots, and an independently fading S2 rib vault. glTF Transform weld/dedup/prune preserves these nodes. Four self-contained GLBs total 2.09 MiB with no external textures or compression decoders.
+- Reproduction: `scripts/world-assets/export-area4-bridges.py`, then `scripts/world-assets/optimize-area4-bridges.mjs --tool-root <gltf-transform installation root>` and the promotion commands in `authoring/README.md`. Editable source: `authoring/local/area4/models/area4-s2-w2.blend`; it is not shipped.
+- Usage: authored for Infuse: Evergrowth under the project owner's direction. No new third-party assets were introduced.
+
 ## Rare enemy runtime LODs
 
 - File: `public/assets/models/enemies/enemy-rare-lods-v1.glb`.

@@ -1,7 +1,49 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-13T12:44:23.589Z",
+  "generatedAt": "2026-09-13T17:43:06.544Z",
   "assets": [
+    {
+      "key": "crossing.area4BoneGate",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-s2-land-gate.glb",
+      "runtime": "assets/world/shared/models/area4-s2-land-gate.glb",
+      "sourceDigest": {
+        "bytes": 210584,
+        "sha256": "138977ed00b91701c5c93d1b3d998ab6fd967b7c06928e0e884dfe585eabe881"
+      },
+      "runtimeDigest": {
+        "bytes": 210584,
+        "sha256": "138977ed00b91701c5c93d1b3d998ab6fd967b7c06928e0e884dfe585eabe881"
+      }
+    },
+    {
+      "key": "crossing.area4SkeletalBridge",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-s2-rib-vault.glb",
+      "runtime": "assets/world/shared/models/area4-s2-rib-vault.glb",
+      "sourceDigest": {
+        "bytes": 844888,
+        "sha256": "2fbfad72f24603e77de6a593efffaada747e6dfa8a2f1bc5b3c4a110d6837d0f"
+      },
+      "runtimeDigest": {
+        "bytes": 844888,
+        "sha256": "2fbfad72f24603e77de6a593efffaada747e6dfa8a2f1bc5b3c4a110d6837d0f"
+      }
+    },
+    {
+      "key": "crossing.area4TimberBridge",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-w2-timber-bridge.glb",
+      "runtime": "assets/world/shared/models/area4-w2-timber-bridge.glb",
+      "sourceDigest": {
+        "bytes": 733076,
+        "sha256": "f8fc7363206113ccce84ba5973bf6aca215856a54791fcd23fd67572cde0ee28"
+      },
+      "runtimeDigest": {
+        "bytes": 733076,
+        "sha256": "f8fc7363206113ccce84ba5973bf6aca215856a54791fcd23fd67572cde0ee28"
+      }
+    },
     {
       "key": "crossing.bridgeA",
       "source": "kaykit-hexagon/buildings/neutral/building_bridge_A.gltf",
@@ -596,6 +638,20 @@
       "runtimeDigest": {
         "bytes": 36196,
         "sha256": "f05c7cfe4c5f42691acac674febf7518314d8c15e3ba409bbb1422185a060bee"
+      }
+    },
+    {
+      "key": "ruin.area4SouthGate",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-w2-wall-gate.glb",
+      "runtime": "assets/world/shared/models/area4-w2-wall-gate.glb",
+      "sourceDigest": {
+        "bytes": 405148,
+        "sha256": "f1f442b90a66cb97359e648c147cc0c3b1839069c2724ff82bedb2cc74e9eef1"
+      },
+      "runtimeDigest": {
+        "bytes": 405148,
+        "sha256": "f1f442b90a66cb97359e648c147cc0c3b1839069c2724ff82bedb2cc74e9eef1"
       }
     },
     {

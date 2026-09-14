@@ -1,4 +1,8 @@
 {
+  "crossing.area4SkeletalBridge": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-s2-rib-vault.glb", "runtime": "assets/world/shared/models/area4-s2-rib-vault.glb", "baseScale": 1, "castShadow": true},
+  "crossing.area4BoneGate": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-s2-land-gate.glb", "runtime": "assets/world/shared/models/area4-s2-land-gate.glb", "baseScale": 1, "castShadow": true},
+  "crossing.area4TimberBridge": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-w2-timber-bridge.glb", "runtime": "assets/world/shared/models/area4-w2-timber-bridge.glb", "baseScale": 1, "castShadow": true},
+  "ruin.area4SouthGate": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-w2-wall-gate.glb", "runtime": "assets/world/shared/models/area4-w2-wall-gate.glb", "baseScale": 1, "castShadow": true},
   "terrain.fallenKeep": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/fallen-keep-landscape.glb", "runtime": "assets/world/shared/models/fallen-keep-landscape.glb", "baseScale": 1, "castShadow": true},
   "ruin.curtainA": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/fallen-keep-wall-a.glb", "runtime": "assets/world/shared/models/fallen-keep-wall-a.glb", "baseScale": 1, "castShadow": true},
   "ruin.curtainB": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/fallen-keep-wall-b.glb", "runtime": "assets/world/shared/models/fallen-keep-wall-b.glb", "baseScale": 1, "castShadow": true},

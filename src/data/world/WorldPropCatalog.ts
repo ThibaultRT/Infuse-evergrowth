@@ -5,7 +5,8 @@ import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_S
 import { GREENHAVEN_COLLISION } from './greenhaven';
 import { HIGHWOOD_COLLISION } from './highwood';
 import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_WALL_COLLISION, fallenKeepShellCollision } from './fallenKeep';
-import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, RIFT_BRIDGE_GATE, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
+import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
+import { AREA4_LAND_GATE, AREA4_LAND_GATE_COLLISION, AREA4_LAND_GATE_FALLBACK, AREA4_WALL_GATE, AREA4_WALL_GATE_COLLISION, AREA4_WALL_GATE_FALLBACK } from './area4Bridges';
 
 export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never }
   | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[] }) & {
@@ -13,7 +14,8 @@ export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blo
   readonly cameraOccluder?: boolean;
   readonly absoluteElevation?: boolean;
   readonly walkSurface?: WorldWalkSurface;
-  readonly gate?: { readonly barrier: CollisionProxy; readonly leaves: readonly { readonly node: string; readonly openAngle: number }[] };
+  readonly fallbackBlockout?: readonly WorldBlockoutPart[];
+  readonly gate?: { readonly barrier: CollisionProxy; readonly floorHeight?: number; readonly leaves: readonly { readonly node: string; readonly openAngle: number }[] };
 };
 
 const rectangle = (width: number, depth: number, center: readonly [number, number] = [0, 0], rotation?: number): CollisionProxy => ({ kind: 'rectangle', center, width, depth, ...(rotation === undefined ? {} : { rotation }) });
@@ -22,8 +24,10 @@ const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): 
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
 
 export const WORLD_PROP_CATALOG = {
-  'blockout.forgedBridge': { blockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR, gate: RIFT_BRIDGE_GATE },
-  'blockout.ruinedTimberBridge': { blockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR, gate: RIFT_BRIDGE_GATE },
+  'crossing.area4SkeletalBridge': { asset: 'crossing.area4SkeletalBridge', fallbackBlockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
+  'crossing.area4TimberBridge': { asset: 'crossing.area4TimberBridge', fallbackBlockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
+  'crossing.area4BoneGate': { asset: 'crossing.area4BoneGate', fallbackBlockout: AREA4_LAND_GATE_FALLBACK, collision: AREA4_LAND_GATE_COLLISION, gate: AREA4_LAND_GATE, absoluteElevation: true, cameraOccluder: true },
+  'ruin.area4SouthGate': { asset: 'ruin.area4SouthGate', fallbackBlockout: AREA4_WALL_GATE_FALLBACK, collision: AREA4_WALL_GATE_COLLISION, gate: AREA4_WALL_GATE, absoluteElevation: true, cameraOccluder: true },
   'blockout.throne': { blockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true },
   'blockout.lavaPool': { blockout: [{ kind: 'cylinder', size: [2, 0.04, 2], position: [0, 0.02, 0], material: 'lava' }], collision: [circle(1)], absoluteElevation: true },
   'blockout.charredTree': { blockout: [

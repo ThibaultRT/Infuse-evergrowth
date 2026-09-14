@@ -38,11 +38,6 @@ export const RIFT_BRIDGE_COLLISION: readonly CollisionProxy[] = [-1, 1].map((sid
   kind: 'rectangle', center: [side * (bridge.width + bridge.railThickness) / 2, 0],
   width: bridge.railThickness, depth: halfLength * 2,
 }));
-export const RIFT_BRIDGE_GATE = {
-  barrier: { kind: 'rectangle', center: [0, -halfDeck], width: bridge.width, depth: 0.3 } as const,
-  leaves: [],
-};
-
 /** Only silhouette guides. Both decks project the same authored floor profile. */
 export function riftBridgeBlockout(material: 'iron' | 'timber'): readonly WorldBlockoutPart[] {
   const parts: WorldBlockoutPart[] = [];

@@ -115,7 +115,7 @@ Area A01 follows `Layout.png` within its unchanged 72 × 72 m playable footprint
 a northwest lake cove, west rock escarpment, southern canyon, fountain plaza,
 branching stone lanes, a southern village loop, cottage gardens and pine clusters.
 The west future exit remains closed by the existing world boundary. Its south exit
-now crosses the Area 4 rift through the forged-bridge blockout.
+now crosses the Area 4 rift through the S2 rib-vault bridge and its bone/iron land gate.
 
 `src/data/world/greenhaven.json` owns the lake/rock footprints, plateau dimensions,
 roads, plaza, gardens and scenic bridge dimensions. The pure layout and the Blender
@@ -220,18 +220,19 @@ walks both gates, the chapel and barracks, checks the south barrier, and exercis
 saved Reduced/30 FPS and missing-terrain fallback. These browser captures are not
 a substitute for real iPhone performance measurements.
 
-## Area 4 blockout
+## Area 4 environment
 
 `area4.md` is the construction plan and asset handoff brief. `Layout-area4.png` is
 the all-area concept reference. Area 4 is currently flat ash ground, a lowered
-12 m rift band, two simple bridge silhouettes, a 5.4 m throne, charred tree markers
-and three impassable lava markers. It has no enemies or rewards yet.
+12 m rift band, the approved S2/W2 bridge models, a 5.4 m throne blockout, charred
+tree markers and three impassable lava markers. It has no enemies or rewards yet.
 
 `area4-blockout.json` owns dimensions, and the two transition placements own their
-rendering, rails, locks and floor profiles. Procedural semantic prop definitions
-use untextured, material-batched box/cylinder parts so the slice needs no new GLBs
-or texture downloads. Replace their presentation after the major asset review;
-keep collision renderer-independent. Both 84 × 12 m transitions span world Z=30..42,
+rendering, rails, locks and floor profiles. Each bridge is a separate GLB from its
+gate: S2 has a bone/iron land gate at Z=27; W2's doors are part of the existing
+masonry gateway at Z=30. The two gate placements own the locks and reuse the
+named-hinge runtime. `area4-bridges.json` adds shared gate dimensions and hinge
+offsets; semantic blockouts remain the loading fallback. Both 84 × 12 m transitions span world Z=30..42,
 with the 12 m decks centered on the unchanged seam at Z=36. Their 3 m approaches
 reach dry land at Z=27 and Z=45. Collision and floor profiles are compiled into
 both adjacent areas, as for A01/A02. Area roots, connection IDs and save v18 stay fixed.
@@ -261,6 +262,24 @@ both bridges each way in Full and persisted Reduced/30 FPS, verify the lock and 
 boss-victory backfill, and inspect both sides of the seam, landings and missing-world-assets
 traversal. World validation checks the Z=30..42 barrier in all three areas, continuous
 Z=27..45 floors and the complete A03 perimeter, including its moved corner joins.
+
+Rebuild the four S2/W2 models in an isolated Blender scene, optimize with an
+existing glTF Transform installation, then refresh their manifest entries:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-area4-bridges.py
+node scripts/world-assets/optimize-area4-bridges.mjs --tool-root '<gltf-transform installation root>'
+npm run authoring:assets:promote -- crossing.area4SkeletalBridge crossing.area4BoneGate crossing.area4TimberBridge ruin.area4SouthGate
+```
+
+The editable source and build reports are under `authoring/local/area4/models/`.
+The four vertex-colored GLBs total 2.09 MiB with no texture or decoder dependencies.
+The S2 rib vault has a separate occlusion group so fading its overhead bones does
+not fade the walking deck. W2 reuses the shipped masonry unchanged.
+Run `node scripts/world-authoring/validate-area4-bridges.mjs` for focused asset,
+hinge, floor and lock checks, and `npm run authoring:world:capture -- --area4-bridges`
+for six bridge/gate captures without the full world export. The user requested
+the full environment review after the separately supplied throne is modeled.
 
 ## Ownership
 

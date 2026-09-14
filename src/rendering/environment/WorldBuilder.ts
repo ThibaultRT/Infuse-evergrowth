@@ -103,18 +103,27 @@ export class WorldBuilder {
 
   private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode): Promise<THREE.Object3D> {
     const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
-    const model = definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
+    let model = definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
+    const failed = Boolean(model.userData.worldAssetFallback);
+    if (failed && definition.fallbackBlockout) {
+      if (model instanceof THREE.Mesh) {
+        model.geometry.dispose();
+        for (const material of Array.isArray(model.material) ? model.material : [model.material]) material.dispose();
+      }
+      model = this.createBlockout(definition.fallbackBlockout);
+      model.userData.worldAssetFallback = definition.asset;
+    }
     const object = definition.walkSurface ? new THREE.Group() : model;
     object.name = placement.name;
     if (definition.walkSurface) {
       model.name = `${placement.name}_Model`;
-      const failed = Boolean(model.userData.worldAssetFallback);
-      if (!failed) object.add(model);
+      if (!failed || definition.fallbackBlockout) object.add(model);
       else if (model instanceof THREE.Mesh) {
         model.geometry.dispose();
         for (const material of Array.isArray(model.material) ? model.material : [model.material]) material.dispose();
       }
-      const deckMaterial = definition.blockout ? this.materials.blockout[definition.blockout[0].material] : this.materials.timber;
+      const fallbackParts = definition.blockout ?? definition.fallbackBlockout;
+      const deckMaterial = fallbackParts ? this.materials.blockout[fallbackParts[0].material] : this.materials.timber;
       object.add(createWalkSurfaceView(definition.walkSurface, deckMaterial, failed || Boolean(definition.blockout)));
     }
     const [x, requestedY, z] = placement.position;
@@ -173,7 +182,7 @@ export class WorldBuilder {
     }
     const placement = layout.props.find((candidate) => candidate.name === volume.sourcePlacementName);
     const definition: WorldPropDefinition | undefined = placement ? WORLD_PROP_CATALOG[placement.prop] : undefined;
-    const floor = definition?.walkSurface && definition.gate ? walkSurfaceHeight(definition.walkSurface, ...definition.gate.barrier.center) ?? 0 : 0;
+    const floor = definition?.gate?.floorHeight ?? (definition?.walkSurface && definition.gate ? walkSurfaceHeight(definition.walkSurface, ...definition.gate.barrier.center) ?? 0 : 0);
     barrier.position.set(volume.x - layout.origin[0], floor * (placement?.scale ?? 1) + (placement?.position[1] ?? 0), volume.z - layout.origin[2]);
     barrier.rotation.y = volume.rotation ?? 0;
     view.addLockedGateVisual(barrier);

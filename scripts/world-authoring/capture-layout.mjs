@@ -7,6 +7,7 @@ import process from 'node:process';
 import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 
 const repositoryRoot = process.cwd();
+const area4BridgesOnly = process.argv.includes('--area4-bridges');
 const viewerPort = 4174;
 const viewerUrl = `http://127.0.0.1:${viewerPort}`;
 const capturesRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -144,33 +145,44 @@ try {
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
-  await capture(client, path.join(capturesRoot, 'general-layout.png'), 'world', 1440, 900);
-  await capture(client, path.join(capturesRoot, 'world-layout-area4-hires.png'), 'world', 3840, 3200);
-  await capture(client, path.join(capturesRoot, 'area1-target-layout.png'), 'greenhaven', 1280, 1100);
-  await capture(client, path.join(capturesRoot, 'area2-target-layout.png'), 'highwood', 1600, 1000);
-  await capture(client, path.join(capturesRoot, 'area3-target-layout.png'), 'fallen-keep', 1280, 1100);
-  await capture(client, path.join(capturesRoot, 'area4-blockout.png'), 'area4', 1600, 1000);
-  await capture(client, path.join(capturesRoot, 'iphone-12-area-a04.png'), 'area4:portrait', 390, 844);
-  await capture(client, path.join(capturesRoot, 'iphone-12-forged-rift-bridge.png'), 'bridge:A01-A04', 390, 844);
-  await capture(client, path.join(capturesRoot, 'iphone-12-timber-rift-bridge.png'), 'bridge:A03-A04', 390, 844);
-  await evaluate(client, "document.querySelector('#spawns').checked=true; document.querySelector('#spawns').dispatchEvent(new Event('change'));");
-  await capture(client, path.join(capturesRoot, 'area3-encounter-spots.png'), 'fallen-keep', 1280, 1100);
-  await evaluate(client, "document.querySelector('#spawns').checked=false; document.querySelector('#spawns').dispatchEvent(new Event('change'));");
-  await capture(client, path.join(capturesRoot, 'iphone-12-fallen-keep-court.png'), 'fallen-keep:portrait', 390, 844);
-  await capture(client, path.join(capturesRoot, 'iphone-12-highwood-trail.png'), 'highwood:portrait', 390, 844);
-  await capture(client, path.join(capturesRoot, 'iphone-12-area-a01.png'), 'area:A01', 390, 844);
-  await capture(client, path.join(capturesRoot, 'iphone-12-area-a02.png'), 'area:A02', 390, 844);
-  await capture(client, path.join(capturesRoot, 'iphone-12-area-a03.png'), 'area:A03', 390, 844);
-  await capture(client, path.join(capturesRoot, 'woodland-bridge.png'), 'bridge:A01-A02', 1000, 900);
-  await capture(client, path.join(capturesRoot, 'iphone-12-woodland-bridge.png'), 'bridge:A01-A02', 390, 844);
+  if (area4BridgesOnly) {
+    for (const [id, name] of [['A01-A04', 's2'], ['A03-A04', 'w2']]) {
+      await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(false)');
+      await capture(client, path.join(capturesRoot, `area4-${name}-gate-closed.png`), `gate:${id}`, 1100, 900);
+      await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
+      await capture(client, path.join(capturesRoot, `area4-${name}-gate-open.png`), `gate:${id}`, 1100, 900);
+      await capture(client, path.join(capturesRoot, `iphone-12-area4-${name}-bridge.png`), `bridge:${id}`, 390, 844);
+    }
+    console.log('Captured S2/W2 closed/open gates and two portrait bridge views.');
+  } else {
+    await capture(client, path.join(capturesRoot, 'general-layout.png'), 'world', 1440, 900);
+    await capture(client, path.join(capturesRoot, 'world-layout-area4-hires.png'), 'world', 3840, 3200);
+    await capture(client, path.join(capturesRoot, 'area1-target-layout.png'), 'greenhaven', 1280, 1100);
+    await capture(client, path.join(capturesRoot, 'area2-target-layout.png'), 'highwood', 1600, 1000);
+    await capture(client, path.join(capturesRoot, 'area3-target-layout.png'), 'fallen-keep', 1280, 1100);
+    await capture(client, path.join(capturesRoot, 'area4-blockout.png'), 'area4', 1600, 1000);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area-a04.png'), 'area4:portrait', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-forged-rift-bridge.png'), 'bridge:A01-A04', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-timber-rift-bridge.png'), 'bridge:A03-A04', 390, 844);
+    await evaluate(client, "document.querySelector('#spawns').checked=true; document.querySelector('#spawns').dispatchEvent(new Event('change'));");
+    await capture(client, path.join(capturesRoot, 'area3-encounter-spots.png'), 'fallen-keep', 1280, 1100);
+    await evaluate(client, "document.querySelector('#spawns').checked=false; document.querySelector('#spawns').dispatchEvent(new Event('change'));");
+    await capture(client, path.join(capturesRoot, 'iphone-12-fallen-keep-court.png'), 'fallen-keep:portrait', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-highwood-trail.png'), 'highwood:portrait', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area-a01.png'), 'area:A01', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area-a02.png'), 'area:A02', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area-a03.png'), 'area:A03', 390, 844);
+    await capture(client, path.join(capturesRoot, 'woodland-bridge.png'), 'bridge:A01-A02', 1000, 900);
+    await capture(client, path.join(capturesRoot, 'iphone-12-woodland-bridge.png'), 'bridge:A01-A02', 390, 844);
 
-  await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadRoot, eventsEnabled: true });
-  await evaluate(client, "document.querySelector('aside').style.display='block'; document.querySelector('#export').click();");
-  const downloaded = await waitForDownload();
-  const debugPath = path.join(debugRoot, 'assembled-world-debug.glb');
-  await rename(downloaded, debugPath);
-  const inspection = inspectDebugGlb(await readFile(debugPath));
-  console.log(`Captured eighteen world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
+    await client.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadRoot, eventsEnabled: true });
+    await evaluate(client, "document.querySelector('aside').style.display='block'; document.querySelector('#export').click();");
+    const downloaded = await waitForDownload();
+    const debugPath = path.join(debugRoot, 'assembled-world-debug.glb');
+    await rename(downloaded, debugPath);
+    const inspection = inspectDebugGlb(await readFile(debugPath));
+    console.log(`Captured eighteen world images and verified debug GLB (${inspection.nodes} named nodes, ${inspection.colliders} collider helpers).`);
+  }
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

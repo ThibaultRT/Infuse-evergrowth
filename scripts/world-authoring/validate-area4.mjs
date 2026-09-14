@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import { validateArea4Bridges } from './validate-area4-bridges.mjs';
 
 /** Check the new loop, abyss containment and progress earned before this area existed. */
 export async function validateArea4(vite, config) {
+  await validateArea4Bridges(vite, config);
   const [{ GameplayRuntime }, { AREA_A04_LAYOUT: layout }, { AREA4_SPEC: spec }, { circleOverlapsWorldCollision }, { worldTerrainHeight }, { loadSave, persist }, { ProgressionSystem }, { GameEvents }, { WORLD_LAYOUTS }, { worldWalkHeight }, { expandWorldScatter }] = await Promise.all([
     vite.ssrLoadModule('/src/game/GameplayRuntime.ts'),
     vite.ssrLoadModule('/src/data/world/areas/areaA04Layout.ts'),
@@ -30,7 +32,8 @@ export async function validateArea4(vite, config) {
     for (const id of transition.areaIds) {
       const adjacent = config.AREAS.find((candidate) => candidate.id === id);
       const colliders = adjacent.collision.filter((shape) => shape.sourceChunkId === transition.id);
-      assert.equal(colliders.length, 5, 'Both areas must share the rails, lock and rift barriers.');
+      assert.equal(colliders.filter((shape) => shape.activation?.connectionId === gate.id).length, 1, 'Each crossing must have one gate lock.');
+      assert.equal(colliders.filter((shape) => shape.sourcePlacementName === transition.props[0].name).length, 2, 'The bridge owns its two continuous rails; the separate gate owns its lock.');
       assert.ok(colliders.every((shape) => area.collision.includes(shape)), 'Adjacent areas must consume the same compiled transition collision.');
       for (const [z, y] of floorSamples) assert.ok(Math.abs(worldWalkHeight(adjacent.walkSurfaces, { x: gate.x, z }) - y) < 1e-8, `${gate.id}: Area ${id} lost the floor at Z=${z}.`);
       const surface = adjacent.walkSurfaces.find((surface) => surface.transform.position[0] === gate.x && surface.transform.position[2] === 36);
@@ -39,8 +42,9 @@ export async function validateArea4(vite, config) {
     const barriers = area.collision.filter((shape) => shape.sourceChunkId === transition.id && shape.id.includes('_Rift_'));
     assert.ok(barriers.every((shape) => shape.z - shape.depth / 2 === 30 && shape.z + shape.depth / 2 === 42));
   }
-  const southGate = WORLD_LAYOUTS.find((chunk) => chunk.id === 'area:A03').props.find((prop) => prop.name === 'A03_SouthGate');
-  assert.deepEqual(southGate.position, [14, 0, 30], 'The south gate must meet the north rift edge without moving A03.');
+  const southTransition = WORLD_LAYOUTS.find((chunk) => chunk.id === 'transition:A03-A04');
+  const southGate = southTransition.props.find((prop) => prop.name === 'A03_SouthGate');
+  assert.deepEqual(southGate.position.map((v, i) => v + southTransition.origin[i]), [86, 0, 30], 'The south gate must meet the north rift edge without moving A03.');
   for (const chunk of WORLD_LAYOUTS.filter((chunk) => ['area:A01', 'area:A03', 'area:A04', 'transition:A01-A03', 'transition:A01-A04', 'transition:A03-A04'].includes(chunk.id))) {
     for (const z of [30.1, 35.9, 36.1, 41.9]) {
       const x = chunk.origin[0];

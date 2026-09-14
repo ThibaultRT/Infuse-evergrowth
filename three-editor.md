@@ -37,11 +37,12 @@ the existing Area A01 boss unlock requirement.
 
 Area A03 is enclosed by a ruined wall with three gate openings. The A01/A03 transition owns its
 west wall and gate. The A02/A03 fortified river transition owns its north wall,
-bridge and gate. Area A03 owns the east and south walls and the new south gate at
-local `(14,0,30)`. The south wall and both southern corner joins meet the rift's
+bridge and gate. Area A03 owns the east and south wall runs. The A03/A04 transition
+owns `A03_SouthGate` at local `(14,0,-6)`, world `(86,0,30)`, plus the separate W2
+timber bridge. The south wall and both southern corner joins meet the rift's
 north edge at Z=30; the east/west curtain runs end at those corners. Broken-looking
 wall pieces remain collidable; only the three authored
-gates are traversable. The A03/A04 transition owns the timber bridge and its lock.
+gates are traversable. Each Area 4 gate owns its connection's single lock proxy.
 
 Area A04 is an untextured burned-forest blockout. Both rift transitions follow the
 A01/A02 convention: world Z=30..42, centered on the unchanged seam at Z=36. The rift
@@ -53,7 +54,11 @@ stay fixed. A04's solid ground begins at Z=42. Their world X values
 are 7.2 (A01) and 86 (A03). Both require the Area A03 boss victory, including victories
 already recorded in supported saves. Overlapping terrain, including the A01/A03
 apron, yields to the same rift cutout; the two northern landscape GLBs follow its
-north bank. `area4-blockout.json` owns the dimensions;
+north bank. S2's separate bone/iron gate stands on Area 1 land at world `(7.2,0,27)`.
+W2's timber doors hinge on the existing masonry's inland face at world Z=29.3.
+Both open inland with 3.4 m clearance, using the existing connection state.
+`area4-blockout.json` owns the floor dimensions and `area4-bridges.json` owns gate
+details shared by the Blender exporter and semantic collision;
 `area4.md` describes the final asset handoff and remaining decisions.
 
 Area A03's ruined masonry uses `fallen-keep.json` for both Blender dimensions and

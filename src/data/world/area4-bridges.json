@@ -1,0 +1,6 @@
+{
+  "skeletal": { "ribPairs": 5, "ribHalfWidth": 2.14, "crownHeight": 4.65, "ribRadius": 0.25 },
+  "timber": { "railHeight": 1.28, "postHalfWidth": 1.98 },
+  "landGate": { "jambHalfWidth": 2.16, "jambWidth": 0.64, "jambDepth": 0.72, "height": 3.65, "hingeHalfWidth": 1.92, "hingeZ": 0, "leafHeight": 2.92, "leafThickness": 0.16, "groundGap": 0.045 },
+  "wallGate": { "hingeOffset": 0.19, "hingeZ": -0.7, "leafThickness": 0.16, "groundGap": 0.045, "archSpringHeight": 2.2 }
+}
