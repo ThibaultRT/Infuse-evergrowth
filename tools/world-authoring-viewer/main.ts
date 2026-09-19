@@ -4,6 +4,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { SPAWNS, WORLD_CONNECTIONS } from '../../src/config';
 import { WORLD_LAYOUTS } from '../../src/data/world';
 import { AREA4_SPEC } from '../../src/data/world/area4';
+import { AREA4_FOREST_SPEC } from '../../src/data/world/area4Forest';
 import { validateWorldLayouts } from '../../src/data/world/validateWorld';
 import { compileWorldCollision } from '../../src/domain/world/WorldCollisionCompiler';
 import type { WorldCollisionShape } from '../../src/domain/world/WorldCollision';
@@ -178,6 +179,11 @@ function framePreset(preset: string): void {
   } else if (preset === 'area4:forest') {
     controls.target.set(-12, 1.4, 67);
     camera.position.set(-4, 15, 83);
+  } else if (preset === 'area4:grove-west' || preset === 'area4:grove-east') {
+    const grove = preset === 'area4:grove-west' ? AREA4_FOREST_SPEC.groves.west : AREA4_FOREST_SPEC.groves.east;
+    const x = AREA4_SPEC.origin[0] + grove.center[0], z = AREA4_SPEC.origin[2] + grove.center[1];
+    controls.target.set(x, 1.8, z);
+    camera.position.set(x + 12, 23, z + 24);
   } else if (preset === 'area4:rift') {
     controls.target.set(36, -2, 36);
     camera.position.set(48, 51, 102);

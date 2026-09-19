@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { WORLD_PROP_CATALOG, type WorldPropDefinition } from '../../data/world/WorldPropCatalog';
+import { WORLD_PROP_CATALOG, worldPropAssetKeys, type WorldPropDefinition } from '../../data/world/WorldPropCatalog';
 import { expandWorldScatter, type AnyWorldLayout, type TransitionWorldLayout, type WorldPropPlacement } from '../../data/world/WorldLayout';
 import { WorldAssetLibrary } from './WorldAssetLibrary';
 import { createWorldRoad, createWorldSurface, createWorldTerrain, worldTerrainHeight } from './WorldGeometry';
@@ -59,10 +59,7 @@ export class WorldBuilder {
 
   async prefetch(layout: AnyWorldLayout): Promise<void> {
     const placements = [...layout.props, ...layout.scatters.flatMap(expandWorldScatter)];
-    await this.assets.preload(placements.flatMap((placement) => {
-      const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
-      return definition.asset ? [definition.asset] : [];
-    }));
+    await this.assets.preload(placements.flatMap((placement) => worldPropAssetKeys(placement.prop)));
   }
 
   async build(layout: AnyWorldLayout, mode: WorldBuildMode = 'runtime'): Promise<WorldChunkView> {
@@ -108,7 +105,7 @@ export class WorldBuilder {
     return view;
   }
 
-  private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode): Promise<THREE.Object3D> {
+  private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode, local = false): Promise<THREE.Object3D> {
     const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
     let model = definition.procedural === 'lava-basin' ? createLavaBasin(this.materials.area4)
       : definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
@@ -135,7 +132,8 @@ export class WorldBuilder {
       object.add(createWalkSurfaceView(definition.walkSurface, deckMaterial, failed || Boolean(definition.blockout)));
     }
     const [x, requestedY, z] = placement.position;
-    object.position.set(x, definition.walkSurface || definition.absoluteElevation ? requestedY : Math.max(requestedY, worldTerrainHeight(layout, x, z) + 0.025), z);
+    if (definition.visualChildren?.length) object.add(...await Promise.all(definition.visualChildren.map((child) => this.createPlacement(layout, { ...child, name: `${placement.name}/${child.name}` }, mode, true))));
+    object.position.set(x, local || definition.walkSurface || definition.absoluteElevation ? requestedY : Math.max(requestedY, worldTerrainHeight(layout, x, z) + 0.025), z);
     object.rotation.y = placement.rotation ?? 0;
     object.scale.multiplyScalar(placement.scale ?? 1);
     object.userData = {
@@ -143,7 +141,7 @@ export class WorldBuilder {
       chunkId: layout.id,
       propKey: placement.prop,
       assetKey: definition.asset,
-      editableProp: true,
+      editableProp: !local,
       cameraOccluder: definition.cameraOccluder === true,
       inspectionMode: mode === 'inspection',
     };

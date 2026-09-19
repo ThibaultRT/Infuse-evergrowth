@@ -14,7 +14,7 @@ const errors = [];
 const check = (condition, message) => { if (!condition) errors.push(message); };
 
 try {
-  const [{ WORLD_LAYOUTS }, { validateWorldLayouts }, { compileWorldCollision }, config, collisionMath, placementMath, { WORLD_PROP_CATALOG }, { WORLD_ASSET_DEFINITIONS }] = await Promise.all([
+  const [{ WORLD_LAYOUTS }, { validateWorldLayouts }, { compileWorldCollision }, config, collisionMath, placementMath, { WORLD_PROP_CATALOG, worldPropAssetKeys }, { WORLD_ASSET_DEFINITIONS }] = await Promise.all([
     vite.ssrLoadModule('/src/data/world/index.ts'),
     vite.ssrLoadModule('/src/data/world/validateWorld.ts'),
     vite.ssrLoadModule('/src/domain/world/WorldCollisionCompiler.ts'),
@@ -62,7 +62,7 @@ try {
       placementNames.add(placement.name);
       const definition = WORLD_PROP_CATALOG[placement.prop];
       check(Boolean(definition), `Unknown prop key ${placement.prop}.`);
-      if (definition?.asset) referencedAssets.add(definition.asset);
+      if (definition) for (const asset of worldPropAssetKeys(placement.prop)) referencedAssets.add(asset);
     }
   }
 

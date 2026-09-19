@@ -43,7 +43,8 @@ Area 4 construction. It is a blockout reference; it does not depict final Area 4
 
 Slice 1 is verified. S2/W2, their gates and the user-supplied throne are integrated
 as slice 2 models. Slice 4 terrain/lava and slice 6 forest dressing are implemented.
-Manual movement and real-device review of the new dressing remain pending. This work adds no
+The user tested the initial scattered dressing and found no gameplay problems.
+The dense-grove follow-up awaits manual review; real-device profiling remains pending. This work adds no
 encounters, boss, loot, damage-over-time, falling, bridge collapse or particles.
 Area 4's unused enemy affinity header is provisional until encounters are authored.
 
@@ -139,7 +140,7 @@ current-area field already represent this content extension.
    logs and basalt rocks. Use restrained deterministic scatter with exclusions around
    paths, pools, gates, spawn spaces and the throne. Keep a playable visual fallback.
    **Implemented:** six reusable textured GLBs replace the twelve tree markers with
-   96 deterministic props. Shared authored footprints remain authoritative, including
+   loose deterministic props and two dense groves. Shared authored footprints remain authoritative, including
    when models fail to load. See the slice 6 handoff below.
 7. **Author gameplay in a later, separate content pass.** Agree encounters, affinities, boss,
    rewards and any throne interaction. Add stable spawn IDs and authored HP/damage/
@@ -160,20 +161,27 @@ the reusable GLBs. Provenance and source hashes are in `ASSET-LICENSES.md` and
 
 `area4-forest.json` owns prop dimensions, visual reservation radii, scatter seeds,
 counts and margins. `area4Forest.ts` feeds the existing deterministic scatter and
-collision compiler. Minimum spacing prevents overlapping props; a failed candidate
-is skipped. The current seeds place 54 trunks, 12 stumps, 8 logs and 22 rocks, for
-43,452 triangles, 96 prop draws before shadow passes and 0.95 MiB of new assets.
+collision compiler. Minimum spacing separates loose props; a failed candidate is
+skipped. Two 6 m-radius dense groves sit at local `(-55,-6)` and `(30,14)`, with
+20 trees each. Their tree variants, scale and orientations are seeded; branch
+overlap is intentional inside these blocked groves. Each grove is one named prop
+with one circular collider and local visual children, so its authored transform
+controls its trees and collision. Loose scatter reserves the groves' branch overhang.
+The current layout has 93 loose props plus 40 grove trees, for 69,098 triangles,
+133 prop draws before shadow passes and the same 0.95 MiB of reused assets.
 Tall trunks use the existing camera-occlusion fade. All six props have semantic
 loading fallbacks. No save shape, world root, ground height or encounter changes.
 
 Reproduction and inspection commands are in `authoring/README.md`. The forest
 validator checks the actual rendered road curves, pool/throne/clearing exclusions,
 ground footprints, texture and mesh budgets, repeatability and asset-free views.
-The viewer's **Burned forest** camera and `--area4-forest` capture option provide
-static overview and 390 × 844 portrait images without running gameplay.
+The viewer's **Burned forest**, **West grove** and **East grove** cameras and the
+`--area4-forest` capture option provide static overview and 390 × 844 portrait
+images without running gameplay. Validation checks complete blocked grove disks,
+clear perimeter walking space, shared parent transforms and child asset fallbacks.
 
-Manual handoff: walk both bridge landings and ash paths to the throne, circle the
-lava pools, brush past logs/rocks/stumps, and check trunk fading in Full and
+Manual handoff: walk around both groves, confirm their interiors cannot be entered,
+then follow both bridge paths to the throne and check trunk fading in Full and
 Reduced/30 FPS. Revisit offline after loading Area 4. Real iPhone load time,
 memory and frame rate remain unmeasured until the user performs device testing.
 
@@ -299,7 +307,7 @@ record provenance in `ASSET-LICENSES.md`. The concept PNG stays outside `public/
 | Throne placement and interaction | Keep it centered in the southern landmark position at A04 local `(0,0,15)`. It is cosmetic scenery only, with no boss or progression interaction. |
 | Lava behavior | Give every lava pool authored collision so the hero cannot run on it. Lava damage and other mechanics are not part of this decision. |
 | Encounters and rewards | Out of scope for the environment work; author them later as a separate content pass. |
-| Asset delivery | S2/W2 and the supplied throne are integrated. Slice 4 terrain is implemented; forest dressing remains a later slice. |
+| Asset delivery | S2/W2, the supplied throne, slice 4 terrain and slice 6 forest dressing are integrated. Two dense groves reuse the shipped tree models. |
 | Rift depth | Keep Area 4 walkable ground at Y=0. Fractured banks fade into unlit black depth with no visible floor; the existing two bridges retain their placements. |
 
 ## Verification and review

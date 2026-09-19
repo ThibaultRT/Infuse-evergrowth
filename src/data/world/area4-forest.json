@@ -7,6 +7,13 @@
     "basaltA": { "height": 1.25, "radius": 1.05, "visualRadius": 1.05 },
     "basaltB": { "height": 0.7, "radius": 0.8, "visualRadius": 0.8 }
   },
+  "groves": {
+    "radius": 6,
+    "trees": 20,
+    "treeScale": [0.85, 1.2],
+    "west": { "name": "A04_DenseGrove_West", "center": [-55, -6], "rotation": 0.3, "seed": 1461 },
+    "east": { "name": "A04_DenseGrove_East", "center": [30, 14], "rotation": -0.8, "seed": 1462 }
+  },
   "scatter": {
     "bounds": { "minX": -69, "maxX": 69, "minZ": -14, "maxZ": 21 },
     "routeMargin": 2,

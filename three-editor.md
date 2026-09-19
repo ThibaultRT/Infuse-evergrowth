@@ -48,6 +48,9 @@ Area A04 has flat charcoal/ash terrain, blended paths and three small lava basin
 Six reusable forest assets dress the area with deterministic, spaced trunks,
 stumps, logs and basalt. Shared `area4-forest.json` dimensions drive their semantic
 footprints and visual clearances; model failures retain simple visible fallbacks.
+Two dense groves each use one circular semantic footprint and twenty local visual
+tree children. Their named parent placements own the transform, and the surrounding
+scatter excludes their branch overhang. Children retain individual occlusion fades.
 Both rift transitions
 follow the A01/A02 convention: world Z=30..42, centered on the unchanged seam at Z=36. The rift
 extends 6 m into Areas A01/A03 and 6 m into A04. Each 3.4 m-wide bridge has a 12 m

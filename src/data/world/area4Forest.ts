@@ -1,6 +1,7 @@
 import spec from './area4-forest.json';
 import encounters from '../areas/area-4.json';
 import { AREA4_SPEC } from './area4';
+import { AREA4_GROVE_PLACEMENTS, AREA4_GROVE_VISUAL_RADIUS } from './area4Groves';
 import { expandWorldScatter, type WorldEncounterSpot, type WorldRoadPlacement, type WorldScatterPlacement } from './WorldLayout';
 
 export const AREA4_FOREST_SPEC = spec;
@@ -9,6 +10,7 @@ export const AREA4_FOREST_SPEC = spec;
 export function createArea4ForestScatters(roads: readonly WorldRoadPlacement[], spots: readonly WorldEncounterSpot[]): WorldScatterPlacement[] {
   const { scatter, props } = spec;
   const reserved = [
+    ...AREA4_GROVE_PLACEMENTS.map(({ position: [x, , z], scale }) => ({ center: [x, z] as const, radius: AREA4_GROVE_VISUAL_RADIUS * (scale ?? 1) + scatter.separation })),
     ...spots.map(({ center, radius }) => ({ center, radius: radius + scatter.clearingMargin })),
     ...AREA4_SPEC.lavaPools.map(({ center, radius }) => ({ center: [center[0], center[1]] as const, radius: radius + scatter.clearingMargin })),
     { center: [AREA4_SPEC.throne.center[0], AREA4_SPEC.throne.center[1]] as const, radius: Math.hypot(AREA4_SPEC.throne.width, AREA4_SPEC.throne.depth) / 2 + 2 },

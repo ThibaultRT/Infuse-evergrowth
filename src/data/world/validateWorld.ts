@@ -1,5 +1,5 @@
 import { WORLD_ASSET_DEFINITIONS } from './WorldAssetKeys';
-import { WORLD_PROP_CATALOG, type WorldPropDefinition } from './WorldPropCatalog';
+import { WORLD_PROP_CATALOG, worldPropAssetKeys, type WorldPropDefinition } from './WorldPropCatalog';
 import { expandWorldScatter, type AnyWorldLayout } from './WorldLayout';
 
 export type WorldValidationIssue = { readonly severity: 'error' | 'warning'; readonly message: string };
@@ -23,7 +23,11 @@ export function validateWorldLayouts(layouts: readonly AnyWorldLayout[]): WorldV
       placementNames.add(qualified);
       const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
       if (!definition) { issues.push({ severity: 'error', message: `${qualified} uses unknown prop ${placement.prop}.` }); continue; }
-      if (definition.asset && !WORLD_ASSET_DEFINITIONS[definition.asset]) issues.push({ severity: 'error', message: `${qualified} uses unresolvable asset ${definition.asset}.` });
+      try {
+        for (const asset of worldPropAssetKeys(placement.prop)) if (!WORLD_ASSET_DEFINITIONS[asset]) issues.push({ severity: 'error', message: `${qualified} uses unresolvable asset ${asset}.` });
+      } catch (error) {
+        issues.push({ severity: 'error', message: `${qualified}: ${error instanceof Error ? error.message : String(error)}` });
+      }
       for (const part of definition.blockout ?? []) {
         if (part.size.some((size) => !Number.isFinite(size) || size <= 0)) issues.push({ severity: 'error', message: `${qualified} has invalid blockout dimensions.` });
       }

@@ -8,6 +8,8 @@ import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_W
 import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
 import { AREA4_LAND_GATE, AREA4_LAND_GATE_COLLISION, AREA4_LAND_GATE_FALLBACK, AREA4_WALL_GATE, AREA4_WALL_GATE_COLLISION, AREA4_WALL_GATE_FALLBACK } from './area4Bridges';
 import forest from './area4-forest.json';
+import { createArea4GroveTrees } from './area4Groves';
+import type { WorldPropPlacement } from './WorldLayout';
 
 export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never; readonly procedural?: never }
   | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[]; readonly procedural?: never }
@@ -17,6 +19,8 @@ export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blo
   readonly absoluteElevation?: boolean;
   readonly walkSurface?: WorldWalkSurface;
   readonly fallbackBlockout?: readonly WorldBlockoutPart[];
+  /** Local visual children only. This parent definition owns all collision. */
+  readonly visualChildren?: readonly (WorldPropPlacement & { readonly collision: 'none' })[];
   readonly gate?: { readonly barrier: CollisionProxy; readonly floorHeight?: number; readonly leaves: readonly { readonly node: string; readonly openAngle: number }[] };
 };
 
@@ -40,6 +44,8 @@ export const WORLD_PROP_CATALOG = {
   'ruin.ancientThrone': { asset: 'ruin.ancientThrone', fallbackBlockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true, absoluteElevation: true },
   'terrain.lavaBasin': { procedural: 'lava-basin', collision: [circle(1)], absoluteElevation: true },
   'nature.charredTrunkA': forestProp('nature.charredTrunkA', forest.props.trunkA, 'ash', true),
+  'nature.charredGroveWest': { blockout: [], visualChildren: createArea4GroveTrees(forest.groves.west.seed), collision: [circle(forest.groves.radius)], absoluteElevation: true },
+  'nature.charredGroveEast': { blockout: [], visualChildren: createArea4GroveTrees(forest.groves.east.seed), collision: [circle(forest.groves.radius)], absoluteElevation: true },
   'nature.charredTrunkB': forestProp('nature.charredTrunkB', forest.props.trunkB, 'ash', true),
   'nature.charredStump': forestProp('nature.charredStump', forest.props.stump, 'ash'),
   'nature.charredLog': { asset: 'nature.charredLog', absoluteElevation: true,
@@ -147,3 +153,13 @@ export const WORLD_PROP_CATALOG = {
 } as const satisfies Record<string, WorldPropDefinition>;
 
 export type WorldPropKey = keyof typeof WORLD_PROP_CATALOG;
+
+/** Include assets below composite props; reject authored recursion before loading. */
+export function worldPropAssetKeys(key: WorldPropKey, ancestors: readonly WorldPropKey[] = []): WorldAssetKey[] {
+  if (ancestors.includes(key)) throw new Error(`Recursive visual prop: ${[...ancestors, key].join(' -> ')}`);
+  const definition: WorldPropDefinition = WORLD_PROP_CATALOG[key];
+  return [
+    ...(definition.asset ? [definition.asset] : []),
+    ...(definition.visualChildren ?? []).flatMap((child) => worldPropAssetKeys(child.prop, [...ancestors, key])),
+  ];
+}

@@ -341,13 +341,18 @@ The downloader checks tracked SHA-256 hashes before writing sources. Raw maps,
 the packed editable `.blend` and runtime statistics stay under ignored
 `authoring/local/area4/forest/`. The exporter embeds 512² color/normal textures;
 the optimizer applies final charcoal/stone tints and keeps one material per model.
-The initial six assets total 0.95 MiB. The seeded layout currently uses 96 props,
-43,452 triangles and at most 96 prop draws before shadow passes.
+The six assets total 0.95 MiB. Two named dense-grove props reuse 20 trees each,
+with one 6 m-radius collision circle per grove. Their local visual children use
+seeded orientation, scale and variants; the parent owns all collision. Moving or
+rotating a named grove moves its children with it. The layout currently uses 93
+loose props plus 40 grove trees, 69,098 triangles and 133 prop draws before shadows.
 
 The forest validator is included in release validation. It checks actual smooth
 path clearance, pools, throne, reserved encounter spaces, spacing, asset bounds,
-texture/mesh budgets and production-builder fallbacks without a browser. Static
-captures write `area4-forest.png`, `iphone-12-area4-forest.png` and
+texture/mesh budgets, blocked grove disks, clear perimeter space, parent transforms
+and production-builder fallbacks without a browser. Static captures write
+`area4-forest.png`, `iphone-12-area4-forest.png`, `iphone-12-area4-grove-west.png`,
+`iphone-12-area4-grove-east.png` and
 `iphone-12-area4-throne.png`. Movement, offline revisits and real mobile performance
 are handed to the user for manual testing; no live gameplay test is needed here.
 

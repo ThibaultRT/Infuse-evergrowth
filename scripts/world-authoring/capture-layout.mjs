@@ -153,8 +153,9 @@ try {
     await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
     await capture(client, path.join(capturesRoot, 'area4-forest.png'), 'area4', 1600, 1000);
     await capture(client, path.join(capturesRoot, 'iphone-12-area4-forest.png'), 'area4:forest', 390, 844);
+    for (const side of ['west', 'east']) await capture(client, path.join(capturesRoot, `iphone-12-area4-grove-${side}.png`), `area4:grove-${side}`, 390, 844);
     await capture(client, path.join(capturesRoot, 'iphone-12-area4-throne.png'), 'area4:throne', 390, 844);
-    console.log('Captured burned forest overview, portrait dressing and throne approach; no live gameplay.');
+    console.log('Captured burned forest overview, both dense groves, portrait dressing and throne approach; no live gameplay.');
   } else if (area4TerrainOnly) {
     await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
     await capture(client, path.join(capturesRoot, 'area4-terrain.png'), 'area4', 1600, 1000);
