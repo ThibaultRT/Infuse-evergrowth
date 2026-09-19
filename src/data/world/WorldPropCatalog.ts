@@ -7,6 +7,7 @@ import { HIGHWOOD_COLLISION } from './highwood';
 import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_WALL_COLLISION, fallenKeepShellCollision } from './fallenKeep';
 import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
 import { AREA4_LAND_GATE, AREA4_LAND_GATE_COLLISION, AREA4_LAND_GATE_FALLBACK, AREA4_WALL_GATE, AREA4_WALL_GATE_COLLISION, AREA4_WALL_GATE_FALLBACK } from './area4Bridges';
+import forest from './area4-forest.json';
 
 export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never; readonly procedural?: never }
   | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[]; readonly procedural?: never }
@@ -23,6 +24,13 @@ const rectangle = (width: number, depth: number, center: readonly [number, numbe
 const circle = (radius: number, center: readonly [number, number] = [0, 0]): CollisionProxy => ({ kind: 'circle', center, radius });
 const prop = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision });
 const occludingProp = (asset: WorldAssetKey, collision: readonly CollisionProxy[] = []): WorldPropDefinition => ({ asset, collision, cameraOccluder: true });
+const forestProp = (asset: WorldAssetKey, shape: { radius: number; height: number }, material: 'ash' | 'stone', trunk = false): WorldPropDefinition => ({
+  asset, collision: [circle(shape.radius)], absoluteElevation: true, cameraOccluder: trunk,
+  fallbackBlockout: [
+    { kind: 'cylinder', size: [shape.radius * 2, shape.height, shape.radius * 2], position: [0, shape.height / 2, 0], material },
+    ...(trunk ? [{ size: [1.8, 0.18, 0.18] as const, position: [0.35, shape.height * 0.64, 0] as const, material }] : []),
+  ],
+});
 
 export const WORLD_PROP_CATALOG = {
   'crossing.area4SkeletalBridge': { asset: 'crossing.area4SkeletalBridge', fallbackBlockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
@@ -31,11 +39,15 @@ export const WORLD_PROP_CATALOG = {
   'ruin.area4SouthGate': { asset: 'ruin.area4SouthGate', fallbackBlockout: AREA4_WALL_GATE_FALLBACK, collision: AREA4_WALL_GATE_COLLISION, gate: AREA4_WALL_GATE, absoluteElevation: true, cameraOccluder: true },
   'ruin.ancientThrone': { asset: 'ruin.ancientThrone', fallbackBlockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true, absoluteElevation: true },
   'terrain.lavaBasin': { procedural: 'lava-basin', collision: [circle(1)], absoluteElevation: true },
-  'blockout.charredTree': { blockout: [
-    { size: [0.5, 4, 0.5], position: [0, 2, 0], material: 'ash' },
-    { size: [2.4, 0.25, 0.25], position: [0.6, 2.8, 0], material: 'ash' },
-    { size: [0.2, 0.2, 1.6], position: [0, 3.4, -0.4], material: 'ash' },
-  ], collision: [circle(0.35)], cameraOccluder: true },
+  'nature.charredTrunkA': forestProp('nature.charredTrunkA', forest.props.trunkA, 'ash', true),
+  'nature.charredTrunkB': forestProp('nature.charredTrunkB', forest.props.trunkB, 'ash', true),
+  'nature.charredStump': forestProp('nature.charredStump', forest.props.stump, 'ash'),
+  'nature.charredLog': { asset: 'nature.charredLog', absoluteElevation: true,
+    collision: [rectangle(forest.props.log.width, forest.props.log.depth)],
+    fallbackBlockout: [{ size: [forest.props.log.width, forest.props.log.height, forest.props.log.depth], position: [0, forest.props.log.height / 2, 0], material: 'ash' }],
+  },
+  'nature.basaltA': forestProp('nature.basaltA', forest.props.basaltA, 'stone'),
+  'nature.basaltB': forestProp('nature.basaltB', forest.props.basaltB, 'stone'),
   'terrain.fallenKeep': { asset: 'terrain.fallenKeep', collision: [], absoluteElevation: true },
   'ruin.curtainA': occludingProp('ruin.curtainA', FALLEN_KEEP_WALL_COLLISION),
   'ruin.curtainB': occludingProp('ruin.curtainB', FALLEN_KEEP_WALL_COLLISION),

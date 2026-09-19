@@ -175,6 +175,9 @@ function framePreset(preset: string): void {
   } else if (preset === 'area4') {
     controls.target.set(36, 0, 50);
     camera.position.set(48, 105, 151);
+  } else if (preset === 'area4:forest') {
+    controls.target.set(-12, 1.4, 67);
+    camera.position.set(-4, 15, 83);
   } else if (preset === 'area4:rift') {
     controls.target.set(36, -2, 36);
     camera.position.set(48, 51, 102);

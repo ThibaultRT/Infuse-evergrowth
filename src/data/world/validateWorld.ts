@@ -40,6 +40,7 @@ export function validateWorldLayouts(layouts: readonly AnyWorldLayout[]): WorldV
       if (!valid) issues.push({ severity: 'error', message: `${layout.id}/${volume.id} has invalid collision dimensions.` });
     }
     for (const scatter of layout.scatters) {
+      if (scatter.minSpacing !== undefined && (!Number.isFinite(scatter.minSpacing) || scatter.minSpacing < 0)) issues.push({ severity: 'error', message: `${layout.id}/${scatter.prefix} has invalid minimum spacing.` });
       if (scatter.collision === 'prop-default' && scatter.count > 32) issues.push({ severity: 'warning', message: `${layout.id}/${scatter.prefix} creates ${scatter.count} scatter colliders.` });
     }
   }

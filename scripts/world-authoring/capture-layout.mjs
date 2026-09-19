@@ -10,6 +10,7 @@ const repositoryRoot = process.cwd();
 const area4BridgesOnly = process.argv.includes('--area4-bridges');
 const area4ThroneOnly = process.argv.includes('--area4-throne');
 const area4TerrainOnly = process.argv.includes('--area4-terrain');
+const area4ForestOnly = process.argv.includes('--area4-forest');
 const viewerPort = 4174;
 const viewerUrl = `http://127.0.0.1:${viewerPort}`;
 const capturesRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
@@ -148,7 +149,13 @@ try {
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
-  if (area4TerrainOnly) {
+  if (area4ForestOnly) {
+    await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
+    await capture(client, path.join(capturesRoot, 'area4-forest.png'), 'area4', 1600, 1000);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area4-forest.png'), 'area4:forest', 390, 844);
+    await capture(client, path.join(capturesRoot, 'iphone-12-area4-throne.png'), 'area4:throne', 390, 844);
+    console.log('Captured burned forest overview, portrait dressing and throne approach; no live gameplay.');
+  } else if (area4TerrainOnly) {
     await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
     await capture(client, path.join(capturesRoot, 'area4-terrain.png'), 'area4', 1600, 1000);
     await capture(client, path.join(capturesRoot, 'area4-rift-banks.png'), 'area4:rift', 1600, 1000);

@@ -317,6 +317,40 @@ semantic throne remains a loading fallback. No gameplay interaction is added.
 The throne capture option writes `area4-throne.png` and
 `iphone-12-area4-throne.png` using the production world builder.
 
+## Area 4 forest dressing (slice 6)
+
+Six small GLBs use CC0 Poly Haven bark/rock maps. Their dimensions and scatter
+settings are in `src/data/world/area4-forest.json`; the existing scatter/compiler
+places both presentation and semantic collision. Roots stay local, metres, Y-up,
+with base scale 1. Trunks fade through the existing camera-occlusion mechanism.
+
+Reproduce with Blender and an existing glTF Transform installation:
+
+```powershell
+node scripts/world-assets/prepare-area4-forest.mjs --download
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-area4-forest.py
+node scripts/world-assets/prepare-area4-forest.mjs --tool-root '<gltf-transform installation root>'
+npm run authoring:assets:promote -- nature.charredTrunkA nature.charredTrunkB nature.charredStump nature.charredLog nature.basaltA nature.basaltB
+node scripts/world-authoring/validate-area4-forest.mjs
+npm run authoring:world:capture -- --area4-forest
+npm run build
+npm run validate:release
+```
+
+The downloader checks tracked SHA-256 hashes before writing sources. Raw maps,
+the packed editable `.blend` and runtime statistics stay under ignored
+`authoring/local/area4/forest/`. The exporter embeds 512² color/normal textures;
+the optimizer applies final charcoal/stone tints and keeps one material per model.
+The initial six assets total 0.95 MiB. The seeded layout currently uses 96 props,
+43,452 triangles and at most 96 prop draws before shadow passes.
+
+The forest validator is included in release validation. It checks actual smooth
+path clearance, pools, throne, reserved encounter spaces, spacing, asset bounds,
+texture/mesh budgets and production-builder fallbacks without a browser. Static
+captures write `area4-forest.png`, `iphone-12-area4-forest.png` and
+`iphone-12-area4-throne.png`. Movement, offline revisits and real mobile performance
+are handed to the user for manual testing; no live gameplay test is needed here.
+
 ## Ownership
 
 - `src/data/world/**`: authoritative dimensions, layouts, prop catalog and asset map.

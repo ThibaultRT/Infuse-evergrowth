@@ -162,6 +162,15 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Source: project-authored procedural geometry, vertex colors and one 256px ash-grain texture in `src/rendering/environment/Area4TerrainView.ts`, driven by the renderer-neutral Area 4 layouts and dimensions. No third-party textures, models or generated-image references are used in this terrain pass.
 - Content: flat charcoal/ash ground and paths, fractured rift banks with unlit dark depth, and three small lava basins within the existing collision footprints. Ground and bank geometry are reproducible in the production builder and assembled debug GLB.
 - The Greenhaven and Fallen Keep landscape GLBs were regenerated without their shallow southern cliff rocks. Their existing sources and provenance are unchanged; reproduction uses each existing Blender exporter with `--landscape-only`, followed by glTF Transform dedup/prune and manifest promotion.
+
+## Area 4 burned forest dressing
+
+- Files: `public/assets/world/shared/models/area4-charred-*.glb` and `area4-basalt-*.glb`.
+- Geometry: six project-authored reusable meshes (two scorched trunks, a stump, a fallen log and two basalt rocks), reproduced by `scripts/world-assets/export-area4-forest.py`. Editable source: ignored `authoring/local/area4/forest/area4-forest.blend`.
+- Bark color/normal maps: [Bark Willow](https://polyhaven.com/a/bark_willow), photographed by Dimitrios Savva and processed by Dario Barresi.
+- Rock color/normal maps: [Dark Rock](https://polyhaven.com/a/dark_rock), by Amal Kumar.
+- Both texture sets are [CC0 1.0](https://polyhaven.com/license). Their exact download URLs and source SHA-256 hashes are tracked in `scripts/world-assets/area4-forest-sources.json`; `prepare-area4-forest.mjs --download` retrieves and verifies the four source maps.
+- Processing: 1K source maps resized to 512² JPEG color and OpenGL normal maps; baked metre-scale geometry, charcoal/stone material tints, one material/draw per GLB, glTF Transform weld/dedup/prune, no compression decoder or external dependencies. Six GLBs total 0.95 MiB. No image or 3D generation service is used in this pass.
 - Usage: authored for Infuse: Evergrowth under the project owner's direction.
 
 ## Rare enemy runtime LODs

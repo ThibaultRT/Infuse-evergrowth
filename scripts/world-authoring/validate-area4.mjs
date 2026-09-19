@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import { validateArea4Bridges } from './validate-area4-bridges.mjs';
 import { validateArea4Terrain } from './validate-area4-terrain.mjs';
+import { validateArea4Forest } from './validate-area4-forest.mjs';
 
 /** Check the new loop, abyss containment and progress earned before this area existed. */
 export async function validateArea4(vite, config) {
   await validateArea4Bridges(vite, config);
   await validateArea4Terrain(vite);
+  await validateArea4Forest(vite);
   const [{ GameplayRuntime }, { AREA_A04_LAYOUT: layout }, { AREA4_SPEC: spec }, { circleOverlapsWorldCollision }, { worldTerrainHeight }, { loadSave, persist }, { ProgressionSystem }, { GameEvents }, { WORLD_LAYOUTS }, { worldWalkHeight }, { expandWorldScatter }] = await Promise.all([
     vite.ssrLoadModule('/src/game/GameplayRuntime.ts'),
     vite.ssrLoadModule('/src/data/world/areas/areaA04Layout.ts'),

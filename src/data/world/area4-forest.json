@@ -1,0 +1,20 @@
+{
+  "props": {
+    "trunkA": { "height": 5.2, "radius": 0.6, "visualRadius": 1.9 },
+    "trunkB": { "height": 4.3, "radius": 0.6, "visualRadius": 1.7 },
+    "stump": { "height": 0.85, "radius": 0.65, "visualRadius": 0.65 },
+    "log": { "height": 0.9, "width": 3.8, "depth": 1.1, "visualRadius": 2 },
+    "basaltA": { "height": 1.25, "radius": 1.05, "visualRadius": 1.05 },
+    "basaltB": { "height": 0.7, "radius": 0.8, "visualRadius": 0.8 }
+  },
+  "scatter": {
+    "bounds": { "minX": -69, "maxX": 69, "minZ": -14, "maxZ": 21 },
+    "routeMargin": 2,
+    "clearingMargin": 0.8,
+    "separation": 0.5,
+    "trunks": { "count": 54, "seed": 461, "scale": [0.8, 1.15] },
+    "stumps": { "count": 12, "seed": 462, "scale": [0.75, 1.1] },
+    "logs": { "count": 9, "seed": 463, "scale": [0.75, 1] },
+    "rocks": { "count": 22, "seed": 464, "scale": [0.6, 1.15] }
+  }
+}

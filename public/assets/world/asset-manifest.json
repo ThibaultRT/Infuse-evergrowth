@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T18:10:25.726Z",
+  "generatedAt": "2026-09-19T18:28:28.445Z",
   "assets": [
     {
       "key": "crossing.area4BoneGate",
@@ -227,6 +227,90 @@
       "runtimeDigest": {
         "bytes": 1563448,
         "sha256": "283972d4b7a6c9dc2ac6c2f0a3bcefa820f121ed2cb2e01b1049a6e1ee741733"
+      }
+    },
+    {
+      "key": "nature.basaltA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-basalt-a.glb",
+      "runtime": "assets/world/shared/models/area4-basalt-a.glb",
+      "sourceDigest": {
+        "bytes": 107120,
+        "sha256": "20c474894153e0f96554050f28a4b6c75710a7aab3c573a74b4770949acfb876"
+      },
+      "runtimeDigest": {
+        "bytes": 107120,
+        "sha256": "20c474894153e0f96554050f28a4b6c75710a7aab3c573a74b4770949acfb876"
+      }
+    },
+    {
+      "key": "nature.basaltB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-basalt-b.glb",
+      "runtime": "assets/world/shared/models/area4-basalt-b.glb",
+      "sourceDigest": {
+        "bytes": 107136,
+        "sha256": "816fbfc756e3126f5226234138350f4acd34e709d615c45c3e3745fe1c0648f7"
+      },
+      "runtimeDigest": {
+        "bytes": 107136,
+        "sha256": "816fbfc756e3126f5226234138350f4acd34e709d615c45c3e3745fe1c0648f7"
+      }
+    },
+    {
+      "key": "nature.charredLog",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-charred-log.glb",
+      "runtime": "assets/world/shared/models/area4-charred-log.glb",
+      "sourceDigest": {
+        "bytes": 185380,
+        "sha256": "4987d02f52ff8abcd92ec8418b475f2da9d046dfaf7a36565b3c1c3d7ff3ab8f"
+      },
+      "runtimeDigest": {
+        "bytes": 185380,
+        "sha256": "4987d02f52ff8abcd92ec8418b475f2da9d046dfaf7a36565b3c1c3d7ff3ab8f"
+      }
+    },
+    {
+      "key": "nature.charredStump",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-charred-stump.glb",
+      "runtime": "assets/world/shared/models/area4-charred-stump.glb",
+      "sourceDigest": {
+        "bytes": 189440,
+        "sha256": "07b72b7e05300993d73a9fce7bd873129877969872f9d07cb2fc63c1e720ffbe"
+      },
+      "runtimeDigest": {
+        "bytes": 189440,
+        "sha256": "07b72b7e05300993d73a9fce7bd873129877969872f9d07cb2fc63c1e720ffbe"
+      }
+    },
+    {
+      "key": "nature.charredTrunkA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-charred-trunk-a.glb",
+      "runtime": "assets/world/shared/models/area4-charred-trunk-a.glb",
+      "sourceDigest": {
+        "bytes": 204168,
+        "sha256": "d291c4e478dee16b5e68c022a4e3e9b46907fd6322c89c5b7a3d80f0576b1cd1"
+      },
+      "runtimeDigest": {
+        "bytes": 204168,
+        "sha256": "d291c4e478dee16b5e68c022a4e3e9b46907fd6322c89c5b7a3d80f0576b1cd1"
+      }
+    },
+    {
+      "key": "nature.charredTrunkB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-charred-trunk-b.glb",
+      "runtime": "assets/world/shared/models/area4-charred-trunk-b.glb",
+      "sourceDigest": {
+        "bytes": 202976,
+        "sha256": "eed8f762f9f4316a0c0e9b8b19e2f54589848666d1d7594c1881e1ffacda64b5"
+      },
+      "runtimeDigest": {
+        "bytes": 202976,
+        "sha256": "eed8f762f9f4316a0c0e9b8b19e2f54589848666d1d7594c1881e1ffacda64b5"
       }
     },
     {

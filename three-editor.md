@@ -45,7 +45,10 @@ wall pieces remain collidable; only the three authored
 gates are traversable. Each Area 4 gate owns its connection's single lock proxy.
 
 Area A04 has flat charcoal/ash terrain, blended paths and three small lava basins.
-Tree markers remain blockouts until the forest-dressing pass. Both rift transitions
+Six reusable forest assets dress the area with deterministic, spaced trunks,
+stumps, logs and basalt. Shared `area4-forest.json` dimensions drive their semantic
+footprints and visual clearances; model failures retain simple visible fallbacks.
+Both rift transitions
 follow the A01/A02 convention: world Z=30..42, centered on the unchanged seam at Z=36. The rift
 extends 6 m into Areas A01/A03 and 6 m into A04. Each 3.4 m-wide bridge has a 12 m
 deck at Y=0.6 centered on the seam and 3 m approaches reaching Y=0 at Z=27 and Z=45.

@@ -23,6 +23,8 @@ export type WorldScatterPlacement = {
   readonly bounds: WorldBounds;
   readonly seed: number;
   readonly scale: readonly [number, number];
+  /** Optional minimum centre spacing within this scatter, in local metres. */
+  readonly minSpacing?: number;
   readonly exclusions?: readonly { readonly center: WorldVec2; readonly radius: number }[];
   readonly collision?: 'none' | 'prop-default';
 };
@@ -177,16 +179,20 @@ function seededRandom(seed: number): () => number {
 export function expandWorldScatter(scatter: WorldScatterPlacement): WorldPropPlacement[] {
   const random = seededRandom(scatter.seed);
   const placements: WorldPropPlacement[] = [];
+  const minSpacing = scatter.minSpacing ?? 0;
+  const excluded = (x: number, z: number): boolean =>
+    Boolean(scatter.exclusions?.some(({ center, radius }) => (x - center[0]) ** 2 + (z - center[1]) ** 2 < radius ** 2))
+    || (minSpacing > 0 && placements.some(({ position }) => Math.hypot(x - position[0], z - position[2]) < minSpacing));
   for (let index = 0; index < scatter.count; index += 1) {
     let x = scatter.bounds.minX;
     let z = scatter.bounds.minZ;
     for (let attempt = 0; attempt < 24; attempt += 1) {
       x = scatter.bounds.minX + (scatter.bounds.maxX - scatter.bounds.minX) * random();
       z = scatter.bounds.minZ + (scatter.bounds.maxZ - scatter.bounds.minZ) * random();
-      if (!scatter.exclusions?.some(({ center, radius }) => (x - center[0]) ** 2 + (z - center[1]) ** 2 < radius ** 2)) break;
+      if (!excluded(x, z)) break;
     }
     // Dense exclusion zones can exhaust the attempts; never place inside them.
-    if (scatter.exclusions?.some(({ center, radius }) => (x - center[0]) ** 2 + (z - center[1]) ** 2 < radius ** 2)) continue;
+    if (excluded(x, z)) continue;
     const prop = scatter.props[Math.min(scatter.props.length - 1, Math.floor(random() * scatter.props.length))];
     if (!prop) continue;
     placements.push({

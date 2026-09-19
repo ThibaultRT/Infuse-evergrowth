@@ -38,10 +38,12 @@ Area 4 construction. It is a blockout reference; it does not depict final Area 4
 - [x] Build slice 4 terrain: charcoal/ash ground, blended readable paths, fractured
   north/south rift banks fading into black, and three small crusted lava basins.
   Retire the old shallow southern cliff rocks from both northern landscapes.
+- [x] Dress slice 6 with scorched trunks, stumps, fallen logs and basalt rocks;
+  reserve paths, pools, encounter spaces, bridge approaches and the throne.
 
 Slice 1 is verified. S2/W2, their gates and the user-supplied throne are integrated
-as slice 2 models. Slice 4 terrain and lava are implemented; trees remain blockouts
-until the forest-dressing pass. This work adds no
+as slice 2 models. Slice 4 terrain/lava and slice 6 forest dressing are implemented.
+Manual movement and real-device review of the new dressing remain pending. This work adds no
 encounters, boss, loot, damage-over-time, falling, bridge collapse or particles.
 Area 4's unused enemy affinity header is provisional until encounters are authored.
 
@@ -136,6 +138,9 @@ current-area field already represent this content extension.
 6. **Dress the burned forest.** Prepare a small set of scorched trunks, stumps, fallen
    logs and basalt rocks. Use restrained deterministic scatter with exclusions around
    paths, pools, gates, spawn spaces and the throne. Keep a playable visual fallback.
+   **Implemented:** six reusable textured GLBs replace the twelve tree markers with
+   96 deterministic props. Shared authored footprints remain authoritative, including
+   when models fail to load. See the slice 6 handoff below.
 7. **Author gameplay in a later, separate content pass.** Agree encounters, affinities, boss,
    rewards and any throne interaction. Add stable spawn IDs and authored HP/damage/
    reward ranges in `src/data/areas/area-4.json`. Lava remains blocked by authored
@@ -144,6 +149,33 @@ current-area field already represent this content extension.
 8. **Polish and validate.** Add restrained ember/light effects only after profiling.
    Check Full/Reduced and Smooth/30 FPS, offline revisits, loading fallback and a real
    iPhone 12-class device before considering the environment finished.
+
+## Slice 6 handoff
+
+The six project-authored props use CC0 Poly Haven **Bark Willow** and **Dark Rock**
+color/normal maps. A charcoal material tint turns the bark into scorched wood;
+there is no generated imagery. Both textures are reduced to 512² and embedded in
+the reusable GLBs. Provenance and source hashes are in `ASSET-LICENSES.md` and
+`scripts/world-assets/area4-forest-sources.json`.
+
+`area4-forest.json` owns prop dimensions, visual reservation radii, scatter seeds,
+counts and margins. `area4Forest.ts` feeds the existing deterministic scatter and
+collision compiler. Minimum spacing prevents overlapping props; a failed candidate
+is skipped. The current seeds place 54 trunks, 12 stumps, 8 logs and 22 rocks, for
+43,452 triangles, 96 prop draws before shadow passes and 0.95 MiB of new assets.
+Tall trunks use the existing camera-occlusion fade. All six props have semantic
+loading fallbacks. No save shape, world root, ground height or encounter changes.
+
+Reproduction and inspection commands are in `authoring/README.md`. The forest
+validator checks the actual rendered road curves, pool/throne/clearing exclusions,
+ground footprints, texture and mesh budgets, repeatability and asset-free views.
+The viewer's **Burned forest** camera and `--area4-forest` capture option provide
+static overview and 390 × 844 portrait images without running gameplay.
+
+Manual handoff: walk both bridge landings and ash paths to the throne, circle the
+lava pools, brush past logs/rocks/stumps, and check trunk fading in Full and
+Reduced/30 FPS. Revisit offline after loading Area 4. Real iPhone load time,
+memory and frame rate remain unmeasured until the user performs device testing.
 
 ## Major asset handoff
 
