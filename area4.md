@@ -40,6 +40,8 @@ Area 4 construction. It is a blockout reference; it does not depict final Area 4
   Retire the old shallow southern cliff rocks from both northern landscapes.
 - [x] Dress slice 6 with scorched trunks, stumps, fallen logs and basalt rocks;
   reserve paths, pools, encounter spaces, bridge approaches and the throne.
+- [x] Enclose the east edge with the supplied fence and gate; add a continuous,
+  impassable lava lake across the southern apron.
 
 Slice 1 is verified. S2/W2, their gates and the user-supplied throne are integrated
 as slice 2 models. Slice 4 terrain/lava and slice 6 forest dressing are implemented.
@@ -70,6 +72,9 @@ Area 4's unused enemy affinity header is provisional until encounters are author
 | S2 land gate | World `(7.2,0,27)`; separate bone/iron module before the north ramp |
 | Area 3 south wall/gate | Transition-local `(14,0,-6)`, world `(86,0,30)`; existing masonry with inland hinges at world Z=29.3, scale 1 |
 | Throne | A04 local `(0,0,15)`, world `(36,0,75)`; authored footprint 4.9 × 3.7 m, exactly 5.4 m tall; faces -Z |
+| Eastern fence | World X `108`; four supplied 8.5 m modules join the north bank to the southern lava, around the gate |
+| Eastern gate | World `(108,0,71.4)`; 70% down Z `42..84`, faces west; 8 m wide and about 4 m tall; closed scenic boundary |
+| Southern lava lake | World X `-42..114`, Z `82..90`; complete south playable edge at Z `84` is blocked, including both corners |
 
 The area ownership seam remains at world Z `36`, now at the deck midpoint as for
 A01/A02. Each transition supplies the same compiled collision and walk surfaces to
@@ -127,7 +132,8 @@ current-area field already represent this content extension.
 4. **Build terrain and the rift banks.** Add ash/charcoal ground, jagged northern and
    southern lips, dark abyss depth, small lava basins and clear readable paths.
    Reconcile the old Greenhaven/Fallen Keep cliff geometry and A04 terrain cutouts.
-   Keep Y=0 walkable ground and reserve the routes/clearings. Avoid a large lava river.
+   Keep Y=0 walkable ground and reserve the routes/clearings. Interior lava stays in
+   small pools; the later approved boundary lake occupies only the southern edge.
    **Implemented:** the production builder generates the terrain from shared layouts.
    Ash paths follow the existing authored curves; the three lava basins retain their
    original blocked circles. No ground height, bridge profile or save shape changed.
@@ -167,8 +173,8 @@ skipped. Two 6 m-radius dense groves sit at local `(-55,-6)` and `(30,14)`, with
 overlap is intentional inside these blocked groves. Each grove is one named prop
 with one circular collider and local visual children, so its authored transform
 controls its trees and collision. Loose scatter reserves the groves' branch overhang.
-The current layout has 93 loose props plus 40 grove trees, for 69,098 triangles,
-133 prop draws before shadow passes and the same 0.95 MiB of reused assets.
+The current layout has 94 loose props plus 40 grove trees, for 69,772 triangles,
+134 prop draws before shadow passes and the same 0.95 MiB of reused assets.
 Tall trunks use the existing camera-occlusion fade. All six props have semantic
 loading fallbacks. No save shape, world root, ground height or encounter changes.
 
@@ -306,11 +312,29 @@ record provenance in `ASSET-LICENSES.md`. The concept PNG stays outside `public/
 | Throne proportions | Uniformly scale the supplied model; use a 4.9 × 3.7 m authored footprint to enclose its base and lava apron at the required height. |
 | Throne placement and interaction | Keep it centered in the southern landmark position at A04 local `(0,0,15)`. It is cosmetic scenery only, with no boss or progression interaction. |
 | Lava behavior | Give every lava pool authored collision so the hero cannot run on it. Lava damage and other mechanics are not part of this decision. |
+| Outer boundaries | The supplied eastern gate remains closed until a destination is authored. The southern lava lake blocks the whole south border. Both northern rift transitions already exist; the southern scenic transition is owned by A04, without a new connection or save field. |
 | Encounters and rewards | Out of scope for the environment work; author them later as a separate content pass. |
 | Asset delivery | S2/W2, the supplied throne, slice 4 terrain and slice 6 forest dressing are integrated. Two dense groves reuse the shipped tree models. |
 | Rift depth | Keep Area 4 walkable ground at Y=0. Fractured banks fade into unlit black depth with no visible floor; the existing two bridges retain their placements. |
 
 ## Verification and review
+
+The eastern wall and southern lava use `area4-boundaries.json` and named placements
+in `area4Boundaries.ts`. Fence and gate retain uniform proportions, ground-centred
+pivots and runtime scale 1. Their 4,000 / 9,000 triangles total 1.98 MiB; four fence
+instances plus the gate add 25,000 rendered triangles. The lake adds 2,896 procedural
+triangles in three batches, with no texture requests or lights. Its single rectangle
+owns the full blocked shore; the ash ground ends at that same placement's north edge.
+The existing forest scatter reserves both the shoreline and the gate approach.
+
+`node scripts/world-authoring/validate-area4-boundaries.mjs` checks the complete
+eastern joins and southern shore, diagonal corner containment and movement at
+30/60 FPS, asset budgets, forest clearance, matching ground/lava edges and visible
+model-loading fallbacks. It runs inside world/release validation.
+`npm run authoring:world:capture -- --area4-boundaries` writes an overview, eastern
+gate detail and 390 × 844 portrait gate/lava views. Inspect these in the viewer with
+**A04 boundaries**, **East gate** and **South lava shore**. Real-device performance
+and human movement review remain pending.
 
 Focused bridge checks: `node scripts/world-authoring/validate-area4-bridges.mjs`
 checks packed assets, actual hinge clearance, visual deck/profile agreement and

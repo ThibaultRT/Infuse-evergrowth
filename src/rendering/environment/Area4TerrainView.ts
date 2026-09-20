@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { RIFT_SOUTH_Z } from '../../data/world/area4';
+import { AREA4_SPEC, RIFT_SOUTH_Z } from '../../data/world/area4';
+import { AREA4_BOUNDARY_SPEC, AREA4_SOUTH_GROUND_Z } from '../../data/world/area4Boundaries';
 import type { AreaWorldLayout, WorldRiftBank } from '../../data/world/WorldLayout';
 import { sampleWorldRoad } from './WorldGeometry';
 
@@ -77,7 +78,7 @@ class ColoredFaces {
 /** The same authored curves paint the routes into flat ground, with soft ash edges. */
 export function createArea4Ground(layout: AreaWorldLayout, material: THREE.Material): THREE.Mesh {
   const paths = layout.roads.map((road) => ({ points: sampleWorldRoad(road), halfWidth: road.width / 2 }));
-  const minZ = RIFT_SOUTH_Z - layout.origin[2], maxZ = layout.visualSize.depth / 2;
+  const minZ = RIFT_SOUTH_Z - layout.origin[2], maxZ = AREA4_SOUTH_GROUND_Z;
   const width = layout.visualSize.width, columns = Math.ceil(width), rows = Math.ceil(maxZ - minZ);
   const positions: number[] = [], colors: number[] = [], uvs: number[] = [], indices: number[] = [];
   const charcoal = new THREE.Color(0x303034), ash = new THREE.Color(0x777579), trail = new THREE.Color(0xa59e93);
@@ -180,5 +181,65 @@ export function createLavaBasin(materials: Area4MaterialSet): THREE.Group {
   }
   const group = new THREE.Group();
   group.add(rim.mesh('Lava_BasaltCrust', materials.rock), lava.mesh('Lava_MoltenFissures', materials.molten));
+  return group;
+}
+
+/** A complete southern shore, entirely inside the lake's semantic rectangle.
+ * The ash ground ends at its north edge; crust is scenery, never a crossing. */
+export function createArea4LavaLake(materials: Area4MaterialSet): THREE.Group {
+  const { depth, surfaceY, bankWidth, bankHeight } = AREA4_BOUNDARY_SPEC.southLake;
+  const width = AREA4_SPEC.visualSize.width, north = -depth / 2;
+  const bank = new ColoredFaces(), molten = new ColoredFaces(), crust = new ColoredFaces();
+  const basalt = new THREE.Color(0x242125), ash = new THREE.Color(0x55484a);
+  const cool = new THREE.Color(0x9c2106), hot = new THREE.Color(0xff941e);
+  const columns = Math.ceil(width / 1.3), rows = 7;
+  for (let column = 0; column < columns; column++) {
+    const ax = -width / 2 + width * column / columns, bx = -width / 2 + width * (column + 1) / columns;
+    const edge = (x: number): { z: number; y: number } => ({ z: north + bankWidth * (.65 + .35 * grain(x, 3)), y: bankHeight * (.4 + .6 * grain(x, 6)) });
+    const a = edge(ax), b = edge(bx);
+    const shade = ash.clone().multiplyScalar(.65 + .35 * grain(ax, 8));
+    bank.face([[ax, 0, north], [ax, a.y, a.z], [bx, b.y, b.z], [bx, 0, north]], [basalt, shade, shade, basalt]);
+    bank.face([[ax, a.y, a.z], [ax, surfaceY, a.z + .35], [bx, surfaceY, b.z + .35], [bx, b.y, b.z]], [shade, basalt, basalt, shade]);
+    for (let row = 0; row < rows; row++) {
+      const az = north + depth * row / rows, bz = north + depth * (row + 1) / rows;
+      const points: Point[] = [[ax, surfaceY, az], [ax, surfaceY, bz], [bx, surfaceY, bz], [bx, surfaceY, az]];
+      molten.face(points, points.map(([x, , z]) => cool.clone().lerp(hot, clamp(.4 + .28 * Math.sin(x * .6 + z * 1.8) + .15 * Math.sin(x * 1.7 - z)))));
+    }
+  }
+  // Contracted Voronoi cells make irregular crust plates and branching molten
+  // channels, without a repeating stepping-stone pattern or texture request.
+  type Site = readonly [number, number];
+  const crustNorth = north + bankWidth + .4, crustSouth = depth / 2;
+  const sites: Site[] = Array.from({ length: 220 }, (_, i) => [
+    (grain(i, 61) - .5) * width,
+    crustNorth + grain(i, 73) * (crustSouth - crustNorth),
+  ]);
+  for (const [index, site] of sites.entries()) {
+    let polygon: Site[] = [[-width / 2, crustNorth], [-width / 2, crustSouth], [width / 2, crustSouth], [width / 2, crustNorth]];
+    for (const other of sites) {
+      if (other === site) continue;
+      const dx = other[0] - site[0], dz = other[1] - site[1];
+      const limit = (other[0] ** 2 + other[1] ** 2 - site[0] ** 2 - site[1] ** 2) / 2;
+      const clipped: Site[] = [];
+      for (let i = 0; i < polygon.length; i++) {
+        const a = polygon[i], b = polygon[(i + 1) % polygon.length];
+        const da = a[0] * dx + a[1] * dz - limit, db = b[0] * dx + b[1] * dz - limit;
+        if (da <= 0) clipped.push(a);
+        if ((da <= 0) !== (db <= 0)) {
+          const t = da / (da - db);
+          clipped.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+        }
+      }
+      polygon = clipped;
+    }
+    const contraction = .68 + .2 * grain(index, 83);
+    const color = basalt.clone().lerp(ash, .4 * grain(index, 97));
+    const points: Point[] = polygon.map(([x, z]) => [site[0] + (x - site[0]) * contraction, surfaceY + .035, site[1] + (z - site[1]) * contraction]);
+    crust.face(points, points.map(() => color));
+  }
+  const group = new THREE.Group();
+  const shore = bank.mesh('SouthLake_FracturedShore', materials.rock);
+  shore.receiveShadow = true;
+  group.add(shore, molten.mesh('SouthLake_MoltenSurface', materials.molten), crust.mesh('SouthLake_CooledRafts', materials.rock));
   return group;
 }

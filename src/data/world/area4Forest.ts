@@ -1,6 +1,7 @@
 import spec from './area4-forest.json';
 import encounters from '../areas/area-4.json';
 import { AREA4_SPEC } from './area4';
+import { AREA4_BOUNDARY_SPEC, AREA4_EAST_GATE_PLACEMENT, AREA4_SOUTH_GROUND_Z } from './area4Boundaries';
 import { AREA4_GROVE_PLACEMENTS, AREA4_GROVE_VISUAL_RADIUS } from './area4Groves';
 import { expandWorldScatter, type WorldEncounterSpot, type WorldRoadPlacement, type WorldScatterPlacement } from './WorldLayout';
 
@@ -10,6 +11,7 @@ export const AREA4_FOREST_SPEC = spec;
 export function createArea4ForestScatters(roads: readonly WorldRoadPlacement[], spots: readonly WorldEncounterSpot[]): WorldScatterPlacement[] {
   const { scatter, props } = spec;
   const reserved = [
+    { center: [AREA4_EAST_GATE_PLACEMENT.position[0], AREA4_EAST_GATE_PLACEMENT.position[2]] as const, radius: AREA4_BOUNDARY_SPEC.gate.width / 2 + 2 },
     ...AREA4_GROVE_PLACEMENTS.map(({ position: [x, , z], scale }) => ({ center: [x, z] as const, radius: AREA4_GROVE_VISUAL_RADIUS * (scale ?? 1) + scatter.separation })),
     ...spots.map(({ center, radius }) => ({ center, radius: radius + scatter.clearingMargin })),
     ...AREA4_SPEC.lavaPools.map(({ center, radius }) => ({ center: [center[0], center[1]] as const, radius: radius + scatter.clearingMargin })),
@@ -36,7 +38,10 @@ export function createArea4ForestScatters(roads: readonly WorldRoadPlacement[], 
     const extent = radius * tuning.scale[1];
     const group: WorldScatterPlacement = {
       prefix, props: keys, count: tuning.count, seed: tuning.seed,
-      bounds: scatter.bounds, scale: [tuning.scale[0], tuning.scale[1]], collision: 'prop-default',
+      bounds: { ...scatter.bounds,
+        maxX: Math.min(scatter.bounds.maxX, AREA4_SPEC.playableSize.width / 2 - AREA4_BOUNDARY_SPEC.gate.depth / 2 - extent - scatter.separation),
+        maxZ: Math.min(scatter.bounds.maxZ, AREA4_SOUTH_GROUND_Z - extent - scatter.separation),
+      }, scale: [tuning.scale[0], tuning.scale[1]], collision: 'prop-default',
       minSpacing: extent * 2 + scatter.separation,
       exclusions: [...reserved, ...occupied].map(({ center, radius: reservedRadius }) => ({ center, radius: reservedRadius + extent })),
     };

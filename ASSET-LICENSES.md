@@ -173,6 +173,15 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Processing: 1K source maps resized to 512² JPEG color and OpenGL normal maps; baked metre-scale geometry, charcoal/stone material tints, one material/draw per GLB, glTF Transform weld/dedup/prune, no compression decoder or external dependencies. Six GLBs total 0.95 MiB. No image or 3D generation service is used in this pass.
 - Usage: authored for Infuse: Evergrowth under the project owner's direction.
 
+## Area 4 supplied eastern fence and gate
+
+- Files: `public/assets/world/shared/models/area4-east-fence.glb` and `area4-east-gate.glb`.
+- Source: the project owner's `Fence-area4.glb` and `Gate-area4.glb`, supplied directly for this implementation. Original SHA-256: fence `33d212cbb39396e61de24901215ee5524adb9f104c0314ec6e9376403a346167`; gate `6874379789b8ecec538477d04794655487530e1d5d99432c98b9ff85192ba2a4`. Unchanged originals are retained in `authoring/local/area4/boundaries/source/`.
+- Processing: isolated Blender 5.2 scene, mesh decimation from 31,036 / 30,706 triangles to 4,000 / 9,000; uniform scale baked to 8.5 / 8 m wide, ground-centred pivots and preserved proportions. glTF Transform weld/dedup/prune packages one material and three embedded 1024² JPEG PBR maps per asset, without decoder dependencies. Combined size: 2,080,100 bytes (1.98 MiB).
+- Reproduction: `scripts/world-assets/export-area4-boundaries.py`, `scripts/world-assets/optimize-area4-boundaries.mjs --tool-root <gltf-transform installation root>`, then the promotion commands in `authoring/README.md`. The editable `.blend` and build reports are ignored local sources.
+- The southern lava lake is project-authored procedural geometry/vertex colors in `Area4TerrainView.ts`; it adds no third-party material or generated image.
+- Usage: user-supplied artwork included with the project owner's permission for Infuse: Evergrowth; no broader redistribution license is asserted.
+
 ## Rare enemy runtime LODs
 
 - File: `public/assets/models/enemies/enemy-rare-lods-v1.glb`.

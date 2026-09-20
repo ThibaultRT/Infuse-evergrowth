@@ -2,6 +2,7 @@ import { AREA4_ORIGIN, AREA4_SPEC, RIFT_SOUTH_Z, area4RiftCutout } from '../area
 import type { AreaWorldLayout, WorldEncounterSpot, WorldPropPlacement, WorldRoadPlacement } from '../WorldLayout';
 import { createArea4ForestScatters } from '../area4Forest';
 import { AREA4_GROVE_PLACEMENTS } from '../area4Groves';
+import { AREA4_BOUNDARY_PLACEMENTS } from '../area4Boundaries';
 
 const { bridge, crossings, throne, lavaPools } = AREA4_SPEC;
 const westLanding = crossings.greenhavenX - AREA4_ORIGIN[0];
@@ -25,6 +26,7 @@ export const AREA_A04_LAYOUT = {
   roads,
   encounterSpots,
   props: [
+    ...AREA4_BOUNDARY_PLACEMENTS,
     ...AREA4_GROVE_PLACEMENTS,
     { name: 'A04_Ancient_Throne', prop: 'ruin.ancientThrone', position: [throne.center[0], 0, throne.center[1]] },
     ...lavaPools.map((pool, index): WorldPropPlacement => ({ name: pool.id, prop: 'terrain.lavaBasin', position: [pool.center[0], 0, pool.center[1]], scale: pool.radius, rotation: index * 2.1 })),

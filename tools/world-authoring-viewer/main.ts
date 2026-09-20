@@ -4,6 +4,7 @@ import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { SPAWNS, WORLD_CONNECTIONS } from '../../src/config';
 import { WORLD_LAYOUTS } from '../../src/data/world';
 import { AREA4_SPEC } from '../../src/data/world/area4';
+import { AREA4_EAST_GATE_PLACEMENT, AREA4_SOUTH_GROUND_Z } from '../../src/data/world/area4Boundaries';
 import { AREA4_FOREST_SPEC } from '../../src/data/world/area4Forest';
 import { validateWorldLayouts } from '../../src/data/world/validateWorld';
 import { compileWorldCollision } from '../../src/domain/world/WorldCollisionCompiler';
@@ -176,6 +177,17 @@ function framePreset(preset: string): void {
   } else if (preset === 'area4') {
     controls.target.set(36, 0, 50);
     camera.position.set(48, 105, 151);
+  } else if (preset === 'area4:east-gate') {
+    const x = AREA4_SPEC.origin[0] + AREA4_EAST_GATE_PLACEMENT.position[0], z = AREA4_SPEC.origin[2] + AREA4_EAST_GATE_PLACEMENT.position[2];
+    controls.target.set(x, 1.6, z);
+    camera.position.set(x - 18, 12, z + 12);
+  } else if (preset === 'area4:south-lake') {
+    const z = AREA4_SPEC.origin[2] + AREA4_SOUTH_GROUND_Z;
+    controls.target.set(4, -.1, z + 1.8);
+    camera.position.set(16, 15, z - 17);
+  } else if (preset === 'area4:boundaries') {
+    controls.target.set(41, 0, 64);
+    camera.position.set(21, 104, 154);
   } else if (preset === 'area4:forest') {
     controls.target.set(-12, 1.4, 67);
     camera.position.set(-4, 15, 83);

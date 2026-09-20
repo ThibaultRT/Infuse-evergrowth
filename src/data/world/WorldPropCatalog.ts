@@ -5,15 +5,16 @@ import { WOODLAND_BRIDGE_COLLISION, WOODLAND_BRIDGE_GATE, WOODLAND_BRIDGE_WALK_S
 import { GREENHAVEN_COLLISION } from './greenhaven';
 import { HIGHWOOD_COLLISION } from './highwood';
 import { FALLEN_KEEP_CORNER_COLLISION, FALLEN_KEEP_GATE_COLLISION, FALLEN_KEEP_WALL_COLLISION, fallenKeepShellCollision } from './fallenKeep';
-import { RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
+import { AREA4_SPEC, RIFT_BRIDGE_COLLISION, RIFT_BRIDGE_FLOOR, THRONE_BLOCKOUT, THRONE_COLLISION, riftBridgeBlockout, type WorldBlockoutPart } from './area4';
 import { AREA4_LAND_GATE, AREA4_LAND_GATE_COLLISION, AREA4_LAND_GATE_FALLBACK, AREA4_WALL_GATE, AREA4_WALL_GATE_COLLISION, AREA4_WALL_GATE_FALLBACK } from './area4Bridges';
 import forest from './area4-forest.json';
 import { createArea4GroveTrees } from './area4Groves';
 import type { WorldPropPlacement } from './WorldLayout';
+import { AREA4_BOUNDARY_SPEC as boundary, AREA4_FENCE_FALLBACK, AREA4_GATE_FALLBACK } from './area4Boundaries';
 
 export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blockout?: never; readonly procedural?: never }
   | { readonly asset?: never; readonly blockout: readonly WorldBlockoutPart[]; readonly procedural?: never }
-  | { readonly asset?: never; readonly blockout?: never; readonly procedural: 'lava-basin' }) & {
+  | { readonly asset?: never; readonly blockout?: never; readonly procedural: 'lava-basin' | 'area4-lava-lake' }) & {
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
   readonly absoluteElevation?: boolean;
@@ -37,6 +38,9 @@ const forestProp = (asset: WorldAssetKey, shape: { radius: number; height: numbe
 });
 
 export const WORLD_PROP_CATALOG = {
+  'boundary.area4Fence': { asset: 'boundary.area4Fence', collision: [rectangle(boundary.fence.width, boundary.fence.depth)], fallbackBlockout: AREA4_FENCE_FALLBACK, absoluteElevation: true, cameraOccluder: true },
+  'boundary.area4Gate': { asset: 'boundary.area4Gate', collision: [rectangle(boundary.gate.width, boundary.gate.depth)], fallbackBlockout: AREA4_GATE_FALLBACK, absoluteElevation: true, cameraOccluder: true },
+  'terrain.area4LavaLake': { procedural: 'area4-lava-lake', collision: [rectangle(AREA4_SPEC.visualSize.width, boundary.southLake.depth)], absoluteElevation: true },
   'crossing.area4SkeletalBridge': { asset: 'crossing.area4SkeletalBridge', fallbackBlockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
   'crossing.area4TimberBridge': { asset: 'crossing.area4TimberBridge', fallbackBlockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
   'crossing.area4BoneGate': { asset: 'crossing.area4BoneGate', fallbackBlockout: AREA4_LAND_GATE_FALLBACK, collision: AREA4_LAND_GATE_COLLISION, gate: AREA4_LAND_GATE, absoluteElevation: true, cameraOccluder: true },

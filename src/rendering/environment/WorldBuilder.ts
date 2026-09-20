@@ -9,7 +9,7 @@ import { walkSurfaceHeight } from '../../domain/world/WorldWalkSurface';
 import { createWalkSurfaceView } from './WorldWalkSurfaceView';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { BlockoutMaterial, WorldBlockoutPart } from '../../data/world/area4';
-import { createArea4Ground, createLavaBasin, createRiftBanks } from './Area4TerrainView';
+import { createArea4Ground, createLavaBasin, createArea4LavaLake, createRiftBanks } from './Area4TerrainView';
 
 export type WorldBuildMode = 'runtime' | 'inspection';
 
@@ -81,13 +81,13 @@ export class WorldBuilder {
     const landmarks = new THREE.Group();
     landmarks.name = `${layout.id.replace(':', '_')}_Props`;
     const authored = await Promise.all(layout.props.map(async (placement) => this.createPlacement(layout, placement, mode)));
-    landmarks.add(...authored);
+    if (authored.length) landmarks.add(...authored);
     view.root.add(landmarks);
 
     const scatter = new THREE.Group();
     scatter.name = `${layout.id.replace(':', '_')}_Scatter`;
     const scattered = await Promise.all(layout.scatters.flatMap(expandWorldScatter).map(async (placement) => this.createPlacement(layout, placement, mode)));
-    scatter.add(...scattered);
+    if (scattered.length) scatter.add(...scattered);
     view.root.add(scatter);
 
     if (layout.kind === 'transition') {
@@ -107,7 +107,8 @@ export class WorldBuilder {
 
   private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode, local = false): Promise<THREE.Object3D> {
     const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
-    let model = definition.procedural === 'lava-basin' ? createLavaBasin(this.materials.area4)
+    let model = definition.procedural
+      ? (definition.procedural === 'lava-basin' ? createLavaBasin(this.materials.area4) : createArea4LavaLake(this.materials.area4))
       : definition.blockout ? this.createBlockout(definition.blockout) : await this.assets.instantiate(definition.asset, placement.name);
     const failed = Boolean(model.userData.worldAssetFallback);
     if (failed && definition.fallbackBlockout) {

@@ -1,7 +1,35 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-19T18:28:28.445Z",
+  "generatedAt": "2026-09-20T06:31:35.340Z",
   "assets": [
+    {
+      "key": "boundary.area4Fence",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-east-fence.glb",
+      "runtime": "assets/world/shared/models/area4-east-fence.glb",
+      "sourceDigest": {
+        "bytes": 904336,
+        "sha256": "d4724e45f7a8dec413cb9abffda432144a6f12feaf5d7d5eaf7caff481f1cdec"
+      },
+      "runtimeDigest": {
+        "bytes": 904336,
+        "sha256": "d4724e45f7a8dec413cb9abffda432144a6f12feaf5d7d5eaf7caff481f1cdec"
+      }
+    },
+    {
+      "key": "boundary.area4Gate",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/area4-east-gate.glb",
+      "runtime": "assets/world/shared/models/area4-east-gate.glb",
+      "sourceDigest": {
+        "bytes": 1175764,
+        "sha256": "4a59976277a3cd14f02d6bb87bb6c5ac820323b46989a02f2a1a00d161786305"
+      },
+      "runtimeDigest": {
+        "bytes": 1175764,
+        "sha256": "4a59976277a3cd14f02d6bb87bb6c5ac820323b46989a02f2a1a00d161786305"
+      }
+    },
     {
       "key": "crossing.area4BoneGate",
       "sourceRoot": "public",

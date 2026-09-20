@@ -1,0 +1,5 @@
+{
+  "fence": { "width": 8.5, "height": 2.35, "depth": 1.12, "triangleBudget": 4200 },
+  "gate": { "width": 8, "height": 4.05, "depth": 2, "fractionDownWall": 0.7, "triangleBudget": 9500 },
+  "southLake": { "depth": 8, "surfaceY": -0.28, "bankWidth": 1.2, "bankHeight": 0.24 }
+}

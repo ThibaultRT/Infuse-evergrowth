@@ -344,8 +344,8 @@ the optimizer applies final charcoal/stone tints and keeps one material per mode
 The six assets total 0.95 MiB. Two named dense-grove props reuse 20 trees each,
 with one 6 m-radius collision circle per grove. Their local visual children use
 seeded orientation, scale and variants; the parent owns all collision. Moving or
-rotating a named grove moves its children with it. The layout currently uses 93
-loose props plus 40 grove trees, 69,098 triangles and 133 prop draws before shadows.
+rotating a named grove moves its children with it. The layout currently uses 94
+loose props plus 40 grove trees, 69,772 triangles and 134 prop draws before shadows.
 
 The forest validator is included in release validation. It checks actual smooth
 path clearance, pools, throne, reserved encounter spaces, spacing, asset bounds,
@@ -355,6 +355,39 @@ and production-builder fallbacks without a browser. Static captures write
 `iphone-12-area4-grove-east.png` and
 `iphone-12-area4-throne.png`. Movement, offline revisits and real mobile performance
 are handed to the user for manual testing; no live gameplay test is needed here.
+
+## Area 4 eastern wall and southern lava
+
+The owner-supplied `Fence-area4.glb` and `Gate-area4.glb` are preserved unchanged
+under `authoring/local/area4/boundaries/source/`. Dimensions in
+`area4-boundaries.json` are shared by the exporter and semantic prop catalog.
+`area4Boundaries.ts` owns the four fence placements, the closed gate at world
+`(108,0,71.4)`, and the southern lake at world X=-42..114, Z=82..90.
+The lake is an environmental transition within A04, not a new traversable connection.
+Its north edge is the ash terrain's south edge; one semantic rectangle blocks the
+entire lake regardless of rendered crust or model loading.
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python-exit-code 1 --python scripts/world-assets/export-area4-boundaries.py
+node scripts/world-assets/optimize-area4-boundaries.mjs --tool-root '<gltf-transform installation root>'
+npm run authoring:assets:promote -- boundary.area4Fence boundary.area4Gate
+node scripts/world-authoring/validate-area4-boundaries.mjs
+npm run authoring:world:capture -- --area4-boundaries
+```
+
+Blender MCP was unavailable for this pass, so the installed background Blender
+ran the same isolated-scene exporter. The editable `.blend` and export reports
+remain under `authoring/local/area4/boundaries/`. The fence is 8.5 m wide and
+2.30 m tall; the gate is 8 m wide and 3.98 m tall, with proportions preserved.
+Each is one draw with its three original embedded 1K maps. The runtime assets
+total 1.98 MiB and need no additional decoder. The procedural lake uses three
+batches / 2,896 triangles and no additional textures, lights or animation.
+
+Static captures include `area4-boundaries.png`, `area4-east-gate.png`,
+`iphone-12-area4-east-gate.png` and `iphone-12-area4-south-lake.png`. Deterministic
+checks cover wall joins, the full southern shore and corners at 30/60 FPS,
+forest clearances, semantic fallbacks, model bounds and geometry budgets.
+Both original northern connections, saved progression and area roots are retained.
 
 ## Ownership
 

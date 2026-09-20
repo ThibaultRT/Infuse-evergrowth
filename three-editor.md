@@ -45,6 +45,14 @@ wall pieces remain collidable; only the three authored
 gates are traversable. Each Area 4 gate owns its connection's single lock proxy.
 
 Area A04 has flat charcoal/ash terrain, blended paths and three small lava basins.
+Its eastern boundary at world X=108 uses four supplied fence modules around
+`A04_East_Gate` at `(108,0,71.4)`. The gate is a closed scenic boundary with no new
+progression rule. `A04_South_Lava_Transition` belongs to A04 and covers world
+X=-42..114, Z=82..90, including the full south playable edge. Its single named
+placement supplies the lake mesh and semantic rectangle; the ash ground terminates
+at its north edge. This environmental transition requires no additional area or
+connection chunk. `area4-boundaries.json` owns dimensions and `area4Boundaries.ts`
+owns placements; supplied models are normalized in Blender and retain fallbacks.
 Six reusable forest assets dress the area with deterministic, spaced trunks,
 stumps, logs and basalt. Shared `area4-forest.json` dimensions drive their semantic
 footprints and visual clearances; model failures retain simple visible fallbacks.
