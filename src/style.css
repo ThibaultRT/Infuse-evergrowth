@@ -52,6 +52,11 @@ canvas { display: block; width: 100%; height: 100%; }
 .stats-button { min-width: 44px; min-height: 44px; padding: 7px 10px; }
 .debug-actions { display: flex; flex-direction: column; gap: 6px; }
 .settings-button { position: absolute; top: max(118px, calc(env(safe-area-inset-top) + 106px)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; padding: 0; color: inherit; font-size: 21px; line-height: 1; pointer-events: auto; cursor: pointer; }
+.camera-distance-control { position: absolute; top: 50%; left: max(8px, env(safe-area-inset-left)); transform: translateY(-50%); z-index: 3; display: flex; align-items: center; gap: 7px; padding: 8px 7px; pointer-events: auto; }
+.camera-distance-control input { width: 26px; height: min(230px, 32vh); margin: 0; accent-color: #78d7a0; writing-mode: vertical-lr; direction: rtl; touch-action: none; }
+.camera-distance-readout { display: grid; gap: 4px; min-width: 35px; font-size: 9px; font-weight: 800; letter-spacing: .03em; }
+.camera-distance-readout span { opacity: .65; }
+.camera-distance-readout output { font-size: 12px; font-variant-numeric: tabular-nums; }
 .edge-actions { position:absolute; top:max(172px,calc(env(safe-area-inset-top) + 160px)); right:max(12px,env(safe-area-inset-right)); display:grid; gap:7px; pointer-events:auto; }
 .edge-button { width:48px; min-height:52px; display:grid; place-items:center; gap:1px; padding:4px 2px; border:1px solid #ffffff22; border-radius:11px; background:#0c111ac7; color:#f6f7fb; }
 .edge-button small { font-size:6px; line-height:1.05; font-weight:900; letter-spacing:.04em; }

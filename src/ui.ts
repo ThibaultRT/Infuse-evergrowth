@@ -43,6 +43,10 @@ app.innerHTML = `
       <button id="inventory-button" class="edge-button" type="button"><span class="edge-icon bag-icon"></span><small>BAG</small></button>
     </div>
     <button id="settings-button" class="settings-button card" type="button" aria-label="Graphics settings" title="Graphics settings">&#9881;</button>
+    <div class="camera-distance-control card">
+      <input id="camera-distance" type="range" min="10" max="35" step="0.1" aria-label="Camera distance">
+      <div class="camera-distance-readout"><span>DIST</span><output id="camera-distance-value" for="camera-distance"></output></div>
+    </div>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
     <div class="bottom-dock card">
@@ -139,6 +143,7 @@ export const ui = {
   world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'), soulGainStack: q<HTMLDivElement>('#soul-gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   spawnButton: q<HTMLButtonElement>('#spawn-button'),
+  cameraDistance: q<HTMLInputElement>('#camera-distance'), cameraDistanceValue: q<HTMLOutputElement>('#camera-distance-value'),
   settingsButton: q<HTMLButtonElement>('#settings-button'), settingsPanel: q<HTMLDivElement>('#settings-panel'),
   renderScaleInputs: Array.from(document.querySelectorAll<HTMLInputElement>('input[name="render-scale"]')),
   frameRateInputs: Array.from(document.querySelectorAll<HTMLInputElement>('input[name="frame-rate"]')),

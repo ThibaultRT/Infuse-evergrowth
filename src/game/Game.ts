@@ -10,7 +10,7 @@ import { renderEnemyAffinities, showBossProgression, showEquipmentDrop, showSoul
 import { makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
-import { CameraController } from '../controllers/CameraController';
+import { CameraController, DEFAULT_CAMERA_DISTANCE } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
 import { EQUIPMENT_BY_ID, attackProfile } from '../systems/EquipmentSystem';
 import { effectivePixelRatio, loadRenderingQuality, saveRenderingQuality, type RenderingQualitySettings } from '../rendering/RenderingQuality';
@@ -78,7 +78,6 @@ const sun = new THREE.DirectionalLight(0xfff0d2, 2.8);
 scene.add(sun, sun.target);
 
 let currentAreaId = gameplay.currentAreaId;
-const initialArea = areaById(currentAreaId);
 const heroView = new HeroView();
 heroView.syncEquipment(save.inventory);
 events.on('equipmentEquipped', () => heroView.syncEquipment(save.inventory));
@@ -89,6 +88,13 @@ scene.add(hero);
 let heroDeathHidden = false;
 
 const cameraController = new CameraController(camera, hero.position);
+ui.cameraDistance.value = DEFAULT_CAMERA_DISTANCE.toFixed(1);
+ui.cameraDistanceValue.value = ui.cameraDistance.value;
+ui.cameraDistance.addEventListener('input', () => {
+  const distance = ui.cameraDistance.valueAsNumber;
+  cameraController.setFollowDistance(distance);
+  ui.cameraDistanceValue.value = distance.toFixed(1);
+});
 const environmentOcclusion = new EnvironmentOcclusionManager(camera);
 
 function syncLighting(): void {
@@ -106,7 +112,7 @@ function syncLighting(): void {
   sun.target.position.set(area.originX, 0, area.originZ);
 }
 syncLighting();
-camera.position.set(initialArea.originX, 19, initialArea.originZ + 16.5);
+cameraController.snapToHero();
 
 function formatRewardAmount(amount: number): string {
   return amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
