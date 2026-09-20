@@ -71,6 +71,13 @@ Three.js renders the world; HTML/CSS renders normal UI. iPhone 12 portrait (390Ã
 
 For production world changes, read `three-editor.md` and `authoring/README.md` before changing dimensions, world origins, prop/collision definitions, transition chunks, or scene-loading placement. Keep exported visual roots local; derive rendering placement and compiled gameplay collision from the shared renderer-neutral world layout.
 
+### Blender authoring
+
+- At the start of a Blender task, discover the available Blender MCP tools and make one small read-only call. For the open Blender session, use `get_objects_summary` and verify the intended `.blend` is open; a successful call against the default Camera/Cube/Light scene does not identify the project asset. Do not infer that Blender MCP is broken from a failed background command, or that a successful live call opened the right file.
+- Use live Blender MCP for inspecting or interactively editing the open scene. Inspect the relevant objects and units before changing them. Batch related edits, return compact structured results, and use one targeted viewport image or render for visual verification when needed. Avoid full scene dumps and screenshots after every action.
+- Use the checked-in `scripts/world-assets/` exporters and `authoring/README.md` promotion steps for repeatable production GLB changes. Run an exporter once in an isolated background Blender scene, then verify dimensions, triangle/texture budgets, output paths, and the promoted asset. Preserve supplied sources and editable `.blend` files under `authoring/local/`; never treat a GLB's mesh bounds as gameplay collision authority.
+- The Blender MCP `*_for_cli` tools launch a separate background Blender process. They require the executable on `PATH` or `BLENDER_PATH` in the MCP server environment. In `~/.codex/config.toml`, put `BLENDER_PATH = "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"` under `[mcp_servers.blender.env]`, not directly under `[mcp_servers.blender]`, and restart the server after changing its config. If a background MCP tool cannot find Blender, use the installed executable directly with `--background --python-exit-code 1 --python <script>` and report the MCP configuration issue separately.
+
 ## Successive merged PRs
 
 Before a new slice after a prior PR is merged: fetch, branch from current `origin/main`, and verify `git log origin/main..HEAD` plus `git diff origin/main...HEAD` contain only the new slice. Never continue from a stale merged branch.
