@@ -222,172 +222,46 @@ walks both gates, the chapel and barracks, checks the south barrier, and exercis
 saved Reduced/30 FPS and missing-terrain fallback. These browser captures are not
 a substitute for real iPhone performance measurements.
 
-## Area 4 environment
+## Area 4 authoring commands
 
-`area4.md` is the construction plan and asset handoff brief. `Layout-area4.png` is
-the all-area concept reference. Area 4 has flat charcoal/ash ground with blended
-paths, a deep dark 12 m rift, the approved S2/W2 bridge models, the supplied 5.4 m
-throne, charred tree markers and three impassable crusted lava basins. It has no
-enemies or rewards yet.
+[area4.md](../area4.md) owns the current design, spatial contract, asset fit,
+status, and human review handoff. This section is the command reference for
+rebuilding or checking the implemented Area 4 environment. Use only the commands
+relevant to the changed component. `AGENTS.md` sets the design and validation scope.
 
-`area4-blockout.json` owns dimensions, and the two transition placements own their
-rendering, rails, locks and floor profiles. Each bridge is a separate GLB from its
-gate: S2 has a bone/iron land gate at Z=27; W2's doors are part of the existing
-masonry gateway at Z=30. The two gate placements own the locks and reuse the
-named-hinge runtime. `area4-bridges.json` adds shared gate dimensions and hinge
-offsets; semantic blockouts remain the loading fallback. Both 84 × 12 m transitions span world Z=30..42,
-with the 12 m decks centered on the unchanged seam at Z=36. Their 3 m approaches
-reach dry land at Z=27 and Z=45. Collision and floor profiles are compiled into
-both adjacent areas, as for A01/A02. Area roots, connection IDs and save v18 stay fixed.
+The production viewer uses `WorldBuilder` and `WorldCollisionCompiler`; renderer-
+neutral layouts remain authoritative for placement and collision. Local raw sources
+and editable Blender scenes are under ignored `authoring/local/area4/`. Generated
+captures are under ignored `authoring/generated/captures/`. Promote accepted assets
+through `world-assets.json`; check `ASSET-LICENSES.md` for provenance.
 
-The rift reaches 6 m into Areas 1 and 3. All overlapping terrain uses its shared
-cutout, including the A01/A03 apron. The A03 south wall/gate sits at Z=30, with
-shorter east/west runs and relocated corner joins; its enclosure fits without an
-area extension. The southern roads/scatter and both landscape exports meet the
-new bank. A01's old canyon water and scenic bridge remain retired.
+| Component | Rebuild / focused check |
+| --- | --- |
+| Bridges and gates | `scripts/world-assets/export-area4-bridges.py`, `scripts/world-assets/optimize-area4-bridges.mjs`, `scripts/world-authoring/validate-area4-bridges.mjs`, capture flag `--area4-bridges` |
+| Supplied throne | `scripts/world-assets/prepare-area4-throne.mjs`, capture flag `--area4-throne` |
+| Terrain and rift | `scripts/world-assets/export-greenhaven.py -- --landscape-only` and `scripts/world-assets/export-fallen-keep.py -- --landscape-only` if northern landscapes change; capture flag `--area4-terrain` |
+| Forest | `scripts/world-assets/prepare-area4-forest.mjs`, `scripts/world-assets/export-area4-forest.py`, `scripts/world-authoring/validate-area4-forest.mjs`, capture flag `--area4-forest` |
+| Eastern fence and southern lake | `scripts/world-assets/export-area4-boundaries.py`, `scripts/world-assets/optimize-area4-boundaries.mjs`, `scripts/world-authoring/validate-area4-boundaries.mjs`, capture flag `--area4-boundaries` |
 
-Slice 4 replaces the northern landscapes' shallow south cliff rocks with
-transition-owned fractured banks. Shared `riftBanks` keep their roots local and
-their world X=36 join continuous. Open terrain cutouts remove the underlying
-surface; bank faces fade to black by Y=-14, above an unlit black closure at Y=-48.
-The abyss ignores light, exposure and sky fog. The walkable land stays at Y=0.
-`Area4TerrainView.ts` builds the ash grain, flat routes and small lava crusts
-without an asset request, so the terrain remains available during loading failure.
-The three lava placements retain their original semantic circle footprints.
+Run a focused capture with `npm run authoring:world:capture -- <flag>`. The
+component scripts are reproducible exporters or validators; their options and asset
+keys live in the scripts and `src/data/world/world-assets.json`. Use
+`npm run authoring:assets:promote -- <asset-keys>` only for changed accepted assets,
+then `npm run authoring:assets:verify`. For a changed implementation slice, run
+`npm run build`; at slice acceptance run `npm run authoring:world:validate` and
+`npm run validate:release`. The scripted runtime smoke command is available for a
+human reviewer but is not an AI gameplay-trial requirement.
 
-Use `npm run authoring:world:capture -- --area4-terrain` for six focused captures:
-terrain, continuous banks, portrait abyss depth, lava and both bridge landings.
-The viewer includes matching bank, depth and lava presets. The world validator
-also checks missing rift surfaces, dark depth, shared bank endpoints, flat ground,
-lava containment and a 21k triangle budget (currently about 18.5k plus one 256px
-generated texture). Runtime `--area4` smoke also walks into the lava boundary.
+## Blender tool setup
 
-To rebuild just the affected landscapes, preserving other runtime models and the
-previous full local creative scenes, run:
-
-```powershell
-& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-greenhaven.py -- --landscape-only
-& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-fallen-keep.py -- --landscape-only
-```
-
-Both exporters read the shared rift dimensions and save separate `*-landscape.blend`
-sources under their local directories. Apply glTF Transform dedup/prune to the two
-landscape GLBs, then run `npm run authoring:assets:promote -- terrain.greenhaven terrain.fallenKeep`.
-
-`authoring:world:capture` includes the 3840 × 3200 `world-layout-area4-hires.png`, `area4-blockout.png`,
-`iphone-12-area-a04.png` and both portrait rift bridges. The assembled debug GLB
-now contains nine chunks. Run `authoring:world:smoke-runtime -- --area4` to walk
-both bridges each way in Full and persisted Reduced/30 FPS, verify the lock and old
-boss-victory backfill, and inspect both sides of the seam, landings and missing-world-assets
-traversal. World validation checks the Z=30..42 barrier in all three areas, continuous
-Z=27..45 floors and the complete A03 perimeter, including its moved corner joins.
-
-Rebuild the four S2/W2 models in an isolated Blender scene, optimize with an
-existing glTF Transform installation, then refresh their manifest entries:
-
-```powershell
-& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-area4-bridges.py
-node scripts/world-assets/optimize-area4-bridges.mjs --tool-root '<gltf-transform installation root>'
-npm run authoring:assets:promote -- crossing.area4SkeletalBridge crossing.area4BoneGate crossing.area4TimberBridge ruin.area4SouthGate
-```
-
-The editable source and build reports are under `authoring/local/area4/models/`.
-The four vertex-colored GLBs total 2.09 MiB with no texture or decoder dependencies.
-The S2 rib vault has a separate occlusion group so fading its overhead bones does
-not fade the walking deck. W2 reuses the shipped masonry unchanged.
-Run `node scripts/world-authoring/validate-area4-bridges.mjs` for focused asset,
-hinge, floor and lock checks, and `npm run authoring:world:capture -- --area4-bridges`
-for six bridge/gate captures without the full world export.
-
-The user-supplied `Throne-area4.glb` is preserved as
-`authoring/local/area4/throne/Throne-area4-source.glb`. Reproduce its runtime export:
-
-```powershell
-node scripts/world-assets/prepare-area4-throne.mjs --tool-root '<gltf-transform installation root>'
-npm run authoring:assets:promote -- ruin.ancientThrone
-npm run authoring:world:capture -- --area4-throne
-```
-
-The exporter checks the original hash, simplifies to 14,900 triangles, retains all
-three original 1K textures, and bakes uniform scale to the shared 5.4 m height.
-The 0.90 MiB GLB has a ground-centred local root and faces -Z. Its 4.887 × 3.657 m
-visual extent fits the revised 4.9 × 3.7 m authored footprint. The unchanged
-`A04_Ancient_Throne` placement supplies collision and occlusion; the previous
-semantic throne remains a loading fallback. No gameplay interaction is added.
-The throne capture option writes `area4-throne.png` and
-`iphone-12-area4-throne.png` using the production world builder.
-
-## Area 4 forest dressing (slice 6)
-
-Six small GLBs use CC0 Poly Haven bark/rock maps. Their dimensions and scatter
-settings are in `src/data/world/area4-forest.json`; the existing scatter/compiler
-places both presentation and semantic collision. Roots stay local, metres, Y-up,
-with base scale 1. Trunks fade through the existing camera-occlusion mechanism.
-
-Reproduce with Blender and an existing glTF Transform installation:
-
-```powershell
-node scripts/world-assets/prepare-area4-forest.mjs --download
-& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python scripts/world-assets/export-area4-forest.py
-node scripts/world-assets/prepare-area4-forest.mjs --tool-root '<gltf-transform installation root>'
-npm run authoring:assets:promote -- nature.charredTrunkA nature.charredTrunkB nature.charredStump nature.charredLog nature.basaltA nature.basaltB
-node scripts/world-authoring/validate-area4-forest.mjs
-npm run authoring:world:capture -- --area4-forest
-npm run build
-npm run validate:release
-```
-
-The downloader checks tracked SHA-256 hashes before writing sources. Raw maps,
-the packed editable `.blend` and runtime statistics stay under ignored
-`authoring/local/area4/forest/`. The exporter embeds 512² color/normal textures;
-the optimizer applies final charcoal/stone tints and keeps one material per model.
-The six assets total 0.95 MiB. Two named dense-grove props reuse 20 trees each,
-with one 6 m-radius collision circle per grove. Their local visual children use
-seeded orientation, scale and variants; the parent owns all collision. Moving or
-rotating a named grove moves its children with it. The layout currently uses 94
-loose props plus 40 grove trees, 69,772 triangles and 134 prop draws before shadows.
-
-The forest validator is included in release validation. It checks actual smooth
-path clearance, pools, throne, reserved encounter spaces, spacing, asset bounds,
-texture/mesh budgets, blocked grove disks, clear perimeter space, parent transforms
-and production-builder fallbacks without a browser. Static captures write
-`area4-forest.png`, `iphone-12-area4-forest.png`, `iphone-12-area4-grove-west.png`,
-`iphone-12-area4-grove-east.png` and
-`iphone-12-area4-throne.png`. Movement, offline revisits and real mobile performance
-are handed to the user for manual testing; no live gameplay test is needed here.
-
-## Area 4 eastern wall and southern lava
-
-The owner-supplied `Fence-area4.glb` and `Gate-area4.glb` are preserved unchanged
-under `authoring/local/area4/boundaries/source/`. Dimensions in
-`area4-boundaries.json` are shared by the exporter and semantic prop catalog.
-`area4Boundaries.ts` owns the four fence placements, the closed gate at world
-`(108,0,71.4)`, and the southern lake at world X=-42..114, Z=82..90.
-The lake is an environmental transition within A04, not a new traversable connection.
-Its north edge is the ash terrain's south edge; one semantic rectangle blocks the
-entire lake regardless of rendered crust or model loading.
-
-```powershell
-& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python-exit-code 1 --python scripts/world-assets/export-area4-boundaries.py
-node scripts/world-assets/optimize-area4-boundaries.mjs --tool-root '<gltf-transform installation root>'
-npm run authoring:assets:promote -- boundary.area4Fence boundary.area4Gate
-node scripts/world-authoring/validate-area4-boundaries.mjs
-npm run authoring:world:capture -- --area4-boundaries
-```
-
-Blender MCP was unavailable for this pass, so the installed background Blender
-ran the same isolated-scene exporter. The editable `.blend` and export reports
-remain under `authoring/local/area4/boundaries/`. The fence is 8.5 m wide and
-2.30 m tall; the gate is 8 m wide and 3.98 m tall, with proportions preserved.
-Each is one draw with its three original embedded 1K maps. The runtime assets
-total 1.98 MiB and need no additional decoder. The procedural lake uses three
-batches / 2,896 triangles and no additional textures, lights or animation.
-
-Static captures include `area4-boundaries.png`, `area4-east-gate.png`,
-`iphone-12-area4-east-gate.png` and `iphone-12-area4-south-lake.png`. Deterministic
-checks cover wall joins, the full southern shore and corners at 30/60 FPS,
-forest clearances, semantic fallbacks, model bounds and geometry budgets.
-Both original northern connections, saved progression and area roots are retained.
+For live edits, first call Blender MCP `get_objects_summary` and verify the intended
+`.blend` is open; the default Camera/Cube/Light scene is not the project asset. MCP
+`*_for_cli` tools start a separate background process. If they cannot find Blender,
+set `BLENDER_PATH = "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"`
+under `[mcp_servers.blender.env]` in `~/.codex/config.toml` and restart the server.
+Until then, run the installed executable directly with
+`--background --python-exit-code 1 --python <script>`. A failed background command
+does not mean the live Blender session is unavailable.
 
 ## Ownership
 

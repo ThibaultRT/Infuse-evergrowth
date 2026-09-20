@@ -24,7 +24,15 @@ npm run preview
 npm run validate:release
 ```
 
-There is no test runner yet. Do not edit `dist/` or dependencies. World-generation validation must not require an AI agent to perform live gameplay sessions; use deterministic checks, manual inspection, and human playtesting instead. Before committing, review `git diff` and `git status`, increment `package.json` with appropriate semantic versioning, and commit on the current branch. The Vite production base is `/Infuse-evergrowth/`.
+There is no test runner yet. Do not edit `dist/` or dependencies. Before committing, review `git diff` and `git status`; increment `package.json` with appropriate semantic versioning for shipped code or asset changes, then commit on the current branch. Documentation-only commits need no version bump. The Vite production base is `/Infuse-evergrowth/`.
+
+## Scope and handoffs
+
+- During a design request, produce a concise decision or asset brief and stop. Do not model, implement, capture, or start the next slice unless requested.
+- For a new major visual asset, ask the user for a 2D reference or existing 3D source made in another app before modeling. Once supplied, adapt it in Blender to the agreed dimensions, orientation, pivot, and budget. Reuse approved project assets for minor scenery when suitable.
+- If a supplied asset needs a substantial artistic redesign, describe the needed change and ask the user for a revised source. Limit agent Blender work to technical fitting and modest corrections.
+- Do not conduct AI-controlled live gameplay trials. Use relevant deterministic validators and focused static captures; give the user a short manual playtest checklist for movement, visual judgment, offline revisits, and real-device performance when applicable. Use their findings for follow-up fixes.
+- Validate the affected area or asset first. Run full world and release checks when an implementation slice is ready for acceptance. Keep `npm run build` after code changes. Do not repeat successful checks without a relevant change.
 
 ## Architecture
 
@@ -69,14 +77,12 @@ Use compact strict TypeScript, ES modules, and explicit return types on exported
 
 Three.js renders the world; HTML/CSS renders normal UI. iPhone 12 portrait (390×844 CSS) is the minimum reference. Preserve Full/Reduced scale, Smooth/30 FPS, saved preferences, DPR caps (Full 2; Reduced 70%), dev renderer statistics, <=20-second representative initial load, and <500 MB payload. Profile real constrained/mobile hardware; emulation is not proof. Cosmetic failures need playable fallbacks, URLs must be Vite-base-aware, and third-party provenance belongs in `ASSET-LICENSES.md`. For visible changes, inspect a mobile viewport and capture a screenshot when tooling permits.
 
-For production world changes, read `three-editor.md` and `authoring/README.md` before changing dimensions, world origins, prop/collision definitions, transition chunks, or scene-loading placement. Keep exported visual roots local; derive rendering placement and compiled gameplay collision from the shared renderer-neutral world layout.
+For production world changes, read the relevant sections of `three-editor.md` and `authoring/README.md` before changing dimensions, world origins, prop/collision definitions, transition chunks, or scene-loading placement. Keep exported visual roots local; derive rendering placement and compiled gameplay collision from the shared renderer-neutral world layout.
 
 ### Blender authoring
 
-- At the start of a Blender task, discover the available Blender MCP tools and make one small read-only call. For the open Blender session, use `get_objects_summary` and verify the intended `.blend` is open; a successful call against the default Camera/Cube/Light scene does not identify the project asset. Do not infer that Blender MCP is broken from a failed background command, or that a successful live call opened the right file.
-- Use live Blender MCP for inspecting or interactively editing the open scene. Inspect the relevant objects and units before changing them. Batch related edits, return compact structured results, and use one targeted viewport image or render for visual verification when needed. Avoid full scene dumps and screenshots after every action.
-- Use the checked-in `scripts/world-assets/` exporters and `authoring/README.md` promotion steps for repeatable production GLB changes. Run an exporter once in an isolated background Blender scene, then verify dimensions, triangle/texture budgets, output paths, and the promoted asset. Preserve supplied sources and editable `.blend` files under `authoring/local/`; never treat a GLB's mesh bounds as gameplay collision authority.
-- The Blender MCP `*_for_cli` tools launch a separate background Blender process. They require the executable on `PATH` or `BLENDER_PATH` in the MCP server environment. In `~/.codex/config.toml`, put `BLENDER_PATH = "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"` under `[mcp_servers.blender.env]`, not directly under `[mcp_servers.blender]`, and restart the server after changing its config. If a background MCP tool cannot find Blender, use the installed executable directly with `--background --python-exit-code 1 --python <script>` and report the MCP configuration issue separately.
+- Verify the intended `.blend` is open with one small read-only Blender MCP call before editing. Inspect only relevant objects, batch edits, and use one targeted image or render for review.
+- Use checked-in exporters for repeatable GLB changes; verify fit, budget, and promotion once. Preserve sources under `authoring/local/`. See `authoring/README.md` for Blender setup and fallback commands.
 
 ## Successive merged PRs
 
