@@ -97,6 +97,12 @@ gate while `startIndex` keeps stable sequential debug names. Area layouts may us
 named `terrainCutouts` to lower overlapping terrain beneath a shared water surface
 without changing the river or bridge elevation.
 
+Legacy area floors use named `terrainRegions` to stop primary geometry at shared
+playable seams while retaining the larger chunk bounds for streaming. Transition
+regions are material-matched underlays: they fill a neighbour that has not mounted
+yet, but use depth bias so mounted primary ground always wins without coplanar
+flicker. Adjacent transition owners partition the river at world X=36.
+
 The A01/A02 woodland bridge has a semantic `walkSurface` profile and a hinged
 `gate` definition in its prop catalog entry. Its one placement supplies rendering,
 rail and door collision, and the floor used by hero/enemy movement. The 12 m deck

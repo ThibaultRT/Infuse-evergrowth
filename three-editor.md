@@ -28,6 +28,14 @@ the same transforms. Never treat an edited GLB or mesh bounds as gameplay author
 Area A02 spans the combined width of A01 and A03. Visual aprons overlap; there is no
 additional empty gap between playable chunks.
 
+The chunk bounds still overlap for streaming, but their flat floor geometry does
+not share coplanar primary faces. A01, A02 and A03 primary `terrainRegions` stop at
+their playable seams. The three legacy transitions provide material-matched,
+depth-biased underlay regions for unloaded neighbours: meadow/cobble meet on the
+A01/A03 wall axis, forest meets the southern areas at the river seam, and the two
+Mosswater surfaces meet without overlap at world X=36. Props and collision retain
+the unchanged visual and playable bounds.
+
 Area A03 also owns `A03_East_Cliff_Horizon`, a collision-free surface below the
 eastern cliff base. It begins at the listed visual edge and ends beyond runtime fog,
 so a wide camera cannot expose the finite terrain border. It does not expand the

@@ -10,7 +10,13 @@ export const A01_A03_TRANSITION = {
   name: 'Greenhaven–Fallen Keep West Gate',
   origin: [36, 0, 0],
   visualSize: { width: 12, depth: 84 },
-  terrain: 'transition-fortress',
+  terrain: 'cobble',
+  // The river transitions own the northern 12 m band. These two halves meet at
+  // the wall axis so meadow reaches the wall and cobble begins inside the keep.
+  terrainRegions: [
+    { name: 'A01_A03_Greenhaven_Underlay', center: [-3, 6], size: { width: 6, depth: 72 }, terrain: 'meadow', layer: 'underlay' },
+    { name: 'A01_A03_FallenKeep_Underlay', center: [3, 6], size: { width: 6, depth: 72 }, terrain: 'cobble', layer: 'underlay' },
+  ],
   terrainCutouts: [area4RiftCutout('A01_A03_South_Rift', [36, 0, 0])],
   axis: 'x',
   crossingCenter: 3.6,

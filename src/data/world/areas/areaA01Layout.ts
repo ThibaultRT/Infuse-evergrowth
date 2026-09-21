@@ -27,6 +27,9 @@ export const AREA_A01_LAYOUT = {
   playableSize: { width: 72, depth: 72 },
   visualSize: { width: 84, depth: 84 },
   terrain: 'meadow',
+  // Keep the outer west/south apron, but stop primary ground at the north and
+  // east playable seams. Transition underlays cover unloaded neighbours.
+  terrainRegions: [{ name: 'A01_Meadow_Ground', center: [-3, 3], size: { width: 78, depth: 78 } }],
   terrainCutouts: [...transitionTerrainCutouts(A01_A02_TRANSITION, origin), area4RiftCutout('A01_South_Rift', origin)],
   roads: GREENHAVEN_ROADS,
   surfaces: [GREENHAVEN_LAKE],

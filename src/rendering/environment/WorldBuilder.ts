@@ -71,7 +71,16 @@ export class WorldBuilder {
       terrain.add(createArea4Ground(layout, this.materials.area4.ground));
     } else {
       // Rift transitions contain banks and a black closure, with no terrain mesh.
-      if (layout.terrain !== 'rift') terrain.add(createWorldTerrain(layout, this.materials.terrain[layout.terrain]));
+      if (layout.terrain !== 'rift') {
+        const regions = layout.terrainRegions ?? [undefined];
+        for (const region of regions) {
+          const profile = region?.terrain ?? layout.terrain;
+          const material = region?.layer === 'underlay'
+            ? this.materials.terrainUnderlay[profile] ?? this.materials.terrain[profile]
+            : this.materials.terrain[profile];
+          terrain.add(createWorldTerrain(layout, material, region));
+        }
+      }
       for (const road of layout.roads) terrain.add(createWorldRoad(layout, road, this.materials));
     }
     if (layout.riftBanks) terrain.add(createRiftBanks(layout.riftBanks, layout.origin[0], this.materials.area4));

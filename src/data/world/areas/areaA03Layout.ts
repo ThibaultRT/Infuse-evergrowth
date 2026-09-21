@@ -30,8 +30,11 @@ export const AREA_A03_LAYOUT = {
   origin: [72, 0, 0],
   playableSize: { width: 72, depth: 72 }, visualSize: { width: 84, depth: 84 },
   terrain: 'cobble',
+  // Primary cobble begins at the west/north playable seams. This lets Area 1
+  // meadow reach the west wall without two area floors occupying the corridor.
+  terrainRegions: [{ name: 'A03_Cobble_Ground', center: [3, 3], size: { width: 78, depth: 78 } }],
   terrainCutouts: [
-    { name: 'A03_Mosswater_Riverbed', center: [0, -37.5], size: { width: 84, depth: 8.5 }, elevation: 0 },
+    { name: 'A03_Mosswater_Riverbed', center: [3, -37.5], size: { width: 78, depth: 8.5 }, elevation: 0 },
     ...FALLEN_KEEP_CLIFF_CUTOUTS,
     area4RiftCutout('A03_South_Rift', [72, 0, 0]),
   ],

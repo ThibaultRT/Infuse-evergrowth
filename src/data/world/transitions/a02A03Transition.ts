@@ -1,6 +1,14 @@
 import { createWallRun, type TransitionWorldLayout } from '../WorldLayout';
 import { FALLEN_KEEP_CORNER_SCALE, fallenKeepCornerPosition } from '../fallenKeep';
 
+const waterMinX = -36;
+const waterMaxX = 42;
+const waterCenterX = (waterMinX + waterMaxX) / 2;
+const crossingCenter = 7.2;
+const crossingWidth = 7;
+const crossingWestEdge = crossingCenter - crossingWidth / 2;
+const crossingEastEdge = crossingCenter + crossingWidth / 2;
+
 export const A02_A03_TRANSITION = {
   kind: 'transition',
   id: 'transition:A02-A03',
@@ -9,16 +17,20 @@ export const A02_A03_TRANSITION = {
   name: 'Highwood–Fallen Keep Fortified River Crossing',
   origin: [72, 0, -36],
   visualSize: { width: 84, depth: 12 },
-  terrain: 'transition-fortress',
+  terrain: 'cobble',
+  terrainRegions: [
+    { name: 'A02_A03_Highwood_Underlay', center: [3, -3], size: { width: 78, depth: 6 }, terrain: 'forest', layer: 'underlay' },
+    { name: 'A02_A03_FallenKeep_Underlay', center: [3, 3], size: { width: 78, depth: 6 }, terrain: 'cobble', layer: 'underlay' },
+  ],
   axis: 'z',
-  crossingCenter: 7.2,
-  crossingWidth: 7,
+  crossingCenter,
+  crossingWidth,
   barrierDepth: 9,
   roads: [
     { name: 'A02_A03_BridgeRoad', points: [[7.2, -6], [7.2, 0], [7.2, 6]], width: 6.2, material: 'cobble' },
   ],
   surfaces: [
-    { name: 'A02_A03_Mosswater', kind: 'water', center: [0, -1.5], size: { width: 84, depth: 7.5 }, elevation: 0.08 },
+    { name: 'A02_A03_Mosswater', kind: 'water', center: [waterCenterX, -1.5], size: { width: waterMaxX - waterMinX, depth: 7.5 }, elevation: 0.08 },
   ],
   props: [
     // The gate's visible outer faces are x=1.32 and x=13.08 at scale 0.84.
@@ -30,8 +42,8 @@ export const A02_A03_TRANSITION = {
   ],
   scatters: [],
   collision: [
-    { id: 'A02_A03_Water_West', kind: 'rectangle', center: [-19.15, -1.5], width: 45.7, depth: 7.5 },
-    { id: 'A02_A03_Water_East', kind: 'rectangle', center: [26.35, -1.5], width: 31.3, depth: 7.5 },
+    { id: 'A02_A03_Water_West', kind: 'rectangle', center: [(waterMinX + crossingWestEdge) / 2, -1.5], width: crossingWestEdge - waterMinX, depth: 7.5 },
+    { id: 'A02_A03_Water_East', kind: 'rectangle', center: [(waterMaxX + crossingEastEdge) / 2, -1.5], width: waterMaxX - crossingEastEdge, depth: 7.5 },
     { id: 'A02_A03_LockedGate', kind: 'rectangle', center: [7.2, 1.7], width: 7, depth: 1.2, activation: { kind: 'connection-locked', connectionId: 'area2-area3' } },
   ],
 } as const satisfies TransitionWorldLayout;

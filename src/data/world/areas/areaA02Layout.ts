@@ -52,6 +52,9 @@ export const AREA_A02_LAYOUT = {
   playableSize: { width: 144, depth: 48 },
   visualSize: { width: 156, depth: 60 },
   terrain: 'forest',
+  // The northern/western/eastern visual apron remains; the southern floor ends
+  // at the shared river seam instead of overlapping both transition owners.
+  terrainRegions: [{ name: 'A02_Forest_Ground', center: [0, -3], size: { width: 156, depth: 54 } }],
   terrainCutouts: [
     ...transitionTerrainCutouts(A01_A02_TRANSITION, origin),
     ...transitionTerrainCutouts(A02_A03_TRANSITION, origin),

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement, WorldTerrainCutout } from '../../data/world/WorldLayout';
+import type { AnyWorldLayout, WorldRoadPlacement, WorldSurfacePlacement, WorldTerrainCutout, WorldTerrainRegion } from '../../data/world/WorldLayout';
 import type { WorldMaterialSet } from './WorldMaterials';
 import { greenhavenGroundHeight } from '../../data/world/greenhaven';
 import { highwoodGroundHeight } from '../../data/world/highwood';
@@ -31,24 +31,29 @@ export function worldTerrainHeight(layout: AnyWorldLayout, x: number, z: number)
   return terrainHeight(layout, x, z, true);
 }
 
-export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Material): THREE.Mesh {
+export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Material, region?: WorldTerrainRegion): THREE.Mesh {
   // Include cutout boundaries in the grid so coarse terrain triangles cannot
   // stretch over the river or poke through the bridge's landings.
-  const axisSamples = (size: number, divisions: number, axis: 0 | 1): number[] => {
-    const samples = new Set(Array.from({ length: divisions + 1 }, (_, index) => -size / 2 + size * index / divisions));
+  const terrainSize = region?.size ?? layout.visualSize;
+  const terrainCenter = region?.center ?? [0, 0];
+  const axisSamples = (center: number, size: number, divisions: number, axis: 0 | 1): number[] => {
+    const min = center - size / 2, max = center + size / 2;
+    const samples = new Set(Array.from({ length: divisions + 1 }, (_, index) => min + size * index / divisions));
     for (const cutout of layout.terrainCutouts ?? []) {
       if (cutout.rotation) continue;
       const extent = (axis === 0 ? cutout.size.width : cutout.size.depth) / 2;
       for (const edge of [-extent, 0, extent]) {
         const point = cutout.center[axis] + edge;
-        for (const offset of [-0.01, 0, 0.01]) if (Math.abs(point + offset) < size / 2) samples.add(point + offset);
+        for (const offset of [-0.01, 0, 0.01]) if (point + offset > min && point + offset < max) samples.add(point + offset);
       }
     }
     return [...samples].sort((a, b) => a - b);
   };
   const meadow = layout.kind === 'area' && layout.areaId === 1;
-  const xs = axisSamples(layout.visualSize.width, meadow ? 112 : 28, 0);
-  const zs = axisSamples(layout.visualSize.depth, meadow ? 112 : 20, 1);
+  const xDivisions = Math.max(1, Math.round((meadow ? 112 : 28) * terrainSize.width / layout.visualSize.width));
+  const zDivisions = Math.max(1, Math.round((meadow ? 112 : 20) * terrainSize.depth / layout.visualSize.depth));
+  const xs = axisSamples(terrainCenter[0], terrainSize.width, xDivisions, 0);
+  const zs = axisSamples(terrainCenter[1], terrainSize.depth, zDivisions, 1);
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
@@ -68,7 +73,7 @@ export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Mater
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.name = `${layout.id.replace(':', '_')}_Terrain`;
+  mesh.name = region?.name ?? `${layout.id.replace(':', '_')}_Terrain`;
   mesh.receiveShadow = true;
   mesh.userData.worldOwnedGeometry = true;
   return mesh;

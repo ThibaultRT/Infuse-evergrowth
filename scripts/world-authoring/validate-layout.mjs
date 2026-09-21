@@ -51,6 +51,39 @@ try {
     if (layout.kind === 'area' && contract.playable) check(layout.playableSize.width === contract.playable[0] && layout.playableSize.depth === contract.playable[1], `${layout.id} has the wrong playable dimensions.`);
   }
 
+  // Explicit floor regions own the legacy A01/A02/A03 seams. Regions on the
+  // same compositing layer may touch but must never share positive surface area.
+  const terrainRegions = WORLD_LAYOUTS.flatMap((layout) => (layout.terrainRegions ?? []).map((region) => ({
+    chunkId: layout.id,
+    name: region.name,
+    layer: region.layer ?? 'primary',
+    minX: layout.origin[0] + region.center[0] - region.size.width / 2,
+    maxX: layout.origin[0] + region.center[0] + region.size.width / 2,
+    minZ: layout.origin[2] + region.center[1] - region.size.depth / 2,
+    maxZ: layout.origin[2] + region.center[1] + region.size.depth / 2,
+  })));
+  for (let left = 0; left < terrainRegions.length; left += 1) {
+    for (let right = left + 1; right < terrainRegions.length; right += 1) {
+      const first = terrainRegions[left], second = terrainRegions[right];
+      if (first.layer !== second.layer) continue;
+      const overlapX = Math.min(first.maxX, second.maxX) - Math.max(first.minX, second.minX);
+      const overlapZ = Math.min(first.maxZ, second.maxZ) - Math.max(first.minZ, second.minZ);
+      check(overlapX <= 1e-6 || overlapZ <= 1e-6, `${first.chunkId}/${first.name} overlaps ${second.chunkId}/${second.name} on the ${first.layer} terrain layer.`);
+    }
+  }
+  for (const id of ['area:A01', 'area:A02', 'area:A03']) {
+    const layout = WORLD_LAYOUTS.find((candidate) => candidate.id === id);
+    check(layout?.terrainRegions?.every((region) => (region.layer ?? 'primary') === 'primary'), `${id} must own an explicit primary terrain region.`);
+  }
+  for (const id of ['transition:A01-A02', 'transition:A01-A03', 'transition:A02-A03']) {
+    const layout = WORLD_LAYOUTS.find((candidate) => candidate.id === id);
+    check(layout?.terrainRegions?.every((region) => region.layer === 'underlay'), `${id} must use explicit streaming underlay terrain regions.`);
+  }
+  const westRiver = WORLD_LAYOUTS.find((layout) => layout.id === 'transition:A01-A02')?.surfaces.find((surface) => surface.name === 'A01_A02_Mosswater');
+  const eastRiver = WORLD_LAYOUTS.find((layout) => layout.id === 'transition:A02-A03')?.surfaces.find((surface) => surface.name === 'A02_A03_Mosswater');
+  check(Boolean(westRiver) && Math.abs((westRiver.center[0] + westRiver.size.width / 2) - 36) < 1e-6, 'The western Mosswater surface must end at world X=36.');
+  check(Boolean(eastRiver) && Math.abs((72 + eastRiver.center[0] - eastRiver.size.width / 2) - 36) < 1e-6, 'The eastern Mosswater surface must begin at world X=36.');
+
   const placementNames = new Set();
   const referencedAssets = new Set([
     'terrain.meadowColor', 'terrain.meadowNormal', 'terrain.forestColor', 'terrain.forestNormal',

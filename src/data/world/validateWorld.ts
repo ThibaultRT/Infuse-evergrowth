@@ -13,6 +13,19 @@ export function validateWorldLayouts(layouts: readonly AnyWorldLayout[]): WorldV
     chunkIds.add(layout.id);
     if (layout.visualSize.width <= 0 || layout.visualSize.depth <= 0) issues.push({ severity: 'error', message: `${layout.id} has invalid visual dimensions.` });
     if (layout.kind === 'area' && (layout.playableSize.width <= 0 || layout.playableSize.depth <= 0)) issues.push({ severity: 'error', message: `${layout.id} has invalid playable dimensions.` });
+    const terrainRegionNames = new Set<string>();
+    for (const region of layout.terrainRegions ?? []) {
+      if (terrainRegionNames.has(region.name)) issues.push({ severity: 'error', message: `${layout.id} has duplicate terrain region ${region.name}.` });
+      terrainRegionNames.add(region.name);
+      if (region.size.width <= 0 || region.size.depth <= 0) issues.push({ severity: 'error', message: `${layout.id}/${region.name} has invalid terrain-region dimensions.` });
+      const profile = region.terrain ?? layout.terrain;
+      if (region.layer === 'underlay' && !['meadow', 'forest', 'cobble'].includes(profile)) {
+        issues.push({ severity: 'error', message: `${layout.id}/${region.name} uses unsupported ${profile} underlay terrain.` });
+      }
+      const insideVisualBounds = Math.abs(region.center[0]) + region.size.width / 2 <= layout.visualSize.width / 2 + 1e-6
+        && Math.abs(region.center[1]) + region.size.depth / 2 <= layout.visualSize.depth / 2 + 1e-6;
+      if (!insideVisualBounds) issues.push({ severity: 'error', message: `${layout.id}/${region.name} exceeds the chunk's visual bounds.` });
+    }
     for (const cutout of layout.terrainCutouts ?? []) {
       if (cutout.size.width <= 0 || cutout.size.depth <= 0) issues.push({ severity: 'error', message: `${layout.id}/${cutout.name} has invalid terrain-cutout dimensions.` });
     }

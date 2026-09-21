@@ -7,6 +7,7 @@ import { createArea4Materials, type Area4MaterialSet } from './Area4TerrainView'
 
 export type WorldMaterialSet = {
   readonly terrain: Readonly<Record<TerrainProfile, THREE.MeshStandardMaterial | THREE.MeshBasicMaterial>>;
+  readonly terrainUnderlay: Readonly<Partial<Record<TerrainProfile, THREE.MeshStandardMaterial | THREE.MeshBasicMaterial>>>;
   readonly trail: THREE.MeshStandardMaterial;
   readonly cobble: THREE.MeshStandardMaterial;
   readonly water: THREE.MeshPhysicalMaterial;
@@ -59,15 +60,20 @@ export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<W
     tiledMaterial(assets, 'terrain.trailColor', 'terrain.trailNormal', 5, 0xcdbb91),
     tiledMaterial(assets, 'terrain.cobbleColor', 'terrain.cobbleNormal', 14, 0xc4beb0),
   ]);
-  const transitionMeadow = meadow.clone();
-  transitionMeadow.color.setHex(0xaebf91);
-  const transitionFortress = cobble.clone();
-  transitionFortress.color.setHex(0xa9a294);
+  const underlay = (source: THREE.MeshStandardMaterial): THREE.MeshStandardMaterial => {
+    const material = source.clone();
+    // Transition floors are fallback coverage for streamed neighbours. Bias them
+    // behind primary area ground without introducing a visible height step.
+    material.polygonOffset = true;
+    material.polygonOffsetFactor = 1;
+    material.polygonOffsetUnits = 1;
+    return material;
+  };
   const abyss = new THREE.MeshBasicMaterial({ color: 0x000000, fog: false, toneMapped: false });
   const area4 = createArea4Materials();
   return {
-    terrain: { meadow, forest, cobble, 'transition-meadow': transitionMeadow, 'transition-fortress': transitionFortress,
-      ash: area4.ground, rift: abyss },
+    terrain: { meadow, forest, cobble, ash: area4.ground, rift: abyss },
+    terrainUnderlay: { meadow: underlay(meadow), forest: underlay(forest), cobble: underlay(cobble) },
     area4,
     trail,
     cobble,

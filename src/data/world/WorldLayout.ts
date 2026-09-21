@@ -4,8 +4,17 @@ import type { WorldPropKey } from './WorldPropCatalog';
 
 export type WorldBounds = { readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number };
 export type WorldSize = { readonly width: number; readonly depth: number };
-export type TerrainProfile = 'meadow' | 'forest' | 'cobble' | 'transition-meadow' | 'transition-fortress' | 'ash' | 'rift';
+export type TerrainProfile = 'meadow' | 'forest' | 'cobble' | 'ash' | 'rift';
 export type RoadMaterial = 'trail' | 'cobble' | 'water' | 'ash';
+
+export type WorldTerrainRegion = {
+  readonly name: string;
+  readonly center: WorldVec2;
+  readonly size: WorldSize;
+  readonly terrain?: TerrainProfile;
+  /** Streaming underlays fill an unloaded neighbour's apron and yield to primary area ground. */
+  readonly layer?: 'primary' | 'underlay';
+};
 
 export type WorldPropPlacement = {
   readonly name: string;
@@ -77,6 +86,8 @@ type WorldLayoutBase = {
   readonly origin: WorldVec3;
   readonly visualSize: WorldSize;
   readonly terrain: TerrainProfile;
+  /** Optional non-overlapping floor ownership inside the chunk's unchanged visual bounds. */
+  readonly terrainRegions?: readonly WorldTerrainRegion[];
   readonly terrainCutouts?: readonly WorldTerrainCutout[];
   readonly roads: readonly WorldRoadPlacement[];
   readonly surfaces?: readonly WorldSurfacePlacement[];
