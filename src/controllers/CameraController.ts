@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 // Replace this value with the distance chosen using the temporary HUD slider.
-export const DEFAULT_CAMERA_DISTANCE = 25.2;
+export const DEFAULT_CAMERA_DISTANCE = 20;
 const FOLLOW_HEIGHT_SHARE = 19 / Math.hypot(19, 16.5);
 const FOLLOW_DEPTH_SHARE = 16.5 / Math.hypot(19, 16.5);
 

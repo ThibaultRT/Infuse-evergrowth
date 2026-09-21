@@ -5,7 +5,7 @@
   "rift": { "seamZ": 36, "depth": 12, "floorY": -48, "darknessY": -14, "halfWidth": 78, "lipInset": 1.65, "bankStep": 1.3 },
   "bridge": { "width": 3.4, "deckLength": 12, "approachLength": 3, "deckHeight": 0.6, "railThickness": 0.22 },
   "crossings": { "greenhavenX": 7.2, "fallenKeepLocalX": 14 },
-  "throne": { "center": [0, 15], "width": 4.9, "depth": 3.7, "height": 5.4, "humanHeight": 1.8 },
+  "throne": { "center": [0, 15], "width": 9.8, "depth": 7.4, "height": 10.8, "humanHeight": 1.8 },
   "lavaPools": [
     { "id": "A04_Lava_West", "center": [-51, 6], "radius": 2.4 },
     { "id": "A04_Lava_East", "center": [53, 7], "radius": 2 },

@@ -123,9 +123,9 @@
     "baseSeconds": 300
   },
   "visualStreaming": {
-    "destinationPrefetchMeters": 28,
-    "destinationMountMeters": 16,
-    "destinationUnmountMeters": 24,
+    "destinationPrefetchMeters": 35,
+    "destinationMountMeters": 20,
+    "destinationUnmountMeters": 30,
     "enemyActivateMeters": 46,
     "enemyDeactivateMeters": 54
   }
