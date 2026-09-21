@@ -25,11 +25,15 @@ export async function validateArea4(vite, config) {
   ]);
   const area = config.AREAS.find((candidate) => candidate.id === 4);
   const crossings = config.WORLD_CONNECTIONS.filter((connection) => connection.areaBId === 4);
-  assert.equal(config.SPAWNS.filter((spawn) => spawn.areaId === 4).length, 0, 'The playground must not add provisional encounters or rewards.');
-  assert.equal(area.bossSpawnId, null, 'The blockout must not invent a boss ID.');
+  const areaSpawns = config.SPAWNS.filter((spawn) => spawn.areaId === 4);
+  assert.equal(areaSpawns.length, 30, 'Area 4 must retain its authored encounter population.');
+  assert.equal(areaSpawns.filter((spawn) => spawn.isBoss).length, 1, 'Area 4 must have one explicit boss.');
+  assert.equal(area.bossSpawnId, 'area4-epic-01');
+  const areaBoss = areaSpawns.find((spawn) => spawn.id === area.bossSpawnId);
+  assert.ok(areaBoss?.isBoss && Math.hypot(areaBoss.x - area.originX - spec.throne.center[0], areaBoss.z - area.originZ - spec.throne.center[1]) <= 8, 'The Area 4 boss must guard the throne.');
   assert.deepEqual(crossings.map((connection) => connection.areaAId).sort(), [1, 3]);
   assert.ok(crossings.every((connection) => connection.axis === 'z' && connection.z === 36 && connection.requiredUnlockedAreaId === 4 && connection.unlockOnBossOfAreaId === 3));
-  assert.equal(spec.throne.height / spec.throne.humanHeight, 3);
+  assert.equal(spec.throne.height / spec.throne.humanHeight, 6);
   const floorSamples = [[27, 0], [28.5, .3], [30, .6], [33, .6], [35.9, .6], [36, .6], [36.1, .6], [39, .6], [42, .6], [43.5, .3], [45, 0]];
   for (const gate of crossings) {
     const transition = WORLD_LAYOUTS.find((chunk) => chunk.connectionId === gate.id);

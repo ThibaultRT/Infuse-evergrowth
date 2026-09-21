@@ -4,6 +4,796 @@
   "environmentTheme": "burned-forest",
   "enemyWeapon": "slash",
   "enemyWeakness": "pierce",
-  "bossSpawnId": null,
-  "spawns": []
+  "bossSpawnId": "area4-epic-01",
+  "spawns": [
+    {
+      "id": "area4-crystal-01",
+      "tier": "crystal",
+      "x": -66,
+      "z": -17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-02",
+      "tier": "crystal",
+      "x": -53,
+      "z": -17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-03",
+      "tier": "crystal",
+      "x": -40,
+      "z": -16,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-04",
+      "tier": "crystal",
+      "x": -20,
+      "z": -14,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-05",
+      "tier": "crystal",
+      "x": -14,
+      "z": -16,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-06",
+      "tier": "crystal",
+      "x": 14,
+      "z": -16,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-07",
+      "tier": "crystal",
+      "x": 27,
+      "z": -17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-08",
+      "tier": "crystal",
+      "x": 40,
+      "z": -16,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-09",
+      "tier": "crystal",
+      "x": 53,
+      "z": -17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-10",
+      "tier": "crystal",
+      "x": 66,
+      "z": -17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-11",
+      "tier": "crystal",
+      "x": -67,
+      "z": 3,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-12",
+      "tier": "crystal",
+      "x": -44,
+      "z": 10,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-13",
+      "tier": "crystal",
+      "x": -37,
+      "z": 13,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-14",
+      "tier": "crystal",
+      "x": -23,
+      "z": 17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-15",
+      "tier": "crystal",
+      "x": 23,
+      "z": 17,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-16",
+      "tier": "crystal",
+      "x": 41,
+      "z": 8,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-17",
+      "tier": "crystal",
+      "x": 54,
+      "z": 4,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-crystal-18",
+      "tier": "crystal",
+      "x": 67,
+      "z": 10,
+      "hp": {
+        "min": 6000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "hp",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "regen",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "attackDamage": 42
+    },
+    {
+      "id": "area4-common-01",
+      "tier": "common",
+      "x": -62,
+      "z": 15,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-west"
+    },
+    {
+      "id": "area4-common-02",
+      "tier": "common",
+      "x": -46,
+      "z": -5,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-west"
+    },
+    {
+      "id": "area4-common-03",
+      "tier": "common",
+      "x": -32,
+      "z": 2,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-west"
+    },
+    {
+      "id": "area4-common-04",
+      "tier": "common",
+      "x": -16,
+      "z": 7,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-west"
+    },
+    {
+      "id": "area4-common-05",
+      "tier": "common",
+      "x": 16,
+      "z": 7,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-east"
+    },
+    {
+      "id": "area4-common-06",
+      "tier": "common",
+      "x": 34,
+      "z": -4,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-east"
+    },
+    {
+      "id": "area4-common-07",
+      "tier": "common",
+      "x": 48,
+      "z": 16,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-east"
+    },
+    {
+      "id": "area4-common-08",
+      "tier": "common",
+      "x": 61,
+      "z": -3,
+      "hp": {
+        "min": 18000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 5,
+          "max": 9
+        },
+        {
+          "stat": "hp",
+          "min": 25,
+          "max": 60
+        }
+      ],
+      "attackDamage": 65,
+      "group": "area4-common-east"
+    },
+    {
+      "id": "area4-uncommon-01",
+      "tier": "uncommon",
+      "x": -57,
+      "z": 6,
+      "hp": {
+        "min": 8000,
+        "max": 12000
+      },
+      "rewards": [
+        {
+          "stat": "evasion",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "piercing",
+          "min": 8,
+          "max": 20
+        }
+      ],
+      "attackDamage": 135
+    },
+    {
+      "id": "area4-rare-01",
+      "tier": "rare",
+      "x": 57,
+      "z": 7,
+      "hp": {
+        "min": 24000,
+        "max": 30000
+      },
+      "rewards": [
+        {
+          "stat": "piercing",
+          "min": 160,
+          "max": 200
+        }
+      ],
+      "attackDamage": 360
+    },
+    {
+      "id": "area4-epic-01",
+      "tier": "epic",
+      "x": 0,
+      "z": 8,
+      "hp": {
+        "min": 90000,
+        "max": 135000
+      },
+      "rewards": [
+        {
+          "stat": "hp",
+          "min": 1000,
+          "max": 1500
+        },
+        {
+          "stat": "piercing",
+          "min": 15,
+          "max": 25
+        }
+      ],
+      "isBoss": true,
+      "attackDamage": 864
+    },
+    {
+      "id": "area4-epic-02",
+      "tier": "epic",
+      "x": 0,
+      "z": -9,
+      "hp": {
+        "min": 60000,
+        "max": 75000
+      },
+      "rewards": [
+        {
+          "stat": "hp",
+          "min": 500,
+          "max": 750
+        },
+        {
+          "stat": "regen",
+          "min": 6,
+          "max": 9
+        },
+        {
+          "stat": "piercing",
+          "min": 10,
+          "max": 15
+        }
+      ],
+      "attackDamage": 864
+    }
+  ]
 }

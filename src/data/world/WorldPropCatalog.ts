@@ -18,6 +18,8 @@ export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blo
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
   readonly absoluteElevation?: boolean;
+  /** Cosmetic lift for a model whose deck would otherwise be coplanar with authored terrain. */
+  readonly visualElevationOffset?: number;
   readonly walkSurface?: WorldWalkSurface;
   readonly fallbackBlockout?: readonly WorldBlockoutPart[];
   /** Local visual children only. This parent definition owns all collision. */
@@ -41,8 +43,8 @@ export const WORLD_PROP_CATALOG = {
   'boundary.area4Fence': { asset: 'boundary.area4Fence', collision: [rectangle(boundary.fence.width, boundary.fence.depth)], fallbackBlockout: AREA4_FENCE_FALLBACK, absoluteElevation: true, cameraOccluder: true },
   'boundary.area4Gate': { asset: 'boundary.area4Gate', collision: [rectangle(boundary.gate.width, boundary.gate.depth)], fallbackBlockout: AREA4_GATE_FALLBACK, absoluteElevation: true, cameraOccluder: true },
   'terrain.area4LavaLake': { procedural: 'area4-lava-lake', collision: [rectangle(AREA4_SPEC.visualSize.width, boundary.southLake.depth)], absoluteElevation: true },
-  'crossing.area4SkeletalBridge': { asset: 'crossing.area4SkeletalBridge', fallbackBlockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
-  'crossing.area4TimberBridge': { asset: 'crossing.area4TimberBridge', fallbackBlockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR },
+  'crossing.area4SkeletalBridge': { asset: 'crossing.area4SkeletalBridge', fallbackBlockout: riftBridgeBlockout('iron'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR, visualElevationOffset: 0.02 },
+  'crossing.area4TimberBridge': { asset: 'crossing.area4TimberBridge', fallbackBlockout: riftBridgeBlockout('timber'), collision: RIFT_BRIDGE_COLLISION, walkSurface: RIFT_BRIDGE_FLOOR, visualElevationOffset: 0.02 },
   'crossing.area4BoneGate': { asset: 'crossing.area4BoneGate', fallbackBlockout: AREA4_LAND_GATE_FALLBACK, collision: AREA4_LAND_GATE_COLLISION, gate: AREA4_LAND_GATE, absoluteElevation: true, cameraOccluder: true },
   'ruin.area4SouthGate': { asset: 'ruin.area4SouthGate', fallbackBlockout: AREA4_WALL_GATE_FALLBACK, collision: AREA4_WALL_GATE_COLLISION, gate: AREA4_WALL_GATE, absoluteElevation: true, cameraOccluder: true },
   'ruin.ancientThrone': { asset: 'ruin.ancientThrone', fallbackBlockout: THRONE_BLOCKOUT, collision: THRONE_COLLISION, cameraOccluder: true, absoluteElevation: true },
@@ -106,7 +108,7 @@ export const WORLD_PROP_CATALOG = {
   'ruin.scaffolding': occludingProp('ruin.scaffolding', [rectangle(4.2, 2.8)]),
   'crossing.bridgeA': prop('crossing.bridgeA'),
   'crossing.bridgeB': prop('crossing.bridgeB'),
-  'crossing.woodlandBridge': { asset: 'crossing.woodlandBridge', collision: WOODLAND_BRIDGE_COLLISION, walkSurface: WOODLAND_BRIDGE_WALK_SURFACE, gate: WOODLAND_BRIDGE_GATE },
+  'crossing.woodlandBridge': { asset: 'crossing.woodlandBridge', collision: WOODLAND_BRIDGE_COLLISION, walkSurface: WOODLAND_BRIDGE_WALK_SURFACE, gate: WOODLAND_BRIDGE_GATE, visualElevationOffset: 0.02 },
   // These lengths follow the visible GLB bounds after the catalog's 7x base scale.
   // The gate proxies cover its solid side wings while preserving the open arch.
   'fortress.wall': prop('fortress.wall', [rectangle(14, 0.9)]),

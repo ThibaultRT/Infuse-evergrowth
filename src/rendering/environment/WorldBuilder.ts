@@ -132,6 +132,7 @@ export class WorldBuilder {
     object.name = placement.name;
     if (definition.walkSurface) {
       model.name = `${placement.name}_Model`;
+      if (!failed) model.position.y += definition.visualElevationOffset ?? 0;
       if (!failed || definition.fallbackBlockout) object.add(model);
       else if (model instanceof THREE.Mesh) {
         model.geometry.dispose();
