@@ -1,5 +1,6 @@
 import type { TransitionWorldLayout } from '../WorldLayout';
 import { RIFT_NORTH_Z, area4RiftCutout } from '../area4';
+import { FALLEN_KEEP_CORNER_SCALE, fallenKeepCornerPosition } from '../fallenKeep';
 
 export const A01_A03_TRANSITION = {
   kind: 'transition',
@@ -25,8 +26,8 @@ export const A01_A03_TRANSITION = {
     { name: 'A03_CurtainWall_West_002', prop: 'ruin.curtainA', position: [0, 0, -9.84], rotation: -Math.PI / 2, scale: 1.08 },
     { name: 'A03_CurtainWall_West_003', prop: 'ruin.curtainA', position: [0, 0, 17.04], rotation: -Math.PI / 2, scale: 1.08 },
     { name: 'A03_WestGate', prop: 'ruin.gate', position: [0, 0, 3.6], rotation: Math.PI / 2, scale: 0.84 },
-    { name: 'A03_Corner_NW', prop: 'ruin.cornerTower', position: [-0.307, 0, -28.445], rotation: 7 * Math.PI / 6, scale: 1.1 },
-    { name: 'A03_Corner_SW', prop: 'ruin.cornerTower', position: [3.486, 0, RIFT_NORTH_Z + 0.307], rotation: 5 * Math.PI / 3, scale: 1.1 },
+    { name: 'A03_Corner_NW', prop: 'ruin.cornerTower', position: fallenKeepCornerPosition([0, -34.3], 7 * Math.PI / 6), rotation: 7 * Math.PI / 6, scale: FALLEN_KEEP_CORNER_SCALE },
+    { name: 'A03_Corner_SW', prop: 'ruin.cornerTower', position: fallenKeepCornerPosition([0, RIFT_NORTH_Z], 5 * Math.PI / 3), rotation: 5 * Math.PI / 3, scale: FALLEN_KEEP_CORNER_SCALE },
   ],
   scatters: [],
   collision: [

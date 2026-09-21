@@ -326,6 +326,15 @@ try {
     await capture(client, 'runtime-iphone-12-keep-west-gate.png');
     await moveAxis(client, 'x', 72);
     await capture(client, 'runtime-iphone-12-keep-ash-court.png');
+    await moveAxis(client, 'z', 10);
+    await moveAxis(client, 'x', 106.2);
+    await client.send('Emulation.setDeviceMetricsOverride', { width: 924, height: 453, deviceScaleFactor: 1, mobile: false });
+    await evaluate(client, `document.getElementById('camera-distance').value = '15'; document.getElementById('camera-distance').dispatchEvent(new Event('input', { bubbles: true }));`);
+    await wait(700);
+    await capture(client, 'runtime-area3-east-wall-15.png');
+    await client.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await evaluate(client, `document.getElementById('camera-distance').value = '25.2'; document.getElementById('camera-distance').dispatchEvent(new Event('input', { bubbles: true }));`);
+    await moveAxis(client, 'x', 72);
     await moveAxis(client, 'z', -21);
     await capture(client, 'runtime-iphone-12-keep-chapel.png');
     await moveAxis(client, 'z', -10);
@@ -500,7 +509,7 @@ try {
 
   const rendererStats = await evaluate(client, "document.getElementById('renderer-stats')?.textContent");
   if (client.errors.length > 0) throw new Error(`Browser errors:\n${client.errors.join('\n')}`);
-  console.log(`Runtime smoke passed: ${area4 ? 'Area 4 locked/unlocked bridges, both directions, existing boss victory, throne, saved Reduced/30 FPS and missing world assets' : fallenKeep ? 'Fallen Keep gates, chapel/barracks interiors, south wall, persisted Reduced/30 FPS, terrain fallback' : highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed south gate, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
+  console.log(`Runtime smoke passed: ${area4 ? 'Area 4 locked/unlocked bridges, both directions, existing boss victory, throne, saved Reduced/30 FPS and missing world assets' : fallenKeep ? 'Fallen Keep gates, aligned east wall at distance 15, chapel/barracks interiors, south wall, persisted Reduced/30 FPS, terrain fallback' : highwood ? 'Highwood trail, both crossings, persisted Reduced/30 FPS, missing landscape fallback' : greenhavenShore ? 'fountain and pine occlusion fade' : greenhaven ? 'village loop, closed south gate, impassable lake, Full/Reduced, persisted 30 FPS, missing landscape fallback' : woodlandBridge ? 'woodland bridge closed, open, A01 → A02 → A01' : 'Areas 1 → 3 → 1 → 2'}.\n${rendererStats}`);
 } finally {
   await closeBrowser(client, socket, browserProcess, viteProcess);
   await wait(300);

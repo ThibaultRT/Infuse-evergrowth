@@ -1,4 +1,5 @@
 import { createWallRun, type TransitionWorldLayout } from '../WorldLayout';
+import { FALLEN_KEEP_CORNER_SCALE, fallenKeepCornerPosition } from '../fallenKeep';
 
 export const A02_A03_TRANSITION = {
   kind: 'transition',
@@ -25,7 +26,7 @@ export const A02_A03_TRANSITION = {
     ...createWallRun({ prefix: 'A03_CurtainWall_North', prop: 'ruin.curtainA', from: [13.08, 1.7], to: [19.6, 1.7], moduleLength: 14, elevation: 0, scale: 1.08, alignment: 'start', startIndex: 3, rotationOffset: Math.PI }),
     { name: 'A02_A03_Bridge', prop: 'crossing.bridgeA', position: [7.2, 0.15, -1.5], scale: 0.76, collision: 'none' },
     { name: 'A03_NorthGate', prop: 'ruin.gate', position: [7.2, 0, 1.7], scale: 0.84 },
-    { name: 'A03_Corner_NE', prop: 'ruin.cornerTower', position: [29.645, 0, 1.393], rotation: 2 * Math.PI / 3, scale: 1.1 },
+    { name: 'A03_Corner_NE', prop: 'ruin.cornerTower', position: fallenKeepCornerPosition([35.5, 1.7], 2 * Math.PI / 3), rotation: 2 * Math.PI / 3, scale: FALLEN_KEEP_CORNER_SCALE },
   ],
   scatters: [],
   collision: [

@@ -76,5 +76,15 @@
     {"id": "A03_Encounter_Barracks", "name": "Barracks interior", "center": [0, 22], "radius": 3},
     {"id": "A03_Encounter_EastCourt", "name": "Eastern muster court", "center": [17, 15], "radius": 3.2}
   ],
-  "outerCliff": {"edge": 37, "outerEdge": 42, "from": -34, "base": -4.2, "rockCenter": 39, "rockStart": -36, "rockStep": 2.9, "rockCount": 27}
+  "outerCliff": {
+    "edge": 37,
+    "outerEdge": 42,
+    "from": -34,
+    "base": -4.2,
+    "rockCenter": 39,
+    "rockStart": -36,
+    "rockStep": 2.9,
+    "rockCount": 27,
+    "horizon": {"east": 120, "north": -120, "south": 112}
+  }
 }

@@ -1,5 +1,12 @@
 import { createWallRun, type AreaWorldLayout } from '../WorldLayout';
-import { FALLEN_KEEP_CLIFF_CUTOUTS, FALLEN_KEEP_ENCOUNTER_SPOTS, FALLEN_KEEP_ROADS } from '../fallenKeep';
+import {
+  FALLEN_KEEP_CLIFF_CUTOUTS,
+  FALLEN_KEEP_CORNER_SCALE,
+  FALLEN_KEEP_EAST_HORIZON,
+  FALLEN_KEEP_ENCOUNTER_SPOTS,
+  FALLEN_KEEP_ROADS,
+  fallenKeepCornerPosition,
+} from '../fallenKeep';
 import areaContent from '../../areas/area-3.json';
 import { AREA4_SPEC, RIFT_NORTH_Z, area4RiftCutout } from '../area4';
 import keep from '../fallen-keep.json';
@@ -28,6 +35,7 @@ export const AREA_A03_LAYOUT = {
     ...FALLEN_KEEP_CLIFF_CUTOUTS,
     area4RiftCutout('A03_South_Rift', [72, 0, 0]),
   ],
+  surfaces: [FALLEN_KEEP_EAST_HORIZON],
   roads: [...FALLEN_KEEP_ROADS, { name: 'A03_SouthGate_Approach', points: [[southGateX, 25], [southGateX, southWallZ - AREA4_SPEC.bridge.approachLength]], width: AREA4_SPEC.bridge.width, material: 'cobble' }],
   encounterSpots: FALLEN_KEEP_ENCOUNTER_SPOTS,
   props: [
@@ -50,7 +58,7 @@ export const AREA_A03_LAYOUT = {
     ...createWallRun({ prefix: 'A03_CurtainWall_East', prop: 'ruin.curtainA', brokenProp: 'ruin.curtainB', brokenEvery: 2, from: [35.5, -23.8], to: [35.5, southWallZ - 9], moduleLength: keep.wall.width, scale: 1.08, alignment: 'start' }),
     ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainB', from: [-22.5, southWallZ], to: [southGateX - southGateHalfWidth, southWallZ], moduleLength: keep.wall.width, scale: 1.08, alignment: 'end' }),
     ...createWallRun({ prefix: 'A03_CurtainWall_South', prop: 'ruin.curtainA', from: [southGateX + southGateHalfWidth, southWallZ], to: [25, southWallZ], moduleLength: keep.wall.width, scale: 1.08, alignment: 'start', startIndex: 3 }),
-    { name: 'A03_Corner_SE', prop: 'ruin.cornerTower', position: [35.807, 0, southWallZ - 5.855], rotation: Math.PI / 6, scale: 1.1 },
+    { name: 'A03_Corner_SE', prop: 'ruin.cornerTower', position: fallenKeepCornerPosition([35.5, southWallZ], Math.PI / 6), rotation: Math.PI / 6, scale: FALLEN_KEEP_CORNER_SCALE },
   ],
   scatters: clearTransitionApproaches([
     { prefix: 'A03_Masonry_Debris', props: ['ruin.rubbleHalf', 'ruin.rubbleLarge'], count: 28, bounds: { minX: -30, maxX: 31, minZ: -29, maxZ: southWallZ - 2 }, seed: 301, scale: [0.18, 0.4], exclusions: clearings },

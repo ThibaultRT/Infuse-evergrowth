@@ -11,6 +11,12 @@ export async function validateFallenKeep(vite, config) {
     vite.ssrLoadModule('/src/domain/world/WorldWalkSurface.ts'),
   ]);
   const area = config.AREAS.find((candidate) => candidate.id === 3);
+  const horizon = layout.surfaces?.find((surface) => surface.name === 'A03_East_Cliff_Horizon');
+  assert.ok(horizon && horizon.kind === 'cliff', 'Fallen Keep needs its collision-free eastern cliff horizon.');
+  assert.equal(horizon.center[0] - horizon.size.width / 2, 42, 'The eastern cliff horizon must meet the visual terrain edge.');
+  assert.ok(horizon.center[0] + horizon.size.width / 2 >= 120, 'The eastern cliff horizon must end beyond runtime fog.');
+  assert.ok(horizon.center[1] - horizon.size.depth / 2 <= -120 && horizon.center[1] + horizon.size.depth / 2 >= 112, 'The eastern cliff horizon must cover every Area 3 camera latitude.');
+  assert.ok((horizon.elevation ?? 0) < -4.2, 'The eastern cliff horizon must remain below the authored cliff base.');
   const columns = 141, step = .5, minimum = -35;
   const pointAt = (i) => ({ x: i % columns * step + minimum, z: Math.floor(i / columns) * step + minimum });
   const indexOf = ({ x, z }) => Math.round((z - minimum) / step) * columns + Math.round((x - minimum) / step);

@@ -113,11 +113,17 @@ try {
       }
     }
     const wallColliders = compiled.all.filter((shape) => shape.kind === 'rectangle' && shape.sourcePlacementName?.startsWith('A03_CurtainWall_'));
-    const expectedWallModules = new Map([['West', 3], ['North', 3], ['East', 3], ['South', 3]]);
+    const expectedWallModules = new Map([
+      ['West', { count: 3, axis: 'x', value: 36 }],
+      ['North', { count: 3, axis: 'z', value: -34.3 }],
+      ['East', { count: 3, axis: 'x', value: 107.5 }],
+      ['South', { count: 3, axis: 'z', value: 30 }],
+    ]);
     check(wallColliders.length === 12, `Expected 12 authored A03 wall modules, found ${wallColliders.length}.`);
-    for (const [side, expectedCount] of expectedWallModules) {
+    for (const [side, expected] of expectedWallModules) {
       const sideColliders = wallColliders.filter((shape) => shape.sourcePlacementName?.startsWith(`A03_CurtainWall_${side}_`));
-      check(sideColliders.length === expectedCount, `Expected ${expectedCount} A03 ${side.toLowerCase()} wall modules, found ${sideColliders.length}.`);
+      check(sideColliders.length === expected.count, `Expected ${expected.count} A03 ${side.toLowerCase()} wall modules, found ${sideColliders.length}.`);
+      for (const shape of sideColliders) check(Math.abs(shape[expected.axis] - expected.value) < 1e-6, `${shape.sourcePlacementName} is off the ${side.toLowerCase()} wall axis.`);
       for (let left = 0; left < sideColliders.length; left += 1) {
         for (let right = left + 1; right < sideColliders.length; right += 1) {
           const first = sideColliders[left];
@@ -127,9 +133,20 @@ try {
         }
       }
     }
-    for (const corner of ['NW', 'NE', 'SE', 'SW']) {
+    const expectedCorners = new Map([
+      ['NW', { x: 36, z: -34.3 }],
+      ['NE', { x: 107.5, z: -34.3 }],
+      ['SE', { x: 107.5, z: 30 }],
+      ['SW', { x: 36, z: 30 }],
+    ]);
+    for (const [corner, intersection] of expectedCorners) {
       const shapes = compiled.all.filter((shape) => shape.sourcePlacementName === `A03_Corner_${corner}`);
-      check(shapes.filter((shape) => shape.kind === 'rectangle').length === 2 && shapes.some((shape) => shape.kind === 'circle'), `A03_Corner_${corner} must retain both wall arms and its ruined tower footprint.`);
+      const arms = shapes.filter((shape) => shape.kind === 'rectangle');
+      const tower = shapes.find((shape) => shape.kind === 'circle');
+      check(arms.length === 2 && Boolean(tower), `A03_Corner_${corner} must retain both wall arms and its ruined tower footprint.`);
+      check(Boolean(tower) && Math.hypot(tower.x - intersection.x, tower.z - intersection.z) < 1e-6, `A03_Corner_${corner} tower is off its wall intersection.`);
+      check(arms.some((shape) => Math.abs(shape.x - intersection.x) < .01), `A03_Corner_${corner} has no arm aligned to its east/west wall.`);
+      check(arms.some((shape) => Math.abs(shape.z - intersection.z) < .01), `A03_Corner_${corner} has no arm aligned to its north/south wall.`);
     }
   }
 

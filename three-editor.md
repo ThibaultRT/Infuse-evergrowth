@@ -28,6 +28,11 @@ the same transforms. Never treat an edited GLB or mesh bounds as gameplay author
 Area A02 spans the combined width of A01 and A03. Visual aprons overlap; there is no
 additional empty gap between playable chunks.
 
+Area A03 also owns `A03_East_Cliff_Horizon`, a collision-free surface below the
+eastern cliff base. It begins at the listed visual edge and ends beyond runtime fog,
+so a wide camera cannot expose the finite terrain border. It does not expand the
+playable footprint or supply gameplay height.
+
 The A01/A02 crossing uses the project-supplied woodland bridge. Its deck runs
 from world Z=-30 to Z=-42 over the river, with 3 m approaches reaching dry land
 at Z=-27 and Z=-45. The shared area boundary at Z=-36 lies at midspan; neither
@@ -92,7 +97,9 @@ the shared spec reserves a 4.9 × 3.7 m collision footprint, including the lava
 apron. The model and fallback both use that same placement and occlusion tag.
 
 Area A03's ruined masonry uses `fallen-keep.json` for both Blender dimensions and
-semantic collision. Corner towers add a round footprint to the two wall arms.
+semantic collision. Each corner placement is derived from its tower pivot so both
+arms share the adjoining straight-wall axes. Corner towers add a round footprint to
+the two wall arms.
 Roofless house, chapel and keep shells have wall-segment proxies so their interiors
 can be entered. Seven `A03_Encounter_*` clearings are reserved for later spawn
 authoring; the viewer shows their radii with its spawn overlay. They are scenery

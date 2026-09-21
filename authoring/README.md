@@ -194,7 +194,10 @@ paving is a cosmetic surface dressing.
 `src/data/world/fallen-keep.json` owns masonry dimensions, building wall segments,
 roads, outer cliff dimensions and seven reserved encounter spots. The Blender
 exporter and semantic collision proxies consume those same values. Building
-interiors and entrances are open; ruined perimeter walls remain barriers.
+interiors and entrances are open; ruined perimeter walls remain barriers. Corner
+placements are calculated from the shared tower pivot so their two arms stay on the
+straight-wall axes. A collision-free surface below the eastern cliff continues past
+runtime fog to conceal the finite terrain edge at wide landscape viewports.
 
 The reserved spots are Gate Court, Ash Court, Chapel, Keep Hall, Smithy, Barracks
 and East Court. Their stable `A03_Encounter_*` IDs, centers and clear radii can be
@@ -218,9 +221,10 @@ npm run authoring:assets:promote -- terrain.fallenKeep ruin.curtainA ruin.curtai
 both gate approaches, the reserved clear radii and a 6 MiB / 85k unique triangle
 asset budget. `authoring:world:capture` adds `area3-target-layout.png` and
 `iphone-12-fallen-keep-court.png`. `authoring:world:smoke-runtime -- --fallen-keep`
-walks both gates, the chapel and barracks, checks the south barrier, and exercises
-saved Reduced/30 FPS and missing-terrain fallback. These browser captures are not
-a substitute for real iPhone performance measurements.
+walks both gates, the chapel and barracks, checks the south barrier, captures the
+eastern wall at a 924 x 453 landscape viewport and camera distance 15, and exercises
+saved Reduced/30 FPS and missing-terrain fallback. These browser captures are not a
+substitute for real iPhone performance measurements.
 
 ## Area 4 authoring commands
 
