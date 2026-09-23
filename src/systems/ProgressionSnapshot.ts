@@ -68,7 +68,7 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
     const armorSlot = equipmentSlot(definition.id);
     const equipSlots = slots.filter(({ slot, unlocked }) => unlocked && (armorSlot ? slot === armorSlot : WEAPON_SLOTS.some((weaponSlot) => slot === weaponSlot))).map(({ slot, itemId }) => ({ slot, itemId }));
     const freeSlots = equipSlots.filter(({ itemId }) => itemId === null);
-    const copiesRequired = ascendCopies(definition.rarity), ascendValue = equipmentAscendValue(definition, owned);
+    const copiesRequired = ascendCopies(definition, owned.ascend), ascendValue = equipmentAscendValue(definition, owned);
     items[owned.itemId] = {
       definition: { ...definition }, owned: { ...owned }, equippedSlot: slots.find(({ itemId }) => itemId === owned.itemId)?.slot ?? null,
       value: definition.kind === 'weapon' ? equipmentDamage(definition, owned) : equipmentDefense(definition, owned),

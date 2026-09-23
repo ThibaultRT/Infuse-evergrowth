@@ -117,6 +117,13 @@
       "rare": 150,
       "epic": 160,
       "legendary": 200
+    },
+    "armorByRarity": {
+      "common": { "baseDefense": 600, "defensePerCopy": 100, "firstAscendCopies": 70, "copyGrowth": 2.58, "ascendMultiplier": 1.65 },
+      "uncommon": { "baseDefense": 4700, "defensePerCopy": 200, "firstAscendCopies": 100, "copyGrowth": 2.45, "ascendMultiplier": 1.35 },
+      "rare": { "baseDefense": 50000, "defensePerCopy": 350, "firstAscendCopies": 130, "copyGrowth": 2.076923076923077, "ascendMultiplier": 1.47 },
+      "epic": { "baseDefense": 310000, "defensePerCopy": 500, "firstAscendCopies": 190, "copyGrowth": 2.1, "ascendMultiplier": 1.4 },
+      "legendary": { "baseDefense": 2500000, "defensePerCopy": 2000, "firstAscendCopies": 160, "copyGrowth": 2, "ascendMultiplier": 1.4 }
     }
   },
   "respawn": {

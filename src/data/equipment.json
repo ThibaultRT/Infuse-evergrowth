@@ -170,8 +170,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "common",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 1
+    "damageType": "blunt"
   },
   {
     "id": "helmet-slash-common",
@@ -179,8 +178,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "common",
-    "damageType": "slash",
-    "baseDefensePerLevel": 1
+    "damageType": "slash"
   },
   {
     "id": "helmet-piercing-common",
@@ -188,8 +186,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "common",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 1
+    "damageType": "piercing"
   },
   {
     "id": "helmet-blunt-uncommon",
@@ -197,8 +194,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "uncommon",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 2
+    "damageType": "blunt"
   },
   {
     "id": "helmet-slash-uncommon",
@@ -206,8 +202,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "uncommon",
-    "damageType": "slash",
-    "baseDefensePerLevel": 2
+    "damageType": "slash"
   },
   {
     "id": "helmet-piercing-uncommon",
@@ -215,8 +210,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "uncommon",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 2
+    "damageType": "piercing"
   },
   {
     "id": "helmet-blunt-rare",
@@ -224,8 +218,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "rare",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 4
+    "damageType": "blunt"
   },
   {
     "id": "helmet-slash-rare",
@@ -233,8 +226,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "rare",
-    "damageType": "slash",
-    "baseDefensePerLevel": 4
+    "damageType": "slash"
   },
   {
     "id": "helmet-piercing-rare",
@@ -242,8 +234,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "rare",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 4
+    "damageType": "piercing"
   },
   {
     "id": "helmet-blunt-epic",
@@ -251,8 +242,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "epic",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 8
+    "damageType": "blunt"
   },
   {
     "id": "helmet-slash-epic",
@@ -260,8 +250,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "epic",
-    "damageType": "slash",
-    "baseDefensePerLevel": 8
+    "damageType": "slash"
   },
   {
     "id": "helmet-piercing-epic",
@@ -269,8 +258,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "epic",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 8
+    "damageType": "piercing"
   },
   {
     "id": "helmet-blunt-legendary",
@@ -278,8 +266,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "legendary",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 15
+    "damageType": "blunt"
   },
   {
     "id": "helmet-slash-legendary",
@@ -287,8 +274,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "legendary",
-    "damageType": "slash",
-    "baseDefensePerLevel": 15
+    "damageType": "slash"
   },
   {
     "id": "helmet-piercing-legendary",
@@ -296,8 +282,7 @@
     "kind": "armor",
     "armorClass": "helmet",
     "rarity": "legendary",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 15
+    "damageType": "piercing"
   },
   {
     "id": "armor-blunt-common",
@@ -305,8 +290,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "common",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 1
+    "damageType": "blunt"
   },
   {
     "id": "armor-slash-common",
@@ -314,8 +298,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "common",
-    "damageType": "slash",
-    "baseDefensePerLevel": 1
+    "damageType": "slash"
   },
   {
     "id": "armor-piercing-common",
@@ -323,8 +306,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "common",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 1
+    "damageType": "piercing"
   },
   {
     "id": "armor-blunt-uncommon",
@@ -332,8 +314,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "uncommon",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 2
+    "damageType": "blunt"
   },
   {
     "id": "armor-slash-uncommon",
@@ -341,8 +322,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "uncommon",
-    "damageType": "slash",
-    "baseDefensePerLevel": 2
+    "damageType": "slash"
   },
   {
     "id": "armor-piercing-uncommon",
@@ -350,8 +330,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "uncommon",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 2
+    "damageType": "piercing"
   },
   {
     "id": "armor-blunt-rare",
@@ -359,8 +338,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "rare",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 4
+    "damageType": "blunt"
   },
   {
     "id": "armor-slash-rare",
@@ -368,8 +346,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "rare",
-    "damageType": "slash",
-    "baseDefensePerLevel": 4
+    "damageType": "slash"
   },
   {
     "id": "armor-piercing-rare",
@@ -377,8 +354,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "rare",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 4
+    "damageType": "piercing"
   },
   {
     "id": "armor-blunt-epic",
@@ -386,8 +362,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "epic",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 8
+    "damageType": "blunt"
   },
   {
     "id": "armor-slash-epic",
@@ -395,8 +370,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "epic",
-    "damageType": "slash",
-    "baseDefensePerLevel": 8
+    "damageType": "slash"
   },
   {
     "id": "armor-piercing-epic",
@@ -404,8 +378,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "epic",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 8
+    "damageType": "piercing"
   },
   {
     "id": "armor-blunt-legendary",
@@ -413,8 +386,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "legendary",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 15
+    "damageType": "blunt"
   },
   {
     "id": "armor-slash-legendary",
@@ -422,8 +394,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "legendary",
-    "damageType": "slash",
-    "baseDefensePerLevel": 15
+    "damageType": "slash"
   },
   {
     "id": "armor-piercing-legendary",
@@ -431,8 +402,7 @@
     "kind": "armor",
     "armorClass": "armor",
     "rarity": "legendary",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 15
+    "damageType": "piercing"
   },
   {
     "id": "boots-blunt-common",
@@ -440,8 +410,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "common",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 1
+    "damageType": "blunt"
   },
   {
     "id": "boots-slash-common",
@@ -449,8 +418,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "common",
-    "damageType": "slash",
-    "baseDefensePerLevel": 1
+    "damageType": "slash"
   },
   {
     "id": "boots-piercing-common",
@@ -458,8 +426,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "common",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 1
+    "damageType": "piercing"
   },
   {
     "id": "boots-blunt-uncommon",
@@ -467,8 +434,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "uncommon",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 2
+    "damageType": "blunt"
   },
   {
     "id": "boots-slash-uncommon",
@@ -476,8 +442,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "uncommon",
-    "damageType": "slash",
-    "baseDefensePerLevel": 2
+    "damageType": "slash"
   },
   {
     "id": "boots-piercing-uncommon",
@@ -485,8 +450,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "uncommon",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 2
+    "damageType": "piercing"
   },
   {
     "id": "boots-blunt-rare",
@@ -494,8 +458,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "rare",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 4
+    "damageType": "blunt"
   },
   {
     "id": "boots-slash-rare",
@@ -503,8 +466,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "rare",
-    "damageType": "slash",
-    "baseDefensePerLevel": 4
+    "damageType": "slash"
   },
   {
     "id": "boots-piercing-rare",
@@ -512,8 +474,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "rare",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 4
+    "damageType": "piercing"
   },
   {
     "id": "boots-blunt-epic",
@@ -521,8 +482,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "epic",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 8
+    "damageType": "blunt"
   },
   {
     "id": "boots-slash-epic",
@@ -530,8 +490,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "epic",
-    "damageType": "slash",
-    "baseDefensePerLevel": 8
+    "damageType": "slash"
   },
   {
     "id": "boots-piercing-epic",
@@ -539,8 +498,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "epic",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 8
+    "damageType": "piercing"
   },
   {
     "id": "boots-blunt-legendary",
@@ -548,8 +506,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "legendary",
-    "damageType": "blunt",
-    "baseDefensePerLevel": 15
+    "damageType": "blunt"
   },
   {
     "id": "boots-slash-legendary",
@@ -557,8 +514,7 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "legendary",
-    "damageType": "slash",
-    "baseDefensePerLevel": 15
+    "damageType": "slash"
   },
   {
     "id": "boots-piercing-legendary",
@@ -566,7 +522,6 @@
     "kind": "armor",
     "armorClass": "boots",
     "rarity": "legendary",
-    "damageType": "piercing",
-    "baseDefensePerLevel": 15
+    "damageType": "piercing"
   }
 ]

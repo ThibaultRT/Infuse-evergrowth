@@ -299,7 +299,7 @@ try {
   });
   await check('Ascend carries excess copies regardless of acquisition order for every item', () => {
     for (const item of equipment.EQUIPMENT) {
-      const threshold = equipment.ascendCopies(item.rarity);
+      const threshold = equipment.ascendCopies(item, 0);
       const owned = { itemId: item.id, level: threshold - 1, ascend: 0 };
       assert.equal(canAscend(item, owned), false);
       owned.level = threshold;
@@ -314,6 +314,33 @@ try {
       while (canAscend(item, late)) late = ascendOwnedEquipment(item, late);
       assert.deepEqual(early, late);
     }
+  });
+  await check('Armor bases, per-copy gains and successive ascend costs follow rarity curves', () => {
+    const cases = [
+      ['common', [600, 12375, 49954, 159809], [70, 180, 470, 1200], 100],
+      ['uncommon', [4700, 33075, 111881], [100, 250, 600], 200],
+      ['rare', [50000, 139871], [130, 270], 350],
+      ['epic', [310000, 566300], [190, 400], 500],
+      ['legendary', [2500000, 3945200], [160, 320], 2000],
+    ];
+    for (const [rarity, bases, costs, perCopy] of cases) {
+      const armor = equipment.EQUIPMENT.find((item) => item.kind === 'armor' && item.rarity === rarity);
+      for (let ascend = 0; ascend < bases.length; ascend++) {
+        const owned = { itemId: armor.id, level: 1, ascend };
+        assert.equal(equipment.ascendCopies(armor, ascend), costs[ascend]);
+        assert.equal(equipment.equipmentDefense(armor, owned), bases[ascend]);
+        assert.equal(equipment.equipmentDefense(armor, { ...owned, level: 2 }), bases[ascend] + perCopy);
+        assert.equal(equipment.equipmentValuePerLevel(armor, owned), perCopy);
+      }
+      const threshold = costs[0];
+      const owned = { itemId: armor.id, level: threshold + 3, ascend: 0 };
+      assert.equal(equipment.equipmentAscendValue(armor, owned), bases[1] + 3 * perCopy);
+      const restored = load({ ...fresh(), inventory: { ...fresh().inventory, items: { [armor.id]: owned } } });
+      assert.equal(equipment.equipmentDefense(armor, restored.inventory.items[armor.id]), bases[0] + (threshold + 2) * perCopy);
+    }
+    const weapon = equipment.EQUIPMENT.find((item) => item.kind === 'weapon' && item.rarity === 'common');
+    assert.equal(equipment.ascendCopies(weapon, 0), 100);
+    assert.equal(equipment.ascendCopies(weapon, 3), 100);
   });
   await check('Commands and reset helpers mutate only the injected session', () => {
     const globalBefore = structuredClone(persistence.save), first = fresh(), second = fresh();
