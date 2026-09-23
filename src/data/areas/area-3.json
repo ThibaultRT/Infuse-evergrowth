@@ -751,7 +751,7 @@
         }
       ],
       "group": "area3-common-a",
-      "attackDamage": 36
+      "attackDamage": 180
     },
     {
       "id": "area3-common-02",
@@ -770,7 +770,7 @@
         }
       ],
       "group": "area3-common-a",
-      "attackDamage": 36
+      "attackDamage": 203
     },
     {
       "id": "area3-common-03",
@@ -789,7 +789,7 @@
         }
       ],
       "group": "area3-common-a",
-      "attackDamage": 36
+      "attackDamage": 225
     },
     {
       "id": "area3-common-04",
@@ -808,7 +808,7 @@
         }
       ],
       "group": "area3-common-b",
-      "attackDamage": 36
+      "attackDamage": 248
     },
     {
       "id": "area3-common-05",
@@ -827,7 +827,7 @@
         }
       ],
       "group": "area3-common-b",
-      "attackDamage": 36
+      "attackDamage": 271
     },
     {
       "id": "area3-common-06",
@@ -846,7 +846,7 @@
         }
       ],
       "group": "area3-common-b",
-      "attackDamage": 36
+      "attackDamage": 294
     },
     {
       "id": "area3-common-07",
@@ -864,7 +864,7 @@
           "max": 4
         }
       ],
-      "attackDamage": 36
+      "attackDamage": 316
     },
     {
       "id": "area3-common-08",
@@ -882,7 +882,7 @@
           "max": 4
         }
       ],
-      "attackDamage": 36
+      "attackDamage": 339
     },
     {
       "id": "area3-common-09",
@@ -900,7 +900,7 @@
           "max": 4
         }
       ],
-      "attackDamage": 36
+      "attackDamage": 362
     },
     {
       "id": "area3-common-10",
@@ -919,7 +919,7 @@
         }
       ],
       "group": "area3-common-c",
-      "attackDamage": 36
+      "attackDamage": 385
     },
     {
       "id": "area3-common-11",
@@ -938,7 +938,7 @@
         }
       ],
       "group": "area3-common-c",
-      "attackDamage": 36
+      "attackDamage": 407
     },
     {
       "id": "area3-common-12",
@@ -957,7 +957,7 @@
         }
       ],
       "group": "area3-common-c",
-      "attackDamage": 36
+      "attackDamage": 430
     },
     {
       "id": "area3-uncommon-01",
@@ -975,7 +975,7 @@
           "max": 1
         }
       ],
-      "attackDamage": 90
+      "attackDamage": 200
     },
     {
       "id": "area3-uncommon-02",
@@ -1003,7 +1003,7 @@
           "max": 10
         }
       ],
-      "attackDamage": 90
+      "attackDamage": 1000
     },
     {
       "id": "area3-rare-01",
@@ -1021,7 +1021,7 @@
           "max": 80
         }
       ],
-      "attackDamage": 180
+      "attackDamage": 1000
     },
     {
       "id": "area3-epic-01",
@@ -1040,7 +1040,7 @@
         }
       ],
       "isBoss": true,
-      "attackDamage": 288
+      "attackDamage": 1250
     },
     {
       "id": "area3-epic-02",
@@ -1068,7 +1068,7 @@
           "max": 5
         }
       ],
-      "attackDamage": 288
+      "attackDamage": 1250
     }
   ]
 }
