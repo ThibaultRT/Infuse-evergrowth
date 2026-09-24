@@ -80,7 +80,7 @@ export function calculateInfusion(roster: readonly SavedMinion[]): Infusion {
     stats.speed += (minion.stats.speed.additive.kills ?? 0) * 0.5;
     stats.evasion += minion.stats.evasion.raw.kills * 0.5;
     for (const type of ['blunt', 'slash', 'piercing'] as DamageType[]) stats[type] += (minion.stats.attack[type].additive.kills ?? 0) * 0.5;
-    for (const [id, count] of Object.entries(minion.copiesEarned)) if (EQUIPMENT_BY_ID.has(id)) copies[id] = (copies[id] ?? 0) + count;
+    for (const [id, count] of Object.entries(minion.copiesEarned)) if (count > 0 && EQUIPMENT_BY_ID.has(id)) copies[id] = (copies[id] ?? 0) + count;
   }
   return { stats, copies };
 }

@@ -1,11 +1,12 @@
 import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
+import balance from '../data/balance.json';
 import { soulCost } from '../domain/soul-catcher';
 import { statAdditiveTotal, statTotal } from '../domain/stats/StatSources';
 import type { DamageType, EquipmentDefinition, EquipmentSlotId, OwnedEquipment, SaveData, SoulType, StatSources, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID, ascendCopies, attackProfile, defenseSources, equipmentAscendValue, equipmentCombatSummary, equipmentDamage, equipmentDefense, equipmentSlot, equipmentSlotUnlocked, equipmentValuePerLevel, type InventoryCombatSummary } from './EquipmentSystem';
 import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRawEvasionChance, heroSpeed, heroSpeedMultiplier } from './HeroStats';
 import type { SoulCatcherSystem } from './SoulCatcherSystem';
-import { nextSummonCost } from '../domain/minions';
+import { calculateInfusion, nextSummonCost, type Infusion } from '../domain/minions';
 import type { MinionSummary, MinionSystem } from './MinionSystem';
 
 type ReadonlyValues<T> = { readonly [K in keyof T]: T[K] extends object ? ReadonlyValues<T[K]> : T[K] };
@@ -43,7 +44,7 @@ export type ProgressionSnapshot = ReadonlyValues<{
     yields: { type: SoulType; unlocked: boolean; base: number; additional: number; total: number }[];
     layers: { layer: number; name: string; authored: boolean; unlocked: boolean; nodes: SoulNodeSnapshot[]; edges: [string, string][] }[];
   };
-  minions: { unlockedEver: boolean; paidSummonCount: number; nextSummonCost: number; roster: MinionSummary[] };
+  minions: { unlockedEver: boolean; paidSummonCount: number; nextSummonCost: number; activeCapacity: number; roster: MinionSummary[]; infusionPreview: Infusion };
 }>;
 
 const WEAPON_SLOTS = ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const;
@@ -113,6 +114,7 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
       })),
     },
     minions: { unlockedEver: state.minions.unlockedEver, paidSummonCount: state.minions.paidSummonCount,
-      nextSummonCost: nextSummonCost(state.minions.paidSummonCount), roster: minions?.summaries() ?? [] },
+      nextSummonCost: nextSummonCost(state.minions.paidSummonCount), activeCapacity: balance.minions.activeCapacity,
+      roster: minions?.summaries() ?? [], infusionPreview: calculateInfusion(state.minions.roster) },
   };
 }

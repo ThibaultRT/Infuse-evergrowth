@@ -49,7 +49,7 @@ export class GameSession {
       enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS, enemyAttackRange: ENEMY_ATTACK_RANGE_METERS,
       enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS, enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN,
     });
-    this.commands = new GameCommands(state, this.runtime, events, () => this.persist(), this.soulCatcher);
+    this.commands = new GameCommands(state, this.runtime, events, () => this.persist(), this.soulCatcher, this.minions);
     this.progression = new ProgressionSystem(state, events, () => this.persist(), random, (rarity) => this.soulCatcher.equipmentQuantity(rarity),
       (definition) => this.soulCatcher.credit(definition), this.minions);
     this.minionAI = new MinionAISystem(state, this.runtime, random);

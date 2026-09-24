@@ -2,7 +2,7 @@ import './reward-popups.css';
 import { combatAffinityIcon, damageTypeDefenseIcon, damageTypeIcon, evasionIcon, heartIcon, heartRegenIcon } from './icons';
 import { EQUIPMENT_BY_ID } from './domain/items/EquipmentCatalog';
 import { equipmentIcon } from './equipment-icons';
-import type { AreaDefinition, EquipmentSlotId, SoulType } from './types';
+import type { AreaDefinition, DamageType, EquipmentSlotId, LootType, SoulType } from './types';
 import type { EquipmentSnapshot, ProgressionSnapshot, SoulNodeSnapshot, StatSnapshot } from './systems/ProgressionSnapshot';
 
 const app = document.querySelector<HTMLDivElement>('#app');
@@ -36,6 +36,7 @@ app.innerHTML = `
       <div class="debug-actions">
         <button id="stats-button" class="card stats-button" type="button">STATS</button>
         <button id="spawn-button" class="card stats-button" type="button" title="Reset active respawn cooldowns">SPAWN</button>
+        ${import.meta.env.DEV ? '<button id="debug-unlock-minions" class="card stats-button" type="button">UNLOCK IMP</button>' : ''}
       </div>
     </div>
     <div class="edge-actions">
@@ -99,6 +100,15 @@ app.innerHTML = `
         <div id="soul-layer-tabs" class="soul-layer-tabs" aria-label="Soul Catcher layers"></div>
       </div>
     </div>
+    <div id="minion-panel" class="modal-panel minion-panel" aria-hidden="true">
+      <div class="card modal-sheet minion-sheet">
+        <div class="modal-header"><div><div class="brand">Summoning Pit</div><h2>Minions</h2></div><div class="minion-header-actions"><button id="minion-summon" type="button">Summon minion</button><button id="minion-close" class="modal-close" type="button">CLOSE</button></div></div>
+        <p id="minion-summon-reason" class="minion-summon-reason"></p>
+        <div id="minion-cards" class="minion-cards"></div>
+        <section id="minion-infusion-preview" class="minion-infusion-preview"></section>
+        <button id="minion-sacrifice" class="minion-sacrifice" type="button">Sacrifice minions and infuse the hero</button>
+      </div>
+    </div>
     <div id="settings-panel" class="modal-panel" aria-hidden="true">
       <div class="card modal-sheet settings-sheet">
         <div class="modal-header">
@@ -129,7 +139,7 @@ app.innerHTML = `
     </div>
     <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-message">
       <p id="confirm-message"></p>
-      <form method="dialog"><button value="cancel" autofocus>Cancel</button><button value="confirm">Reset</button></form>
+      <form method="dialog"><button value="cancel" autofocus>Cancel</button><button id="confirm-action" value="confirm">Reset</button></form>
     </dialog>
     <output id="renderer-stats" class="renderer-stats" aria-live="off"></output>
   </div>
@@ -138,12 +148,14 @@ app.innerHTML = `
 const q = <T extends Element>(selector: string): T => document.querySelector<T>(selector)!;
 export const ui = {
   confirmDialog: q<HTMLDialogElement>('#confirm-dialog'), confirmMessage: q<HTMLParagraphElement>('#confirm-message'),
+  confirmAction: q<HTMLButtonElement>('#confirm-action'),
   loadingScreen: q<HTMLDivElement>('#loading-screen'), loadingSubtitle: q<HTMLDivElement>('#loading-subtitle'), loadingVersion: q<HTMLDivElement>('#loading-version'), loadingProgress: q<HTMLSpanElement>('#loading-progress'), loadingPercent: q<HTMLDivElement>('#loading-percent'),
   hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), orbit1Stat: q<HTMLSpanElement>('#orbit1-stat'), orbit2Stat: q<HTMLSpanElement>('#orbit2-stat'), orbit3Stat: q<HTMLSpanElement>('#orbit3-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
   world: q<HTMLDivElement>('#world-ui'), minionPitButton: q<HTMLButtonElement>('#minion-pit-button'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'), soulGainStack: q<HTMLDivElement>('#soul-gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   spawnButton: q<HTMLButtonElement>('#spawn-button'),
+  debugUnlockMinions: document.querySelector<HTMLButtonElement>('#debug-unlock-minions'),
   cameraDistance: q<HTMLInputElement>('#camera-distance'), cameraDistanceValue: q<HTMLOutputElement>('#camera-distance-value'),
   settingsButton: q<HTMLButtonElement>('#settings-button'), settingsPanel: q<HTMLDivElement>('#settings-panel'),
   renderScaleInputs: Array.from(document.querySelectorAll<HTMLInputElement>('input[name="render-scale"]')),
@@ -159,6 +171,9 @@ export const ui = {
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
   soulCatcherButton: q<HTMLButtonElement>('#soul-catcher-button'), soulCatcherPanel: q<HTMLDivElement>('#soul-catcher-panel'), soulCatcherClose: q<HTMLButtonElement>('#soul-catcher-close'),
+  minionPanel: q<HTMLDivElement>('#minion-panel'), minionClose: q<HTMLButtonElement>('#minion-close'), minionSummon: q<HTMLButtonElement>('#minion-summon'),
+  minionSummonReason: q<HTMLParagraphElement>('#minion-summon-reason'), minionCards: q<HTMLDivElement>('#minion-cards'),
+  minionInfusionPreview: q<HTMLElement>('#minion-infusion-preview'), minionSacrifice: q<HTMLButtonElement>('#minion-sacrifice'),
   soulBalances: q<HTMLDivElement>('#soul-balances'), soulXp: q<HTMLDivElement>('#soul-xp'), soulLayerTabs: q<HTMLDivElement>('#soul-layer-tabs'), soulTreeViewport: q<HTMLDivElement>('#soul-tree-viewport'), soulTree: q<HTMLDivElement>('#soul-tree'), soulConnections: q<SVGElement>('#soul-connections'), soulNodes: q<HTMLDivElement>('#soul-nodes'), soulDetail: q<HTMLDivElement>('#soul-detail'),
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryOverview: q<HTMLDivElement>('#inventory-overview'),
   inventorySummary: q<HTMLDivElement>('#inventory-summary'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
@@ -167,9 +182,10 @@ export const ui = {
 };
 
 /** A DOM dialog leaves the render loop and simulation running during confirmation. */
-export function confirmReset(message: string): Promise<boolean> {
+export function confirmReset(message: string, actionLabel = 'Reset'): Promise<boolean> {
   if (ui.confirmDialog.open) return Promise.resolve(false);
   ui.confirmMessage.textContent = message;
+  ui.confirmAction.textContent = actionLabel;
   ui.confirmDialog.returnValue = '';
   ui.confirmDialog.showModal();
   return new Promise((resolve) => ui.confirmDialog.addEventListener('close', () => resolve(ui.confirmDialog.returnValue === 'confirm'), { once: true }));
@@ -223,10 +239,10 @@ export function showToast(message: string): void {
 }
 
 function sourceLabel(source: string): string { return source.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase()); }
-function renderBreakdown(label: string, stat: StatSnapshot, suffix = '', decimals = false, scale = 1): string {
+function renderBreakdown(label: string, stat: StatSnapshot, suffix = '', decimals = false, scale = 1, minionSource = false): string {
   const additiveTotal = stat.additiveTotal, total = stat.total;
-  const format = (value: number): string => decimals ? (value * scale).toLocaleString(undefined, { maximumFractionDigits: 3 }) : Math.round(value * scale).toLocaleString();
-  const adds = Object.entries(stat.additive).filter(([, value]) => value !== 0).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${format(v)}${suffix}</span></div>`).join('');
+  const format = (value: number): string => decimals || minionSource ? (value * scale).toLocaleString(undefined, { maximumFractionDigits: 6 }) : Math.round(value * scale).toLocaleString();
+  const adds = Object.entries(stat.additive).filter(([source, value]) => value !== 0 || (source === 'minions' && minionSource)).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>${format(v)}${suffix}</span></div>`).join('');
   const mults = Object.entries(stat.multiplicative).filter(([, value]) => value !== 1).map(([s, v]) => `<div class="stat-line"><span>From ${sourceLabel(s)}</span><span>x${v.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span></div>`).join('');
   const base = stat.base !== 0 ? `<div class="stat-group-title">Base</div><div class="stat-line"><span>Base</span><span>${format(stat.base)}${suffix}</span></div>` : '';
   return `<section class="stat-breakdown"><div class="stat-row"><span>${label}</span><strong>${format(total)}${suffix}</strong></div>${base}${adds ? `<div class="stat-group-title">Additive</div>${adds}` : ''}<div class="stat-line stat-subtotal"><span>Total</span><span>${format(additiveTotal)}${suffix}</span></div>${mults ? `<div class="stat-group-title">Multiplicative</div>${mults}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${format(total)}${suffix}</strong></div></section>`;
@@ -239,23 +255,88 @@ export function renderStats(snapshot: ProgressionSnapshot): void {
   const evasionRawChance = stats.evasion.rawChance;
   const evasionTotal = stats.evasion.total;
   const percent = (chance: number): string => `${(chance * 100).toFixed(2)}%`;
-  const rawSources = Object.entries(stats.evasion.raw).filter(([, value]) => value !== 0).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>${value.toFixed(2)}</span></div>`).join('');
+  const rawSources = Object.entries(stats.evasion.raw).filter(([source, value]) => value !== 0 || source === 'minions').map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>${value.toFixed(2)}</span></div>`).join('');
   const directSources = Object.entries(stats.evasion.directChance).filter(([, value]) => value !== 0).map(([source, value]) => `<div class="stat-line"><span>From ${sourceLabel(source)}</span><span>+${percent(value)}</span></div>`).join('');
   const evasion = `<section class="stat-breakdown"><div class="stat-row"><span class="stat-title-with-icon">${evasionIcon(14)} Evasion</span><strong>${percent(evasionTotal)}</strong></div>${rawSources ? `<div class="stat-group-title">Raw Evasion</div>${rawSources}` : ''}<div class="stat-line stat-subtotal"><span>Raw total</span><span>${percent(evasionRawChance)}</span></div>${directSources ? `<div class="stat-group-title">Direct Evasion</div>${directSources}` : ''}<div class="stat-line stat-total"><span>Total</span><strong>${percent(evasionTotal)}</strong></div></section>`;
   const scaled = (label: string, stat: StatSnapshot, effective: number, suffix: string): string => `${renderBreakdown(`${label} (raw)`, stat, '', true)}<div class="stat-line stat-total"><span>Effective ${label.toLowerCase()}</span><strong>${effective.toFixed(2)}${suffix}</strong></div>`;
   const effectiveSpeedMultiplier = stats.speed.multiplier;
-  const speed = `${renderBreakdown('Speed (raw)', stats.speed, '', true)}<div class="stat-line stat-subtotal"><span>Speed multiplier</span><strong>x${effectiveSpeedMultiplier.toFixed(2)}</strong></div><div class="stat-line stat-total"><span>Effective speed</span><strong>${stats.speed.metersPerSecond.toFixed(2)} m/s</strong></div>`;
+  const speed = `${renderBreakdown('Speed (raw)', stats.speed, '', true, 1, true)}<div class="stat-line stat-subtotal"><span>Speed multiplier</span><strong>x${effectiveSpeedMultiplier.toFixed(2)}</strong></div><div class="stat-line stat-total"><span>Effective speed</span><strong>${stats.speed.metersPerSecond.toFixed(2)} m/s</strong></div>`;
   const attacks = (['blunt', 'slash', 'piercing'] as const).map((type) => {
     const profiles = stats.attacks.filter((profile) => profile.damageType === type);
     const label = `${sourceLabel(type)} attack`;
-    if (!profiles.length) return renderBreakdown(`${label} · no weapon equipped`, stats.attack[type], '', true);
-    return profiles.map(({ slot, sources }) => renderBreakdown(`${SLOT_LABELS[slot]} · ${label}`, sources, '', true)).join('');
+    if (!profiles.length) return renderBreakdown(`${label} · no weapon equipped`, stats.attack[type], '', true, 1, true);
+    return profiles.map(({ slot, sources }) => renderBreakdown(`${SLOT_LABELS[slot]} · ${label}`, sources, '', true, 1, true)).join('');
   }).join('');
   const souls = snapshot.soulCatcher.yields.filter(({ total }) => total > 0).map(({ type, base, additional: additions }) => `<div class="stat-line"><span>${sourceLabel(type)}</span><strong>${base} base + ${additions} Soul Catcher</strong></div>`).join('');
-  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp), attacks, renderBreakdown('Blunt defence', stats.defense.blunt, '', true), renderBreakdown('Slash defence', stats.defense.slash, '', true), renderBreakdown('Piercing defence', stats.defense.piercing, '', true), renderBreakdown('Blunt resistance', stats.damageResistance.blunt, '%', false, 100), renderBreakdown('Slash resistance', stats.damageResistance.slash, '%', false, 100), renderBreakdown('Piercing resistance', stats.damageResistance.piercing, '%', false, 100), renderBreakdown(regenLabel, stats.regen, ' HP/s'), speed, scaled('Critical hit chance', stats.criticalChance, stats.criticalChance.percent, '%'), scaled('Critical damage', stats.criticalDamage, stats.criticalDamage.bonusPercent, '%'), scaled('Block chance', stats.blockChance, stats.blockChance.percent, '%'), evasion, `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
+  ui.statsContent.innerHTML = [renderBreakdown(maxHpLabel, stats.maxHp, '', false, 1, true), attacks, renderBreakdown('Blunt defence', stats.defense.blunt, '', true), renderBreakdown('Slash defence', stats.defense.slash, '', true), renderBreakdown('Piercing defence', stats.defense.piercing, '', true), renderBreakdown('Blunt resistance', stats.damageResistance.blunt, '%', false, 100), renderBreakdown('Slash resistance', stats.damageResistance.slash, '%', false, 100), renderBreakdown('Piercing resistance', stats.damageResistance.piercing, '%', false, 100), renderBreakdown(regenLabel, stats.regen, ' HP/s', false, 1, true), speed, scaled('Critical hit chance', stats.criticalChance, stats.criticalChance.percent, '%'), scaled('Critical damage', stats.criticalDamage, stats.criticalDamage.bonusPercent, '%'), scaled('Block chance', stats.blockChance, stats.blockChance.percent, '%'), evasion, `<section class="stat-breakdown"><div class="stat-row"><span>Soul Drops</span></div>${souls}</section>`].join('');
 }
 
 const soulIcon = (type: SoulType): string => `<span class="soul-icon soul-${type}" aria-hidden="true"></span>`;
+
+const minionNumber = (value: number): string => value.toLocaleString(undefined, { maximumFractionDigits: 3 });
+const minionStatIcons: Record<LootType, string> = {
+  hp: heartIcon(17), regen: heartRegenIcon(17), speed: '<span aria-hidden="true">SPD</span>', evasion: evasionIcon(17),
+  blunt: damageTypeIcon('blunt', 17), slash: damageTypeIcon('slash', 17), piercing: damageTypeIcon('piercing', 17)
+};
+const minionStatLabels: Record<LootType, string> = {
+  hp: 'Max HP', regen: 'Health regeneration', speed: 'Movement speed', evasion: 'Evasion',
+  blunt: 'Blunt attack', slash: 'Slash attack', piercing: 'Piercing attack'
+};
+const minionStatCell = (label: string, icon: string, value: string): string =>
+  `<div class="minion-stat-cell" aria-label="${label}: ${value}"><span aria-hidden="true">${icon}</span><strong>${value}</strong></div>`;
+
+export function updateMinionCountdown(now = Date.now()): void {
+  for (const element of ui.minionCards.querySelectorAll<HTMLElement>('[data-respawn-at]')) {
+    const remaining = Math.max(0, Math.ceil((Number(element.dataset.respawnAt) - now) / 1000));
+    element.textContent = remaining ? `Respawning in ${remaining}s` : 'Reviving';
+  }
+}
+
+export function renderMinions(snapshot: ProgressionSnapshot): void {
+  const { minions, soulCatcher } = snapshot;
+  const cost = minions.nextSummonCost, atCapacity = minions.roster.length >= minions.activeCapacity;
+  const summonReason = !minions.unlockedEver ? 'Unlock minions in Soul Catcher' : atCapacity ? 'Roster full'
+    : !Number.isSafeInteger(cost) ? 'Summon cost is unavailable' : soulCatcher.balances.uncommon < cost ? 'Not enough Uncommon Souls' : '';
+  ui.minionSummon.disabled = !!summonReason;
+  ui.minionSummon.innerHTML = `Summon minion · ${Number.isSafeInteger(cost) ? minionNumber(cost) : '—'} ${soulIcon('uncommon')}`;
+  ui.minionSummonReason.textContent = summonReason;
+  ui.minionCards.innerHTML = minions.roster.length ? minions.roster.map((minion) => {
+    const statCells = [
+      minionStatCell('HP', heartIcon(17), `${minionNumber(minion.hp)} / ${minionNumber(minion.maxHp)}`),
+      minionStatCell('Health regeneration', heartRegenIcon(17), `${minionNumber(minion.stats.regenPerSecond)}/s`),
+      minionStatCell('Movement speed', minionStatIcons.speed, `${minionNumber(minion.stats.speedMetersPerSecond)} m/s`),
+      minionStatCell('Evasion', evasionIcon(17), `${minionNumber(minion.stats.evasionChancePercent)}%`),
+      ...(['blunt', 'slash', 'piercing'] as DamageType[]).flatMap((type) => [
+        minion.stats.attackByType[type] > 0 ? minionStatCell(`${sourceLabel(type)} attack`, damageTypeIcon(type, 17), minionNumber(minion.stats.attackByType[type])) : '',
+        minion.stats.defenseByType[type] > 0 ? minionStatCell(`${sourceLabel(type)} defence`, damageTypeDefenseIcon(type, 17), minionNumber(minion.stats.defenseByType[type])) : ''
+      ]).filter(Boolean)
+    ].join('');
+    const equipped = Object.entries(minion.equipment.equipped).flatMap(([slot, itemId]) => {
+      if (!itemId) return [];
+      const definition = EQUIPMENT_BY_ID.get(itemId), owned = minion.equipment.items.find((entry) => entry.itemId === itemId);
+      if (!definition || !owned) return [];
+      const icon = equipmentIcon(definition, { itemId, level: owned.level, ascend: owned.ascend }, 'slot') ?? damageTypeIcon(definition.damageType, 24);
+      return [`<div class="minion-equipment-item rarity-${definition.rarity}" aria-label="${SLOT_LABELS[slot as EquipmentSlotId]}: ${definition.name}, Level ${owned.level}, Ascend ${owned.ascend}">${icon}</div>`];
+    }).join('');
+    const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) =>
+      minionStatCell(`${sourceLabel(type)} Souls contributed`, soulIcon(type), minionNumber(minion.soulContributions[type]))).join('');
+    const status = minion.respawnAt === null ? `Area ${minion.areaId} · Active` : `<span data-respawn-at="${minion.respawnAt}"></span>`;
+    return `<article class="minion-card"><div class="minion-card-heading"><span class="minion-color minion-color-${minion.color}" aria-hidden="true"></span><strong>Imp ${minion.id.replace(/^minion-/, '#')}</strong><small>${status}</small></div><div class="minion-stat-grid">${statCells}</div><div class="minion-card-subtitle">Equipped</div><div class="minion-equipment-grid">${equipped || '<span class="minion-empty">None</span>'}</div><div class="minion-card-subtitle">Souls contributed</div><div class="minion-soul-grid">${souls}</div></article>`;
+  }).join('') : '<p class="minion-empty-roster">No minions summoned.</p>';
+  const { stats, copies } = minions.infusionPreview;
+  const statPreview = (Object.keys(minionStatLabels) as LootType[]).filter((type) => stats[type] !== 0).map((type) =>
+    minionStatCell(minionStatLabels[type], minionStatIcons[type], `+${minionNumber(stats[type])}`)).join('');
+  const copyPreview = Object.entries(copies).map(([itemId, quantity]) => {
+    const definition = EQUIPMENT_BY_ID.get(itemId);
+    if (!definition) return '';
+    const icon = equipmentIcon(definition, { itemId, level: quantity, ascend: 0 }, 'bag') ?? damageTypeIcon(definition.damageType, 20);
+    return `<div class="minion-copy-item" aria-label="${quantity} ${definition.name} copies transferred"><span aria-hidden="true">${icon}</span><strong>×${minionNumber(quantity)}</strong></div>`;
+  }).join('');
+  ui.minionInfusionPreview.innerHTML = `<h3>Hero infusion preview</h3><p>50% of kill-earned stats</p><div class="minion-stat-grid">${statPreview || '<span class="minion-empty">No stat gains yet</span>'}</div><p>100% of earned equipment copies</p><div class="minion-copy-grid">${copyPreview || '<span class="minion-empty">No copies earned yet</span>'}</div>`;
+  ui.minionSacrifice.disabled = minions.roster.length === 0;
+  updateMinionCountdown();
+}
+
 export function renderSoulCatcher(snapshot: ProgressionSnapshot, selectedId: string | null, currentLayer: number): void {
   const { soulCatcher } = snapshot, { layers } = soulCatcher;
   const layer = layers.find((entry) => entry.layer === currentLayer);

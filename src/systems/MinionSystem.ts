@@ -1,11 +1,11 @@
 import balance from '../data/balance.json';
 import { MINION_PIT } from '../data/world/minionPit';
-import { applyMinionDrop, createMinion, nextSummonCost } from '../domain/minions';
+import { applyMinionDrop, calculateInfusion, createMinion, nextSummonCost, type Infusion } from '../domain/minions';
 import { awardKillStat } from '../domain/stats/KillReward';
 import { statTotal } from '../domain/stats/StatSources';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { equipmentDamage, equipmentDefense } from '../domain/items/EquipmentProgression';
-import { attackProfile, equippedDefense } from './EquipmentSystem';
+import { applyEquipmentCopies, attackProfile, equippedDefense } from './EquipmentSystem';
 import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed } from './HeroStats';
 import type { DamageType, EquipmentSlotId, InventoryState, LootType, SaveData, SavedMinion, SoulType } from '../types';
 
@@ -45,6 +45,20 @@ export class MinionSystem {
     this.state.soulCatcher.balances.uncommon -= cost;
     progression.paidSummonCount += 1;
     return { minion: this.addMinion(), cost };
+  }
+
+  sacrifice(): Infusion | null {
+    if (!this.state.minions.roster.length) return null;
+    const infusion = calculateInfusion(this.state.minions.roster);
+    this.state.stats.maxHp.additive.minions += infusion.stats.hp;
+    this.state.stats.regen.additive.minions += infusion.stats.regen;
+    this.state.stats.speed.additive.minions += infusion.stats.speed;
+    this.state.stats.evasion.raw.minions += infusion.stats.evasion;
+    for (const type of ['blunt', 'slash', 'piercing'] as const) this.state.stats.attack[type].additive.minions += infusion.stats[type];
+    for (const [itemId, quantity] of Object.entries(infusion.copies)) applyEquipmentCopies(this.state, itemId, quantity);
+    // Runtime and save share this roster array; remove entries in place so enemy intent cannot retain sacrificed actors.
+    this.state.minions.roster.splice(0);
+    return infusion;
   }
 
   find(id: string): SavedMinion | null { return this.state.minions.roster.find((entry) => entry.id === id) ?? null; }

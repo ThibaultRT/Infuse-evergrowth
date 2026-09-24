@@ -1,4 +1,5 @@
 import type { CombatAffinity, CombatActorRef, DamageType, EquipmentSlotId, LootType, SoulType } from '../types';
+import type { Infusion } from '../domain/minions';
 
 export type GameEventMap = {
   enemyDamaged: { enemyId: string; owner: CombatActorRef; amount: number; damageType: DamageType; itemId: string; slot: import('../types').WeaponSlotId };
@@ -33,6 +34,7 @@ export type GameEventMap = {
   minionRespawned: { minionId: string };
   minionEquipmentChanged: { minionId: string; itemId: string; slot: EquipmentSlotId | null };
   minionProgressed: { minionId: string; sourceId: string; stat: LootType; amount: number; itemId: string | null; quantity: number; souls: { type: SoulType; quantity: number } | null };
+  minionsInfused: { minionIds: string[]; infusion: Infusion };
 };
 
 type Listener<T> = (event: T) => void;

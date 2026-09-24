@@ -34,6 +34,67 @@ try {
   assert.equal(state.minions.paidSummonCount, 0);
   assert.match(session.progressionSnapshot().soulCatcher.layers[0].nodes.find((node) => node.id === 'SC-M01').description, /already permanently unlocked/);
 
+  // Slice 7 commands persist once before events and cannot replay an unlock or infusion.
+  const commandState = fresh(), commandEvents = new GameEvents();
+  let commandWrites = 0, commandUnlocks = 0, infusions = 0;
+  commandEvents.on('minionsUnlocked', () => { commandUnlocks++; assert.equal(commandWrites, 1); assert.equal(commandState.minions.roster.length, 1); });
+  commandEvents.on('minionsInfused', ({ minionIds, infusion }) => {
+    infusions++;
+    assert.equal(commandWrites, 2);
+    assert.deepEqual(minionIds, ['minion-1', 'future-companion']);
+    assert.equal(infusion.stats.hp, 2);
+    assert.equal(infusion.copies['hammer-common'], 109);
+    assert.equal(commandState.minions.roster.length, 0);
+  });
+  const commandSession = new GameSession(commandState, commandEvents, () => { commandWrites++; }, clock, () => .4);
+  assert.equal(commandSession.commands.execute({ type: 'debugUnlockMinions' }), true);
+  assert.equal(commandSession.commands.execute({ type: 'debugUnlockMinions' }), false);
+  assert.equal(commandUnlocks, 1);
+  assert.equal(commandState.soulCatcher.xp, 0);
+  assert.equal(commandState.soulCatcher.balances.uncommon, 0);
+  assert.equal(commandSession.commands.execute({ type: 'summonMinion' }), false);
+  assert.equal(commandWrites, 1);
+  const first = commandState.minions.roster[0];
+  first.stats.maxHp.additive.kills = 3;
+  first.stats.evasion.raw.kills = .25;
+  first.stats.attack.blunt.additive.kills = 5;
+  first.copiesEarned['hammer-common'] = 101;
+  first.inventory.items['hammer-common'] = { itemId: 'hammer-common', level: 1, ascend: 2 };
+  first.soulContributions.common = 7;
+  const respawning = minionRules.createMinion('future-companion', () => .8);
+  respawning.stats.maxHp.additive.kills = 1;
+  respawning.copiesEarned['hammer-common'] = 8;
+  respawning.respawnAt = now.getTime() + 30000;
+  commandState.minions.roster.push(respawning);
+  const preview = commandSession.progressionSnapshot().minions.infusionPreview;
+  assert.equal(preview.stats.hp, 2);
+  assert.equal(preview.copies['hammer-common'], 109);
+  const heroHammerBefore = commandState.inventory.items['hammer-common']?.level ?? 0;
+  commandSession.runtime.hero.hp = 10;
+  assert.equal(commandSession.commands.execute({ type: 'sacrificeMinions' }), true);
+  assert.equal(commandSession.runtime.hero.hp, 12);
+  assert.equal(commandState.stats.maxHp.additive.minions, 2);
+  assert.equal(commandState.stats.evasion.raw.minions, .125);
+  assert.equal(commandState.stats.attack.blunt.additive.minions, 2.5);
+  assert.equal(commandState.inventory.items['hammer-common'].level, heroHammerBefore + 109);
+  assert.equal(commandState.inventory.items['hammer-common'].ascend, 0);
+  assert.equal(commandState.soulCatcher.balances.common, 0, 'sacrifice does not award Souls again');
+  assert.equal(commandSession.commands.execute({ type: 'sacrificeMinions' }), false);
+  assert.equal(infusions, 1);
+  assert.equal(commandWrites, 2);
+  commandState.soulCatcher.balances.uncommon = 29;
+  assert.equal(commandSession.commands.execute({ type: 'summonMinion' }), false);
+  assert.equal(commandState.minions.paidSummonCount, 0);
+  commandState.soulCatcher.balances.uncommon = 30;
+  assert.equal(commandSession.commands.execute({ type: 'summonMinion' }), true);
+  assert.equal(commandState.soulCatcher.balances.uncommon, 0);
+  assert.equal(commandState.minions.paidSummonCount, 1);
+  assert.equal(commandState.minions.roster[0].id, 'minion-2');
+  assert.equal(commandSession.progressionSnapshot().minions.nextSummonCost, 300);
+  commandSession.commands.execute({ type: 'resetSoulCatcher' });
+  assert.equal(commandState.minions.unlockedEver, true);
+  assert.equal(commandState.minions.paidSummonCount, 1);
+
   // Save migration, remote position, death deadline, and private equipment ledger.
   const owned = state.minions.roster[0];
   state.unlockedAreas.push(2);
@@ -44,6 +105,7 @@ try {
   assert.equal(owned.inventory.items['hammer-common'].ascend, 1);
   assert.equal(minionRules.nextSummonCost(0), 30);
   assert.equal(minionRules.nextSummonCost(1), 300);
+  assert.equal(minionRules.nextSummonCost(2), 3000);
   owned.stats.maxHp.additive.kills = 3;
   const infusion = minionRules.calculateInfusion([owned]);
   assert.equal(infusion.stats.hp, 1.5);

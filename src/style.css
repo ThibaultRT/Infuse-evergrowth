@@ -257,3 +257,36 @@ canvas { display: block; width: 100%; height: 100%; }
   font-size: 12px;
 }
 .minion-pit-button[hidden] { display: none; }
+.minion-sheet { width: min(520px, 100%); }
+.minion-header-actions { display: flex; align-items: flex-start; gap: 7px; }
+.minion-header-actions button, .minion-sacrifice { min-height: 44px; border: 1px solid #8a70b3; border-radius: 9px; background: #38274d; color: #f2e4ff; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
+.minion-header-actions #minion-summon { display: flex; align-items: center; gap: 4px; padding: 6px 9px; }
+.minion-header-actions .soul-icon { width: 20px; height: 20px; }
+.minion-header-actions button:disabled, .minion-sacrifice:disabled { opacity: .42; cursor: default; }
+.minion-summon-reason { min-height: 14px; margin: -5px 0 8px; color: #d8b7b7; font-size: 10px; text-align: right; }
+.minion-cards { display: grid; gap: 12px; }
+.minion-card { padding: 12px; border: 1px solid #ffffff1c; border-radius: 12px; background: #ffffff08; }
+.minion-card-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.minion-card-heading strong { font-size: 14px; }
+.minion-card-heading small { margin-left: auto; color: #d4c6e4; font-size: 10px; font-variant-numeric: tabular-nums; }
+.minion-color { width: 17px; height: 17px; flex: 0 0 17px; border-radius: 50%; border: 2px solid #ffffff9c; }
+.minion-color-variant-1 { background: #d64f44; }.minion-color-variant-2 { background: #8168c8; }.minion-color-variant-3 { background: #d9943b; }
+.minion-stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.minion-stat-cell { min-width: 0; min-height: 37px; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 3px; border-radius: 7px; background: #ffffff0b; color: #eee7f4; }
+.minion-stat-cell > span { display: inline-flex; align-items: center; font-size: 9px; font-weight: 800; }
+.minion-stat-cell strong { overflow: hidden; font-size: 12px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.minion-card-subtitle { margin: 11px 0 5px; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .55; }
+.minion-equipment-grid, .minion-soul-grid, .minion-copy-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+.minion-equipment-item, .minion-copy-item { min-width: 0; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 2px; border: 1px solid #ffffff18; border-radius: 8px; background: #ffffff0b; }
+.minion-equipment-item .equipment-icon, .minion-copy-item .equipment-icon { width: 37px; height: 37px; }
+.minion-copy-item strong { font-size: 10px; font-variant-numeric: tabular-nums; }
+.minion-copy-item .equipment-progress-number { display: none; }
+.minion-soul-grid .minion-stat-cell { flex-direction: column; gap: 1px; }
+.minion-soul-grid .soul-icon { width: 20px; height: 20px; }
+.minion-empty, .minion-empty-roster { font-size: 11px; opacity: .6; }
+.minion-empty-roster { margin: 20px 0; text-align: center; }
+.minion-infusion-preview { margin-top: 14px; padding: 12px; border: 1px solid #8a70b355; border-radius: 11px; background: #ad74f013; }
+.minion-infusion-preview h3 { margin: 0 0 7px; font-size: 14px; }
+.minion-infusion-preview p { margin: 10px 0 5px; font-size: 10px; font-weight: 800; }
+.minion-sacrifice { width: 100%; margin-top: 13px; padding: 9px; border-color: #de8792; background: #67323b; }
+@media (max-width: 430px) { .minion-header-actions { flex-direction: column-reverse; align-items: flex-end; }.minion-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

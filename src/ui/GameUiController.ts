@@ -1,24 +1,26 @@
 import type { EquipmentSlotId } from '../types';
 import type { GameSession } from '../game/GameSession';
 import type { RenderingQualitySettings } from '../rendering/RenderingQuality';
-import { confirmReset, renderInventory, renderItemDetail, renderProgressionHud, renderSoulCatcher, renderStats, showToast, ui } from '../ui';
+import { confirmReset, renderInventory, renderItemDetail, renderMinions, renderProgressionHud, renderSoulCatcher, renderStats, showToast, ui, updateMinionCountdown } from '../ui';
 
 /** HTML interaction only. Panels never change the simulation or render loop. */
 export function mountGameUi(session: GameSession, quality: { current: () => RenderingQualitySettings; apply: (next: RenderingQualitySettings) => void }, updateHud: () => void): void {
 const { commands, events } = session;
 const readSnapshot = (): ReturnType<GameSession['progressionSnapshot']> => session.progressionSnapshot();
 const refreshStats = (): void => renderStats(readSnapshot());
+let minionCountdownTimer: number | null = null;
 function setStatsPanel(open: boolean): void {
   if (open) closeOtherPanels('stats');
   ui.statsPanel.classList.toggle('visible', open);
   ui.statsPanel.setAttribute('aria-hidden', String(!open));
   if (open) refreshStats();
 }
-function closeOtherPanels(except: 'stats' | 'inventory' | 'settings' | 'soul'): void {
-  for (const [name, panel] of [['stats', ui.statsPanel], ['inventory', ui.inventoryPanel], ['settings', ui.settingsPanel], ['soul', ui.soulCatcherPanel]] as const) {
+function closeOtherPanels(except: 'stats' | 'inventory' | 'settings' | 'soul' | 'minions'): void {
+  for (const [name, panel] of [['stats', ui.statsPanel], ['inventory', ui.inventoryPanel], ['settings', ui.settingsPanel], ['soul', ui.soulCatcherPanel], ['minions', ui.minionPanel]] as const) {
     if (name === except) continue;
     panel.classList.remove('visible');
     panel.setAttribute('aria-hidden', 'true');
+    if (name === 'minions' && minionCountdownTimer !== null) { window.clearInterval(minionCountdownTimer); minionCountdownTimer = null; }
   }
 }
 function setInventoryPanel(open: boolean): void {
@@ -44,6 +46,9 @@ function setSettingsPanel(open: boolean): void {
 }
 ui.statsButton.addEventListener('click', () => setStatsPanel(true));
 ui.spawnButton.addEventListener('click', () => { const count = session.resetSpawnCooldowns(); showToast(count ? `Spawned ${count} targets` : 'No spawn cooldowns active'); });
+ui.debugUnlockMinions?.addEventListener('click', () => {
+  if (commands.execute({ type: 'debugUnlockMinions' })) { updateHud(); showToast('Minions unlocked'); }
+});
 ui.statsClose.addEventListener('click', () => setStatsPanel(false));
 ui.statsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.statsPanel) setStatsPanel(false); });
 ui.inventoryButton.addEventListener('click', () => setInventoryPanel(true));
@@ -61,6 +66,25 @@ function setSoulCatcherPanel(open: boolean): void {
 ui.soulCatcherButton.addEventListener('click', () => setSoulCatcherPanel(true));
 ui.soulCatcherClose.addEventListener('click', () => setSoulCatcherPanel(false));
 ui.soulCatcherPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.soulCatcherPanel) setSoulCatcherPanel(false); });
+function setMinionPanel(open: boolean): void {
+  if (open && !readSnapshot().minions.unlockedEver) return;
+  if (open) closeOtherPanels('minions');
+  ui.minionPanel.classList.toggle('visible', open);
+  ui.minionPanel.setAttribute('aria-hidden', String(!open));
+  if (minionCountdownTimer !== null) { window.clearInterval(minionCountdownTimer); minionCountdownTimer = null; }
+  if (open) { renderMinions(readSnapshot()); minionCountdownTimer = window.setInterval(() => updateMinionCountdown(), 1000); }
+}
+ui.minionPitButton.addEventListener('click', () => setMinionPanel(true));
+ui.minionClose.addEventListener('click', () => setMinionPanel(false));
+ui.minionPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.minionPanel) setMinionPanel(false); });
+ui.minionSummon.addEventListener('click', () => {
+  if (commands.execute({ type: 'summonMinion' })) { updateHud(); showToast('Minion summoned'); }
+});
+ui.minionSacrifice.addEventListener('click', async () => {
+  if (!readSnapshot().minions.roster.length) return;
+  const confirmed = await confirmReset('Permanently sacrifice every minion, including any awaiting respawn? The hero gains 50% of their kill-earned stats and 100% of their earned equipment copies. Souls were already credited and will not be awarded again. This cannot be undone.', 'Sacrifice');
+  if (confirmed && commands.execute({ type: 'sacrificeMinions' })) { updateHud(); showToast('Minions infused into the hero'); }
+});
 ui.soulLayerTabs.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-soul-layer]'); const layer = Number(button?.dataset.soulLayer); if (!layer || !readSnapshot().soulCatcher.layers.find((entry) => entry.layer === layer)?.unlocked) return; selectedSoulLayer = layer; selectedSoulNode = null; refreshSoulTree(); });
 ui.soulNodes.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLElement>('[data-soul-node]'); if (!button?.dataset.soulNode) return; selectedSoulNode = button.dataset.soulNode; refreshSoulTree(); });
 ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (commands.execute({ type: 'purchaseSoulNode', nodeId: button.dataset.purchaseSoul })) { updateHud(); } });
@@ -169,9 +193,12 @@ const refreshProgression = (): void => {
       else showInventoryOverview(inventoryView.overviewScrollTop);
     }
     if (ui.soulCatcherPanel.classList.contains('visible')) renderSoulCatcher(snapshot, selectedSoulNode, selectedSoulLayer);
+    if (ui.minionPanel.classList.contains('visible')) renderMinions(snapshot);
+    if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = snapshot.minions.unlockedEver;
   });
 };
-for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated'] as const) events.on(event, refreshProgression);
+for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated', 'minionsUnlocked', 'minionSummoned', 'minionDamaged', 'minionDefeated', 'minionRespawned', 'minionEquipmentChanged', 'minionProgressed', 'minionsInfused'] as const) events.on(event, refreshProgression);
 renderQualityControls();
 renderProgressionHud(readSnapshot());
+if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = readSnapshot().minions.unlockedEver;
 }

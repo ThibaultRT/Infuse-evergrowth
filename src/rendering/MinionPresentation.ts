@@ -20,7 +20,14 @@ export class MinionPresentation {
     if (pitVisible && !this.pit) { this.pit = new SummoningPitView(); this.scene.add(this.pit.root); }
     if (!pitVisible && this.pit) { this.pit.dispose(); this.pit = null; }
     this.button.hidden = !this.pit;
-    if (this.pit) this.worldUi.project(this.pit.root.position, this.button, MINION_PIT.labelHeight);
+    this.button.disabled = !this.pit;
+    if (this.pit && this.worldUi.project(this.pit.root.position, this.button, MINION_PIT.labelHeight)) {
+      const width = this.button.parentElement?.clientWidth ?? window.innerWidth;
+      const height = this.button.parentElement?.clientHeight ?? window.innerHeight;
+      const halfWidth = this.button.offsetWidth / 2;
+      this.button.style.left = `${Math.max(halfWidth + 8, Math.min(width - halfWidth - 8, parseFloat(this.button.style.left)))}px`;
+      this.button.style.top = `${Math.max(this.button.offsetHeight + 8, Math.min(height - 8, parseFloat(this.button.style.top)))}px`;
+    }
     const visible = new Set<string>();
     if (unlocked) for (const minion of roster) {
       const limit = this.views.has(minion.id) ? VISUAL_STREAMING.enemyDeactivateDistance : VISUAL_STREAMING.enemyActivateDistance;
