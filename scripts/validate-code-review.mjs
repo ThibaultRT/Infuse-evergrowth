@@ -357,6 +357,45 @@ try {
     for (const slot of ['hand1','orbit1','orbit2','orbit3']) assert.ok(hits.includes(slot));
     assert.ok(hits.filter(s=>s==='orbit2').length > hits.filter(s=>s==='orbit1').length);
   });
+  await check('Only hostile combat suppresses the out-of-combat regeneration bonus', () => {
+    const state = fresh(), events = new GameEvents();
+    state.stats.evasion.directChance.other = 1;
+    const session = new GameSession(state, events, () => {}, clock, () => 0);
+    for (const spawn of session.runtime.spawns) session.runtime.setSpawnAlive(spawn.id, false);
+    const regen = persistence.statTotal(state.stats.regen);
+    session.runtime.hero.hp = 1;
+    session.update(.05, { x: 0, y: 0 });
+    near(session.runtime.hero.hp, 1 + regen * config.HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER * .05);
+    assert.equal(session.progressionSnapshot().stats.regen.total, regen, 'The displayed stat must remain unmodified');
+
+    session.runtime.hero.hp = 1;
+    session.damageHero(100, 'blunt');
+    assert.equal(session.runtime.hero.hp, 1, 'An evaded attack must not deal damage');
+    assert.equal(session.runtime.hero.combatRemainingSeconds, config.HERO_COMBAT_EXIT_DELAY_SECONDS);
+    session.update(.05, { x: 0, y: 0 }, config.HERO_COMBAT_EXIT_DELAY_SECONDS - .01);
+    near(session.runtime.hero.hp, 1 + regen * .05);
+    session.update(.05, { x: 0, y: 0 }, .01);
+    near(session.runtime.hero.hp, 1 + regen * .05 + regen * config.HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER * .05);
+    assert.equal(session.runtime.hero.combatRemainingSeconds, 0);
+    assert.equal('combatRemainingSeconds' in state, false, 'Transient combat state must not enter the save');
+  });
+  await check('Hero attacks enter combat for hostile enemies but not passive crystals', () => {
+    const hostileState = fresh(), hostileSession = new GameSession(hostileState, new GameEvents(), () => {}, clock, () => .99);
+    const hostile = hostileSession.runtime.spawns.find((spawn) => spawn.hostile);
+    for (const spawn of hostileSession.runtime.spawns) hostileSession.runtime.setSpawnAlive(spawn.id, spawn === hostile);
+    hostile.hp = 10000000; hostile.attackCooldown = 100;
+    hostileSession.runtime.hero.position = { ...hostile.position };
+    hostileSession.update(.01, { x: 0, y: 0 });
+    assert.equal(hostileSession.runtime.hero.combatRemainingSeconds, config.HERO_COMBAT_EXIT_DELAY_SECONDS);
+
+    const passiveState = fresh(), passiveSession = new GameSession(passiveState, new GameEvents(), () => {}, clock, () => .99);
+    const crystal = passiveSession.runtime.spawnById.get(spawnId);
+    for (const spawn of passiveSession.runtime.spawns) passiveSession.runtime.setSpawnAlive(spawn.id, spawn === crystal);
+    crystal.hp = 10000000;
+    passiveSession.runtime.hero.position = { ...crystal.position };
+    passiveSession.update(.01, { x: 0, y: 0 });
+    assert.equal(passiveSession.runtime.hero.combatRemainingSeconds, 0);
+  });
   await check('One backup survives a corrupt primary and rotates only from valid saves', () => {
     const storage = memory(), state = fresh();
     state.stats.attack.blunt.additive.kills = 10;

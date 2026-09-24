@@ -24,6 +24,7 @@ export type RuntimeHero = {
   position: Position;
   hp: number;
   dead: boolean;
+  combatRemainingSeconds: number;
   respawnRemaining: number;
   moving: boolean;
   facing: number;
@@ -80,6 +81,7 @@ export class GameplayRuntime {
       position: { x: area.originX, y: 0, z: area.originZ },
       hp: options.heroHp,
       dead: options.heroHp <= 0,
+      combatRemainingSeconds: 0,
       respawnRemaining: options.heroHp <= 0 ? options.heroRespawnSeconds : 0,
       moving: false,
       facing: 0
@@ -106,8 +108,14 @@ export class GameplayRuntime {
 
   setHeroSpeed(heroSpeed: number): void { this.options.heroSpeed = heroSpeed; }
 
+  enterHeroCombat(durationSeconds: number): void {
+    if (this.hero.dead) return;
+    this.hero.combatRemainingSeconds = Math.max(this.hero.combatRemainingSeconds, durationSeconds);
+  }
+
   update(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean, elapsedSeconds = dt): GameplayRuntimeEvent[] {
     const events: GameplayRuntimeEvent[] = [];
+    this.hero.combatRemainingSeconds = Math.max(0, this.hero.combatRemainingSeconds - elapsedSeconds);
     if (this.hero.dead) {
       this.hero.moving = false;
       this.hero.respawnRemaining = Math.max(0, this.hero.respawnRemaining - elapsedSeconds);

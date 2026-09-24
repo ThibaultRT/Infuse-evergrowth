@@ -1,4 +1,4 @@
-import { AREAS, BASE_RESPAWN_MS, BLOCKED_DAMAGE_MULTIPLIER, ENEMY_AGGRO_RADIUS_METERS, ENEMY_ATTACK_COOLDOWN, ENEMY_ATTACK_RANGE_METERS, ENEMY_LEASH_RADIUS_METERS, ENEMY_POSITIONING_RANGE_METERS, HERO_ATTACK_RANGE_METERS, HERO_RESPAWN_DELAY_MS, SPAWNS, TIER_CONFIG, WORLD_CONNECTIONS, areaById } from '../config';
+import { AREAS, BASE_RESPAWN_MS, BLOCKED_DAMAGE_MULTIPLIER, ENEMY_AGGRO_RADIUS_METERS, ENEMY_ATTACK_COOLDOWN, ENEMY_ATTACK_RANGE_METERS, ENEMY_LEASH_RADIUS_METERS, ENEMY_POSITIONING_RANGE_METERS, HERO_ATTACK_RANGE_METERS, HERO_COMBAT_EXIT_DELAY_SECONDS, HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER, HERO_RESPAWN_DELAY_MS, SPAWNS, TIER_CONFIG, WORLD_CONNECTIONS, areaById } from '../config';
 import { localDailyKey, nextLocalMidnightMs } from '../save';
 import type { CombatAffinity, SaveData, SpawnDefinition, WeaponSlotId } from '../types';
 import { CombatSystem } from '../systems/CombatSystem';
@@ -73,13 +73,17 @@ export class GameSession {
     }
     this.reviveDueSpawns();
     this.autoAttack();
-    if (!this.runtime.hero.dead) this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + heroRegen(this.state.stats) * dt);
+    if (!this.runtime.hero.dead) {
+      const multiplier = this.runtime.hero.combatRemainingSeconds > 0 ? 1 : HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER;
+      this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + heroRegen(this.state.stats) * multiplier * dt);
+    }
     this.healthPersistSeconds += dt;
     if (this.healthPersistSeconds >= 1) { this.healthPersistSeconds = 0; this.persist(); }
   }
 
   damageHero(amount: number, type: CombatAffinity): void {
     if (this.runtime.hero.dead) return;
+    this.runtime.enterHeroCombat(HERO_COMBAT_EXIT_DELAY_SECONDS);
     if (this.combat.rollChance(heroEvasionChance(this.state.stats), this.random)) {
       this.events.emit('heroEvaded', { damageType: type });
       return;
@@ -111,6 +115,7 @@ export class GameSession {
       const amount = this.combat.heroAttackDamage(profile.damage * (critical ? heroCriticalDamageMultiplier(this.state.stats) : 1), profile.damageType, target.weakness);
       const hit = this.runtime.damageSpawn(target.spawn.id, amount);
       if (!hit) continue;
+      if (target.spawn.hostile) this.runtime.enterHeroCombat(HERO_COMBAT_EXIT_DELAY_SECONDS);
       if (slot === 'hand1') {
         const dx = target.spawn.position.x - this.runtime.hero.position.x, dz = target.spawn.position.z - this.runtime.hero.position.z;
         if (dx !== 0 || dz !== 0) this.runtime.hero.facing = Math.atan2(dx, dz);

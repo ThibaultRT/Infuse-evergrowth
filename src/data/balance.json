@@ -19,6 +19,8 @@
     "evasionRawTarget": 50000,
     "evasionChanceCap": 0.8,
     "attackRangeMeters": 2.15,
+    "combatExitDelaySeconds": 5,
+    "outOfCombatRegenMultiplier": 10,
     "respawnDelaySeconds": 5
   },
   "affinities": {
