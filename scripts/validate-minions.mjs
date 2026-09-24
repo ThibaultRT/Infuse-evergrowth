@@ -206,6 +206,27 @@ try {
   deathSession.minionAI.update(.05);
   assert.notEqual(deathSession.minionAI.mode(survivor.id), 'recovering');
 
+  // A minion's hit takes aggro from a nearby hero; losing that minion restores normal targeting.
+  const aggroState = fresh();
+  aggroState.minions.unlockedEver = true;
+  const defender = minionRules.createMinion('minion-1', () => 0);
+  aggroState.minions.roster.push(defender);
+  const aggroSession = new GameSession(aggroState, new GameEvents(), () => {}, clock, () => .99);
+  const aggroDefinition = config.SPAWNS.find((spawn) => spawn.areaId === 1 && spawn.tier === 'common');
+  const hostile = aggroSession.runtime.spawnById.get(aggroDefinition.id);
+  aggroSession.runtime.hero.position = { ...hostile.position };
+  defender.position = { x: hostile.position.x + .1, z: hostile.position.z };
+  const firstAttack = aggroSession.runtime.update(.05, { x: 0, y: 0 }, true).find((event) => event.type === 'enemyAttack' && event.spawnId === hostile.id);
+  assert.equal(firstAttack?.target.kind, 'hero', 'the closer hero starts as the enemy target');
+  hostile.attackCooldown = 0;
+  assert.ok(aggroSession.runtime.damageSpawn(hostile.id, 1, { kind: 'minion', minionId: defender.id }));
+  const retaliation = aggroSession.runtime.update(.05, { x: 0, y: 0 }, true).find((event) => event.type === 'enemyAttack' && event.spawnId === hostile.id);
+  assert.deepEqual(retaliation?.target, { kind: 'minion', minionId: defender.id });
+  defender.hp = 0; defender.respawnAt = now.getTime() + 30000;
+  hostile.attackCooldown = 0;
+  const fallback = aggroSession.runtime.update(.05, { x: 0, y: 0 }, true).find((event) => event.type === 'enemyAttack' && event.spawnId === hostile.id);
+  assert.equal(fallback?.target.kind, 'hero', 'a dead minion cannot retain enemy aggro');
+
   // Remote lethal hits credit only their minion and persist a single owner.
   const combatState = fresh();
   combatState.defeatedBosses.push('area2-rare-01');
@@ -252,5 +273,5 @@ try {
   assert.equal(simultaneousState.spawns[localTarget.id].killsToday, 1);
   assert.equal(heroRewards + partnerRewards, 1);
 
-  console.log(`Minion validation passed: unlock/reset, migration, infusion math, crossing, remote AI kill, equipment, death/recovery, and single-owner combat. Navigation initial graph: ${navigationMs.toFixed(1)} ms.`);
+  console.log(`Minion validation passed: unlock/reset, migration, infusion math, crossing, remote AI kill, equipment, death/recovery, attacker aggro, and single-owner combat. Navigation initial graph: ${navigationMs.toFixed(1)} ms.`);
 } finally { await vite.close(); }

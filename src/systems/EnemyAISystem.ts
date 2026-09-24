@@ -14,14 +14,14 @@ export class EnemyAISystem {
     private readonly positioningRange: number
   ) {}
 
-  update(state: EnemyAIState, distanceToHero: number, distanceFromSpawn: number, dt: number): EnemyAIIntent {
+  update(state: EnemyAIState, distanceToTarget: number, distanceFromSpawn: number, dt: number): EnemyAIIntent {
     state.attackCooldown = Math.max(0, state.attackCooldown - dt);
-    if (!state.provoked && distanceToHero <= this.aggroRadius && distanceFromSpawn < this.leashRadius) state.provoked = true;
+    if (!state.provoked && distanceToTarget <= this.aggroRadius && distanceFromSpawn < this.leashRadius) state.provoked = true;
     if (state.provoked && distanceFromSpawn >= this.leashRadius) state.provoked = false;
     if (!state.provoked) return distanceFromSpawn > .08 ? 'return' : 'idle';
-    if (distanceToHero > this.attackRange) return 'chase';
+    if (distanceToTarget > this.attackRange) return 'chase';
     if (state.attackCooldown === 0) return 'attack';
-    // Keep closing during cooldown until the hero is comfortably inside retaliation range.
-    return distanceToHero > this.positioningRange ? 'chase' : 'idle';
+    // Keep closing during cooldown until the target is comfortably inside retaliation range.
+    return distanceToTarget > this.positioningRange ? 'chase' : 'idle';
   }
 }

@@ -89,7 +89,7 @@ export class GameSession {
     for (const attack of this.minionAI.update(dt)) {
       const minion = this.minions.find(attack.minionId), target = this.runtime.spawnById.get(attack.spawnId);
       if (!minion || minion.respawnAt !== null || !target?.alive) continue;
-      const hit = this.runtime.damageSpawn(attack.spawnId, attack.amount, minion.areaId);
+      const hit = this.runtime.damageSpawn(attack.spawnId, attack.amount, { kind: 'minion', minionId: minion.id });
       if (!hit) continue;
       this.events.emit('enemyDamaged', { enemyId: attack.spawnId, owner: { kind: 'minion', minionId: minion.id }, amount: attack.amount, damageType: attack.damageType, itemId: attack.itemId, slot: attack.slot });
       if (hit.defeated) {
@@ -162,7 +162,7 @@ export class GameSession {
       this.combat.schedule(slot, profile.cooldownSeconds);
       const critical = this.combat.rollChance(heroCriticalChance(this.state.stats), this.random);
       const amount = this.combat.heroAttackDamage(profile.damage * (critical ? heroCriticalDamageMultiplier(this.state.stats) : 1), profile.damageType, target.weakness);
-      const hit = this.runtime.damageSpawn(target.spawn.id, amount);
+      const hit = this.runtime.damageSpawn(target.spawn.id, amount, { kind: 'hero' });
       if (!hit) continue;
       if (target.spawn.hostile) this.runtime.enterHeroCombat(HERO_COMBAT_EXIT_DELAY_SECONDS);
       if (slot === 'hand1') {

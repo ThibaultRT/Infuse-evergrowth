@@ -188,11 +188,20 @@ export class GameplayRuntime {
     return events;
   }
 
-  damageSpawn(id: string, amount: number, actorAreaId = this.currentAreaId): { hp: number; defeated: boolean } | null {
+  damageSpawn(id: string, amount: number, attacker: CombatActorRef): { hp: number; defeated: boolean } | null {
     const spawn = this.spawnById.get(id);
+    const actorAreaId = attacker.kind === 'hero' ? this.currentAreaId
+      : this.options.minions?.find((minion) => minion.id === attacker.minionId && minion.respawnAt === null && minion.hp > 0)?.areaId;
     if (!spawn?.alive || spawn.definition.areaId !== actorAreaId) return null;
     spawn.hp = Math.max(0, spawn.hp - amount);
-    if (spawn.hostile) spawn.provoked = true;
+    if (spawn.hostile) {
+      spawn.provoked = true;
+      // The actor that landed the hit gets retaliation, even when another actor is closer.
+      spawn.target = attacker;
+      spawn.targetPath = [];
+      spawn.targetWaypoint = 0;
+      spawn.pathRefresh = 0;
+    }
     if (spawn.hp === 0) spawn.alive = false;
     return { hp: spawn.hp, defeated: spawn.hp === 0 };
   }
