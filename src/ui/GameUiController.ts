@@ -79,30 +79,55 @@ function setMinionPanel(open: boolean): void {
 ui.minionPitButton.addEventListener('click', () => setMinionPanel(true));
 ui.minionClose.addEventListener('click', () => setMinionPanel(false));
 ui.minionPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.minionPanel) setMinionPanel(false); });
-ui.minionSummon.addEventListener('click', () => {
-  if (commands.execute({ type: 'summonMinion' })) { updateHud(); showToast('Minion summoned'); }
-});
-ui.minionSacrifice.addEventListener('click', async () => {
-  if (!readSnapshot().minions.roster.length) return;
-  const confirmed = await confirmReset('Permanently sacrifice every minion, including any awaiting respawn? The hero gains 50% of their kill-earned stats and 100% of their earned equipment copies. Souls were already credited and will not be awarded again. This cannot be undone.', 'Sacrifice');
-  if (confirmed && commands.execute({ type: 'sacrificeMinions' })) { updateHud(); showToast('Minions infused into the hero'); }
+ui.minionCards.addEventListener('click', async (event) => {
+  const target = event.target as HTMLElement;
+  const summon = target.closest<HTMLButtonElement>('[data-summon-slot]');
+  if (summon) {
+    const slotId = Number(summon.dataset.summonSlot);
+    if ((slotId === 1 || slotId === 2 || slotId === 3) && commands.execute({ type: 'summonMinion', slotId })) { updateHud(); showToast(`Imp summoned in slot ${slotId}`); }
+    return;
+  }
+  const sacrifice = target.closest<HTMLButtonElement>('[data-sacrifice-minion]');
+  const minion = readSnapshot().minions.roster.find((entry) => entry.id === sacrifice?.dataset.sacrificeMinion);
+  if (!minion) return;
+  const { stats, copies } = minion.infusionPreview;
+  const colorName = { 'variant-1': 'red', 'variant-2': 'violet', 'variant-3': 'amber' }[minion.color];
+  const gains = Object.entries(stats).filter(([, value]) => value > 0).map(([name, value]) => `${value.toLocaleString()} ${name}`).join(', ') || 'no stats yet';
+  const equipment = Object.entries(copies).map(([id, count]) => `${count} ${id}`).join(', ') || 'no equipment yet';
+  const confirmed = await confirmReset(`Permanently sacrifice the ${colorName} Imp ${minion.id} in slot ${minion.slotId}, including if it is awaiting respawn? The hero receives ${gains} and ${equipment}. Souls were already credited. This cannot be undone.`, 'Sacrifice');
+  if (confirmed && commands.execute({ type: 'sacrificeMinion', minionId: minion.id })) { updateHud(); showToast(`Imp in slot ${minion.slotId} infused into the hero`); }
 });
 ui.soulLayerTabs.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-soul-layer]'); const layer = Number(button?.dataset.soulLayer); if (!layer || !readSnapshot().soulCatcher.layers.find((entry) => entry.layer === layer)?.unlocked) return; selectedSoulLayer = layer; selectedSoulNode = null; refreshSoulTree(); });
 ui.soulNodes.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLElement>('[data-soul-node]'); if (!button?.dataset.soulNode) return; selectedSoulNode = button.dataset.soulNode; refreshSoulTree(); });
 ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (commands.execute({ type: 'purchaseSoulNode', nodeId: button.dataset.purchaseSoul })) { updateHud(); } });
-const treePointers = new Map<number, { x: number; y: number }>();
+const treePointers = new Map<number, { x: number; y: number; startX: number; startY: number; dragging: boolean }>();
 let treeX = -170, treeY = -190, treeScale = 1, pinchDistance = 0;
 const transformTree = (): void => { ui.soulTree.style.transform = `translate(${treeX}px,${treeY}px) scale(${treeScale})`; };
-ui.soulTreeViewport.addEventListener('pointerdown', (event) => { treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); ui.soulTreeViewport.setPointerCapture(event.pointerId); });
+const captureTreePointer = (pointerId: number): void => { if (!ui.soulTreeViewport.hasPointerCapture(pointerId)) ui.soulTreeViewport.setPointerCapture(pointerId); };
+ui.soulTreeViewport.addEventListener('pointerdown', (event) => {
+  treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, dragging: false });
+  if (treePointers.size > 1) {
+    for (const [pointerId, pointer] of treePointers) { pointer.dragging = true; captureTreePointer(pointerId); }
+    const [first, second] = [...treePointers.values()];
+    pinchDistance = Math.hypot(first.x - second.x, first.y - second.y);
+  } else if (!(event.target as Element).closest('[data-soul-node]')) captureTreePointer(event.pointerId);
+});
 ui.soulTreeViewport.addEventListener('pointermove', (event) => {
   const previous = treePointers.get(event.pointerId); if (!previous) return;
-  treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); const points = [...treePointers.values()];
-  if (points.length === 1) { treeX += event.clientX - previous.x; treeY += event.clientY - previous.y; }
+  const dx = event.clientX - previous.x, dy = event.clientY - previous.y;
+  previous.x = event.clientX; previous.y = event.clientY;
+  const points = [...treePointers.values()];
+  if (points.length === 1) {
+    if (!previous.dragging && Math.hypot(event.clientX - previous.startX, event.clientY - previous.startY) < 5) return;
+    if (!previous.dragging) { previous.dragging = true; captureTreePointer(event.pointerId); }
+    treeX += dx; treeY += dy;
+  }
   else { const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); if (pinchDistance) treeScale = Math.max(.55, Math.min(1.6, treeScale * distance / pinchDistance)); pinchDistance = distance; }
   transformTree();
 });
 const endTreePointer = (event: PointerEvent): void => { treePointers.delete(event.pointerId); pinchDistance = 0; };
-ui.soulTreeViewport.addEventListener('lostpointercapture', endTreePointer); ui.soulTreeViewport.addEventListener('pointerup', endTreePointer); ui.soulTreeViewport.addEventListener('pointercancel', endTreePointer); transformTree();
+ui.soulTreeViewport.addEventListener('lostpointercapture', (event) => { if (event.target === ui.soulTreeViewport) endTreePointer(event); });
+ui.soulTreeViewport.addEventListener('pointerup', endTreePointer); ui.soulTreeViewport.addEventListener('pointercancel', endTreePointer); transformTree();
 ui.settingsButton.addEventListener('click', () => setSettingsPanel(true));
 ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
 ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
@@ -200,7 +225,7 @@ const refreshProgression = (): void => {
     if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = snapshot.minions.unlockedEver;
   });
 };
-for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated', 'minionsUnlocked', 'minionSummoned', 'minionDamaged', 'minionDefeated', 'minionRespawned', 'minionEquipmentChanged', 'minionProgressed', 'minionsInfused'] as const) events.on(event, refreshProgression);
+for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated', 'minionSlotUnlocked', 'minionSummoned', 'minionDamaged', 'minionDefeated', 'minionRespawned', 'minionEquipmentChanged', 'minionProgressed', 'minionInfused'] as const) events.on(event, refreshProgression);
 events.on('minionVitalsChanged', () => { if (ui.minionPanel.classList.contains('visible')) refreshProgression(); });
 renderQualityControls();
 renderProgressionHud(readSnapshot());

@@ -392,6 +392,7 @@ events.on('enemyDamaged', ({ enemyId, owner, amount, damageType, itemId, slot })
 });
 events.on('minionDamaged', ({ minionId }) => minionPresentation.damaged(minionId));
 events.on('minionDefeated', ({ minionId }) => minionPresentation.remove(minionId));
+events.on('minionInfused', ({ minionId }) => minionPresentation.remove(minionId));
 events.on('enemyDefeated', ({ enemyId }) => entityById.get(enemyId)?.presentDefeat());
 events.on('enemyRespawned', ({ enemyId }) => entityById.get(enemyId)?.presentRespawn());
 events.on('weaponAttacked', ({ slot, targetId }) => {
@@ -568,7 +569,7 @@ function frame(now: number): void {
   entities.forEach((entity) => entity.syncTransform());
   entities.forEach((entity) => entity.updateView(dt));
   cameraController.update(dt, now);
-  minionPresentation.update(dt, save.minions.unlockedEver, save.minions.roster, gameplay.hero.position, (id) => !minionsPaused && session.minionAI.mode(id) === 'moving');
+  minionPresentation.update(dt, Object.values(save.minions.unlockedSlots).some(Boolean), save.minions.roster, gameplay.hero.position, (id) => !minionsPaused && session.minionAI.mode(id) === 'moving');
   environmentOcclusion.update(hero.position, dt);
   updateHud();
   worldUi.update(dt);

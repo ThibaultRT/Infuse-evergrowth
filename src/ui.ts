@@ -102,11 +102,8 @@ app.innerHTML = `
     </div>
     <div id="minion-panel" class="modal-panel minion-panel" aria-hidden="true">
       <div class="card modal-sheet minion-sheet">
-        <div class="modal-header"><div><div class="brand">Summoning Pit</div><h2>Minions</h2></div><div class="minion-header-actions"><button id="minion-summon" type="button">Summon minion</button><button id="minion-close" class="modal-close" type="button">CLOSE</button></div></div>
-        <p id="minion-summon-reason" class="minion-summon-reason"></p>
+        <div class="modal-header"><div><div class="brand">Summoning Pit</div><h2>Minions</h2></div><button id="minion-close" class="modal-close" type="button">CLOSE</button></div>
         <div id="minion-cards" class="minion-cards"></div>
-        <section id="minion-infusion-preview" class="minion-infusion-preview"></section>
-        <button id="minion-sacrifice" class="minion-sacrifice" type="button">Sacrifice minions and infuse the hero</button>
       </div>
     </div>
     <div id="settings-panel" class="modal-panel" aria-hidden="true">
@@ -173,9 +170,7 @@ export const ui = {
   statsContent: q<HTMLDivElement>('#stats-content'), canvasHost: q<HTMLDivElement>('#canvas-host'),
   inventoryButton: q<HTMLButtonElement>('#inventory-button'), inventoryPanel: q<HTMLDivElement>('#inventory-panel'),
   soulCatcherButton: q<HTMLButtonElement>('#soul-catcher-button'), soulCatcherPanel: q<HTMLDivElement>('#soul-catcher-panel'), soulCatcherClose: q<HTMLButtonElement>('#soul-catcher-close'),
-  minionPanel: q<HTMLDivElement>('#minion-panel'), minionClose: q<HTMLButtonElement>('#minion-close'), minionSummon: q<HTMLButtonElement>('#minion-summon'),
-  minionSummonReason: q<HTMLParagraphElement>('#minion-summon-reason'), minionCards: q<HTMLDivElement>('#minion-cards'),
-  minionInfusionPreview: q<HTMLElement>('#minion-infusion-preview'), minionSacrifice: q<HTMLButtonElement>('#minion-sacrifice'),
+  minionPanel: q<HTMLDivElement>('#minion-panel'), minionClose: q<HTMLButtonElement>('#minion-close'), minionCards: q<HTMLDivElement>('#minion-cards'),
   soulBalances: q<HTMLDivElement>('#soul-balances'), soulXp: q<HTMLDivElement>('#soul-xp'), soulLayerTabs: q<HTMLDivElement>('#soul-layer-tabs'), soulTreeViewport: q<HTMLDivElement>('#soul-tree-viewport'), soulTree: q<HTMLDivElement>('#soul-tree'), soulConnections: q<SVGElement>('#soul-connections'), soulNodes: q<HTMLDivElement>('#soul-nodes'), soulDetail: q<HTMLDivElement>('#soul-detail'),
   inventoryClose: q<HTMLButtonElement>('#inventory-close'), inventoryOverview: q<HTMLDivElement>('#inventory-overview'),
   inventorySummary: q<HTMLDivElement>('#inventory-summary'), inventoryEquipped: q<HTMLDivElement>('#inventory-equipped'),
@@ -296,13 +291,16 @@ export function updateMinionCountdown(now = Date.now()): void {
 
 export function renderMinions(snapshot: ProgressionSnapshot): void {
   const { minions, soulCatcher } = snapshot;
-  const cost = minions.nextSummonCost, atCapacity = minions.roster.length >= minions.activeCapacity;
-  const summonReason = !minions.unlockedEver ? 'Unlock minions in Soul Catcher' : atCapacity ? 'Roster full'
-    : !Number.isSafeInteger(cost) ? 'Summon cost is unavailable' : soulCatcher.balances.uncommon < cost ? 'Not enough Uncommon Souls' : '';
-  ui.minionSummon.disabled = !!summonReason;
-  ui.minionSummon.innerHTML = `Summon minion · ${Number.isSafeInteger(cost) ? minionNumber(cost) : '—'} ${soulIcon('uncommon')}`;
-  ui.minionSummonReason.textContent = summonReason;
-  ui.minionCards.innerHTML = minions.roster.length ? minions.roster.map((minion) => {
+  const expanded = new Set(Array.from(ui.minionCards.querySelectorAll<HTMLDetailsElement>('details[open]')).map((node) => node.closest<HTMLElement>('[data-minion-id]')?.dataset.minionId));
+  ui.minionCards.innerHTML = minions.slots.map((slot) => {
+    const minion = minions.roster.find((entry) => entry.slotId === slot.slotId);
+    if (!minion) {
+      const unlock = slot.slotId === 1 ? 'Layer 1 · Minion Covenant · 30 Uncommon Souls' : slot.slotId === 2
+        ? 'Layer 2 · Second Covenant · 40 Rare Souls' : 'Layer 3 · Third Covenant · 20 Epic Souls';
+      if (!slot.unlocked) return `<article class="minion-card"><div class="minion-card-heading"><strong>Slot ${slot.slotId}</strong><small>Locked</small></div><p>Unlock in Soul Catcher: ${unlock}. The first Imp is included with that purchase.</p></article>`;
+      const affordable = soulCatcher.balances[slot.cost.soulType] >= slot.cost.amount;
+      return `<article class="minion-card"><div class="minion-card-heading"><strong>Slot ${slot.slotId}</strong><small>Empty</small></div><button class="minion-summon" data-summon-slot="${slot.slotId}" aria-label="Summon Imp in slot ${slot.slotId} for ${slot.cost.amount} ${sourceLabel(slot.cost.soulType)} Souls" ${affordable ? '' : 'disabled'}>Summon · ${slot.cost.amount} ${soulIcon(slot.cost.soulType)}</button>${affordable ? '' : `<p class="minion-summon-reason">Not enough ${sourceLabel(slot.cost.soulType)} Souls</p>`}</article>`;
+    }
     const statCells = [
       minionStatCell('HP', heartIcon(17), `${minionNumber(minion.hp)} / ${minionNumber(minion.maxHp)}`),
       minionStatCell('Health regeneration', heartRegenIcon(17), `${minionNumber(minion.stats.regenPerSecond)}/s`),
@@ -328,19 +326,17 @@ export function renderMinions(snapshot: ProgressionSnapshot): void {
     const activity = minion.respawnAt !== null ? 'Waiting to respawn' : mode === 'paused' ? 'Paused · provide input to resume' : mode === 'recovering' ? 'Recovering'
       : mode === 'attacking' && target ? `Attacking ${targetKind}` : mode === 'moving' && target ? `Moving toward ${targetKind}` : 'Seeking target';
     const targetProgress = target && minion.respawnAt === null ? `<span aria-label="Target ${target.id} HP: ${minionNumber(target.hp)} of ${minionNumber(target.maxHp)}">${minionNumber(target.hp)} / ${minionNumber(target.maxHp)} HP</span>` : '';
-    return `<article class="minion-card"><div class="minion-card-heading"><span class="minion-color minion-color-${minion.color}" aria-hidden="true"></span><strong>Imp ${minion.id.replace(/^minion-/, '#')}</strong><small>${status}</small></div><div class="minion-activity"><span>${activity}</span>${targetProgress}</div><div class="minion-stat-grid">${statCells}</div><div class="minion-card-subtitle">Equipped</div><div class="minion-equipment-grid">${equipped || '<span class="minion-empty">None</span>'}</div><div class="minion-card-subtitle">Souls contributed</div><div class="minion-soul-grid">${souls}</div></article>`;
-  }).join('') : '<p class="minion-empty-roster">No minions summoned.</p>';
-  const { stats, copies } = minions.infusionPreview;
-  const statPreview = (Object.keys(minionStatLabels) as LootType[]).filter((type) => stats[type] !== 0).map((type) =>
-    minionStatCell(minionStatLabels[type], minionStatIcons[type], `+${minionNumber(stats[type])}`)).join('');
-  const copyPreview = Object.entries(copies).map(([itemId, quantity]) => {
-    const definition = EQUIPMENT_BY_ID.get(itemId);
-    if (!definition) return '';
-    const icon = equipmentIcon(definition, { itemId, level: quantity, ascend: 0 }, 'bag') ?? damageTypeIcon(definition.damageType, 20);
-    return `<div class="minion-copy-item" aria-label="${quantity} ${definition.name} copies transferred"><span aria-hidden="true">${icon}</span><strong>×${minionNumber(quantity)}</strong></div>`;
+    const { stats, copies } = minion.infusionPreview;
+    const statPreview = (Object.keys(minionStatLabels) as LootType[]).filter((type) => stats[type] !== 0).map((type) =>
+      minionStatCell(minionStatLabels[type], minionStatIcons[type], `+${minionNumber(stats[type])}`)).join('');
+    const copyPreview = Object.entries(copies).map(([itemId, quantity]) => {
+      const definition = EQUIPMENT_BY_ID.get(itemId);
+      if (!definition) return '';
+      const icon = equipmentIcon(definition, { itemId, level: quantity, ascend: 0 }, 'bag') ?? damageTypeIcon(definition.damageType, 20);
+      return `<div class="minion-copy-item" aria-label="${quantity} ${definition.name} copies transferred"><span aria-hidden="true">${icon}</span><strong>×${minionNumber(quantity)}</strong></div>`;
+    }).join('');
+    return `<article class="minion-card" data-minion-id="${minion.id}"><div class="minion-card-heading"><span class="minion-color minion-color-${minion.color}" aria-hidden="true"></span><strong>Slot ${slot.slotId} · Imp ${minion.id.replace(/^minion-/, '#')}</strong><small>${status}</small></div><div class="minion-activity"><span>${activity}</span>${targetProgress}</div><div class="minion-stat-grid">${statCells}</div><div class="minion-card-subtitle">Equipped</div><div class="minion-equipment-grid">${equipped || '<span class="minion-empty">None</span>'}</div><div class="minion-card-subtitle">Souls contributed</div><div class="minion-soul-grid">${souls}</div><details class="minion-infusion-preview" ${expanded.has(minion.id) ? 'open' : ''}><summary>Hero infusion preview</summary><p>50% of kill-earned stats</p><div class="minion-stat-grid">${statPreview || '<span class="minion-empty">No stat gains yet</span>'}</div><p>100% of earned equipment copies</p><div class="minion-copy-grid">${copyPreview || '<span class="minion-empty">No copies earned yet</span>'}</div></details><button class="minion-sacrifice" data-sacrifice-minion="${minion.id}" aria-label="Sacrifice Imp ${minion.id} in slot ${slot.slotId}">Sacrifice this Imp</button></article>`;
   }).join('');
-  ui.minionInfusionPreview.innerHTML = `<h3>Hero infusion preview</h3><p>50% of kill-earned stats</p><div class="minion-stat-grid">${statPreview || '<span class="minion-empty">No stat gains yet</span>'}</div><p>100% of earned equipment copies</p><div class="minion-copy-grid">${copyPreview || '<span class="minion-empty">No copies earned yet</span>'}</div>`;
-  ui.minionSacrifice.disabled = minions.roster.length === 0;
   updateMinionCountdown();
 }
 

@@ -105,8 +105,10 @@ export type InventoryState = {
 
 export type CombatActorRef = { kind: 'hero' } | { kind: 'minion'; minionId: string };
 export type MinionColorVariant = 'variant-1' | 'variant-2' | 'variant-3';
+export type MinionSlotId = 1 | 2 | 3;
 export type SavedMinion = {
   id: string;
+  slotId: MinionSlotId;
   color: MinionColorVariant;
   areaId: number;
   position: { x: number; z: number };
@@ -117,10 +119,10 @@ export type SavedMinion = {
   copiesEarned: Record<string, number>;
   soulContributions: Record<SoulType, number>;
 };
-export type MinionProgression = { nextSerial: number; unlockedEver: boolean; paidSummonCount: number; roster: SavedMinion[] };
+export type MinionProgression = { nextSerial: number; unlockedSlots: Record<MinionSlotId, boolean>; roster: SavedMinion[] };
 
 export type SaveData = {
-  version: 19;
+  version: 20;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];

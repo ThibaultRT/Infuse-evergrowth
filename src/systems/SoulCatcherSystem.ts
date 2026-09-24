@@ -2,12 +2,12 @@ import { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID, SOUL_NODE_LAYER, SOUL_NODES, soul
 import { soulCost, soulPurchaseXp, type SoulEffect } from '../domain/soul-catcher';
 import type { GameEvents } from '../game/GameEvents';
 import { statTotal } from '../domain/stats/StatSources';
-import type { DamageType, EquipmentRarity, SaveData, SavedMinion, SoulType, SpawnDefinition, Tier } from '../types';
+import type { DamageType, EquipmentRarity, MinionSlotId, SaveData, SavedMinion, SoulType, SpawnDefinition, Tier } from '../types';
 
 const AREA_TWO_BOSS_ID = 'area2-rare-01';
 export class SoulCatcherSystem {
   constructor(private readonly state: SaveData, private readonly events: GameEvents, private readonly persist: () => void,
-    private readonly unlockMinions: () => SavedMinion | null) { this.projectEffects(); }
+    private readonly unlockMinionSlot: (slotId: MinionSlotId) => SavedMinion | null) { this.projectEffects(); }
   get available(): boolean { return this.state.defeatedBosses.includes(AREA_TWO_BOSS_ID); }
   level(nodeId: string): number { return this.state.soulCatcher.nodeLevels[nodeId] ?? 0; }
   layerUnlocked(layer: number): boolean { return layer <= this.state.soulCatcher.highestUnlockedLayer; }
@@ -28,12 +28,13 @@ export class SoulCatcherSystem {
     const node = SOUL_NODE_BY_ID.get(nodeId); if (!node || !this.canPurchase(nodeId)) return false;
     const previousLevel = this.level(nodeId), cost = soulCost(node, previousLevel + 1), gained = soulPurchaseXp(node.cost.soulType, cost);
     this.state.soulCatcher.balances[node.cost.soulType] -= cost; this.state.soulCatcher.nodeLevels[nodeId] = previousLevel + 1; this.state.soulCatcher.xp += gained;
-    const summoned = node.reward.effects.some((effect) => effect.type === 'unlockMinions') ? this.unlockMinions() : null;
+    const unlock = node.reward.effects.find((effect) => effect.type === 'unlockMinionSlot');
+    const summoned = unlock?.type === 'unlockMinionSlot' ? this.unlockMinionSlot(unlock.slotId) : null;
     const previousLayer = this.state.soulCatcher.highestUnlockedLayer;
-    this.state.soulCatcher.highestUnlockedLayer = SOUL_LAYER_REGISTRY.reduce((highest, metadata) => metadata.unlockXp !== null && this.state.soulCatcher.xp >= metadata.unlockXp ? metadata.layer : highest, 1);
+    this.state.soulCatcher.highestUnlockedLayer = SOUL_LAYER_REGISTRY.reduce((highest, metadata) => metadata.unlockXp !== null && this.state.soulCatcher.xp >= metadata.unlockXp ? Math.max(highest, metadata.layer) : highest, previousLayer);
     this.projectEffects(); this.persist();
     this.events.emit('soulNodePurchased', { nodeId, previousLevel, newLevel: previousLevel + 1, soulType: node.cost.soulType, cost }); this.events.emit('soulCatcherXpGained', { amount: gained, total: this.state.soulCatcher.xp });
-    if (summoned) { this.events.emit('minionsUnlocked', { minionId: summoned.id }); this.events.emit('minionSummoned', { minionId: summoned.id, paid: false }); }
+    if (summoned) { this.events.emit('minionSlotUnlocked', { slotId: summoned.slotId, minionId: summoned.id }); this.events.emit('minionSummoned', { minionId: summoned.id, slotId: summoned.slotId, paid: false }); }
     for (let layer = previousLayer + 1; layer <= this.state.soulCatcher.highestUnlockedLayer; layer += 1) this.events.emit('soulCatcherLayerUnlocked', { layer });
     return true;
   }

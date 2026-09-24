@@ -41,6 +41,7 @@ export class MinionAISystem {
   damaged(id: string): void { const intent = this.intents.get(id); if (intent) { intent.defendUntil = this.elapsed + 3; intent.seekAfter = 0; intent.mode = 'seeking'; } }
   died(id: string): void { const intent = this.intents.get(id); if (intent) { intent.mode = 'dead'; intent.targetId = null; intent.path = []; } }
   respawned(id: string): void { this.intents.delete(id); }
+  remove(id: string): void { this.intents.delete(id); }
 
   update(dt: number): MinionAttack[] {
     this.elapsed += dt;

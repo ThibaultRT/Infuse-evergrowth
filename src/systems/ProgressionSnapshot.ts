@@ -1,12 +1,11 @@
-import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher';
-import balance from '../data/balance.json';
+import { SOUL_LAYER_REGISTRY, soulEdges, soulNodes } from '../data/soul-catcher';
 import { soulCost } from '../domain/soul-catcher';
 import { statAdditiveTotal, statTotal } from '../domain/stats/StatSources';
-import type { DamageType, EquipmentDefinition, EquipmentSlotId, OwnedEquipment, SaveData, SoulType, StatSources, Tier, WeaponSlotId } from '../types';
+import type { DamageType, EquipmentDefinition, EquipmentSlotId, MinionSlotId, OwnedEquipment, SaveData, SoulType, StatSources, Tier, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID, ascendCopies, attackProfile, defenseSources, equipmentAscendValue, equipmentCombatSummary, equipmentDamage, equipmentDefense, equipmentSlot, equipmentSlotUnlocked, equipmentValuePerLevel, type InventoryCombatSummary } from './EquipmentSystem';
 import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRawEvasionChance, heroSpeed, heroSpeedMultiplier } from './HeroStats';
 import type { SoulCatcherSystem } from './SoulCatcherSystem';
-import { calculateInfusion, nextSummonCost, type Infusion } from '../domain/minions';
+import { calculateInfusion, MINION_SLOTS, summonCost, type Infusion } from '../domain/minions';
 import type { MinionSummary, MinionSystem } from './MinionSystem';
 import type { MinionMode } from './MinionAISystem';
 
@@ -47,8 +46,8 @@ export type ProgressionSnapshot = ReadonlyValues<{
     yields: { type: SoulType; unlocked: boolean; base: number; additional: number; total: number }[];
     layers: { layer: number; name: string; authored: boolean; unlocked: boolean; nodes: SoulNodeSnapshot[]; edges: [string, string][] }[];
   };
-  minions: { unlockedEver: boolean; paidSummonCount: number; nextSummonCost: number; activeCapacity: number;
-    roster: (MinionSummary & { activity: MinionActivitySnapshot })[]; infusionPreview: Infusion };
+  minions: { unlockedEver: boolean; slots: { slotId: MinionSlotId; unlocked: boolean; cost: { soulType: SoulType; amount: number }; minionId: string | null }[];
+    roster: (MinionSummary & { activity: MinionActivitySnapshot; infusionPreview: Infusion })[] };
 }>;
 
 const WEAPON_SLOTS = ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const;
@@ -108,9 +107,9 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
       layers: SOUL_LAYER_REGISTRY.map((metadata) => ({
         layer: metadata.layer, name: metadata.name, authored: metadata.authored, unlocked: souls.layerUnlocked(metadata.layer),
         edges: soulEdges(metadata.layer).map(([a, b]) => [a, b]),
-        nodes: (soulLayer(metadata.layer)?.nodes ?? []).map((node) => {
+        nodes: soulNodes(metadata.layer).map((node) => {
           const level = souls.level(node.id);
-          const repeatedUnlock = node.reward.effects.some((effect) => effect.type === 'unlockMinions') && state.minions.unlockedEver;
+          const repeatedUnlock = node.reward.effects.some((effect) => effect.type === 'unlockMinionSlot' && state.minions.unlockedSlots[effect.slotId]);
           return { id: node.id, name: node.name, position: { ...node.position },
             description: repeatedUnlock ? 'Minions are already permanently unlocked. A repeat purchase grants Soul Catcher XP only.' : node.reward.display,
             soulType: node.cost.soulType,
@@ -118,10 +117,12 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
         }),
       })),
     },
-    minions: { unlockedEver: state.minions.unlockedEver, paidSummonCount: state.minions.paidSummonCount,
-      nextSummonCost: nextSummonCost(state.minions.paidSummonCount), activeCapacity: balance.minions.activeCapacity,
+    minions: { unlockedEver: MINION_SLOTS.some((slotId) => state.minions.unlockedSlots[slotId]),
+      slots: MINION_SLOTS.map((slotId) => ({ slotId, unlocked: state.minions.unlockedSlots[slotId], cost: summonCost(slotId),
+        minionId: state.minions.roster.find((entry) => entry.slotId === slotId)?.id ?? null })),
       roster: (minions?.summaries() ?? []).map((minion) => ({ ...minion, activity: activityForMinion?.(minion.id)
-        ?? { mode: minion.respawnAt === null ? 'seeking' : 'dead', target: null } })),
-      infusionPreview: calculateInfusion(state.minions.roster) },
+        ?? { mode: minion.respawnAt === null ? 'seeking' : 'dead', target: null },
+        infusionPreview: calculateInfusion(state.minions.roster.filter((entry) => entry.id === minion.id)) })),
+    },
   };
 }

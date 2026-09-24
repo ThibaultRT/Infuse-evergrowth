@@ -108,6 +108,11 @@ async function capture(file) {
   await writeFile(path.join(captures, file), Buffer.from(shot.data, 'base64'));
 }
 const click = (selector) => evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
+async function pointerClick(selector) {
+  const point = await evaluate(`(() => { const rect = document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect(); return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }; })()`);
+  await client.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', buttons: 1, clickCount: 1 });
+  await client.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
+}
 const fetchText = (file) => evaluate(`fetch(${JSON.stringify(gameUrl + file)}).then((response) => response.text())`);
 const cacheKeys = () => evaluate(`caches.open(${JSON.stringify(cacheName)}).then(cache => cache.keys()).then(keys => keys.map(key => key.url))`);
 
@@ -150,7 +155,8 @@ try {
   await until(`document.getElementById('stats-content').textContent.includes('Orbit 1 · Slash attack')`, 'slot-specific Stats');
   await capture('progression-snapshot-stats.png');
   await click('#soul-catcher-button');
-  await click('#soul-nodes [data-soul-node]:not([data-soul-node=""])');
+  await pointerClick('#soul-nodes [data-soul-node]:not([data-soul-node=""])');
+  await until(`Boolean(document.querySelector('#soul-detail [data-purchase-soul]'))`, 'pointer selection of Soul node');
   await click('#soul-detail [data-purchase-soul]');
   await until(`!document.querySelector('[data-soul-layer="2"]').disabled`, 'live Soul layer unlock');
   await capture('progression-snapshot-souls.png');

@@ -583,7 +583,7 @@
       },
       "neighbors": [
         "SC-21",
-        "SC-M01"
+        "SC-MINION-01"
       ]
     },
     {
@@ -845,12 +845,12 @@
       ]
     },
     {
-      "id": "SC-M01",
+      "id": "SC-MINION-01",
       "name": "Minion Covenant",
       "position": { "angleDeg": 345, "radius": 3.65 },
       "maxLevel": 1,
       "cost": { "soulType": "uncommon", "base": 30, "perLevel": 0, "formula": "base + perLevel * (level - 1)" },
-      "reward": { "effects": [{ "type": "unlockMinions" }], "display": "Permanently unlock one autonomous Imp minion" },
+      "reward": { "effects": [{ "type": "unlockMinionSlot", "slotId": 1 }], "display": "Permanently unlock minion slot 1 and summon its first Imp at no extra cost" },
       "neighbors": []
     },
     {

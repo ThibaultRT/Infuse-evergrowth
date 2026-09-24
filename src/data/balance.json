@@ -132,15 +132,14 @@
     "baseSeconds": 300
   },
   "minions": {
-    "activeCapacity": 1,
+    "activeCapacity": 3,
     "healthMultiplier": 2,
     "attackRangeMeters": 2.15,
     "innateAttackCooldownSeconds": 1.1,
     "recoveryStartFraction": 0.3,
     "recoveryEndFraction": 0.75,
     "respawnSeconds": 30,
-    "baseSummonCost": 30,
-    "summonCostMultiplier": 10
+    "summonCosts": { "1": { "soulType": "uncommon", "amount": 30 }, "2": { "soulType": "rare", "amount": 40 }, "3": { "soulType": "epic", "amount": 30 } }
   },
   "visualStreaming": {
     "destinationPrefetchMeters": 35,

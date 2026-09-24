@@ -3,7 +3,7 @@ import { MINION_PIT } from '../data/world/minionPit';
 import { EQUIPMENT_BY_ID } from './items/EquipmentCatalog';
 import { ascendOwnedEquipment, canAscend, equipmentDamage, equipmentDefense } from './items/EquipmentProgression';
 import { statTotal } from './stats/StatSources';
-import type { DamageType, EquipmentSlotId, InventoryState, LootType, MinionColorVariant, MinionProgression, PlayerStats, SavedMinion, SoulType, StatSources } from '../types';
+import type { DamageType, EquipmentSlotId, InventoryState, LootType, MinionColorVariant, MinionProgression, MinionSlotId, PlayerStats, SavedMinion, SoulType, StatSources } from '../types';
 
 const colors: MinionColorVariant[] = ['variant-1', 'variant-2', 'variant-3'];
 const weaponSlots = ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const;
@@ -27,16 +27,21 @@ export function emptyMinionInventory(): InventoryState {
   return { items: {}, equipped: { hand1: null, orbit1: null, orbit2: null, orbit3: null, helmet: null, armor: null, legs: null, ring: null } };
 }
 
-export function emptyMinionProgression(): MinionProgression { return { nextSerial: 1, unlockedEver: false, paidSummonCount: 0, roster: [] }; }
-export function nextSummonCost(paidSummonCount: number): number { return balance.minions.baseSummonCost * balance.minions.summonCostMultiplier ** paidSummonCount; }
+export const MINION_SLOTS = [1, 2, 3] as const;
+export function emptyMinionProgression(): MinionProgression { return { nextSerial: 1, unlockedSlots: { 1: false, 2: false, 3: false }, roster: [] }; }
+export function summonCost(slotId: MinionSlotId): { soulType: SoulType; amount: number } { return balance.minions.summonCosts[String(slotId) as '1' | '2' | '3'] as { soulType: SoulType; amount: number }; }
 export function minionColor(random: () => number): MinionColorVariant {
   const value = random();
   return colors[Number.isFinite(value) ? Math.min(colors.length - 1, Math.max(0, Math.floor(value * colors.length))) : 0];
 }
 export function validMinionColor(value: unknown): value is MinionColorVariant { return colors.includes(value as MinionColorVariant); }
-export function createMinion(id: string, random: () => number): SavedMinion {
+export function minionPitPosition(slotId: MinionSlotId): { x: number; z: number } {
+  const offset = slotId === 1 ? { x: 0, z: 0 } : slotId === 2 ? { x: -0.7, z: 0.35 } : { x: 0.7, z: 0.35 };
+  return { x: MINION_PIT.x + offset.x, z: MINION_PIT.z + offset.z };
+}
+export function createMinion(id: string, slotId: MinionSlotId, random: () => number): SavedMinion {
   const stats = freshMinionStats();
-  return { id, color: minionColor(random), areaId: MINION_PIT.areaId, position: { x: MINION_PIT.x, z: MINION_PIT.z }, hp: statTotal(stats.maxHp), respawnAt: null,
+  return { id, slotId, color: minionColor(random), areaId: MINION_PIT.areaId, position: minionPitPosition(slotId), hp: statTotal(stats.maxHp), respawnAt: null,
     stats, inventory: emptyMinionInventory(), copiesEarned: {}, soulContributions: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 } };
 }
 export function shouldRecover(hp: number, maxHp: number): boolean { return hp < maxHp * balance.minions.recoveryStartFraction; }

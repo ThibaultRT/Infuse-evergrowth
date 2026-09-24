@@ -35,7 +35,7 @@ export class GameSession {
     this.respawns = new RespawnSystem(random);
     this.minions = new MinionSystem(state, random);
     this.minions.reviveDue(clock.now());
-    this.soulCatcher = new SoulCatcherSystem(state, events, () => this.persist(), () => this.minions.unlockFirst());
+    this.soulCatcher = new SoulCatcherSystem(state, events, () => this.persist(), (slotId) => this.minions.unlockSlot(slotId));
     for (const definition of SPAWNS) {
       this.respawns.reviveIfDue(state.spawns[definition.id], definition, clock.now());
     }
@@ -54,6 +54,7 @@ export class GameSession {
     this.progression = new ProgressionSystem(state, events, () => this.persist(), random, (rarity) => this.soulCatcher.equipmentQuantity(rarity),
       (definition) => this.soulCatcher.credit(definition), this.minions);
     this.minionAI = new MinionAISystem(state, this.runtime, random);
+    events.on('minionInfused', ({ minionId }) => this.minionAI.remove(minionId));
     const cooldown = (slot: WeaponSlotId): number => attackProfile(state, slot)?.cooldownSeconds ?? 0;
     this.combat = new CombatSystem({ orbit1: cooldown('orbit1') * .25, orbit2: cooldown('orbit2') * .5, orbit3: cooldown('orbit3') * .75 });
     events.on('heroProgressReset', () => this.soulCatcher.syncEffects());
