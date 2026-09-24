@@ -8,9 +8,7 @@ This is a follow-up plan, not an instruction to rewrite the original combat, equ
 
 ## Integration preflight — required before implementation
 
-At the time this plan was written, the inspected remote **main** branch still contains the original minions.md specification but **does not contain its minion runtime/commands**, and SC-21 still has its old defence effect. Implement against the branch or merged revision where minions.md was actually completed. Confirm the real minion save shape, slot/capacity representation, Soul Catcher effect wiring, commands, and current summon/sacrifice behavior before editing. If that code has not yet been pushed or merged, integrate it first; do not build a parallel minion system from the outdated main snapshot.
-
-Other verified main-branch constraints:
+verified main-branch constraints:
 - Layer 2 already has 30 canonical nodes (SC-31–SC-60), and authored layers currently require exactly 30 canonical nodes. **Add** a new node rather than silently replacing an existing reward.
 - Layer 3 currently has only registry metadata; it has no authored tree and no Epic Soul drop-unlock node. A purchasable 20-Epic slot node requires an actual source of Epic Souls first.
 - The current Layer 2 entrance, SC-31, unlocks Rare Soul drops. Existing Soul Catcher progression uses typed effects, node IDs, weighted XP, per-layer adjacency, and detached UI snapshots.
@@ -19,7 +17,7 @@ Other verified main-branch constraints:
 
 | Slot | Unlock | One-time unlock price | Minion created on first unlock | Every later summon after sacrifice |
 | --- | --- | --- | --- | --- |
-| 1 | Existing SC-21 / first-minion unlock | Existing 30 Uncommon Souls | 1 free minion (existing behavior) | **30 Uncommon Souls** |
+| 1 | Existing SC-M01 / first-minion unlock | Existing 30 Uncommon Souls | 1 free minion (existing behavior) | **30 Uncommon Souls** |
 | 2 | **New** Layer 2 node | **40 Rare Souls** | 1 free minion in slot 2 | **40 Rare Souls** |
 | 3 | **New** Layer 3 node | **20 Epic Souls** | 1 free minion in slot 3 | **30 Epic Souls** |
 
@@ -32,7 +30,7 @@ The free creation benefit is **once per slot for the lifetime of the save**, not
 ## Soul Catcher node and Layer 3 design
 
 1. Add a typed effect equivalent to **unlockMinionSlot(slotId: 2 | 3)**. Gameplay consumes a projected/evaluated effect; do not check new node IDs in the minion runtime.
-2. Preserve the existing 30 regular nodes in Layer 2 and the planned 30-node format of fully authored layers. Register the two new nodes as **explicit bonus nodes** attached to their respective progression layers, with stable IDs such as **SC-MINION-02** and **SC-MINION-03**. Do not assign fake SC-61/SC-91 numbers or infer layer from numeric ID; node-to-layer membership comes from the registry.
+2. Preserve the existing 30 regular nodes in Layer 2 and the planned 30-node format of fully authored layers. Register the two new nodes as **explicit bonus nodes** attached to their respective progression layers, with stable IDs such as **SC-MINION-02** and **SC-MINION-03**. Do not assign fake SC-61/SC-91 numbers or infer layer from numeric ID; node-to-layer membership comes from the registry. also standardize the layer 1 by renaming it **SC-MINION-01**
 3. Use the standard single-level cost object with perLevel = 0. Both bonus nodes are regular Soul purchases for deduction, purchase XP, display, saving, reveal, and reset. Give each one a stable anchor/prerequisite in its own layer and a collision-free radial position:
    - Layer 2: attach to the SC-31/Rare Resonance branch so Rare Souls can actually be earned first; cost 40 Rare.
    - Layer 3: attach to its eventual Epic Soul unlock branch; cost 20 Epic. Do not expose a purchasable isolated node in an otherwise empty placeholder layer.
