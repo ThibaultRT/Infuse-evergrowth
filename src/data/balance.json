@@ -131,6 +131,17 @@
   "respawn": {
     "baseSeconds": 300
   },
+  "minions": {
+    "activeCapacity": 1,
+    "healthMultiplier": 2,
+    "attackRangeMeters": 2.15,
+    "innateAttackCooldownSeconds": 1.1,
+    "recoveryStartFraction": 0.3,
+    "recoveryEndFraction": 0.75,
+    "respawnSeconds": 30,
+    "baseSummonCost": 30,
+    "summonCostMultiplier": 10
+  },
   "visualStreaming": {
     "destinationPrefetchMeters": 35,
     "destinationMountMeters": 20,

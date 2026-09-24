@@ -181,7 +181,7 @@ try {
     const values = new Map();
     return { values, getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
   };
-  const primary = 'infuse-evergrowth-save-v18', backup = 'infuse-evergrowth-save-backup';
+  const primary = 'infuse-evergrowth-save-v19', backup = 'infuse-evergrowth-save-backup';
   const clock = { now: () => now.getTime(), date: () => new Date(now) };
   const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
 
@@ -289,7 +289,7 @@ try {
     try {
       state.soulCatcher.nodeLevels[node.id] = 5; state.soulCatcher.nodeLevels[second.id] = 1;
       state.stats.attack.blunt.multiplicative.equipment = 1.2;
-      const souls = new SoulCatcherSystem(state, events, () => {});
+      const souls = new SoulCatcherSystem(state, events, () => {}, () => null);
       near(persistence.statMultiplierTotal(state.stats.attack.blunt), 1.05 * 1.1 * 1.2);
       souls.syncEffects();
       near(persistence.statMultiplierTotal(state.stats.attack.blunt), 1.05 * 1.1 * 1.2);

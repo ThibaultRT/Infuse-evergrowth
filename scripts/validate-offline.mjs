@@ -92,7 +92,7 @@ async function until(expression, label, timeoutMs = 45000) {
   }
   throw new Error(`Timed out: ${label}`);
 }
-const ready = `document.querySelector('#canvas-host canvas') && !document.getElementById('loading-screen') && localStorage.getItem('infuse-evergrowth-save-v18')`;
+const ready = `document.querySelector('#canvas-host canvas') && !document.getElementById('loading-screen') && localStorage.getItem('infuse-evergrowth-save-v19')`;
 async function reload() {
   const loads = client.loads;
   // A DevTools hard reload bypasses service workers; exercise an ordinary PWA reload.
@@ -131,7 +131,7 @@ try {
   console.log('Passed: first-visit caching with unavailable version endpoint; staged asset loading.');
 
   await evaluate(`(() => {
-    const key = 'infuse-evergrowth-save-v18', state = JSON.parse(localStorage.getItem(key));
+    const key = 'infuse-evergrowth-save-v19', state = JSON.parse(localStorage.getItem(key));
     state.unlockedAreas = [1, 2, 3]; state.defeatedBosses = ['area2-rare-01'];
     state.heroHp = 10000; state.stats.maxHp.base = 10000;
     state.inventory.items['sword-common'] = { itemId: 'sword-common', level: 101, ascend: 0 };

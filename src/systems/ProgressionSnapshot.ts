@@ -5,6 +5,8 @@ import type { DamageType, EquipmentDefinition, EquipmentSlotId, OwnedEquipment, 
 import { EQUIPMENT_BY_ID, ascendCopies, attackProfile, defenseSources, equipmentAscendValue, equipmentCombatSummary, equipmentDamage, equipmentDefense, equipmentSlot, equipmentSlotUnlocked, equipmentValuePerLevel, type InventoryCombatSummary } from './EquipmentSystem';
 import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRawEvasionChance, heroSpeed, heroSpeedMultiplier } from './HeroStats';
 import type { SoulCatcherSystem } from './SoulCatcherSystem';
+import { nextSummonCost } from '../domain/minions';
+import type { MinionSummary, MinionSystem } from './MinionSystem';
 
 type ReadonlyValues<T> = { readonly [K in keyof T]: T[K] extends object ? ReadonlyValues<T[K]> : T[K] };
 export type StatSnapshot = ReadonlyValues<StatSources & { additiveTotal: number; total: number }>;
@@ -41,6 +43,7 @@ export type ProgressionSnapshot = ReadonlyValues<{
     yields: { type: SoulType; unlocked: boolean; base: number; additional: number; total: number }[];
     layers: { layer: number; name: string; authored: boolean; unlocked: boolean; nodes: SoulNodeSnapshot[]; edges: [string, string][] }[];
   };
+  minions: { unlockedEver: boolean; paidSummonCount: number; nextSummonCost: number; roster: MinionSummary[] };
 }>;
 
 const WEAPON_SLOTS = ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const;
@@ -58,7 +61,7 @@ function typedStats(project: (type: DamageType) => StatSnapshot): Record<DamageT
 /** Detached, read-only presentation values. Build on demand, never in the frame loop.
  * All rules remain in their existing systems/domain; no save state or callbacks escape.
  */
-export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSystem): ProgressionSnapshot {
+export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSystem, minions?: MinionSystem): ProgressionSnapshot {
   const { stats, inventory, soulCatcher } = state;
   const slots = EQUIPMENT_SLOTS.map((slot) => ({ slot, itemId: inventory.equipped[slot], unlocked: equipmentSlotUnlocked(state, slot) }));
   const items: Record<string, EquipmentSnapshot> = {};
@@ -101,10 +104,15 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
         edges: soulEdges(metadata.layer).map(([a, b]) => [a, b]),
         nodes: (soulLayer(metadata.layer)?.nodes ?? []).map((node) => {
           const level = souls.level(node.id);
-          return { id: node.id, name: node.name, position: { ...node.position }, description: node.reward.display, soulType: node.cost.soulType,
+          const repeatedUnlock = node.reward.effects.some((effect) => effect.type === 'unlockMinions') && state.minions.unlockedEver;
+          return { id: node.id, name: node.name, position: { ...node.position },
+            description: repeatedUnlock ? 'Minions are already permanently unlocked. A repeat purchase grants Soul Catcher XP only.' : node.reward.display,
+            soulType: node.cost.soulType,
             level, maxLevel: node.maxLevel, nextCost: level >= node.maxLevel ? null : soulCost(node, level + 1), revealed: souls.revealed(node.id), purchasable: souls.canPurchase(node.id) };
         }),
       })),
     },
+    minions: { unlockedEver: state.minions.unlockedEver, paidSummonCount: state.minions.paidSummonCount,
+      nextSummonCost: nextSummonCost(state.minions.paidSummonCount), roster: minions?.summaries() ?? [] },
   };
 }

@@ -191,6 +191,7 @@ class SpawnEntity {
       scene.add(this.root);
       ui.world.append(this.targetUi);
       this.syncTransform();
+      this.renderHealth();
     } else {
       this.root.removeFromParent();
       this.enemyView?.dispose();
@@ -236,13 +237,15 @@ class SpawnEntity {
   distanceToHero(): number { return gameplay.distanceFromHero(this.state.position); }
 
   presentDamage(amount: number, type: DamageType, itemId: string, slot: WeaponSlotId): void {
+    this.renderHealth();
+    if (!this.presentationActive) return;
     effects.impact(this.root.position, type);
     this.enemyView?.playHit();
     worldUi.addCombatText(this.root.position.clone().add(new THREE.Vector3(0, 2.8, 0)), `<span>-${Math.round(amount)}</span>${weaponCombatIcon(itemId)}`, false, WEAPON_DAMAGE_TEXT_OFFSET[slot]);
-    this.renderHealth();
   }
 
   presentDefeat(): void {
+    if (!this.presentationActive) return;
     this.enemyView?.playDeath();
     this.crystalView?.playDeath();
     this.deathPresentationRemaining = this.crystalView ? .45 : 1.1;
@@ -388,8 +391,8 @@ events.on('weaponAttacked', ({ slot, targetId }) => {
 });
 events.on('statGained', ({ stat, amount }) => showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase()));
 events.on('equipmentDropped', (drop) => showEquipmentDrop({ ...drop, copiesRequired: session.progressionSnapshot().equipment.items[drop.itemId].ascend.copiesRequired }));
-events.on('soulDropped', ({ quantity, soulType }) => showSoulDrop(quantity, soulType));
-events.on('bossDefeated', presentBossDefeat);
+events.on('soulDropped', ({ sourceId, quantity, soulType }) => { if (entityById.get(sourceId)?.presentationActive) showSoulDrop(quantity, soulType); });
+events.on('bossDefeated', (event) => { if (event.areaId === gameplay.currentAreaId) presentBossDefeat(event); });
 events.on('dailyReset', () => showToast('Daily reset · all spawns restored'));
 events.on('heroEvaded', () => showEvadedCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0))));
 events.on('heroDamaged', ({ amount, damageType, blocked }) => showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, damageType, true, blocked));

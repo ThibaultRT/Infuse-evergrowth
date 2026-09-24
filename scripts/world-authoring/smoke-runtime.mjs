@@ -185,7 +185,7 @@ async function approachWoodlandBridge(client) {
 const gameReadyExpression = `Boolean(
   document.getElementById('canvas-host')
   && !document.getElementById('loading-screen')
-  && localStorage.getItem('infuse-evergrowth-save-v18')
+  && localStorage.getItem('infuse-evergrowth-save-v19')
 )`;
 
 try {
@@ -207,7 +207,7 @@ try {
 
   await evaluate(client, `(() => {
     localStorage.setItem('infuse-rendering-quality-v1', JSON.stringify({ renderScale: 1, frameRateLimit: 60, showStats: true }));
-    const key = 'infuse-evergrowth-save-v18';
+    const key = 'infuse-evergrowth-save-v19';
     const save = JSON.parse(localStorage.getItem(key));
     save.unlockedAreas = ${woodlandBridge ? '[1]' : '[1, 2, 3]'};
     save.heroHp = 100000000;
@@ -230,7 +230,7 @@ try {
     await capture(client, 'runtime-iphone-12-area4-locked.png');
     // Simulate a returning save whose boss victory predates the new routes.
     await evaluate(client, `(() => {
-      const key = 'infuse-evergrowth-save-v18';
+      const key = 'infuse-evergrowth-save-v19';
       const saved = JSON.parse(localStorage.getItem(key));
       saved.defeatedBosses.push('area3-epic-01');
       localStorage.setItem(key, JSON.stringify(saved));
@@ -471,7 +471,7 @@ try {
     if (stopped.area !== 1 || stopped.z < -30.2) throw new Error(`Closed bridge was traversable: ${JSON.stringify(stopped)}`);
     await capture(client, 'runtime-iphone-12-woodland-closed.png');
     await evaluate(client, `(() => {
-      const key = 'infuse-evergrowth-save-v18';
+      const key = 'infuse-evergrowth-save-v19';
       const save = JSON.parse(localStorage.getItem(key));
       save.unlockedAreas = [1, 2, 3];
       localStorage.setItem(key, JSON.stringify(save));

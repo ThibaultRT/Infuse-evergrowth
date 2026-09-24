@@ -582,7 +582,8 @@
         "display": "Unlock Uncommon Soul drops (base: 1 per Uncommon enemy)"
       },
       "neighbors": [
-        "SC-21"
+        "SC-21",
+        "SC-M01"
       ]
     },
     {
@@ -842,6 +843,15 @@
       "neighbors": [
         "SC-30"
       ]
+    },
+    {
+      "id": "SC-M01",
+      "name": "Minion Covenant",
+      "position": { "angleDeg": 345, "radius": 3.65 },
+      "maxLevel": 1,
+      "cost": { "soulType": "uncommon", "base": 30, "perLevel": 0, "formula": "base + perLevel * (level - 1)" },
+      "reward": { "effects": [{ "type": "unlockMinions" }], "display": "Permanently unlock one autonomous Imp minion" },
+      "neighbors": []
     },
     {
       "number": 30,

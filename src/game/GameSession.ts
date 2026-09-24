@@ -8,6 +8,9 @@ import { ProgressionSystem } from '../systems/ProgressionSystem';
 import { RespawnSystem } from '../systems/RespawnSystem';
 import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import { createProgressionSnapshot, type ProgressionSnapshot } from '../systems/ProgressionSnapshot';
+import { MinionSystem } from '../systems/MinionSystem';
+import { MinionAISystem } from '../systems/MinionAISystem';
+import { statTotal } from '../domain/stats/StatSources';
 import { GameCommands } from './GameCommands';
 import { GameEvents } from './GameEvents';
 import { GameplayRuntime } from './GameplayRuntime';
@@ -18,6 +21,8 @@ export class GameSession {
   readonly runtime: GameplayRuntime;
   readonly commands: GameCommands;
   readonly soulCatcher: SoulCatcherSystem;
+  readonly minions: MinionSystem;
+  readonly minionAI: MinionAISystem;
   private readonly combat: CombatSystem;
   private readonly respawns: RespawnSystem;
   private readonly progression: ProgressionSystem;
@@ -27,7 +32,9 @@ export class GameSession {
   constructor(readonly state: SaveData, readonly events: GameEvents, private readonly writeSave: () => void,
     private readonly clock: GameClock = browserClock, private readonly random = Math.random) {
     this.respawns = new RespawnSystem(random);
-    this.soulCatcher = new SoulCatcherSystem(state, events, () => this.persist());
+    this.minions = new MinionSystem(state, random);
+    this.minions.reviveDue(clock.now());
+    this.soulCatcher = new SoulCatcherSystem(state, events, () => this.persist(), () => this.minions.unlockFirst());
     for (const definition of SPAWNS) {
       this.respawns.reviveIfDue(state.spawns[definition.id], definition, clock.now());
     }
@@ -36,13 +43,16 @@ export class GameSession {
       spawns: SPAWNS.map((definition) => ({ definition, tier: TIER_CONFIG[definition.tier],
         maxHp: state.spawns[definition.id].roll.maxHp, alive: !state.spawns[definition.id].respawnAt,
         damage: definition.attackDamage, damageType: areaById(definition.areaId).enemyWeapon })),
+      minions: state.minions.roster,
       currentAreaId: state.currentAreaId, heroHp: Math.min(state.heroHp, maxHeroHp(state.stats)), heroSpeed: heroSpeed(state.stats),
       heroRespawnSeconds: HERO_RESPAWN_DELAY_MS / 1000, enemyAggroRadius: ENEMY_AGGRO_RADIUS_METERS,
       enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS, enemyAttackRange: ENEMY_ATTACK_RANGE_METERS,
       enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS, enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN,
     });
     this.commands = new GameCommands(state, this.runtime, events, () => this.persist(), this.soulCatcher);
-    this.progression = new ProgressionSystem(state, events, () => this.persist(), random, (rarity) => this.soulCatcher.equipmentQuantity(rarity));
+    this.progression = new ProgressionSystem(state, events, () => this.persist(), random, (rarity) => this.soulCatcher.equipmentQuantity(rarity),
+      (definition) => this.soulCatcher.credit(definition), this.minions);
+    this.minionAI = new MinionAISystem(state, this.runtime, random);
     const cooldown = (slot: WeaponSlotId): number => attackProfile(state, slot)?.cooldownSeconds ?? 0;
     this.combat = new CombatSystem({ orbit1: cooldown('orbit1') * .25, orbit2: cooldown('orbit2') * .5, orbit3: cooldown('orbit3') * .75 });
     events.on('heroProgressReset', () => this.soulCatcher.syncEffects());
@@ -55,7 +65,7 @@ export class GameSession {
 
   persist(): void { this.state.heroHp = this.runtime.hero.hp; this.writeSave(); }
 
-  progressionSnapshot(): ProgressionSnapshot { return createProgressionSnapshot(this.state, this.soulCatcher); }
+  progressionSnapshot(): ProgressionSnapshot { return createProgressionSnapshot(this.state, this.soulCatcher, this.minions); }
 
   update(dt: number, movement: Readonly<{ x: number; y: number }>, elapsedSeconds = dt): void {
     this.combat.update(dt);
@@ -63,7 +73,10 @@ export class GameSession {
     if (this.midnightSeconds >= 1) { this.midnightSeconds = 0; this.resetAtMidnightIfNeeded(); }
     // Panels and camera presentations never pause simulation or wall-clock timers.
     for (const event of this.runtime.update(dt, this.commands.movement({ type: 'move', ...movement }), true, elapsedSeconds)) {
-      if (event.type === 'enemyAttack') this.damageHero(event.amount, event.damageType);
+      if (event.type === 'enemyAttack') {
+        if (event.target.kind === 'hero') this.damageHero(event.amount, event.damageType);
+        else this.damageMinion(event.target.minionId, event.amount, event.damageType);
+      }
       else if (event.type === 'areaEntered') this.commands.execute({ type: 'enterArea', areaId: event.areaId, connectionId: event.connectionId });
       else {
         this.runtime.hero.hp = maxHeroHp(this.state.stats);
@@ -73,6 +86,22 @@ export class GameSession {
     }
     this.reviveDueSpawns();
     this.autoAttack();
+    for (const attack of this.minionAI.update(dt)) {
+      const minion = this.minions.find(attack.minionId), target = this.runtime.spawnById.get(attack.spawnId);
+      if (!minion || minion.respawnAt !== null || !target?.alive) continue;
+      const hit = this.runtime.damageSpawn(attack.spawnId, attack.amount, minion.areaId);
+      if (!hit) continue;
+      this.events.emit('enemyDamaged', { enemyId: attack.spawnId, owner: { kind: 'minion', minionId: minion.id }, amount: attack.amount, damageType: attack.damageType, itemId: attack.itemId, slot: attack.slot });
+      if (hit.defeated) {
+        const definition = target.definition;
+        this.progression.defeat(definition, TIER_CONFIG[definition.tier], this.runtime.hero, AREAS, WORLD_CONNECTIONS, this.clock.now(),
+          BASE_RESPAWN_MS / this.soulCatcher.respawnDivisor(definition.tier), nextLocalMidnightMs(this.clock.date()), { kind: 'minion', minionId: minion.id });
+        this.minionAI.afterKill(minion);
+      }
+    }
+    const revivedMinions = this.minions.reviveDue(this.clock.now());
+    if (revivedMinions.length) this.persist();
+    for (const minionId of revivedMinions) { this.minionAI.respawned(minionId); this.events.emit('minionRespawned', { minionId }); }
     if (!this.runtime.hero.dead) {
       const multiplier = this.runtime.hero.combatRemainingSeconds > 0 ? 1 : HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER;
       this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + heroRegen(this.state.stats) * multiplier * dt);
@@ -95,6 +124,26 @@ export class GameSession {
     this.events.emit('heroDamaged', { amount: damage, damageType: type, blocked });
     if (defeated) this.events.emit('heroDefeated', undefined);
     this.persist();
+  }
+
+  damageMinion(minionId: string, amount: number, type: CombatAffinity): void {
+    const minion = this.minions.find(minionId);
+    if (!minion || minion.respawnAt !== null) return;
+    this.minionAI.damaged(minionId);
+    if (this.combat.rollChance(heroEvasionChance(minion.stats), this.random)) return;
+    const defended = this.combat.enemyAttackDamage(amount, type, (damageType) => equippedDefense(minion, damageType),
+      (damageType) => statTotal(minion.stats.damageResistance[damageType]));
+    const blocked = this.combat.rollChance(heroBlockChance(minion.stats), this.random);
+    const damage = defended * (blocked ? BLOCKED_DAMAGE_MULTIPLIER : 1);
+    this.runtime.damageMinion(minionId, damage);
+    let respawnAt: number | null = null;
+    if (minion.hp === 0) {
+      respawnAt = this.minions.kill(minionId, this.clock.now());
+      this.minionAI.died(minionId);
+    }
+    this.persist();
+    this.events.emit('minionDamaged', { minionId, amount: damage, blocked });
+    if (respawnAt !== null) this.events.emit('minionDefeated', { minionId, respawnAt });
   }
 
   private autoAttack(): void {
@@ -121,11 +170,10 @@ export class GameSession {
         if (dx !== 0 || dz !== 0) this.runtime.hero.facing = Math.atan2(dx, dz);
       }
       this.events.emit('weaponAttacked', { slot, targetId: target.spawn.id, damageType: profile.damageType, itemId: profile.itemId });
-      this.events.emit('enemyDamaged', { enemyId: target.spawn.id, amount, damageType: profile.damageType, itemId: profile.itemId, slot });
+      this.events.emit('enemyDamaged', { enemyId: target.spawn.id, owner: { kind: 'hero' }, amount, damageType: profile.damageType, itemId: profile.itemId, slot });
       if (hit.defeated) {
         const definition = target.spawn.definition;
         this.progression.defeat(definition, TIER_CONFIG[definition.tier], this.runtime.hero, AREAS, WORLD_CONNECTIONS, this.clock.now(), BASE_RESPAWN_MS / this.soulCatcher.respawnDivisor(definition.tier), nextLocalMidnightMs(this.clock.date()));
-        this.soulCatcher.grant(definition);
       }
     }
   }

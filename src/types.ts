@@ -72,7 +72,7 @@ export type StatSources = {
 
 /** Raw evasion is converted on a curve; direct chances are decimal probabilities added afterwards. */
 export type EvasionSources = {
-  raw: Record<'kills' | 'other', number>;
+  raw: Record<'kills' | 'minions' | 'other', number>;
   directChance: Record<'equipment' | 'soulCatcher' | 'other', number>;
 };
 
@@ -103,8 +103,24 @@ export type InventoryState = {
   equipped: Record<EquipmentSlotId, string | null>;
 };
 
+export type CombatActorRef = { kind: 'hero' } | { kind: 'minion'; minionId: string };
+export type MinionColorVariant = 'variant-1' | 'variant-2' | 'variant-3';
+export type SavedMinion = {
+  id: string;
+  color: MinionColorVariant;
+  areaId: number;
+  position: { x: number; z: number };
+  hp: number;
+  respawnAt: number | null;
+  stats: PlayerStats;
+  inventory: InventoryState;
+  copiesEarned: Record<string, number>;
+  soulContributions: Record<SoulType, number>;
+};
+export type MinionProgression = { nextSerial: number; unlockedEver: boolean; paidSummonCount: number; roster: SavedMinion[] };
+
 export type SaveData = {
-  version: 18;
+  version: 19;
   dailyKey: string;
   currentAreaId: number;
   unlockedAreas: number[];
@@ -114,6 +130,7 @@ export type SaveData = {
   inventory: InventoryState;
   spawns: Record<string, SavedSpawnState>;
   soulCatcher: { balances: Record<SoulType, number>; nodeLevels: Record<string, number>; unlockAnnouncementSeen: boolean; xp: number; highestUnlockedLayer: number };
+  minions: MinionProgression;
 };
 
 export type TierConfig = {

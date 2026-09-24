@@ -92,7 +92,7 @@ ui.resetHeroButton.addEventListener('click', async () => {
   updateHud();
   showToast('Hero reset · attributes and equipment drops removed');
 });
-ui.resetSoulCatcherButton.addEventListener('click', async () => { if (!await confirmReset('Reset all Soul balances and purchased Soul Catcher nodes?')) return; commands.execute({ type: 'resetSoulCatcher' }); selectedSoulNode = null; selectedSoulLayer = 1; updateHud(); showToast('Soul Catcher reset'); });
+ui.resetSoulCatcherButton.addEventListener('click', async () => { if (!await confirmReset('Reset all Soul balances and purchased Soul Catcher nodes? Minions stay permanently unlocked, and your roster and paid summon count are kept. Rebuying the minion node grants XP only.')) return; commands.execute({ type: 'resetSoulCatcher' }); selectedSoulNode = null; selectedSoulLayer = 1; updateHud(); showToast('Soul Catcher reset'); });
 ui.settingsPanel.addEventListener('change', (event) => {
   const input = event.target as HTMLInputElement;
   if (input.name === 'render-scale') quality.apply({ ...quality.current(), renderScale: input.value === '0.7' ? 0.7 : 1 });

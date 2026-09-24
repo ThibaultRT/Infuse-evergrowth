@@ -13,7 +13,8 @@ export const SOUL_LAYER_REGISTRY: SoulLayerMetadata[] = Array.from({ length: 10 
 export const SOUL_LAYERS = authored;
 export const SOUL_NODES: SoulNode[] = SOUL_LAYERS.flatMap((layer) => layer.nodes);
 export const SOUL_NODE_BY_ID = new Map(SOUL_NODES.map((node) => [node.id, node]));
+export const SOUL_NODE_LAYER = new Map(SOUL_LAYERS.flatMap((layer) => layer.nodes.map((node) => [node.id, layer.layer] as const)));
 export const soulLayer = (layer: number): SoulLayer | undefined => SOUL_LAYERS.find((entry) => entry.layer === layer);
 export const soulEdges = (layer: number): [string, string][] => soulLayer(layer)?.nodes.flatMap((node) => node.neighbors.map((neighbor) => [node.id, neighbor] as [string, string])) ?? [];
 const ids = new Set(SOUL_NODES.map((node) => node.id));
-if (ids.size !== SOUL_NODES.length || SOUL_LAYERS.some((layer) => layer.nodes.length !== 30 || layer.nodes.some((node) => node.reward.effects.length !== 1 || node.neighbors.some((id) => !layer.nodes.some((candidate) => candidate.id === id))))) throw new Error('Invalid Soul Catcher layer data');
+if (ids.size !== SOUL_NODES.length || SOUL_LAYERS.some((layer) => layer.nodes.length !== (layer.layer === 1 ? 31 : 30) || layer.nodes.some((node) => node.reward.effects.length !== 1 || node.neighbors.some((id) => !layer.nodes.some((candidate) => candidate.id === id))))) throw new Error('Invalid Soul Catcher layer data');

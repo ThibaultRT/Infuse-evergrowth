@@ -1,9 +1,9 @@
-import type { CombatAffinity, DamageType, EquipmentSlotId, LootType, SoulType } from '../types';
+import type { CombatAffinity, CombatActorRef, DamageType, EquipmentSlotId, LootType, SoulType } from '../types';
 
 export type GameEventMap = {
-  enemyDamaged: { enemyId: string; amount: number; damageType: DamageType; itemId: string; slot: import('../types').WeaponSlotId };
+  enemyDamaged: { enemyId: string; owner: CombatActorRef; amount: number; damageType: DamageType; itemId: string; slot: import('../types').WeaponSlotId };
   weaponAttacked: { slot: import('../types').EquipmentSlotId; targetId: string; damageType: DamageType; itemId: string };
-  enemyDefeated: { enemyId: string };
+  enemyDefeated: { enemyId: string; owner?: CombatActorRef };
   enemyRespawned: { enemyId: string };
   bossDefeated: { bossId: string; areaId: number; openedGateIds: string[] };
   heroDamaged: { amount: number; damageType: CombatAffinity; blocked: boolean };
@@ -19,13 +19,20 @@ export type GameEventMap = {
   weaponAscended: { itemId: string; previousAscend: number; newAscend: number };
   heroProgressReset: { equipment: boolean };
   soulCatcherUnlocked: { areaId: number };
-  soulDropped: { sourceId: string; soulType: SoulType; quantity: number };
+  soulDropped: { sourceId: string; soulType: SoulType; quantity: number; owner?: CombatActorRef };
   soulNodePurchased: { nodeId: string; previousLevel: number; newLevel: number; soulType: SoulType; cost: number };
   soulCatcherReset: undefined;
   soulCatcherXpGained: { amount: number; total: number };
   soulCatcherLayerUnlocked: { layer: number };
   heroEvaded: { damageType: CombatAffinity };
   dailyReset: undefined;
+  minionsUnlocked: { minionId: string };
+  minionSummoned: { minionId: string; paid: boolean };
+  minionDamaged: { minionId: string; amount: number; blocked: boolean };
+  minionDefeated: { minionId: string; respawnAt: number };
+  minionRespawned: { minionId: string };
+  minionEquipmentChanged: { minionId: string; itemId: string; slot: EquipmentSlotId | null };
+  minionProgressed: { minionId: string; sourceId: string; stat: LootType; amount: number; itemId: string | null; quantity: number; souls: { type: SoulType; quantity: number } | null };
 };
 
 type Listener<T> = (event: T) => void;

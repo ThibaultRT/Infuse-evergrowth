@@ -6,11 +6,14 @@ import { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID } from './data/soul-catcher';
 import { soulCost, soulPurchaseXp } from './domain/soul-catcher';
 import { WORLD_CONNECTIONS } from './config';
 import { bossUnlockedConnections } from './domain/world/GateUnlocks';
-import type { EvasionSources, InventoryState, PlayerStats, SaveData, SavedSpawnState, StatSources } from './types';
+import { circleOverlapsWorldCollision } from './domain/world/CollisionMath';
+import { MINION_PIT } from './data/world/minionPit';
+import { emptyMinionProgression, freshMinionStats, emptySoulContributions, validMinionColor } from './domain/minions';
+import type { EvasionSources, InventoryState, MinionProgression, PlayerStats, SaveData, SavedMinion, SavedSpawnState, StatSources } from './types';
 
-const SAVE_KEY = 'infuse-evergrowth-save-v18';
+const SAVE_KEY = 'infuse-evergrowth-save-v19';
 const BACKUP_KEY = 'infuse-evergrowth-save-backup';
-const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v17', 'infuse-evergrowth-save-v16', 'infuse-evergrowth-save-v15', 'infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
+const PREVIOUS_SAVE_KEYS = ['infuse-evergrowth-save-v18', 'infuse-evergrowth-save-v17', 'infuse-evergrowth-save-v16', 'infuse-evergrowth-save-v15', 'infuse-evergrowth-save-v14', 'infuse-evergrowth-save-v13', 'infuse-evergrowth-save-v12', 'infuse-evergrowth-save-v11', 'infuse-evergrowth-save-v10', 'infuse-evergrowth-save-v9', 'infuse-evergrowth-save-v8', 'infuse-evergrowth-save-v7'];
 
 export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
 const volatileValues = new Map<string, string>();
@@ -76,11 +79,11 @@ function migrateSpawns(value: unknown): Record<string, SavedSpawnState> {
 }
 
 function freshStat(base: number): StatSources {
-  return { base, additive: { kills: 0, equipment: 0, other: 0 }, multiplicative: { equipment: 1, other: 1 } };
+  return { base, additive: { kills: 0, minions: 0, equipment: 0, other: 0 }, multiplicative: { equipment: 1, other: 1 } };
 }
 
 function freshEvasion(): EvasionSources {
-  return { raw: { kills: 0, other: 0 }, directChance: { equipment: 0, soulCatcher: 0, other: 0 } };
+  return { raw: { kills: 0, minions: 0, other: 0 }, directChance: { equipment: 0, soulCatcher: 0, other: 0 } };
 }
 
 function freshStats(): PlayerStats {
@@ -152,12 +155,85 @@ function migrateInventory(value: unknown, unlockedAreas: number[]): InventorySta
 function normalizeStat(stat: Partial<StatSources> | undefined, base: number): StatSources {
   const fresh = freshStat(base);
   const validSources = (value: unknown): Record<string, number> => value && typeof value === 'object' && !Array.isArray(value)
-    ? Object.fromEntries(Object.entries(value).filter(([, amount]) => typeof amount === 'number' && Number.isFinite(amount))) : {};
+    ? Object.fromEntries(Object.entries(value).filter(([, amount]) => typeof amount === 'number' && Number.isFinite(amount) && amount >= 0)) : {};
   return {
-    base: typeof stat?.base === 'number' && Number.isFinite(stat.base) ? stat.base : fresh.base,
+    base: typeof stat?.base === 'number' && Number.isFinite(stat.base) && stat.base >= 0 ? stat.base : fresh.base,
     additive: { ...fresh.additive, ...validSources(stat?.additive) },
     multiplicative: { ...fresh.multiplicative, ...validSources(stat?.multiplicative) }
   };
+}
+
+function normalizeStats(source: Partial<PlayerStats>, defaults: PlayerStats): PlayerStats {
+  const typed = (kind: 'attack' | 'defense' | 'damageResistance'): PlayerStats[typeof kind] => ({
+    blunt: normalizeStat(source[kind]?.blunt, defaults[kind].blunt.base),
+    slash: normalizeStat(source[kind]?.slash, defaults[kind].slash.base),
+    piercing: normalizeStat(source[kind]?.piercing, defaults[kind].piercing.base)
+  });
+  return {
+    maxHp: normalizeStat(source.maxHp, defaults.maxHp.base), attack: typed('attack'), defense: typed('defense'), damageResistance: typed('damageResistance'),
+    regen: normalizeStat(source.regen, defaults.regen.base), speed: normalizeStat(source.speed, defaults.speed.base),
+    criticalChance: normalizeStat(source.criticalChance, defaults.criticalChance.base), criticalDamage: normalizeStat(source.criticalDamage, defaults.criticalDamage.base),
+    blockChance: normalizeStat(source.blockChance, defaults.blockChance.base), evasion: normalizeEvasion(source.evasion)
+  };
+}
+
+function reachableAreas(unlockedAreas: number[]): Set<number> {
+  const reached = new Set([1]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const gate of WORLD_CONNECTIONS) {
+      if (!unlockedAreas.includes(gate.requiredUnlockedAreaId)) continue;
+      const next = reached.has(gate.areaAId) ? gate.areaBId : reached.has(gate.areaBId) ? gate.areaAId : null;
+      if (next !== null && !reached.has(next)) { reached.add(next); changed = true; }
+    }
+  }
+  return reached;
+}
+
+function validMinionLocation(areaId: number, x: number, z: number, unlockedAreas: number[]): boolean {
+  const area = AREAS.find((candidate) => candidate.id === areaId);
+  if (!area || !reachableAreas(unlockedAreas).has(areaId) || !Number.isFinite(x) || !Number.isFinite(z)) return false;
+  const inside = Math.abs(x - area.originX) <= area.size.width / 2 - .45 && Math.abs(z - area.originZ) <= area.size.depth / 2 - .45;
+  const corridor = WORLD_CONNECTIONS.some((gate) => unlockedAreas.includes(gate.requiredUnlockedAreaId)
+    && (gate.areaAId === areaId || gate.areaBId === areaId)
+    && Math.abs(gate.axis === 'x' ? z - gate.z : x - gate.x) <= gate.width / 2 - .45
+    && Math.abs(gate.axis === 'x' ? x - gate.x : z - gate.z) <= Math.max(4, (gate.barrierDepth ?? 0) + 4));
+  if (!inside && !corridor) return false;
+  return !area.collision.some((shape) => {
+    if (shape.activation && unlockedAreas.includes(WORLD_CONNECTIONS.find((gate) => gate.id === shape.activation?.connectionId)?.requiredUnlockedAreaId ?? -1)) return false;
+    return circleOverlapsWorldCollision({ x, z }, .45, shape);
+  });
+}
+
+function normalizeMinions(value: unknown, unlockedAreas: number[], now: number): MinionProgression {
+  const source = value && typeof value === 'object' ? value as Partial<MinionProgression> : {};
+  const roster: SavedMinion[] = [];
+  const ids = new Set<string>();
+  for (const entry of Array.isArray(source.roster) ? source.roster : []) {
+    if (!entry || typeof entry !== 'object' || typeof entry.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(entry.id) || ids.has(entry.id)) continue;
+    ids.add(entry.id);
+    const stats = normalizeStats(entry.stats && typeof entry.stats === 'object' ? entry.stats : {}, freshMinionStats());
+    const savedDeadline = typeof entry.respawnAt === 'number' && Number.isFinite(entry.respawnAt) && entry.respawnAt > 0 ? entry.respawnAt : null;
+    const expired = savedDeadline !== null && savedDeadline <= now;
+    const location = !expired && validMinionLocation(entry.areaId, entry.position?.x, entry.position?.z, unlockedAreas)
+      ? { areaId: entry.areaId, position: { x: entry.position.x, z: entry.position.z } }
+      : { areaId: MINION_PIT.areaId, position: { x: MINION_PIT.x, z: MINION_PIT.z } };
+    const deadline = savedDeadline !== null && savedDeadline > now ? savedDeadline : null;
+    const copiesEarned = Object.fromEntries(Object.entries(entry.copiesEarned ?? {}).filter(([id, count]) => EQUIPMENT_BY_ID.has(id) && typeof count === 'number' && Number.isSafeInteger(count) && count >= 0));
+    const contributions = emptySoulContributions();
+    for (const type of Object.keys(contributions) as (keyof typeof contributions)[]) contributions[type] = nonNegativeInteger(entry.soulContributions?.[type]);
+    roster.push({ id: entry.id, color: validMinionColor(entry.color) ? entry.color : 'variant-1', ...location,
+      hp: deadline ? 0 : expired ? statTotal(stats.maxHp) : Math.min(statTotal(stats.maxHp), Math.max(0, finiteNumber(entry.hp, statTotal(stats.maxHp)))), respawnAt: deadline,
+      stats, inventory: migrateInventory(entry.inventory, unlockedAreas), copiesEarned, soulContributions: contributions });
+  }
+  const largestSerial = roster.reduce((max, minion) => {
+    const serial = /^minion-[1-9]\d*$/.test(minion.id) ? Number(minion.id.slice(7)) : 0;
+    return Number.isSafeInteger(serial) ? Math.max(max, serial) : max;
+  }, 0);
+  const requestedSerial = nonNegativeInteger(source.nextSerial, 1);
+  return { nextSerial: Math.min(Number.MAX_SAFE_INTEGER, Math.max(largestSerial + 1, Number.isSafeInteger(requestedSerial) ? requestedSerial : 1, 1)), unlockedEver: source.unlockedEver === true || roster.length > 0,
+    paidSummonCount: nonNegativeInteger(source.paidSummonCount), roster };
 }
 
 function normalizeEvasion(value: unknown): EvasionSources {
@@ -167,10 +243,10 @@ function normalizeEvasion(value: unknown): EvasionSources {
   // v16 stored raw evasion directly as StatSources; retain every accumulated source.
   if (!('raw' in source)) {
     const kills = Math.max(0, finiteNumber(source.additive?.kills, 0));
-    return { raw: { kills, other: Math.max(0, statTotal(normalizeStat(source, 0)) - kills) }, directChance: fresh.directChance };
+    return { raw: { kills, minions: 0, other: Math.max(0, statTotal(normalizeStat(source, 0)) - kills) }, directChance: fresh.directChance };
   }
   return {
-    raw: { kills: Math.max(0, finiteNumber(source.raw?.kills, 0)), other: Math.max(0, finiteNumber(source.raw?.other, 0)) },
+    raw: { kills: Math.max(0, finiteNumber(source.raw?.kills, 0)), minions: Math.max(0, finiteNumber(source.raw?.minions, 0)), other: Math.max(0, finiteNumber(source.raw?.other, 0)) },
     directChance: {
       equipment: Math.max(0, finiteNumber(source.directChance?.equipment, 0)),
       soulCatcher: Math.max(0, finiteNumber(source.directChance?.soulCatcher, 0)),
@@ -189,7 +265,7 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     } catch { /* Unavailable storage is handled by the browser adapter. */ }
   }
   return {
-    version: 18,
+    version: 19,
     dailyKey: localDailyKey(now),
     currentAreaId: 1,
     unlockedAreas: [1],
@@ -198,14 +274,15 @@ export function loadSave(storage: SaveStorage = browserSaveStorage, now = new Da
     stats: freshStats(),
     inventory: freshInventory(),
     spawns: emptySpawnState(),
-    soulCatcher: { balances: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 }, nodeLevels: {}, unlockAnnouncementSeen: false, xp: 0, highestUnlockedLayer: 1 }
+    soulCatcher: { balances: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 }, nodeLevels: {}, unlockAnnouncementSeen: false, xp: 0, highestUnlockedLayer: 1 },
+    minions: emptyMinionProgression()
   };
 }
 
 function decodeSave(raw: string, now: Date): SaveData | null {
   try {
     const parsed = JSON.parse(raw) as Omit<Partial<SaveData>, 'version' | 'spawns'> & { version?: number; spawns?: unknown };
-    if (!parsed || ![7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(parsed.version ?? 0) || !parsed.stats || typeof parsed.stats !== 'object' || Array.isArray(parsed.stats)) return null;
+    if (!parsed || ![7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19].includes(parsed.version ?? 0) || !parsed.stats || typeof parsed.stats !== 'object' || Array.isArray(parsed.stats)) return null;
     const areaIds = new Set(AREAS.map((area) => area.id));
     const spawnIds = new Set(SPAWNS.map((spawn) => spawn.id));
     const unlockedAreas = Array.from(new Set([1, ...(Array.isArray(parsed.unlockedAreas) ? parsed.unlockedAreas : [])])).filter((id): id is number => typeof id === 'number' && areaIds.has(id));
@@ -215,21 +292,10 @@ function decodeSave(raw: string, now: Date): SaveData | null {
       if (!unlockedAreas.includes(connection.requiredUnlockedAreaId)) unlockedAreas.push(connection.requiredUnlockedAreaId);
     }
     const requestedArea = parsed.currentAreaId ?? 1;
-    const stats: PlayerStats = {
-      maxHp: normalizeStat(parsed.stats.maxHp, BASE_HERO_MAX_HP),
-      attack: { blunt: normalizeStat(parsed.stats.attack?.blunt, BASE_HERO_BLUNT_ATTACK), slash: normalizeStat(parsed.stats.attack?.slash, 0), piercing: normalizeStat(parsed.stats.attack?.piercing, 0) },
-      defense: { blunt: normalizeStat(parsed.stats.defense?.blunt, 0), slash: normalizeStat(parsed.stats.defense?.slash, 0), piercing: normalizeStat(parsed.stats.defense?.piercing, 0) },
-      damageResistance: { blunt: normalizeStat(parsed.stats.damageResistance?.blunt, 0), slash: normalizeStat(parsed.stats.damageResistance?.slash, 0), piercing: normalizeStat(parsed.stats.damageResistance?.piercing, 0) },
-      regen: normalizeStat(parsed.stats.regen, BASE_HERO_REGEN),
-      speed: normalizeStat(parsed.stats.speed, BASE_HERO_SPEED_RAW),
-      criticalChance: normalizeStat(parsed.stats.criticalChance, BASE_HERO_CRITICAL_CHANCE_RAW),
-      criticalDamage: normalizeStat(parsed.stats.criticalDamage, BASE_HERO_CRITICAL_DAMAGE_RAW),
-      blockChance: normalizeStat(parsed.stats.blockChance, BASE_HERO_BLOCK_CHANCE_RAW),
-      evasion: normalizeEvasion(parsed.stats.evasion)
-    };
+    const stats = normalizeStats(parsed.stats, freshStats());
     const maxHp = statTotal(stats.maxHp);
     return {
-      version: 18,
+      version: 19,
       dailyKey: localDailyKey(now),
       currentAreaId: typeof requestedArea === 'number' && areaIds.has(requestedArea) && unlockedAreas.includes(requestedArea) ? requestedArea : 1,
       unlockedAreas,
@@ -238,7 +304,8 @@ function decodeSave(raw: string, now: Date): SaveData | null {
       stats,
       inventory: migrateInventory(parsed.inventory, unlockedAreas),
       spawns: parsed.dailyKey === localDailyKey(now) ? migrateSpawns(parsed.spawns) : emptySpawnState(),
-      soulCatcher: normalizeSoulCatcher(parsed.soulCatcher)
+      soulCatcher: normalizeSoulCatcher(parsed.soulCatcher),
+      minions: normalizeMinions(parsed.minions, unlockedAreas, now.getTime())
     };
   } catch {
     return null;

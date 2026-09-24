@@ -1,6 +1,6 @@
 import { heroRegen, maxHeroHp } from './HeroStats';
 import { statTotal } from '../domain/stats/StatSources';
-import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId, SaveData, StatSources } from '../types';
+import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId, SaveData, StatSources, InventoryState, PlayerStats } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { ascendCopies, ascendOwnedEquipment, canAscend, equipmentAscendValue, equipmentDamage, equipmentDefense, equipmentValuePerLevel } from '../domain/items/EquipmentProgression';
 
@@ -19,7 +19,7 @@ export type InventoryCombatSummary = {
  * Runtime equipment orchestration. Static definitions and progression math live
  * in the item domain; this system only connects them to persistent player state.
  */
-export function attackProfile(state: SaveData, hand: WeaponSlotId): AttackProfile | null {
+export function attackProfile(state: { stats: PlayerStats; inventory: InventoryState }, hand: WeaponSlotId): AttackProfile | null {
   const itemId = state.inventory.equipped[hand];
   const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
   const owned = itemId ? state.inventory.items[itemId] : undefined;
@@ -74,11 +74,11 @@ export function ascend(state: SaveData, itemId: string): boolean {
   return true;
 }
 
-export function equippedDefense(state: SaveData, type: DamageType): number {
+export function equippedDefense(state: { stats: PlayerStats; inventory: InventoryState }, type: DamageType): number {
   return statTotal(defenseSources(state, type));
 }
 
-export function defenseSources(state: SaveData, type: DamageType): StatSources {
+export function defenseSources(state: { stats: PlayerStats; inventory: InventoryState }, type: DamageType): StatSources {
   const armor = (['helmet', 'armor', 'legs'] as const).reduce((total, slot) => {
     const itemId = state.inventory.equipped[slot];
     const item = itemId ? EQUIPMENT_BY_ID.get(itemId) : undefined;
