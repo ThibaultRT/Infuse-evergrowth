@@ -2,11 +2,10 @@
 
 ## Current state and next decisions
 
-Area 4 is an environment-only region south of Areas 1 and 3. The flat ash terrain,
+Area 4 is a burned-forest region south of Areas 1 and 3. The flat ash terrain,
 rift and two bridges, gates, supplied throne, charred forest, eastern fence/gate,
-and southern lava shore are integrated. It has no encounters, boss, loot, lava damage,
-falling, bridge collapse, particles, or throne interaction. The unused enemy affinity
-header is provisional until encounters are designed.
+southern lava shore, and thirty-enemy encounter population are integrated. It has
+no lava damage, falling, bridge collapse, particles, or throne interaction.
 
 The initial scattered dressing passed the user's movement review. The two dense
 groves still need the user's manual movement and visibility review. Real-device load
@@ -43,7 +42,7 @@ superseded; the west exit stays closed.
 | Bridge walk profiles | 3.4 m clear deck, Z `30..42` at Y `0.6`; 3 m approaches to Y `0` at Z `27` and `45` |
 | S2 land gate | `(7.2,0,27)` before the north ramp; separate bone/iron module |
 | Area 3 south wall/gate | `(86,0,30)` at the rift bank; masonry wall joins and inland-opening doors |
-| Throne | A04 local `(0,0,15)`, world `(36,0,75)`; 5.4 m tall, 4.9 × 3.7 m blocked footprint, faces -Z |
+| Throne | A04 local `(0,0,15)`, world `(36,0,75)`; 10.8 m tall, 9.8 × 7.4 m blocked footprint, faces -Z |
 | Eastern boundary | Fence at X `108`; closed 8 m gate at `(108,0,71.4)` |
 | Southern lake | X `-42..114`, Z `82..90`; blocks the full south playable edge and corners |
 
@@ -55,8 +54,8 @@ join at X=36 and flatten around bridge lanes. The A03 south wall joins the rift'
 north edge at Z=30. Area 4 does not exceed the combined width of Areas 1 and 3.
 
 Defeating Area 3 boss `area3-epic-01` opens both gates, including for supported saves
-with that victory already recorded. Area 4 has `bossSpawnId: null` and no spawns.
-The existing area list and current-area save fields represent this extension; save
+with that victory already recorded. Area 4 has thirty authored spawns and one
+explicit epic boss guarding the throne. The existing area list and current-area save fields represent this extension; save
 v18 and its storage key remain unchanged. Lava pools and the southern lake are
 impassable through authored collision, with no damage mechanic. The eastern gate
 stays closed until a destination is designed.
@@ -73,7 +72,7 @@ Area 3 masonry gate, and user-supplied throne are already integrated. Retain the
 named placements and semantic fallbacks. S2's overhead bones fade separately from
 its deck. W2's cosmetic damage and sag leave a continuous supported route. Gate
 leaves open inland and clear the full 3.4 m lane. The throne's supplied proportions
-are uniformly scaled to 5.4 m; its lava apron is cosmetic.
+are uniformly scaled to 10.8 m; its lava apron is cosmetic.
 
 For a replacement asset, request a user-made reference/source and specify the
 required dimensions, front/side/top and game-camera views, and 1.8 m human scale
@@ -104,6 +103,5 @@ Profile load time, memory, and frame rate on an iPhone 12-class device before
 accepting the environment performance target. Static captures and browser emulation
 do not establish real-device performance.
 
-Later, design encounters, affinity, boss, rewards, and any throne interaction as a
-separate content pass. Stable spawn IDs and authored HP/damage/rewards belong in
+Stable spawn IDs and authored HP/damage/rewards belong in
 `src/data/areas/area-4.json`; any new save shape needs full versioned migration.

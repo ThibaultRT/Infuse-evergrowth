@@ -99,10 +99,10 @@ within its named prop's unit circle, scaled by the shared pool radius for both
 rendering and collision. No gameplay heights are read from this geometry.
 
 `A04_Ancient_Throne` uses the supplied throne GLB at local `(0,0,15)`, world
-`(36,0,75)`. Uniform scale is baked into the mesh: height 5.4 m, ground Y=0,
-root scale 1 and front -Z. Its natural proportions occupy 4.887 × 3.657 m;
-the shared spec reserves a 4.9 × 3.7 m collision footprint, including the lava
-apron. The model and fallback both use that same placement and occlusion tag.
+`(36,0,75)`. The promoted source is uniformly rendered at 2×: height 10.8 m,
+ground Y=0 and front -Z. The shared spec reserves a 9.8 × 7.4 m collision
+footprint, including the lava apron. The model and fallback both use that same
+placement and occlusion tag.
 
 Area A03's ruined masonry uses `fallen-keep.json` for both Blender dimensions and
 semantic collision. Each corner placement is derived from its tower pivot so both

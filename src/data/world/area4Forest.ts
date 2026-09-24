@@ -16,7 +16,7 @@ export function createArea4ForestScatters(roads: readonly WorldRoadPlacement[], 
     ...spots.map(({ center, radius }) => ({ center, radius: radius + scatter.clearingMargin })),
     ...AREA4_SPEC.lavaPools.map(({ center, radius }) => ({ center: [center[0], center[1]] as const, radius: radius + scatter.clearingMargin })),
     { center: [AREA4_SPEC.throne.center[0], AREA4_SPEC.throne.center[1]] as const, radius: Math.hypot(AREA4_SPEC.throne.width, AREA4_SPEC.throne.depth) / 2 + 2 },
-    ...encounters.spawns.map((spawn: { x: number; z: number }) => ({ center: [spawn.x, spawn.z] as const, radius: 4 })),
+    ...encounters.spawns.map((spawn: { x: number; z: number }) => ({ center: [spawn.x, spawn.z] as const, radius: 2 })),
     // Sample the control polygon with enough margin for the rendered smooth bends.
     ...roads.flatMap((road) => road.points.slice(1).flatMap((to, index) => {
       const from = road.points[index];

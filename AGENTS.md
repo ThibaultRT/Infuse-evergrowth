@@ -49,7 +49,7 @@ Model state is authoritative; systems change it; views project it. Cross-system 
 
 ## Gameplay invariants
 
-- Static equipment definitions are separate from owned Level/Ascend state. Ascend scales both the new base and per-level growth as configured.
+- Static equipment definitions are separate from owned Level/Ascend state. Weapon Ascend scales both the new base and per-level growth as configured; armor Ascend raises its base while keeping per-copy growth fixed and increasing the next copy threshold by rarity.
 - Spawners have stable authored IDs. Their save state owns daily kills, defeat/respawn deadlines, and the persisted per-life HP/reward roll. Reroll only on revival, explicit reset, or local-midnight reset.
 - Spawn HP, rewards, and attack damage are authored per spawn, not calculated globally.
 - Bosses use explicit `isBoss`; gate requirements must match `bossSpawnId`. Use “gate,” never legacy “portal” terminology.

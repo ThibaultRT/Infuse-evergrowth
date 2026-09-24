@@ -94,7 +94,7 @@ export type WeaponClass = 'sword' | 'hammer' | 'spear';
 export type ArmorClass = 'helmet' | 'armor' | 'boots';
 type EquipmentBase = { id: string; name: string; rarity: EquipmentRarity; damageType: DamageType };
 export type WeaponDefinition = EquipmentBase & { kind: 'weapon'; weaponClass: WeaponClass; baseDamage: number; baseDamagePerLevel: number; attackCooldownSeconds: number };
-export type ArmorDefinition = EquipmentBase & { kind: 'armor'; armorClass: ArmorClass; baseDefensePerLevel: number };
+export type ArmorDefinition = EquipmentBase & { kind: 'armor'; armorClass: ArmorClass };
 export type EquipmentDefinition = WeaponDefinition | ArmorDefinition;
 export type OwnedEquipment = { itemId: string; level: number; ascend: number };
 
