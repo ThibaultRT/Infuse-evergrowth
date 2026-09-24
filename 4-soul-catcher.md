@@ -37,15 +37,16 @@ Do not place Soul Catcher balance calculations in UI code. Do not add Soul-Catch
 
 ## Terminology
 
-A **Soul Catcher progression layer** is a complete 30-node tree selected through the bottom tabs.
+A **Soul Catcher progression layer** is an authored tree selected through the bottom tabs. The original layers have 30 nodes each; the minion feature adds one bonus node to Layer 1.
 
 The concentric radii used to draw nodes inside a tree are only visual rings. Do not call those visual rings progression layers in new code or documentation.
 
 Layer 1 contains SC-01 through SC-30.
 Layer 2 contains SC-31 through SC-60.
 Future layers continue with globally unique IDs up to SC-300 for Layer 10.
+`SC-M01` is the Layer 1 Minion Covenant bonus node beside `SC-21`. It is revealed from `SC-20` and has a typed `unlockMinions` effect; it does not renumber or replace existing nodes. Minion persistence and reward ownership rules are in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Neighbor-based reveal remains local to each progression layer. Unlocking a progression layer makes its first node available; it does not reveal all 30 nodes.
+Neighbor-based reveal remains local to each progression layer. Unlocking a progression layer makes its first node available; it does not reveal the whole tree.
 
 ## Global Soul Catcher XP
 
@@ -78,7 +79,7 @@ For each authored layer:
 3. sum the full-layer maximum XP value;
 4. set the unlock target at approximately 80% of that value, rounded to a clean balance value when useful.
 
-Layer 1 currently represents approximately 105,365 weighted XP when fully maxed, giving a Layer 1 -> 2 target of approximately **84,292 XP**.
+The original 30 Layer 1 nodes represent approximately 105,365 weighted XP when fully maxed. `SC-M01` adds 90 XP to that maximum; the published Layer 1 -> 2 target remains **84,292 XP** so existing saves do not relock Layer 2.
 
 Layer 2 should target roughly 3x the economic scale of Layer 1. Its final Layer 2 -> 3 threshold must be recalculated from the authored Layer 2 JSON rather than copied from a provisional estimate.
 
@@ -152,7 +153,7 @@ Migration requirements:
 - highest unlocked progression layer back to Layer 1;
 - reveal state back to the initial Layer 1 node only.
 
-It must continue to preserve Area 2/world unlock progression and must not replay the original Soul Catcher unlock announcement.
+It must continue to preserve Area 2/world unlock progression and must not replay the original Soul Catcher unlock announcement. The permanent minion unlock, roster, and paid-summon count also survive this reset; re-purchasing `SC-M01` grants normal Soul Catcher XP but no second minion unlock.
 
 ## Layer registry and authored data
 
@@ -160,13 +161,13 @@ Refactor Soul Catcher data into a 10-layer registry.
 
 Expected authored structure:
 
-- `src/data/soul-catcher/layer-01.json` — existing 30-node tree;
+- `src/data/soul-catcher/layer-01.json` — the original 30-node tree plus the `SC-M01` bonus node;
 - `src/data/soul-catcher/layer-02.json` — new 30-node tree;
 - Layers 3–10 represented by progression metadata even if they do not yet have node JSON.
 
 Validation should enforce:
 
-- exactly 30 nodes in each authored progression layer;
+- exactly 30 nodes in Layer 2 and other ordinary authored layers; Layer 1 has 31 including `SC-M01`;
 - globally unique node IDs;
 - valid neighbor references;
 - no accidental neighbor connection across progression layers;
@@ -430,7 +431,7 @@ Do not emit redundant events if an existing event already carries all required i
 - support 10 progression-layer metadata entries;
 - keep Layer 1 data intact;
 - add Layer 2 data shape support;
-- change validation from 30 nodes globally to 30 nodes per authored progression layer;
+- change validation from 30 nodes globally to the authored per-layer count (30 in ordinary layers, 31 in Layer 1 including `SC-M01`);
 - allow globally unique SC-01..SC-300 IDs;
 - ensure graph edges stay within their progression layer;
 - add XP rarity conversion and threshold pure rules;

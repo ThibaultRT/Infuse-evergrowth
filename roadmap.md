@@ -7,7 +7,6 @@ This is the single index for planned work. Completed implementation history belo
 3. [Physical hand combat](3-physical-hand-combat.md) — replace whole-body attack playback with independent upper-body/hand presentation.
 4. [Soul Catcher progression](4-soul-catcher.md) — add Area 2 unlock, rarity soul drops, radial upgrade tree, and the right-side Soul Catcher / Inventory HUD rail.
 5. [Area 4 construction](area4.md) — burned forest south of Areas 1 and 3, rift crossings, major asset handoff and later terrain/content passes.
-6. [Autonomous minions](minions.md) — add Soul-unlocked allies with independent combat progression, equipment, sacrifice infusion, and Summoning Pit management.
 
 ## Maintenance rule
 

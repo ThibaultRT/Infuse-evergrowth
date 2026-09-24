@@ -61,6 +61,13 @@ Model state is authoritative; systems change it; views project it. Cross-system 
   world placements may generate collision from semantic prop proxies, but never from
   loaded meshes or GLB bounds; structural transforms must not be copied into a
   parallel collision list. DOM world labels must track life and visibility.
+- Minions are permanently unlocked through the typed `SC-M01` Soul Catcher effect;
+  Soul Catcher reset preserves the unlock, roster, and paid-summon count. Active
+  minions and engaged enemies simulate across unlocked areas even when their views
+  are not mounted. Lethal hits have one stable owner; global Souls, spawn state, and
+  boss/gate consequences happen once, while stat and equipment rewards go to that
+  owner. Track a minion's lifetime earned equipment copies before Ascend consumes
+  them, because sacrifice transfers those copies and half its kill-earned stats.
 
 ## Feature workflow
 

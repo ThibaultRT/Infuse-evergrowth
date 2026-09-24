@@ -32,13 +32,15 @@ src/rendering + src/ui  Three.js/DOM projections and input adapters
 - `src/game/Game.ts`: browser composition root, visual event bindings, and render loop.
 - `src/game/GameSession.ts`: renderer-independent gameplay lifecycle and system coordination.
 - `src/game/GameCommands.ts`: explicit commands acting on the injected session state.
-- `src/systems/ProgressionSnapshot.ts`: detached, deeply read-only presentation values for Stats, equipped slots, inventory/details/Ascend, and all Soul layers. `GameSession.progressionSnapshot()` reads existing rules without mutating the save. Panels consume this interface instead of saves or rule callbacks.
-- `src/ui/GameUiController.ts`: panel, inventory, Soul Catcher, and settings interactions; no simulation pause state.
+- `src/systems/ProgressionSnapshot.ts`: detached, deeply read-only presentation values for Stats, equipped slots, inventory/details/Ascend, Soul layers, and the minion roster. `GameSession.progressionSnapshot()` reads existing rules without mutating the save. Panels consume this interface instead of saves or rule callbacks.
+- `src/ui/GameUiController.ts`: panel, inventory, Soul Catcher, minion, and settings interactions; no simulation pause state.
 - `src/game/GameEvents.ts`: typed event bus.
 - `src/domain/`: combat, stats, items, spawns, and world values.
 - `src/domain/world/WorldCollisionCompiler.ts`: pure expansion of shared
   placements/proxies into gameplay collision values.
 - `src/systems/`: combat, enemy AI, equipment/drop, Soul Catcher, hero stat projections, respawn, and progression. Boss-gate unlocking has one path in `ProgressionSystem`.
+- `src/systems/MinionSystem.ts` and `MinionAISystem.ts`: persistent roster/rewards and transient autonomous intent, respectively. `src/domain/minions.ts` owns pure summon, equipment, recovery, and infusion rules.
+- `src/domain/world/WorldNavigation.ts`: routes over authored walk surfaces, semantic collision, and unlocked connections for actors in separate areas.
 - `src/rendering/`: asset-backed Three.js views and effects.
 - `src/save.ts`: versioned loading/migration and one recoverable previous save. The current save wins when valid; the backup is used on corruption. Simultaneous tabs deliberately use last-write-wins.
 - `src/data/areas/*.json`: language-neutral spawn, enemy, reward and encounter
@@ -57,6 +59,15 @@ Pure domain, systems, data, and `GameSession` can run without a browser renderer
 - Gameplay continues during panels, DOM confirmations, and camera presentations. Only rendering is unavailable during WebGL context loss; browser background throttling remains platform-controlled.
 - Reduced resolution disables water transmission and uses front faces. Full retains authored transmission and double-sided water.
 - Progression views refresh on panel open or coalesced progression events. The snapshot is not rebuilt in the simulation/render loop; closed panels do not rebuild their DOM. UI selection, scrolling, and tree transforms stay in the UI controller. Commands still validate against current authoritative state.
+
+## Minion invariants
+
+- `minions.unlockedEver` is the permanent feature flag and records the first free grant. `SC-M01` has a typed `unlockMinions` effect; repeat purchases after Soul Catcher reset grant XP only. Reset preserves the unlock, roster, and paid-summon count. Layer membership comes from the authored layer registry: Layer 1 has 31 nodes including `SC-M01`, while Layer 2 has 30. The published Layer 1 to 2 threshold remains 84,292 XP.
+- The save owns stable minion IDs, color variants, area/position, HP, respawn deadlines, independent stats/inventory, `copiesEarned` by item ID, and Soul contributions. Target, path, cooldown, and recovery mode are transient. Invalid saved positions fall back to the shared Summoning Pit placement in `src/data/world/minionPit.ts`; expired death deadlines revive at the pit.
+- `GameplayRuntime` and `MinionAISystem` simulate minions and engaged enemies in areas containing the hero or a living minion, regardless of visual residency. Navigation uses authored walk surfaces, semantic blockers, and unlocked connections. Hero area/camera state does not follow a minion. The hero-centered visual streamer only mounts nearby views; remote combat has no local combat overlays or cinematics.
+- A lethal hit has one stable `CombatActorRef` owner. `ProgressionSystem.defeat` commits the spawn's global defeat/respawn state, Soul credit, boss/gate consequences, and that owner's stat/equipment rewards once before emitting presentation events. Minion drops stay in private inventory; their `copiesEarned` ledger counts awarded quantities before Ascend consumes copies. Soul contribution totals are attribution only; Souls enter the player's balance on the kill.
+- `MinionSystem` auto-equips compatible drops, prefers a free slot, and replaces equipped gear only for a strict improvement in standalone calculated value. Sacrifice consumes the roster once, adds half of its kill-earned stats to the hero's `minions` additive sources, and transfers every lifetime earned equipment copy through the usual copy rule. It does not transfer Ascend ranks or credit Souls again. Paid summoning uses the persisted count and `balance.json` cost/capacity values.
+- Minion combat advances only during active simulation. Wall-clock respawn deadlines may mature while the app is away, but elapsed background time grants no combat rewards. `MinionIdleController` pauses minion activity after five minutes without input using a device-local setting; it does not delete or reset progression.
 
 ## Offline assets and updates
 

@@ -306,5 +306,5 @@ no collision. The static viewer's `?minions` fixture loads only Area 1 and shows
 three variants for review; it never starts simulation or writes saves. Captures
 cover 390×844 Full, Reduced, and failed-model fallbacks; residency checks cover
 locked, remote, dead and re-entry snapshots. Real-device movement/performance
-judgment remains manual. The runtime projected button is disabled until slice 7
-provides the management panel and commands.
+judgment remains manual. The runtime projected button opens the management panel
+when the permanent minion unlock is present.
