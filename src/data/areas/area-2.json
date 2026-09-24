@@ -747,7 +747,7 @@
         }
       ],
       "isBoss": true,
-      "attackDamage": 60
+      "attackDamage": 320
     },
     {
       "id": "area2-epic-01",
@@ -765,7 +765,7 @@
           "max": 30
         }
       ],
-      "attackDamage": 96
+      "attackDamage": 1300
     }
   ]
 }
