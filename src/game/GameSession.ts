@@ -65,7 +65,14 @@ export class GameSession {
 
   persist(): void { this.state.heroHp = this.runtime.hero.hp; this.writeSave(); }
 
-  progressionSnapshot(): ProgressionSnapshot { return createProgressionSnapshot(this.state, this.soulCatcher, this.minions); }
+  progressionSnapshot(): ProgressionSnapshot {
+    return createProgressionSnapshot(this.state, this.soulCatcher, this.minions, (id) => {
+      const targetId = this.minionAI.targetId(id);
+      const target = targetId ? this.runtime.spawnById.get(targetId) : null;
+      return { mode: this.minionAI.mode(id), target: target?.alive
+        ? { id: target.id, tier: target.definition.tier, hp: target.hp, maxHp: target.maxHp } : null };
+    });
+  }
 
   update(dt: number, movement: Readonly<{ x: number; y: number }>, elapsedSeconds = dt): void {
     this.combat.update(dt);
@@ -107,7 +114,11 @@ export class GameSession {
       this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + heroRegen(this.state.stats) * multiplier * dt);
     }
     this.healthPersistSeconds += dt;
-    if (this.healthPersistSeconds >= 1) { this.healthPersistSeconds = 0; this.persist(); }
+    if (this.healthPersistSeconds >= 1) {
+      this.healthPersistSeconds = 0;
+      this.persist();
+      if (this.state.minions.roster.length) this.events.emit('minionVitalsChanged', undefined);
+    }
   }
 
   damageHero(amount: number, type: CombatAffinity): void {

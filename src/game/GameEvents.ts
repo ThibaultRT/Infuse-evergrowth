@@ -34,6 +34,7 @@ export type GameEventMap = {
   minionRespawned: { minionId: string };
   minionEquipmentChanged: { minionId: string; itemId: string; slot: EquipmentSlotId | null };
   minionProgressed: { minionId: string; sourceId: string; stat: LootType; amount: number; itemId: string | null; quantity: number; souls: { type: SoulType; quantity: number } | null };
+  minionVitalsChanged: undefined;
   minionsInfused: { minionIds: string[]; infusion: Infusion };
 };
 

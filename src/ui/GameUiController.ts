@@ -198,6 +198,7 @@ const refreshProgression = (): void => {
   });
 };
 for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated', 'minionsUnlocked', 'minionSummoned', 'minionDamaged', 'minionDefeated', 'minionRespawned', 'minionEquipmentChanged', 'minionProgressed', 'minionsInfused'] as const) events.on(event, refreshProgression);
+events.on('minionVitalsChanged', () => { if (ui.minionPanel.classList.contains('visible')) refreshProgression(); });
 renderQualityControls();
 renderProgressionHud(readSnapshot());
 if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = readSnapshot().minions.unlockedEver;

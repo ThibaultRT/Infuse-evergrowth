@@ -269,6 +269,8 @@ canvas { display: block; width: 100%; height: 100%; }
 .minion-card-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .minion-card-heading strong { font-size: 14px; }
 .minion-card-heading small { margin-left: auto; color: #d4c6e4; font-size: 10px; font-variant-numeric: tabular-nums; }
+.minion-activity { display: flex; justify-content: space-between; gap: 8px; margin: -2px 0 8px; color: #cdb9e3; font-size: 10px; font-variant-numeric: tabular-nums; }
+.minion-activity span:last-child { text-align: right; }
 .minion-color { width: 17px; height: 17px; flex: 0 0 17px; border-radius: 50%; border: 2px solid #ffffff9c; }
 .minion-color-variant-1 { background: #d64f44; }.minion-color-variant-2 { background: #8168c8; }.minion-color-variant-3 { background: #d9943b; }
 .minion-stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }

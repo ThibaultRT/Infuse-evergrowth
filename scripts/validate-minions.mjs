@@ -176,6 +176,38 @@ try {
   assert.equal(travelSession.runtime.spawnById.get(remoteCrystal.id).alive, false, 'AI should clear the remote crystal');
   assert.equal(travelSession.runtime.currentAreaId, 1);
 
+  // A distant, high-HP crystal keeps taking damage while the minion regenerates.
+  // Neither change emits a damage-to-minion or kill event for the management panel.
+  const distantState = fresh();
+  distantState.currentAreaId = 4;
+  distantState.unlockedAreas = config.AREAS.map((area) => area.id);
+  distantState.minions.unlockedEver = true;
+  const distantMinion = minionRules.createMinion('minion-1', () => 0);
+  distantMinion.areaId = 2;
+  distantMinion.position = { x: remoteCrystal.x + 1, z: remoteCrystal.z };
+  distantMinion.hp = 100;
+  distantState.minions.roster.push(distantMinion);
+  for (const spawn of config.SPAWNS) if (spawn.id !== remoteCrystal.id) distantState.spawns[spawn.id].respawnAt = now.getTime() + 60000;
+  let distantCombatEvents = 0;
+  let distantRefreshEvents = 0;
+  const distantEvents = new GameEvents();
+  distantEvents.on('minionDamaged', () => { distantCombatEvents++; });
+  distantEvents.on('minionProgressed', () => { distantCombatEvents++; });
+  distantEvents.on('minionVitalsChanged', () => { distantRefreshEvents++; });
+  const distantSession = new GameSession(distantState, distantEvents, () => {}, clock, () => .99);
+  distantSession.runtime.spawnById.get(remoteCrystal.id).hp = 500;
+  for (let frame = 0; frame < 120; frame++) distantSession.update(.05, { x: 0, y: 0 });
+  assert.equal(distantSession.runtime.currentAreaId, 4);
+  assert.equal(distantMinion.areaId, 2);
+  assert.ok(distantSession.runtime.spawnById.get(remoteCrystal.id).hp < 500, 'offscreen crystal HP must keep falling');
+  assert.ok(distantMinion.hp > 100, 'offscreen minion HP must keep regenerating');
+  assert.equal(distantCombatEvents, 0, 'sustained crystal attacks and regeneration emit no combat event');
+  assert.ok(distantRefreshEvents >= 5, 'the panel must receive periodic vitals refresh events');
+  const distantActivity = distantSession.progressionSnapshot().minions.roster[0].activity;
+  assert.equal(distantActivity.mode, 'attacking');
+  assert.equal(distantActivity.target?.id, remoteCrystal.id);
+  assert.equal(distantActivity.target?.hp, distantSession.runtime.spawnById.get(remoteCrystal.id).hp);
+
   // Death keeps private progression and uses a wall-clock deadline on reload.
   const deathState = fresh();
   deathState.minions.unlockedEver = true;
@@ -273,5 +305,5 @@ try {
   assert.equal(simultaneousState.spawns[localTarget.id].killsToday, 1);
   assert.equal(heroRewards + partnerRewards, 1);
 
-  console.log(`Minion validation passed: unlock/reset, migration, infusion math, crossing, remote AI kill, equipment, death/recovery, attacker aggro, and single-owner combat. Navigation initial graph: ${navigationMs.toFixed(1)} ms.`);
+  console.log(`Minion validation passed: unlock/reset, migration, infusion math, crossing, remote AI kill, distant crystal progress, equipment, death/recovery, attacker aggro, and single-owner combat. Navigation initial graph: ${navigationMs.toFixed(1)} ms.`);
 } finally { await vite.close(); }

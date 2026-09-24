@@ -2,12 +2,15 @@ import { SOUL_LAYER_REGISTRY, soulEdges, soulLayer } from '../data/soul-catcher'
 import balance from '../data/balance.json';
 import { soulCost } from '../domain/soul-catcher';
 import { statAdditiveTotal, statTotal } from '../domain/stats/StatSources';
-import type { DamageType, EquipmentDefinition, EquipmentSlotId, OwnedEquipment, SaveData, SoulType, StatSources, WeaponSlotId } from '../types';
+import type { DamageType, EquipmentDefinition, EquipmentSlotId, OwnedEquipment, SaveData, SoulType, StatSources, Tier, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID, ascendCopies, attackProfile, defenseSources, equipmentAscendValue, equipmentCombatSummary, equipmentDamage, equipmentDefense, equipmentSlot, equipmentSlotUnlocked, equipmentValuePerLevel, type InventoryCombatSummary } from './EquipmentSystem';
 import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRawEvasionChance, heroSpeed, heroSpeedMultiplier } from './HeroStats';
 import type { SoulCatcherSystem } from './SoulCatcherSystem';
 import { calculateInfusion, nextSummonCost, type Infusion } from '../domain/minions';
 import type { MinionSummary, MinionSystem } from './MinionSystem';
+import type { MinionMode } from './MinionAISystem';
+
+export type MinionActivitySnapshot = Readonly<{ mode: MinionMode; target: Readonly<{ id: string; tier: Tier; hp: number; maxHp: number }> | null }>;
 
 type ReadonlyValues<T> = { readonly [K in keyof T]: T[K] extends object ? ReadonlyValues<T[K]> : T[K] };
 export type StatSnapshot = ReadonlyValues<StatSources & { additiveTotal: number; total: number }>;
@@ -44,7 +47,8 @@ export type ProgressionSnapshot = ReadonlyValues<{
     yields: { type: SoulType; unlocked: boolean; base: number; additional: number; total: number }[];
     layers: { layer: number; name: string; authored: boolean; unlocked: boolean; nodes: SoulNodeSnapshot[]; edges: [string, string][] }[];
   };
-  minions: { unlockedEver: boolean; paidSummonCount: number; nextSummonCost: number; activeCapacity: number; roster: MinionSummary[]; infusionPreview: Infusion };
+  minions: { unlockedEver: boolean; paidSummonCount: number; nextSummonCost: number; activeCapacity: number;
+    roster: (MinionSummary & { activity: MinionActivitySnapshot })[]; infusionPreview: Infusion };
 }>;
 
 const WEAPON_SLOTS = ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const;
@@ -62,7 +66,8 @@ function typedStats(project: (type: DamageType) => StatSnapshot): Record<DamageT
 /** Detached, read-only presentation values. Build on demand, never in the frame loop.
  * All rules remain in their existing systems/domain; no save state or callbacks escape.
  */
-export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSystem, minions?: MinionSystem): ProgressionSnapshot {
+export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSystem, minions?: MinionSystem,
+  activityForMinion?: (id: string) => MinionActivitySnapshot): ProgressionSnapshot {
   const { stats, inventory, soulCatcher } = state;
   const slots = EQUIPMENT_SLOTS.map((slot) => ({ slot, itemId: inventory.equipped[slot], unlocked: equipmentSlotUnlocked(state, slot) }));
   const items: Record<string, EquipmentSnapshot> = {};
@@ -115,6 +120,8 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
     },
     minions: { unlockedEver: state.minions.unlockedEver, paidSummonCount: state.minions.paidSummonCount,
       nextSummonCost: nextSummonCost(state.minions.paidSummonCount), activeCapacity: balance.minions.activeCapacity,
-      roster: minions?.summaries() ?? [], infusionPreview: calculateInfusion(state.minions.roster) },
+      roster: (minions?.summaries() ?? []).map((minion) => ({ ...minion, activity: activityForMinion?.(minion.id)
+        ?? { mode: minion.respawnAt === null ? 'seeking' : 'dead', target: null } })),
+      infusionPreview: calculateInfusion(state.minions.roster) },
   };
 }

@@ -321,7 +321,12 @@ export function renderMinions(snapshot: ProgressionSnapshot): void {
     const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) =>
       minionStatCell(`${sourceLabel(type)} Souls contributed`, soulIcon(type), minionNumber(minion.soulContributions[type]))).join('');
     const status = minion.respawnAt === null ? `Area ${minion.areaId} · Active` : `<span data-respawn-at="${minion.respawnAt}"></span>`;
-    return `<article class="minion-card"><div class="minion-card-heading"><span class="minion-color minion-color-${minion.color}" aria-hidden="true"></span><strong>Imp ${minion.id.replace(/^minion-/, '#')}</strong><small>${status}</small></div><div class="minion-stat-grid">${statCells}</div><div class="minion-card-subtitle">Equipped</div><div class="minion-equipment-grid">${equipped || '<span class="minion-empty">None</span>'}</div><div class="minion-card-subtitle">Souls contributed</div><div class="minion-soul-grid">${souls}</div></article>`;
+    const { mode, target } = minion.activity;
+    const targetKind = target ? target.tier === 'crystal' ? 'crystal' : `${target.tier} enemy` : '';
+    const activity = minion.respawnAt !== null ? 'Waiting to respawn' : mode === 'recovering' ? 'Recovering'
+      : mode === 'attacking' && target ? `Attacking ${targetKind}` : mode === 'moving' && target ? `Moving toward ${targetKind}` : 'Seeking target';
+    const targetProgress = target && minion.respawnAt === null ? `<span aria-label="Target ${target.id} HP: ${minionNumber(target.hp)} of ${minionNumber(target.maxHp)}">${minionNumber(target.hp)} / ${minionNumber(target.maxHp)} HP</span>` : '';
+    return `<article class="minion-card"><div class="minion-card-heading"><span class="minion-color minion-color-${minion.color}" aria-hidden="true"></span><strong>Imp ${minion.id.replace(/^minion-/, '#')}</strong><small>${status}</small></div><div class="minion-activity"><span>${activity}</span>${targetProgress}</div><div class="minion-stat-grid">${statCells}</div><div class="minion-card-subtitle">Equipped</div><div class="minion-equipment-grid">${equipped || '<span class="minion-empty">None</span>'}</div><div class="minion-card-subtitle">Souls contributed</div><div class="minion-soul-grid">${souls}</div></article>`;
   }).join('') : '<p class="minion-empty-roster">No minions summoned.</p>';
   const { stats, copies } = minions.infusionPreview;
   const statPreview = (Object.keys(minionStatLabels) as LootType[]).filter((type) => stats[type] !== 0).map((type) =>

@@ -32,6 +32,7 @@ export class MinionAISystem {
   }
 
   mode(id: string): MinionMode { return this.intents.get(id)?.mode ?? 'seeking'; }
+  targetId(id: string): string | null { return this.intents.get(id)?.targetId ?? null; }
   afterKill(minion: SavedMinion): void {
     const intent = this.intent(minion);
     intent.targetId = null; intent.path = []; intent.seekAfter = 0;
