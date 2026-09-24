@@ -322,7 +322,8 @@ function normalizeSoulCatcher(value: unknown): SaveData['soulCatcher'] {
   }));
   const historicalXp = Object.entries(nodeLevels).reduce((total, [id, level]) => {
     const node = SOUL_NODE_BY_ID.get(id)!;
-    const cost = level * (soulCost(node, 1) + soulCost(node, level)) / 2;
+    let cost = 0;
+    for (let purchasedLevel = 1; purchasedLevel <= level; purchasedLevel += 1) cost += soulCost(node, purchasedLevel);
     return total + soulPurchaseXp(node.cost.soulType, cost);
   }, 0);
   const xp = nonNegativeInteger(source.xp, historicalXp);

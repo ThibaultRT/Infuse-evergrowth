@@ -1,0 +1,877 @@
+{
+  "schemaVersion": 2,
+  "layer": 3,
+  "name": "Third Layer",
+  "nodes": [
+    {
+      "number": 61,
+      "id": "SC-61",
+      "name": "Rare Resonance II",
+      "position": {
+        "angleDeg": 0,
+        "radius": 0
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 25,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "rare",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Rare Soul per eligible Rare enemy"
+      },
+      "neighbors": [
+        "SC-62",
+        "SC-64",
+        "SC-65"
+      ]
+    },
+    {
+      "number": 62,
+      "id": "SC-62",
+      "name": "Blunt Might",
+      "position": {
+        "angleDeg": -90,
+        "radius": 1
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 25,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 24
+          }
+        ],
+        "display": "+24 Blunt attack per level"
+      },
+      "neighbors": [
+        "SC-68",
+        "SC-69"
+      ]
+    },
+    {
+      "number": 63,
+      "id": "SC-63",
+      "name": "Slash Ascendance",
+      "position": {
+        "angleDeg": -30,
+        "radius": 1
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 25,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 0.02
+          }
+        ],
+        "display": "+2% Slash damage per level"
+      },
+      "neighbors": [
+        "SC-69",
+        "SC-70",
+        "SC-71"
+      ]
+    },
+    {
+      "number": 64,
+      "id": "SC-64",
+      "name": "Rare Bounty",
+      "position": {
+        "angleDeg": 30,
+        "radius": 1
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 30,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "rare",
+            "amountPerLevel": 2
+          }
+        ],
+        "display": "+2 Rare Souls per eligible Rare enemy"
+      },
+      "neighbors": [
+        "SC-72",
+        "SC-73"
+      ]
+    },
+    {
+      "number": 65,
+      "id": "SC-65",
+      "name": "Epic Resonance",
+      "position": {
+        "angleDeg": 90,
+        "radius": 1
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 30,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "unlockSoulDrop",
+            "soulType": "epic"
+          }
+        ],
+        "display": "Unlock Epic Soul drops from Epic enemies (base 1)"
+      },
+      "neighbors": [
+        "SC-73",
+        "SC-74",
+        "SC-75"
+      ]
+    },
+    {
+      "number": 66,
+      "id": "SC-66",
+      "name": "Slash Ward",
+      "position": {
+        "angleDeg": 150,
+        "radius": 1
+      },
+      "maxLevel": 4,
+      "cost": {
+        "soulType": "rare",
+        "base": 30,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "damageResistancePercentAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 0.015
+          }
+        ],
+        "display": "+1.5% Slash resistance per level"
+      },
+      "neighbors": [
+        "SC-75",
+        "SC-76"
+      ]
+    },
+    {
+      "number": 67,
+      "id": "SC-67",
+      "name": "Fervent Vitality",
+      "position": {
+        "angleDeg": 210,
+        "radius": 1
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 35,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 3500
+          }
+        ],
+        "display": "+3,500 Max HP per level"
+      },
+      "neighbors": [
+        "SC-68",
+        "SC-77"
+      ]
+    },
+    {
+      "number": 68,
+      "id": "SC-68",
+      "name": "Deep Vitality",
+      "position": {
+        "angleDeg": -108,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 40,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "maxHpAdditive",
+            "amountPerLevel": 2000
+          }
+        ],
+        "display": "+2,000 Max HP per level"
+      },
+      "neighbors": [
+        "SC-78"
+      ]
+    },
+    {
+      "number": 69,
+      "id": "SC-69",
+      "name": "Blunt Ward",
+      "position": {
+        "angleDeg": -72,
+        "radius": 2
+      },
+      "maxLevel": 4,
+      "cost": {
+        "soulType": "rare",
+        "base": 40,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "damageResistancePercentAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 0.015
+          }
+        ],
+        "display": "+1.5% Blunt resistance per level"
+      },
+      "neighbors": [
+        "SC-79"
+      ]
+    },
+    {
+      "number": 70,
+      "id": "SC-70",
+      "name": "Blunt Bastion",
+      "position": {
+        "angleDeg": -45,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 45,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 20
+          }
+        ],
+        "display": "+20 Blunt defence per level"
+      },
+      "neighbors": [
+        "SC-80"
+      ]
+    },
+    {
+      "number": 71,
+      "id": "SC-71",
+      "name": "Fervent Mending",
+      "position": {
+        "angleDeg": -15,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "epic",
+        "base": 6,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "regenAdditive",
+            "amountPerLevel": 7
+          }
+        ],
+        "display": "+7 HP/s per level"
+      },
+      "neighbors": [
+        "SC-81"
+      ]
+    },
+    {
+      "number": 72,
+      "id": "SC-72",
+      "name": "Piercing Surge",
+      "position": {
+        "angleDeg": 15,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 45,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 0.015
+          }
+        ],
+        "display": "+1.5% Piercing damage per level"
+      },
+      "neighbors": [
+        "SC-82"
+      ]
+    },
+    {
+      "number": 73,
+      "id": "SC-73",
+      "name": "Piercing Bastion",
+      "position": {
+        "angleDeg": 45,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 45,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 20
+          }
+        ],
+        "display": "+20 Piercing defence per level"
+      },
+      "neighbors": [
+        "SC-83"
+      ]
+    },
+    {
+      "number": 74,
+      "id": "SC-74",
+      "name": "Common Abundance",
+      "position": {
+        "angleDeg": 72,
+        "radius": 2
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 50,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "common",
+            "amountPerLevel": 3
+          }
+        ],
+        "display": "+3 Common Souls per eligible Common enemy"
+      },
+      "neighbors": [
+        "SC-84"
+      ]
+    },
+    {
+      "number": 75,
+      "id": "SC-75",
+      "name": "Slash Bastion",
+      "position": {
+        "angleDeg": 108,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 50,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "defenceAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 20
+          }
+        ],
+        "display": "+20 Slash defence per level"
+      },
+      "neighbors": [
+        "SC-85"
+      ]
+    },
+    {
+      "number": 76,
+      "id": "SC-76",
+      "name": "Uncommon Abundance",
+      "position": {
+        "angleDeg": 150,
+        "radius": 2
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "epic",
+        "base": 9,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "uncommon",
+            "amountPerLevel": 2
+          }
+        ],
+        "display": "+2 Uncommon Souls per eligible Uncommon enemy"
+      },
+      "neighbors": [
+        "SC-86"
+      ]
+    },
+    {
+      "number": 77,
+      "id": "SC-77",
+      "name": "Renewing Weave",
+      "position": {
+        "angleDeg": 210,
+        "radius": 2
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 60,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "regenAdditive",
+            "amountPerLevel": 4
+          }
+        ],
+        "display": "+4 HP/s per level"
+      },
+      "neighbors": [
+        "SC-89",
+        "SC-90"
+      ]
+    },
+    {
+      "number": 78,
+      "id": "SC-78",
+      "name": "Critical Echo",
+      "position": {
+        "angleDeg": 252,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 60,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "criticalDamageRawAdditive",
+            "amountPerLevel": 35
+          }
+        ],
+        "display": "+35 Critical Damage raw per level"
+      },
+      "neighbors": [
+        "SC-79",
+        "SC-90"
+      ]
+    },
+    {
+      "number": 79,
+      "id": "SC-79",
+      "name": "Epic Harvest",
+      "position": {
+        "angleDeg": 288,
+        "radius": 3
+      },
+      "maxLevel": 1,
+      "cost": {
+        "soulType": "rare",
+        "base": 65,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "soulDropAdditive",
+            "soulType": "epic",
+            "amountPerLevel": 1
+          }
+        ],
+        "display": "+1 Epic Soul per eligible Epic enemy"
+      },
+      "neighbors": [
+        "SC-80"
+      ]
+    },
+    {
+      "number": 80,
+      "id": "SC-80",
+      "name": "Swift Current",
+      "position": {
+        "angleDeg": 315,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 70,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "speedRawAdditive",
+            "amountPerLevel": 15
+          }
+        ],
+        "display": "+15 Speed raw per level"
+      },
+      "neighbors": [
+        "SC-81"
+      ]
+    },
+    {
+      "number": 81,
+      "id": "SC-81",
+      "name": "Blunt Ascendance",
+      "position": {
+        "angleDeg": 345,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "epic",
+        "base": 12,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 0.02
+          }
+        ],
+        "display": "+2% Blunt damage per level"
+      },
+      "neighbors": [
+        "SC-82"
+      ]
+    },
+    {
+      "number": 82,
+      "id": "SC-82",
+      "name": "Piercing Might",
+      "position": {
+        "angleDeg": 15,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 80,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 24
+          }
+        ],
+        "display": "+24 Piercing attack per level"
+      },
+      "neighbors": [
+        "SC-83"
+      ]
+    },
+    {
+      "number": 83,
+      "id": "SC-83",
+      "name": "Slash Surge",
+      "position": {
+        "angleDeg": 45,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 80,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 0.015
+          }
+        ],
+        "display": "+1.5% Slash damage per level"
+      },
+      "neighbors": [
+        "SC-84"
+      ]
+    },
+    {
+      "number": 84,
+      "id": "SC-84",
+      "name": "Slash Might",
+      "position": {
+        "angleDeg": 72,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 90,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackAdditive",
+            "damageType": "slash",
+            "amountPerLevel": 24
+          }
+        ],
+        "display": "+24 Slash attack per level"
+      },
+      "neighbors": [
+        "SC-85"
+      ]
+    },
+    {
+      "number": 85,
+      "id": "SC-85",
+      "name": "Fortified Guard",
+      "position": {
+        "angleDeg": 108,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 85,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "blockChanceRawAdditive",
+            "amountPerLevel": 7
+          }
+        ],
+        "display": "+7 Block Chance raw per level"
+      },
+      "neighbors": [
+        "SC-86"
+      ]
+    },
+    {
+      "number": 86,
+      "id": "SC-86",
+      "name": "Critical Insight",
+      "position": {
+        "angleDeg": 135,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "epic",
+        "base": 15,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "criticalChanceRawAdditive",
+            "amountPerLevel": 20
+          }
+        ],
+        "display": "+20 Critical Chance raw per level"
+      },
+      "neighbors": [
+        "SC-87"
+      ]
+    },
+    {
+      "number": 87,
+      "id": "SC-87",
+      "name": "Piercing Ascendance",
+      "position": {
+        "angleDeg": 165,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 100,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 0.02
+          }
+        ],
+        "display": "+2% Piercing damage per level"
+      },
+      "neighbors": [
+        "SC-88"
+      ]
+    },
+    {
+      "number": 88,
+      "id": "SC-88",
+      "name": "Blunt Surge",
+      "position": {
+        "angleDeg": 180,
+        "radius": 3
+      },
+      "maxLevel": 5,
+      "cost": {
+        "soulType": "rare",
+        "base": 110,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "attackPercentAdditive",
+            "damageType": "blunt",
+            "amountPerLevel": 0.015
+          }
+        ],
+        "display": "+1.5% Blunt damage per level"
+      },
+      "neighbors": [
+        "SC-89"
+      ]
+    },
+    {
+      "number": 89,
+      "id": "SC-89",
+      "name": "Piercing Ward",
+      "position": {
+        "angleDeg": 195,
+        "radius": 3
+      },
+      "maxLevel": 4,
+      "cost": {
+        "soulType": "rare",
+        "base": 120,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "damageResistancePercentAdditive",
+            "damageType": "piercing",
+            "amountPerLevel": 0.015
+          }
+        ],
+        "display": "+1.5% Piercing resistance per level"
+      },
+      "neighbors": [
+        "SC-90"
+      ]
+    },
+    {
+      "number": 90,
+      "id": "SC-90",
+      "name": "Phantom Step",
+      "position": {
+        "angleDeg": 225,
+        "radius": 3
+      },
+      "maxLevel": 3,
+      "cost": {
+        "soulType": "epic",
+        "base": 18,
+        "multiplier": 1.35,
+        "formula": "ceil(base * multiplier ** (level - 1))"
+      },
+      "reward": {
+        "effects": [
+          {
+            "type": "evasionChanceAdditive",
+            "amountPerLevel": 0.005
+          }
+        ],
+        "display": "+0.5% Evasion per level"
+      },
+      "neighbors": []
+    }
+  ]
+}

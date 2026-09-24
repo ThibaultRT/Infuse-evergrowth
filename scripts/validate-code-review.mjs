@@ -251,6 +251,44 @@ try {
     assert.equal(session.progressionSnapshot().equipment.items['sword-common'], undefined);
   });
 
+  await check('Layer 3 prices, Epic Soul unlock, and restored XP', async () => {
+    const { SOUL_LAYER_REGISTRY, SOUL_NODE_BY_ID, SOUL_LAYERS } = await vite.ssrLoadModule('/src/data/soul-catcher/index.ts');
+    const { soulCost, soulPurchaseXp } = await vite.ssrLoadModule('/src/domain/soul-catcher.ts');
+    const layer = SOUL_LAYERS[2], fifth = layer.nodes[4], priced = SOUL_NODE_BY_ID.get('SC-62');
+    assert.equal(layer.nodes.length, 30);
+    assert.equal(fifth.id, 'SC-65');
+    assert.deepEqual(fifth.reward.effects, [{ type: 'unlockSoulDrop', soulType: 'epic' }]);
+    assert.ok(layer.nodes[0].neighbors.includes(fifth.id));
+    assert.equal(soulCost(priced, 2), Math.ceil(priced.cost.base * 1.35));
+    assert.ok(soulCost(priced, 3) > soulCost(priced, 2));
+    assert.ok(SOUL_LAYER_REGISTRY[3].unlockXp <= 1000000, 'Existing Layer 4 unlocks must remain unlocked');
+
+    const state = fresh();
+    state.defeatedBosses.push('area2-rare-01');
+    state.soulCatcher.xp = SOUL_LAYER_REGISTRY[2].unlockXp;
+    state.soulCatcher.highestUnlockedLayer = 3;
+    state.soulCatcher.balances.rare = 1000;
+    const session = new GameSession(state, new GameEvents(), () => {}, clock);
+    const epic = config.SPAWNS.find(({ tier }) => tier === 'epic');
+    assert.equal(session.soulCatcher.yieldFor(epic), null);
+    assert.equal(session.commands.execute({ type: 'purchaseSoulNode', nodeId: 'SC-61' }), true);
+    assert.equal(session.commands.execute({ type: 'purchaseSoulNode', nodeId: fifth.id }), true);
+    assert.deepEqual(session.soulCatcher.yieldFor(epic), { soulType: 'epic', quantity: 1 });
+    assert.deepEqual(session.soulCatcher.credit(epic), { soulType: 'epic', quantity: 1 });
+    assert.equal(state.soulCatcher.balances.epic, 1);
+    const previousXp = state.soulCatcher.xp;
+    assert.equal(session.commands.execute({ type: 'purchaseSoulNode', nodeId: priced.id }), true);
+    assert.equal(session.commands.execute({ type: 'purchaseSoulNode', nodeId: priced.id }), true);
+    assert.equal(state.soulCatcher.xp - previousXp, soulPurchaseXp('rare', soulCost(priced, 1) + soulCost(priced, 2)));
+
+    const stored = fresh();
+    stored.soulCatcher.nodeLevels = { [priced.id]: 3 };
+    delete stored.soulCatcher.xp;
+    const restored = load(stored);
+    const spent = [1, 2, 3].reduce((sum, level) => sum + soulCost(priced, level), 0);
+    assert.equal(restored.soulCatcher.xp, soulPurchaseXp('rare', spent));
+  });
+
   await check('Complete weapon attack sums additions before multiplying every source', () => {
     const state = fresh();
     const item = equipment.EQUIPMENT_BY_ID.get('hammer-common');
