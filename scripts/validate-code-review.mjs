@@ -38,7 +38,7 @@ try {
   const load = (data) => persistence.loadSave({ getItem: (key) => key.endsWith(`v${data.version}`) ? JSON.stringify(data) : null, setItem: () => {} }, now);
   const spawnId = config.SPAWNS[0].id;
 
-  await check('Supported v7-v18 saves retain progression', () => {
+  await check('Supported legacy saves retain progression', () => {
     for (let version = 7; version <= 18; version++) {
       const data = fresh();
       data.version = version;
@@ -181,7 +181,7 @@ try {
     const values = new Map();
     return { values, getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
   };
-  const primary = 'infuse-evergrowth-save-v19', backup = 'infuse-evergrowth-save-backup';
+  const primary = 'infuse-evergrowth-save-v20', backup = 'infuse-evergrowth-save-backup';
   const clock = { now: () => now.getTime(), date: () => new Date(now) };
   const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
 

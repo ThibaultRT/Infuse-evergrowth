@@ -1,4 +1,4 @@
-import type { DamageType, SoulType } from '../types';
+import type { DamageType, MinionSlotId, SoulType } from '../types';
 
 export type SoulEffect =
   | { type: 'maxHpAdditive' | 'regenAdditive' | 'speedRawAdditive' | 'criticalChanceRawAdditive' | 'criticalDamageRawAdditive' | 'blockChanceRawAdditive' | 'evasionChanceAdditive'; amountPerLevel: number }
@@ -8,7 +8,7 @@ export type SoulEffect =
   | { type: 'unlockSoulDrop'; soulType: SoulType }
   | { type: 'enemyRespawnDivisor'; tier: 'uncommon'; divisorPerLevel: number }
   | { type: 'equipmentQuantityAdditive'; equipmentRarity: 'uncommon'; amountPerLevel: number }
-  | { type: 'unlockMinions' };
+  | { type: 'unlockMinionSlot'; slotId: MinionSlotId };
 export type SoulCost =
   | { soulType: SoulType; base: number; perLevel: number; formula: 'base + perLevel * (level - 1)' }
   | { soulType: SoulType; base: number; multiplier: number; formula: 'ceil(base * multiplier ** (level - 1))' };

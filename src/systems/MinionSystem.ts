@@ -1,16 +1,16 @@
 import balance from '../data/balance.json';
 import { MINION_PIT } from '../data/world/minionPit';
-import { applyMinionDrop, calculateInfusion, createMinion, nextSummonCost, type Infusion } from '../domain/minions';
+import { applyMinionDrop, calculateInfusion, createMinion, minionPitPosition, summonCost, type Infusion } from '../domain/minions';
 import { awardKillStat } from '../domain/stats/KillReward';
 import { statTotal } from '../domain/stats/StatSources';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { equipmentDamage, equipmentDefense } from '../domain/items/EquipmentProgression';
 import { applyEquipmentCopies, attackProfile, equippedDefense } from './EquipmentSystem';
 import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed } from './HeroStats';
-import type { DamageType, EquipmentSlotId, InventoryState, LootType, SaveData, SavedMinion, SoulType } from '../types';
+import type { DamageType, EquipmentSlotId, InventoryState, LootType, MinionSlotId, SaveData, SavedMinion, SoulType } from '../types';
 
 export type MinionSummary = Readonly<{
-  id: string; active: boolean; color: SavedMinion['color']; areaId: number; position: Readonly<{ x: number; z: number }>;
+  id: string; slotId: MinionSlotId; active: boolean; color: SavedMinion['color']; areaId: number; position: Readonly<{ x: number; z: number }>;
   hp: number; maxHp: number; respawnAt: number | null;
   stats: Readonly<{ regenPerSecond: number; speedMetersPerSecond: number; attackByType: Readonly<Record<DamageType, number>>;
     defenseByType: Readonly<Record<DamageType, number>>; criticalChancePercent: number; criticalDamageBonusPercent: number;
@@ -24,32 +24,35 @@ export type MinionSummary = Readonly<{
 export class MinionSystem {
   constructor(private readonly state: SaveData, private readonly random: () => number) {}
 
-  unlockFirst(): SavedMinion | null {
-    if (this.state.minions.unlockedEver) return null;
-    this.state.minions.unlockedEver = true;
-    return this.addMinion();
+  unlockSlot(slotId: MinionSlotId): SavedMinion | null {
+    if (this.state.minions.unlockedSlots[slotId]) return null;
+    this.state.minions.unlockedSlots[slotId] = true;
+    if (this.state.minions.roster.some((entry) => entry.slotId === slotId)) return null;
+    return this.addMinion(slotId);
   }
 
-  private addMinion(): SavedMinion {
+  private addMinion(slotId: MinionSlotId): SavedMinion {
     const id = `minion-${this.state.minions.nextSerial++}`;
-    const minion = createMinion(id, this.random);
+    const minion = createMinion(id, slotId, this.random);
     this.state.minions.roster.push(minion);
     return minion;
   }
 
-  paidSummon(): { minion: SavedMinion; cost: number } | null {
+  paidSummon(slotId: MinionSlotId): { minion: SavedMinion; cost: number; soulType: SoulType } | null {
     const progression = this.state.minions;
-    const cost = nextSummonCost(progression.paidSummonCount);
-    if (!progression.unlockedEver || progression.roster.length >= balance.minions.activeCapacity || !Number.isSafeInteger(cost)
-      || this.state.soulCatcher.balances.uncommon < cost) return null;
-    this.state.soulCatcher.balances.uncommon -= cost;
-    progression.paidSummonCount += 1;
-    return { minion: this.addMinion(), cost };
+    if (![1, 2, 3].includes(slotId)) return null;
+    const { soulType, amount } = summonCost(slotId);
+    if (!progression.unlockedSlots[slotId] || progression.roster.some((minion) => minion.slotId === slotId)
+      || this.state.soulCatcher.balances[soulType] < amount) return null;
+    this.state.soulCatcher.balances[soulType] -= amount;
+    return { minion: this.addMinion(slotId), cost: amount, soulType };
   }
 
-  sacrifice(): Infusion | null {
-    if (!this.state.minions.roster.length) return null;
-    const infusion = calculateInfusion(this.state.minions.roster);
+  sacrifice(minionId: string): { slotId: MinionSlotId; infusion: Infusion } | null {
+    const index = this.state.minions.roster.findIndex((entry) => entry.id === minionId);
+    if (index < 0) return null;
+    const minion = this.state.minions.roster[index];
+    const infusion = calculateInfusion([minion]);
     this.state.stats.maxHp.additive.minions += infusion.stats.hp;
     this.state.stats.regen.additive.minions += infusion.stats.regen;
     this.state.stats.speed.additive.minions += infusion.stats.speed;
@@ -57,8 +60,8 @@ export class MinionSystem {
     for (const type of ['blunt', 'slash', 'piercing'] as const) this.state.stats.attack[type].additive.minions += infusion.stats[type];
     for (const [itemId, quantity] of Object.entries(infusion.copies)) applyEquipmentCopies(this.state, itemId, quantity);
     // Runtime and save share this roster array; remove entries in place so enemy intent cannot retain sacrificed actors.
-    this.state.minions.roster.splice(0);
-    return infusion;
+    this.state.minions.roster.splice(index, 1);
+    return { slotId: minion.slotId, infusion };
   }
 
   find(id: string): SavedMinion | null { return this.state.minions.roster.find((entry) => entry.id === id) ?? null; }
@@ -90,7 +93,7 @@ export class MinionSystem {
       if (minion.respawnAt === null || minion.respawnAt > now) continue;
       minion.respawnAt = null;
       minion.areaId = MINION_PIT.areaId;
-      minion.position = { x: MINION_PIT.x, z: MINION_PIT.z };
+      minion.position = minionPitPosition(minion.slotId);
       minion.hp = statTotal(minion.stats.maxHp);
       revived.push(minion.id);
     }
@@ -98,7 +101,7 @@ export class MinionSystem {
   }
 
   summaries(): MinionSummary[] {
-    return this.state.minions.roster.map((minion, index) => {
+    return this.state.minions.roster.map((minion) => {
       const types: DamageType[] = ['blunt', 'slash', 'piercing'];
       const attackByType: Record<DamageType, number> = { blunt: 0, slash: 0, piercing: 0 };
       for (const slot of ['hand1', 'orbit1', 'orbit2', 'orbit3'] as const) {
@@ -108,7 +111,7 @@ export class MinionSystem {
       if (!minion.inventory.equipped.hand1) attackByType.blunt += statTotal(minion.stats.attack.blunt);
       const defenseByType = Object.fromEntries(types.map((type) => [type, equippedDefense(minion, type)])) as Record<DamageType, number>;
       return {
-      id: minion.id, active: index < balance.minions.activeCapacity, color: minion.color, areaId: minion.areaId, position: { ...minion.position }, hp: minion.hp,
+      id: minion.id, slotId: minion.slotId, active: true, color: minion.color, areaId: minion.areaId, position: { ...minion.position }, hp: minion.hp,
       maxHp: statTotal(minion.stats.maxHp), respawnAt: minion.respawnAt,
       stats: { regenPerSecond: heroRegen(minion.stats), speedMetersPerSecond: heroSpeed(minion.stats), attackByType, defenseByType,
         criticalChancePercent: heroCriticalChance(minion.stats) * 100, criticalDamageBonusPercent: (heroCriticalDamageMultiplier(minion.stats) - 1) * 100,

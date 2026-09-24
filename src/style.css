@@ -258,11 +258,7 @@ canvas { display: block; width: 100%; height: 100%; }
 }
 .minion-pit-button[hidden] { display: none; }
 .minion-sheet { width: min(520px, 100%); }
-.minion-header-actions { display: flex; align-items: flex-start; gap: 7px; }
-.minion-header-actions button, .minion-sacrifice { min-height: 44px; border: 1px solid #8a70b3; border-radius: 9px; background: #38274d; color: #f2e4ff; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
-.minion-header-actions #minion-summon { display: flex; align-items: center; gap: 4px; padding: 6px 9px; }
-.minion-header-actions .soul-icon { width: 20px; height: 20px; }
-.minion-header-actions button:disabled, .minion-sacrifice:disabled { opacity: .42; cursor: default; }
+.minion-sacrifice { min-height: 44px; border: 1px solid #de8792; border-radius: 9px; background: #67323b; color: #f2e4ff; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
 .minion-summon-reason { min-height: 14px; margin: -5px 0 8px; color: #d8b7b7; font-size: 10px; text-align: right; }
 .minion-cards { display: grid; gap: 12px; }
 .minion-card { padding: 12px; border: 1px solid #ffffff1c; border-radius: 12px; background: #ffffff08; }
@@ -290,5 +286,9 @@ canvas { display: block; width: 100%; height: 100%; }
 .minion-infusion-preview { margin-top: 14px; padding: 12px; border: 1px solid #8a70b355; border-radius: 11px; background: #ad74f013; }
 .minion-infusion-preview h3 { margin: 0 0 7px; font-size: 14px; }
 .minion-infusion-preview p { margin: 10px 0 5px; font-size: 10px; font-weight: 800; }
-.minion-sacrifice { width: 100%; margin-top: 13px; padding: 9px; border-color: #de8792; background: #67323b; }
-@media (max-width: 430px) { .minion-header-actions { flex-direction: column-reverse; align-items: flex-end; }.minion-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.minion-sacrifice { width: 100%; margin-top: 13px; padding: 9px; }
+.minion-summon { min-height: 44px; padding: 9px 14px; border: 1px solid #8a70b3; border-radius: 9px; background: #38274d; color: #f2e4ff; font: inherit; font-weight: 800; pointer-events: auto; }
+.minion-summon:disabled { opacity: .42; }
+.minion-infusion-preview summary { cursor: pointer; font-size: 12px; font-weight: 800; min-height: 30px; }
+.minion-sheet { max-height: min(92dvh, 800px); overflow-y: auto; }
+@media (max-width: 430px) { .minion-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -1,4 +1,4 @@
-import type { CombatAffinity, CombatActorRef, DamageType, EquipmentSlotId, LootType, SoulType } from '../types';
+import type { CombatAffinity, CombatActorRef, DamageType, EquipmentSlotId, LootType, MinionSlotId, SoulType } from '../types';
 import type { Infusion } from '../domain/minions';
 
 export type GameEventMap = {
@@ -27,15 +27,15 @@ export type GameEventMap = {
   soulCatcherLayerUnlocked: { layer: number };
   heroEvaded: { damageType: CombatAffinity };
   dailyReset: undefined;
-  minionsUnlocked: { minionId: string };
-  minionSummoned: { minionId: string; paid: boolean };
+  minionSlotUnlocked: { slotId: MinionSlotId; minionId: string };
+  minionSummoned: { minionId: string; slotId: MinionSlotId; paid: boolean };
   minionDamaged: { minionId: string; amount: number; blocked: boolean };
   minionDefeated: { minionId: string; respawnAt: number };
   minionRespawned: { minionId: string };
   minionEquipmentChanged: { minionId: string; itemId: string; slot: EquipmentSlotId | null };
   minionProgressed: { minionId: string; sourceId: string; stat: LootType; amount: number; itemId: string | null; quantity: number; souls: { type: SoulType; quantity: number } | null };
   minionVitalsChanged: undefined;
-  minionsInfused: { minionIds: string[]; infusion: Infusion };
+  minionInfused: { minionId: string; slotId: MinionSlotId; infusion: Infusion };
 };
 
 type Listener<T> = (event: T) => void;

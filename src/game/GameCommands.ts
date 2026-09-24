@@ -2,7 +2,7 @@ import type { GameEvents } from './GameEvents';
 import type { GameplayRuntime } from './GameplayRuntime';
 import { ascend, equip, unequip } from '../systems/EquipmentSystem';
 import { resetHeroProgress, resetPermanentStats, statTotal } from '../save';
-import type { EquipmentSlotId, SaveData } from '../types';
+import type { EquipmentSlotId, MinionSlotId, SaveData } from '../types';
 import type { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import type { MinionSystem } from '../systems/MinionSystem';
 import { maxHeroHp } from '../systems/HeroStats';
@@ -15,8 +15,8 @@ export type GameCommand =
   | { type: 'resetHero'; equipment: boolean }
   | { type: 'purchaseSoulNode'; nodeId: string }
   | { type: 'resetSoulCatcher' }
-  | { type: 'summonMinion' }
-  | { type: 'sacrificeMinions' }
+  | { type: 'summonMinion'; slotId: MinionSlotId }
+  | { type: 'sacrificeMinion'; minionId: string }
   | { type: 'debugUnlockMinions' }
   | { type: 'enterArea'; areaId: number; connectionId: string };
 
@@ -34,27 +34,26 @@ export class GameCommands {
     if (command.type === 'resetSoulCatcher') { this.soulCatcher.reset(); return true; }
     if (command.type === 'debugUnlockMinions') {
       if (!import.meta.env.DEV) return false;
-      const minion = this.minions.unlockFirst();
+      const minion = this.minions.unlockSlot(1);
       if (!minion) return false;
       this.persist();
-      this.events.emit('minionsUnlocked', { minionId: minion.id });
-      this.events.emit('minionSummoned', { minionId: minion.id, paid: false });
+      this.events.emit('minionSlotUnlocked', { slotId: 1, minionId: minion.id });
+      this.events.emit('minionSummoned', { minionId: minion.id, slotId: 1, paid: false });
       return true;
     }
     if (command.type === 'summonMinion') {
-      const result = this.minions.paidSummon();
+      const result = this.minions.paidSummon(command.slotId);
       if (!result) return false;
       this.persist();
-      this.events.emit('minionSummoned', { minionId: result.minion.id, paid: true });
+      this.events.emit('minionSummoned', { minionId: result.minion.id, slotId: command.slotId, paid: true });
       return true;
     }
-    if (command.type === 'sacrificeMinions') {
-      const minionIds = this.state.minions.roster.map(({ id }) => id);
-      const infusion = this.minions.sacrifice();
-      if (!infusion) return false;
-      this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + infusion.stats.hp);
+    if (command.type === 'sacrificeMinion') {
+      const result = this.minions.sacrifice(command.minionId);
+      if (!result) return false;
+      this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + result.infusion.stats.hp);
       this.persist();
-      this.events.emit('minionsInfused', { minionIds, infusion });
+      this.events.emit('minionInfused', { minionId: command.minionId, slotId: result.slotId, infusion: result.infusion });
       return true;
     }
     if (command.type === 'equip') { if (!equip(this.state, command.itemId, command.slot)) return false; this.events.emit('equipmentEquipped', { itemId: command.itemId, hand: command.slot }); }
