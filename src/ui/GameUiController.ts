@@ -90,19 +90,34 @@ ui.minionSacrifice.addEventListener('click', async () => {
 ui.soulLayerTabs.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-soul-layer]'); const layer = Number(button?.dataset.soulLayer); if (!layer || !readSnapshot().soulCatcher.layers.find((entry) => entry.layer === layer)?.unlocked) return; selectedSoulLayer = layer; selectedSoulNode = null; refreshSoulTree(); });
 ui.soulNodes.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLElement>('[data-soul-node]'); if (!button?.dataset.soulNode) return; selectedSoulNode = button.dataset.soulNode; refreshSoulTree(); });
 ui.soulDetail.addEventListener('click', (event) => { const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-purchase-soul]'); if (!button?.dataset.purchaseSoul) return; if (commands.execute({ type: 'purchaseSoulNode', nodeId: button.dataset.purchaseSoul })) { updateHud(); } });
-const treePointers = new Map<number, { x: number; y: number }>();
+const treePointers = new Map<number, { x: number; y: number; startX: number; startY: number; dragging: boolean }>();
 let treeX = -170, treeY = -190, treeScale = 1, pinchDistance = 0;
 const transformTree = (): void => { ui.soulTree.style.transform = `translate(${treeX}px,${treeY}px) scale(${treeScale})`; };
-ui.soulTreeViewport.addEventListener('pointerdown', (event) => { treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); ui.soulTreeViewport.setPointerCapture(event.pointerId); });
+const captureTreePointer = (pointerId: number): void => { if (!ui.soulTreeViewport.hasPointerCapture(pointerId)) ui.soulTreeViewport.setPointerCapture(pointerId); };
+ui.soulTreeViewport.addEventListener('pointerdown', (event) => {
+  treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, dragging: false });
+  if (treePointers.size > 1) {
+    for (const [pointerId, pointer] of treePointers) { pointer.dragging = true; captureTreePointer(pointerId); }
+    const [first, second] = [...treePointers.values()];
+    pinchDistance = Math.hypot(first.x - second.x, first.y - second.y);
+  } else if (!(event.target as Element).closest('[data-soul-node]')) captureTreePointer(event.pointerId);
+});
 ui.soulTreeViewport.addEventListener('pointermove', (event) => {
   const previous = treePointers.get(event.pointerId); if (!previous) return;
-  treePointers.set(event.pointerId, { x: event.clientX, y: event.clientY }); const points = [...treePointers.values()];
-  if (points.length === 1) { treeX += event.clientX - previous.x; treeY += event.clientY - previous.y; }
+  const dx = event.clientX - previous.x, dy = event.clientY - previous.y;
+  previous.x = event.clientX; previous.y = event.clientY;
+  const points = [...treePointers.values()];
+  if (points.length === 1) {
+    if (!previous.dragging && Math.hypot(event.clientX - previous.startX, event.clientY - previous.startY) < 5) return;
+    if (!previous.dragging) { previous.dragging = true; captureTreePointer(event.pointerId); }
+    treeX += dx; treeY += dy;
+  }
   else { const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); if (pinchDistance) treeScale = Math.max(.55, Math.min(1.6, treeScale * distance / pinchDistance)); pinchDistance = distance; }
   transformTree();
 });
 const endTreePointer = (event: PointerEvent): void => { treePointers.delete(event.pointerId); pinchDistance = 0; };
-ui.soulTreeViewport.addEventListener('lostpointercapture', endTreePointer); ui.soulTreeViewport.addEventListener('pointerup', endTreePointer); ui.soulTreeViewport.addEventListener('pointercancel', endTreePointer); transformTree();
+ui.soulTreeViewport.addEventListener('lostpointercapture', (event) => { if (event.target === ui.soulTreeViewport) endTreePointer(event); });
+ui.soulTreeViewport.addEventListener('pointerup', endTreePointer); ui.soulTreeViewport.addEventListener('pointercancel', endTreePointer); transformTree();
 ui.settingsButton.addEventListener('click', () => setSettingsPanel(true));
 ui.settingsClose.addEventListener('click', () => setSettingsPanel(false));
 ui.settingsPanel.addEventListener('pointerdown', (event) => { if (event.target === ui.settingsPanel) setSettingsPanel(false); });
