@@ -284,3 +284,27 @@ does not mean the live Blender session is unavailable.
 
 See `three-editor.md` for the spatial and inspection contract and
 `ASSET-LICENSES.md` for shipped provenance.
+# Minion presentation assets
+
+Run the isolated preparation with:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python-exit-code 1 --python scripts/world-assets/prepare-minions.py
+node scripts/world-assets/promote.mjs minion.imp landmark.summoningPit minion.impColor1 minion.impColor2 minion.impColor3
+node scripts/world-assets/validate-minions.mjs
+npm run authoring:world:capture -- --minions
+```
+
+The supplied Imp GLB and FBX have a 55-joint rig but no clips. `MinionView` uses a
+modest lowered-arm rest correction and procedural cosmetic motion. Real authored
+clips can replace that fallback when supplied. The source +Z forward axis matches
+the game's actor facing. Color IDs map to the three supplied numbered maps.
+
+`src/data/world/minionPit.ts` is the sole placement/spawn/label transform: Area 1,
+world `(6, 0, 4.5)`, yaw 0, 3 m diameter beside the fountain. It deliberately adds
+no collision. The static viewer's `?minions` fixture loads only Area 1 and shows all
+three variants for review; it never starts simulation or writes saves. Captures
+cover 390×844 Full, Reduced, and failed-model fallbacks; residency checks cover
+locked, remote, dead and re-entry snapshots. Real-device movement/performance
+judgment remains manual. The runtime projected button is disabled until slice 7
+provides the management panel and commands.

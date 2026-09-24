@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-20T06:31:35.340Z",
+  "generatedAt": "2026-09-24T10:06:47.270Z",
   "assets": [
     {
       "key": "boundary.area4Fence",
@@ -255,6 +255,76 @@
       "runtimeDigest": {
         "bytes": 1563448,
         "sha256": "283972d4b7a6c9dc2ac6c2f0a3bcefa820f121ed2cb2e01b1049a6e1ee741733"
+      }
+    },
+    {
+      "key": "landmark.summoningPit",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/summoning-pit.glb",
+      "runtime": "assets/world/shared/models/summoning-pit.glb",
+      "sourceDigest": {
+        "bytes": 347640,
+        "sha256": "a148cd6a5cabdcdec04ff23ffbeaa7f27ba4bcd94cef6a95e6d7487041fe7864"
+      },
+      "runtimeDigest": {
+        "bytes": 347640,
+        "sha256": "a148cd6a5cabdcdec04ff23ffbeaa7f27ba4bcd94cef6a95e6d7487041fe7864"
+      }
+    },
+    {
+      "key": "minion.imp",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/imp.glb",
+      "runtime": "assets/world/shared/models/imp.glb",
+      "sourceDigest": {
+        "bytes": 1230088,
+        "sha256": "1a22c31cbf59688ec14f4fd4bffc2878b2842714f2230878af0c3105c3f0a0e1"
+      },
+      "runtimeDigest": {
+        "bytes": 1230088,
+        "sha256": "1a22c31cbf59688ec14f4fd4bffc2878b2842714f2230878af0c3105c3f0a0e1"
+      }
+    },
+    {
+      "key": "minion.impColor1",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/imp-variant-1.jpg",
+      "runtime": "assets/world/shared/models/imp-variant-1.jpg",
+      "sourceDigest": {
+        "bytes": 40478,
+        "sha256": "4f91f45109a3f5bc73e02446f84811e29bf7af468283a83153bfb5d96d82b254"
+      },
+      "runtimeDigest": {
+        "bytes": 40478,
+        "sha256": "4f91f45109a3f5bc73e02446f84811e29bf7af468283a83153bfb5d96d82b254"
+      }
+    },
+    {
+      "key": "minion.impColor2",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/imp-variant-2.jpg",
+      "runtime": "assets/world/shared/models/imp-variant-2.jpg",
+      "sourceDigest": {
+        "bytes": 40567,
+        "sha256": "f87cbc2fb13e49c837bf58cecc67ee904f05b8c84b1bbaf714cca42738522644"
+      },
+      "runtimeDigest": {
+        "bytes": 40567,
+        "sha256": "f87cbc2fb13e49c837bf58cecc67ee904f05b8c84b1bbaf714cca42738522644"
+      }
+    },
+    {
+      "key": "minion.impColor3",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/imp-variant-3.jpg",
+      "runtime": "assets/world/shared/models/imp-variant-3.jpg",
+      "sourceDigest": {
+        "bytes": 36031,
+        "sha256": "99a97d676ef4e8983220fdcc11a878077ecca662a98083460058ab22c123f924"
+      },
+      "runtimeDigest": {
+        "bytes": 36031,
+        "sha256": "99a97d676ef4e8983220fdcc11a878077ecca662a98083460058ab22c123f924"
       }
     },
     {

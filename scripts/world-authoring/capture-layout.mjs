@@ -7,13 +7,14 @@ import process from 'node:process';
 import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 
 const repositoryRoot = process.cwd();
+const minionsOnly = process.argv.includes('--minions');
 const area4BridgesOnly = process.argv.includes('--area4-bridges');
 const area4ThroneOnly = process.argv.includes('--area4-throne');
 const area4TerrainOnly = process.argv.includes('--area4-terrain');
 const area4ForestOnly = process.argv.includes('--area4-forest');
 const area4BoundariesOnly = process.argv.includes('--area4-boundaries');
 const viewerPort = 4174;
-const viewerUrl = `http://127.0.0.1:${viewerPort}`;
+const viewerUrl = `http://127.0.0.1:${viewerPort}${minionsOnly ? '/?minions' : ''}`;
 const capturesRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
 const debugRoot = path.join(repositoryRoot, 'authoring', 'generated', 'debug');
 const edgeCandidates = [
@@ -67,6 +68,7 @@ class CdpClient {
       const pending = this.pending.get(message.id);
       if (!pending) return;
       this.pending.delete(message.id);
+      clearTimeout(pending.timer);
       if (message.error) pending.reject(new Error(message.error.message));
       else pending.resolve(message.result);
     });
@@ -75,7 +77,8 @@ class CdpClient {
   send(method, params = {}) {
     const id = this.nextId++;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`CDP timed out: ${method}`)); }, 60000);
+      this.pending.set(id, { resolve, reject, timer });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -150,7 +153,30 @@ try {
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
-  if (area4BoundariesOnly) {
+  if (minionsOnly) {
+    const assert = (await import('node:assert/strict')).default;
+    const state = (mode) => evaluate(client, `window.__MINIONS_PREVIEW__(${JSON.stringify(mode)})`);
+    assert.deepEqual(await state('locked'), { pit: false, minions: 0, buttonHidden: true });
+    const resources = await evaluate(client, 'performance.getEntriesByType("resource").map(entry => entry.name)');
+    assert.ok(!resources.some((url) => /\/(imp|summoning-pit)[-.]/.test(url)), 'Locked preview must not request minion assets');
+    assert.deepEqual(await state('alive'), { pit: true, minions: 3, buttonHidden: false });
+    await wait(1800);
+    await capture(client, path.join(capturesRoot, 'minions-placement.png'), 'minions', 1100, 900);
+    await capture(client, path.join(capturesRoot, 'iphone-12-minions-full.png'), 'minions', 390, 844);
+    await state('reduced');
+    await capture(client, path.join(capturesRoot, 'iphone-12-minions-reduced.png'), 'minions', 390, 844);
+    assert.deepEqual(await state('remote'), { pit: false, minions: 0, buttonHidden: true });
+    assert.deepEqual(await state('dead'), { pit: true, minions: 0, buttonHidden: false });
+    assert.deepEqual(await state('alive'), { pit: true, minions: 3, buttonHidden: false });
+    await client.send('Network.enable');
+    await client.send('Network.setBlockedURLs', { urls: ['*imp.glb*', '*imp-variant*', '*summoning-pit.glb*'] });
+    await client.send('Page.reload', { ignoreCache: true });
+    await wait(1000);
+    await waitForReady(client);
+    assert.deepEqual(await state('alive'), { pit: true, minions: 3, buttonHidden: false });
+    await capture(client, path.join(capturesRoot, 'iphone-12-minions-fallback.png'), 'minions', 390, 844);
+    console.log('Minion static residency, death/re-entry, locked lazy loading and portrait captures passed.');
+  } else if (area4BoundariesOnly) {
     await evaluate(client, 'window.__WORLD_AUTHORING_GATES__(true)');
     await capture(client, path.join(capturesRoot, 'area4-boundaries.png'), 'area4:boundaries', 1600, 1000);
     await capture(client, path.join(capturesRoot, 'area4-east-gate.png'), 'area4:east-gate', 1200, 900);

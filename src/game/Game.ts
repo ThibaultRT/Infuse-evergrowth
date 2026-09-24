@@ -28,6 +28,7 @@ import { ProductionWorldAssetResolver } from '../rendering/environment/WorldVisu
 import { createWorldMaterials, applyWorldMaterialQuality } from '../rendering/environment/WorldMaterials';
 import { WorldBuilder, type WorldChunkView } from '../rendering/environment/WorldBuilder';
 import { createLayoutVisualProvider } from '../rendering/environment/LayoutVisualProvider';
+import { MinionPresentation } from '../rendering/MinionPresentation';
 
 export class Game {
   private started = false;
@@ -265,7 +266,7 @@ class SpawnEntity {
       this.deathPresentationRemaining = Math.max(0, this.deathPresentationRemaining - dt);
       if (this.deathPresentationRemaining === 0) this.syncAreaVisibility();
     }
-    this.enemyView?.update(dt, this.state.moving, this.def.areaId === currentAreaId && (this.alive || this.deathPresentationRemaining > 0));
+    this.enemyView?.update(dt, this.state.moving, this.presentationActive && (this.alive || this.deathPresentationRemaining > 0));
   }
 }
 
@@ -316,6 +317,7 @@ const visualStreaming = new WorldVisualStreamingManager(
   (root) => environmentOcclusion.unregister(root)
 );
 visualStreaming.update(currentAreaId, gameplay.hero.position);
+const minionPresentation = new MinionPresentation(scene, ui.minionPitButton, worldUi, (areaId) => visualStreaming.areaIsMounted(areaId));
 
 function syncAreaVisibility(): void {
   entities.forEach((entity) => entity.syncAreaVisibility());
@@ -381,7 +383,13 @@ const respawnIndicators: RespawnIndicator[] = respawnSpawnerMembers.map((members
 });
 
 const entityById = new Map(entities.map((entity) => [entity.def.id, entity]));
-events.on('enemyDamaged', ({ enemyId, amount, damageType, itemId, slot }) => entityById.get(enemyId)?.presentDamage(amount, damageType, itemId, slot));
+events.on('enemyDamaged', ({ enemyId, owner, amount, damageType, itemId, slot }) => {
+  const entity = entityById.get(enemyId);
+  entity?.presentDamage(amount, damageType, itemId, slot);
+  if (owner.kind === 'minion' && entity) minionPresentation.attack(owner.minionId, entity.state.position);
+});
+events.on('minionDamaged', ({ minionId }) => minionPresentation.damaged(minionId));
+events.on('minionDefeated', ({ minionId }) => minionPresentation.remove(minionId));
 events.on('enemyDefeated', ({ enemyId }) => entityById.get(enemyId)?.presentDefeat());
 events.on('enemyRespawned', ({ enemyId }) => entityById.get(enemyId)?.presentRespawn());
 events.on('weaponAttacked', ({ slot, targetId }) => {
@@ -389,10 +397,11 @@ events.on('weaponAttacked', ({ slot, targetId }) => {
   const target = gameplay.spawnById.get(targetId);
   if (profile && target) heroView.playWeaponAttack(slot as WeaponSlotId, new THREE.Vector3().copy(target.position), profile.cooldownSeconds);
 });
-events.on('statGained', ({ stat, amount }) => showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase()));
-events.on('equipmentDropped', (drop) => showEquipmentDrop({ ...drop, copiesRequired: session.progressionSnapshot().equipment.items[drop.itemId].ascend.copiesRequired }));
+events.on('statGained', ({ sourceId, stat, amount }) => { if (entityById.get(sourceId)?.presentationActive) showStatGain(amount, stat === 'hp' ? 'HP' : stat === 'regen' ? 'HP/S' : stat.toUpperCase()); });
+events.on('equipmentDropped', (drop) => { if (entityById.get(drop.sourceId)?.presentationActive) showEquipmentDrop({ ...drop, copiesRequired: session.progressionSnapshot().equipment.items[drop.itemId].ascend.copiesRequired }); });
 events.on('soulDropped', ({ sourceId, quantity, soulType }) => { if (entityById.get(sourceId)?.presentationActive) showSoulDrop(quantity, soulType); });
-events.on('bossDefeated', (event) => { if (event.areaId === gameplay.currentAreaId) presentBossDefeat(event); });
+events.on('bossDefeated', (event) => { if (entityById.get(event.bossId)?.presentationActive) presentBossDefeat(event); });
+events.on('gateUnlocked', ({ gateId }) => gateEntities.find((gate) => gate.def.id === gateId)?.setOpen(true));
 events.on('dailyReset', () => showToast('Daily reset · all spawns restored'));
 events.on('heroEvaded', () => showEvadedCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0))));
 events.on('heroDamaged', ({ amount, damageType, blocked }) => showCombatText(hero.position.clone().add(new THREE.Vector3(0, 2.9, 0)), amount, damageType, true, blocked));
@@ -554,6 +563,7 @@ function frame(now: number): void {
   entities.forEach((entity) => entity.syncTransform());
   entities.forEach((entity) => entity.updateView(dt));
   cameraController.update(dt, now);
+  minionPresentation.update(dt, save.minions.unlockedEver, save.minions.roster, gameplay.hero.position, (id) => session.minionAI.mode(id) === 'moving');
   environmentOcclusion.update(hero.position, dt);
   updateHud();
   worldUi.update(dt);

@@ -13,6 +13,8 @@ import { WorldAssetLibrary } from '../../src/rendering/environment/WorldAssetLib
 import { WorldBuilder } from '../../src/rendering/environment/WorldBuilder';
 import { createWorldMaterials } from '../../src/rendering/environment/WorldMaterials';
 import { DevelopmentWorldAssetResolver, ProductionWorldAssetResolver } from '../../src/rendering/environment/WorldVisualAssetCatalog';
+import { minionPreview } from './minions';
+import { MINION_PIT } from '../../src/data/world/minionPit';
 
 declare global {
   interface Window {
@@ -156,7 +158,10 @@ function selectObject(object: THREE.Object3D | null): void {
 
 function framePreset(preset: string): void {
   const layout = WORLD_LAYOUTS.find((candidate) => candidate.id === preset);
-  if (preset === 'top') {
+  if (preset === 'minions') {
+    controls.target.set(MINION_PIT.x - 1, 0.5, MINION_PIT.z);
+    camera.position.set(MINION_PIT.x + 5, 11, MINION_PIT.z + 13);
+  } else if (preset === 'top') {
     controls.target.set(36, 0, 0);
     camera.position.set(36, 250, 0.1);
   } else if (preset === 'greenhaven') {
@@ -266,7 +271,8 @@ async function loadWorld(): Promise<void> {
     const assets = new WorldAssetLibrary(resolver);
     const materials = await createWorldMaterials(assets);
     const builder = new WorldBuilder(assets, materials);
-    const views = await Promise.all(WORLD_LAYOUTS.map(async (layout) => builder.build(layout, 'inspection')));
+    const layouts = new URLSearchParams(location.search).has('minions') ? WORLD_LAYOUTS.filter((layout) => layout.id === 'area:A01') : WORLD_LAYOUTS;
+    const views = await Promise.all(layouts.map(async (layout) => builder.build(layout, 'inspection')));
     if (generation !== loadingGeneration) return;
     window.__WORLD_AUTHORING_GATES__ = (open) => {
       for (const view of views) if (view.layout.kind === 'transition') view.setOpen(open);
@@ -371,8 +377,10 @@ function resize(): void {
 addEventListener('resize', resize);
 resize();
 window.__WORLD_AUTHORING_CAMERA__ = framePreset;
+const updateMinionPreview = new URLSearchParams(location.search).has('minions') ? minionPreview(scene, camera, renderer) : undefined;
 renderer.setAnimationLoop(() => {
   controls.update();
+  updateMinionPreview?.();
   if (selected) selectionHelper.setFromObject(selected);
   renderer.render(scene, camera);
 });

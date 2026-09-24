@@ -1,0 +1,4 @@
+{
+  "impHeight": 1.5,
+  "pit": { "name": "A01_SummoningPit", "areaId": 1, "x": 6, "y": 0, "z": 4.5, "rotation": 0, "diameter": 3, "labelHeight": 1.8 }
+}

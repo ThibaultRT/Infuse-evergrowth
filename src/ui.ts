@@ -48,6 +48,7 @@ app.innerHTML = `
       <div class="camera-distance-readout"><span>DIST</span><output id="camera-distance-value" for="camera-distance"></output></div>
     </div>
     <div id="world-ui" class="world-ui" aria-hidden="true"></div>
+    <button id="minion-pit-button" class="minion-pit-button card" type="button" hidden disabled>Manage minions</button>
     <div class="controls"><div id="joystick" class="joystick-zone"><div id="joystick-knob" class="joystick-knob"></div></div></div>
     <div class="bottom-dock card">
       <div class="quick-slots" aria-label="equipped weapon slots">
@@ -140,7 +141,7 @@ export const ui = {
   loadingScreen: q<HTMLDivElement>('#loading-screen'), loadingSubtitle: q<HTMLDivElement>('#loading-subtitle'), loadingVersion: q<HTMLDivElement>('#loading-version'), loadingProgress: q<HTMLSpanElement>('#loading-progress'), loadingPercent: q<HTMLDivElement>('#loading-percent'),
   hpText: q<HTMLSpanElement>('#hp-text'), hpBar: q<HTMLSpanElement>('#hp-bar'), hand1Stat: q<HTMLSpanElement>('#hand1-stat'), orbit1Stat: q<HTMLSpanElement>('#orbit1-stat'), orbit2Stat: q<HTMLSpanElement>('#orbit2-stat'), orbit3Stat: q<HTMLSpanElement>('#orbit3-stat'),
   enemyAffinities: q<HTMLDivElement>('#enemy-affinities'),
-  world: q<HTMLDivElement>('#world-ui'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'), soulGainStack: q<HTMLDivElement>('#soul-gain-stack'),
+  world: q<HTMLDivElement>('#world-ui'), minionPitButton: q<HTMLButtonElement>('#minion-pit-button'), toast: q<HTMLDivElement>('#toast'), gainStack: q<HTMLDivElement>('#gain-stack'), soulGainStack: q<HTMLDivElement>('#soul-gain-stack'),
   joystick: q<HTMLDivElement>('#joystick'), joystickKnob: q<HTMLDivElement>('#joystick-knob'), statsButton: q<HTMLButtonElement>('#stats-button'),
   spawnButton: q<HTMLButtonElement>('#spawn-button'),
   cameraDistance: q<HTMLInputElement>('#camera-distance'), cameraDistanceValue: q<HTMLOutputElement>('#camera-distance-value'),

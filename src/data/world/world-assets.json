@@ -1,4 +1,9 @@
 {
+  "minion.imp": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/imp.glb","runtime":"assets/world/shared/models/imp.glb"},
+  "landmark.summoningPit": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/summoning-pit.glb","runtime":"assets/world/shared/models/summoning-pit.glb"},
+  "minion.impColor1": {"kind":"texture","sourceRoot":"public","source":"assets/world/shared/models/imp-variant-1.jpg","runtime":"assets/world/shared/models/imp-variant-1.jpg"},
+  "minion.impColor2": {"kind":"texture","sourceRoot":"public","source":"assets/world/shared/models/imp-variant-2.jpg","runtime":"assets/world/shared/models/imp-variant-2.jpg"},
+  "minion.impColor3": {"kind":"texture","sourceRoot":"public","source":"assets/world/shared/models/imp-variant-3.jpg","runtime":"assets/world/shared/models/imp-variant-3.jpg"},
   "boundary.area4Fence": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-east-fence.glb", "runtime": "assets/world/shared/models/area4-east-fence.glb", "baseScale": 1, "castShadow": true },
   "boundary.area4Gate": { "kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-east-gate.glb", "runtime": "assets/world/shared/models/area4-east-gate.glb", "baseScale": 1, "castShadow": true },
   "nature.charredTrunkA": {"kind": "model", "sourceRoot": "public", "source": "assets/world/shared/models/area4-charred-trunk-a.glb", "runtime": "assets/world/shared/models/area4-charred-trunk-a.glb", "baseScale": 1, "castShadow": true},
