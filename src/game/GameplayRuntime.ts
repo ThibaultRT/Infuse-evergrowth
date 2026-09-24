@@ -123,7 +123,8 @@ export class GameplayRuntime {
     this.hero.combatRemainingSeconds = Math.max(this.hero.combatRemainingSeconds, durationSeconds);
   }
 
-  update(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean, elapsedSeconds = dt): GameplayRuntimeEvent[] {
+  update(dt: number, movement: Readonly<{ x: number; y: number }>, controlsEnabled: boolean, elapsedSeconds = dt,
+    minionsActive = true): GameplayRuntimeEvent[] {
     const events: GameplayRuntimeEvent[] = [];
     this.hero.combatRemainingSeconds = Math.max(0, this.hero.combatRemainingSeconds - elapsedSeconds);
     if (this.hero.dead) {
@@ -146,7 +147,7 @@ export class GameplayRuntime {
       if (!spawn.alive || !spawn.hostile) continue;
       const actors: { ref: CombatActorRef; position: Position }[] = [];
       if (!this.hero.dead && spawn.definition.areaId === this.currentAreaId) actors.push({ ref: { kind: 'hero' }, position: this.hero.position });
-      for (const minion of this.options.minions ?? []) if (minion.respawnAt === null && minion.hp > 0 && minion.areaId === spawn.definition.areaId)
+      for (const minion of this.options.minions ?? []) if (minionsActive && minion.respawnAt === null && minion.hp > 0 && minion.areaId === spawn.definition.areaId)
         actors.push({ ref: { kind: 'minion', minionId: minion.id }, position: { ...minion.position, y: 0 } });
       if (!actors.length) { spawn.target = null; spawn.targetPath = []; spawn.provoked = false; continue; }
       const retained = actors.find(({ ref }) => ref.kind === spawn.target?.kind && (ref.kind === 'hero' || ref.minionId === (spawn.target as { minionId?: string } | null)?.minionId));

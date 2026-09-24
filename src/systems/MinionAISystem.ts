@@ -9,7 +9,7 @@ import { heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed 
 import type { GameplayRuntime, RuntimeSpawn } from '../game/GameplayRuntime';
 import type { DamageType, SavedMinion, SaveData, WeaponSlotId } from '../types';
 
-export type MinionMode = 'seeking' | 'moving' | 'attacking' | 'recovering' | 'dead';
+export type MinionMode = 'seeking' | 'moving' | 'attacking' | 'recovering' | 'dead' | 'paused';
 export type MinionAttack = { minionId: string; spawnId: string; amount: number; damageType: DamageType; slot: WeaponSlotId; itemId: string };
 type Intent = { mode: MinionMode; targetId: string | null; path: { x: number; z: number }[]; waypoint: number; seekAfter: number; stuckFor: number;
   defendUntil: number; lastX: number; lastZ: number; combat: CombatSystem; routeKey: string };

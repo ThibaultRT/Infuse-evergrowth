@@ -254,6 +254,10 @@ try {
   assert.ok(aggroSession.runtime.damageSpawn(hostile.id, 1, { kind: 'minion', minionId: defender.id }));
   const retaliation = aggroSession.runtime.update(.05, { x: 0, y: 0 }, true).find((event) => event.type === 'enemyAttack' && event.spawnId === hostile.id);
   assert.deepEqual(retaliation?.target, { kind: 'minion', minionId: defender.id });
+  hostile.attackCooldown = 0;
+  const pausedTarget = aggroSession.runtime.update(.05, { x: 0, y: 0 }, true, .05, false)
+    .find((event) => event.type === 'enemyAttack' && event.spawnId === hostile.id);
+  assert.equal(pausedTarget?.target.kind, 'hero', 'paused minions are excluded from enemy targeting');
   defender.hp = 0; defender.respawnAt = now.getTime() + 30000;
   hostile.attackCooldown = 0;
   const fallback = aggroSession.runtime.update(.05, { x: 0, y: 0 }, true).find((event) => event.type === 'enemyAttack' && event.spawnId === hostile.id);
@@ -277,6 +281,11 @@ try {
   const beforeHero = JSON.stringify(combatState.stats);
   combatSession.runtime.spawnById.get(target.id).hp = 1;
   combatSession.runtime.spawnById.get(target.id).attackCooldown = 100;
+  const pausedPosition = { ...killer.position };
+  combatSession.update(.05, { x: 0, y: 0 }, .05, true);
+  assert.deepEqual(killer.position, pausedPosition, 'idle pause keeps the minion in place');
+  assert.equal(combatSession.runtime.spawnById.get(target.id).hp, 1, 'idle pause blocks minion attacks');
+  assert.equal(combatSession.progressionSnapshot().minions.roster[0].activity.mode, 'paused');
   combatSession.update(.05, { x: 0, y: 0 });
   assert.equal(minionProgress, 1);
   assert.deepEqual(JSON.stringify(combatState.stats), beforeHero);

@@ -28,6 +28,7 @@ export class GameSession {
   private readonly progression: ProgressionSystem;
   private healthPersistSeconds = 0;
   private midnightSeconds = 0;
+  private minionsPaused = false;
 
   constructor(readonly state: SaveData, readonly events: GameEvents, private readonly writeSave: () => void,
     private readonly clock: GameClock = browserClock, private readonly random = Math.random) {
@@ -69,17 +70,18 @@ export class GameSession {
     return createProgressionSnapshot(this.state, this.soulCatcher, this.minions, (id) => {
       const targetId = this.minionAI.targetId(id);
       const target = targetId ? this.runtime.spawnById.get(targetId) : null;
-      return { mode: this.minionAI.mode(id), target: target?.alive
+      return { mode: this.minionsPaused ? 'paused' : this.minionAI.mode(id), target: target?.alive
         ? { id: target.id, tier: target.definition.tier, hp: target.hp, maxHp: target.maxHp } : null };
     });
   }
 
-  update(dt: number, movement: Readonly<{ x: number; y: number }>, elapsedSeconds = dt): void {
+  update(dt: number, movement: Readonly<{ x: number; y: number }>, elapsedSeconds = dt, minionsPaused = false): void {
+    this.minionsPaused = minionsPaused;
     this.combat.update(dt);
     this.midnightSeconds += dt;
     if (this.midnightSeconds >= 1) { this.midnightSeconds = 0; this.resetAtMidnightIfNeeded(); }
     // Panels and camera presentations never pause simulation or wall-clock timers.
-    for (const event of this.runtime.update(dt, this.commands.movement({ type: 'move', ...movement }), true, elapsedSeconds)) {
+    for (const event of this.runtime.update(dt, this.commands.movement({ type: 'move', ...movement }), true, elapsedSeconds, !minionsPaused)) {
       if (event.type === 'enemyAttack') {
         if (event.target.kind === 'hero') this.damageHero(event.amount, event.damageType);
         else this.damageMinion(event.target.minionId, event.amount, event.damageType);
@@ -93,7 +95,7 @@ export class GameSession {
     }
     this.reviveDueSpawns();
     this.autoAttack();
-    for (const attack of this.minionAI.update(dt)) {
+    for (const attack of minionsPaused ? [] : this.minionAI.update(dt)) {
       const minion = this.minions.find(attack.minionId), target = this.runtime.spawnById.get(attack.spawnId);
       if (!minion || minion.respawnAt !== null || !target?.alive) continue;
       const hit = this.runtime.damageSpawn(attack.spawnId, attack.amount, { kind: 'minion', minionId: minion.id });

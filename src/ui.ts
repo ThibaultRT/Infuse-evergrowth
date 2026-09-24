@@ -43,7 +43,7 @@ app.innerHTML = `
       <button id="soul-catcher-button" class="edge-button soul-catcher-button" type="button"><span class="edge-icon soul-catcher-icon"></span><small>SOUL<br>CATCHER</small></button>
       <button id="inventory-button" class="edge-button" type="button"><span class="edge-icon bag-icon"></span><small>BAG</small></button>
     </div>
-    <button id="settings-button" class="settings-button card" type="button" aria-label="Graphics settings" title="Graphics settings">&#9881;</button>
+    <button id="settings-button" class="settings-button card" type="button" aria-label="Settings" title="Settings">&#9881;</button>
     <div class="camera-distance-control card">
       <input id="camera-distance" type="range" min="10" max="35" step="0.1" aria-label="Camera distance">
       <div class="camera-distance-readout"><span>DIST</span><output id="camera-distance-value" for="camera-distance"></output></div>
@@ -112,7 +112,7 @@ app.innerHTML = `
     <div id="settings-panel" class="modal-panel" aria-hidden="true">
       <div class="card modal-sheet settings-sheet">
         <div class="modal-header">
-          <div><div class="brand">Display</div><h2>Graphics settings</h2></div>
+          <div><div class="brand">Preferences</div><h2>Settings</h2></div>
           <button id="settings-close" class="modal-close" type="button">CLOSE</button>
         </div>
         <fieldset class="settings-group">
@@ -126,6 +126,7 @@ app.innerHTML = `
           <label><input type="radio" name="frame-rate" value="30"> <span><strong>Battery saver</strong><small>Target 30 FPS</small></span></label>
         </fieldset>
         <label id="renderer-stats-option" class="settings-stats"><input id="renderer-stats-toggle" type="checkbox"> Show renderer statistics</label>
+        ${import.meta.env.DEV ? '<label class="settings-stats"><input id="minion-anti-idle-toggle" type="checkbox"> Pause minions after 5 minutes without input (debug)</label>' : ''}
         <p class="settings-help">Changes apply immediately and are kept on this device.</p>
         <div class="settings-danger">
           <div><strong>Reset attributes</strong><small>Remove all permanent stat gains. Equipment and its progress are kept.</small></div>
@@ -164,6 +165,7 @@ export const ui = {
   inventorySlotPicker: (): HTMLElement | null => document.querySelector<HTMLElement>('[data-slot-picker]'),
   settingsClose: q<HTMLButtonElement>('#settings-close'), rendererStatsOption: q<HTMLLabelElement>('#renderer-stats-option'),
   rendererStatsToggle: q<HTMLInputElement>('#renderer-stats-toggle'), rendererStats: q<HTMLOutputElement>('#renderer-stats'),
+  minionAntiIdleToggle: document.querySelector<HTMLInputElement>('#minion-anti-idle-toggle'),
   resetAttributesButton: q<HTMLButtonElement>('#reset-attributes-button'),
   resetHeroButton: q<HTMLButtonElement>('#reset-hero-button'),
   resetSoulCatcherButton: q<HTMLButtonElement>('#reset-soul-catcher-button'),
@@ -320,10 +322,10 @@ export function renderMinions(snapshot: ProgressionSnapshot): void {
     }).join('');
     const souls = (['common', 'uncommon', 'rare', 'epic', 'legendary'] as SoulType[]).map((type) =>
       minionStatCell(`${sourceLabel(type)} Souls contributed`, soulIcon(type), minionNumber(minion.soulContributions[type]))).join('');
-    const status = minion.respawnAt === null ? `Area ${minion.areaId} · Active` : `<span data-respawn-at="${minion.respawnAt}"></span>`;
+    const status = minion.respawnAt === null ? `Area ${minion.areaId} · ${minion.activity.mode === 'paused' ? 'Paused' : 'Active'}` : `<span data-respawn-at="${minion.respawnAt}"></span>`;
     const { mode, target } = minion.activity;
     const targetKind = target ? target.tier === 'crystal' ? 'crystal' : `${target.tier} enemy` : '';
-    const activity = minion.respawnAt !== null ? 'Waiting to respawn' : mode === 'recovering' ? 'Recovering'
+    const activity = minion.respawnAt !== null ? 'Waiting to respawn' : mode === 'paused' ? 'Paused · provide input to resume' : mode === 'recovering' ? 'Recovering'
       : mode === 'attacking' && target ? `Attacking ${targetKind}` : mode === 'moving' && target ? `Moving toward ${targetKind}` : 'Seeking target';
     const targetProgress = target && minion.respawnAt === null ? `<span aria-label="Target ${target.id} HP: ${minionNumber(target.hp)} of ${minionNumber(target.maxHp)}">${minionNumber(target.hp)} / ${minionNumber(target.maxHp)} HP</span>` : '';
     return `<article class="minion-card"><div class="minion-card-heading"><span class="minion-color minion-color-${minion.color}" aria-hidden="true"></span><strong>Imp ${minion.id.replace(/^minion-/, '#')}</strong><small>${status}</small></div><div class="minion-activity"><span>${activity}</span>${targetProgress}</div><div class="minion-stat-grid">${statCells}</div><div class="minion-card-subtitle">Equipped</div><div class="minion-equipment-grid">${equipped || '<span class="minion-empty">None</span>'}</div><div class="minion-card-subtitle">Souls contributed</div><div class="minion-soul-grid">${souls}</div></article>`;

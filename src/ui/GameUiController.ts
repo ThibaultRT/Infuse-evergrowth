@@ -4,7 +4,8 @@ import type { RenderingQualitySettings } from '../rendering/RenderingQuality';
 import { confirmReset, renderInventory, renderItemDetail, renderMinions, renderProgressionHud, renderSoulCatcher, renderStats, showToast, ui, updateMinionCountdown } from '../ui';
 
 /** HTML interaction only. Panels never change the simulation or render loop. */
-export function mountGameUi(session: GameSession, quality: { current: () => RenderingQualitySettings; apply: (next: RenderingQualitySettings) => void }, updateHud: () => void): void {
+export function mountGameUi(session: GameSession, quality: { current: () => RenderingQualitySettings; apply: (next: RenderingQualitySettings) => void },
+  idle: { enabled: () => boolean; setEnabled: (enabled: boolean) => void }, updateHud: () => void): void {
 const { commands, events } = session;
 const readSnapshot = (): ReturnType<GameSession['progressionSnapshot']> => session.progressionSnapshot();
 const refreshStats = (): void => renderStats(readSnapshot());
@@ -35,6 +36,7 @@ function renderQualityControls(): void {
   if (scale) scale.checked = true;
   if (frameRate) frameRate.checked = true;
   ui.rendererStatsToggle.checked = quality.current().showStats;
+  if (ui.minionAntiIdleToggle) ui.minionAntiIdleToggle.checked = idle.enabled();
   ui.rendererStatsOption.hidden = !import.meta.env.DEV;
   ui.rendererStats.classList.toggle('visible', import.meta.env.DEV && quality.current().showStats);
 }
@@ -122,6 +124,7 @@ ui.settingsPanel.addEventListener('change', (event) => {
   if (input.name === 'render-scale') quality.apply({ ...quality.current(), renderScale: input.value === '0.7' ? 0.7 : 1 });
   if (input.name === 'frame-rate') quality.apply({ ...quality.current(), frameRateLimit: input.value === '30' ? 30 : 60 });
   if (input === ui.rendererStatsToggle) quality.apply({ ...quality.current(), showStats: input.checked });
+  if (input === ui.minionAntiIdleToggle) idle.setEnabled(input.checked);
 });
 type InventoryViewState =
   | { view: 'overview'; scrollTop: number }

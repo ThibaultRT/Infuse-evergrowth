@@ -10,6 +10,7 @@ import { renderEnemyAffinities, showBossProgression, showEquipmentDrop, showSoul
 import { makeTierRing } from '../visuals';
 import { CrystalView } from '../rendering/CrystalView';
 import { InputController } from '../controllers/InputController';
+import { MinionIdleController } from '../controllers/MinionIdleController';
 import { CameraController, DEFAULT_CAMERA_DISTANCE } from '../controllers/CameraController';
 import { GameEvents } from './GameEvents';
 import { EQUIPMENT_BY_ID, attackProfile } from '../systems/EquipmentSystem';
@@ -38,6 +39,7 @@ export class Game {
     this.started = true;
 const events = new GameEvents();
 const input = new InputController(ui.joystick, ui.joystickKnob);
+const minionIdle = new MinionIdleController();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x93b8cf);
@@ -428,7 +430,8 @@ function applyRenderingQuality(next: RenderingQualitySettings): void {
     statsFrames = 0; statsStartedAt = performance.now(); ui.rendererStats.textContent = 'Measuring renderer…';
   }
 }
-mountGameUi(session, { current: () => renderingQuality, apply: applyRenderingQuality }, updateHud);
+mountGameUi(session, { current: () => renderingQuality, apply: applyRenderingQuality },
+  { enabled: () => minionIdle.enabled, setEnabled: (enabled) => minionIdle.setEnabled(enabled) }, updateHud);
 
 function updateHero(dt: number): void {
   hero.position.copy(gameplay.hero.position);
@@ -555,7 +558,9 @@ function frame(now: number): void {
   const elapsedSeconds = (now - previous) / 1000;
   const dt = Math.min(elapsedSeconds, .05);
   previous = now;
-  session.update(dt, input.movement, elapsedSeconds);
+  const movement = input.movement;
+  const minionsPaused = minionIdle.paused(now, movement);
+  session.update(dt, movement, elapsedSeconds, minionsPaused);
   updateHero(dt);
   visualStreaming.update(currentAreaId, gameplay.hero.position);
   syncEnemyPresentations();
@@ -563,7 +568,7 @@ function frame(now: number): void {
   entities.forEach((entity) => entity.syncTransform());
   entities.forEach((entity) => entity.updateView(dt));
   cameraController.update(dt, now);
-  minionPresentation.update(dt, save.minions.unlockedEver, save.minions.roster, gameplay.hero.position, (id) => session.minionAI.mode(id) === 'moving');
+  minionPresentation.update(dt, save.minions.unlockedEver, save.minions.roster, gameplay.hero.position, (id) => !minionsPaused && session.minionAI.mode(id) === 'moving');
   environmentOcclusion.update(hero.position, dt);
   updateHud();
   worldUi.update(dt);
