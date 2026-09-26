@@ -6,7 +6,7 @@ import { statTotal } from '../domain/stats/StatSources';
 import { EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';
 import { equipmentDamage, equipmentDefense } from '../domain/items/EquipmentProgression';
 import { applyEquipmentCopies, attackProfile, equippedDefense } from './EquipmentSystem';
-import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed } from './HeroStats';
+import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed } from './HeroStatProjection';
 import type { DamageType, EquipmentSlotId, InventoryState, LootType, MinionSlotId, SaveData, SavedMinion, SoulType } from '../types';
 
 export type MinionSummary = Readonly<{

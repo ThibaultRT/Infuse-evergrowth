@@ -1,6 +1,6 @@
 import type { SaveData, WeaponSlotId } from '../types';
 import { attackProfile, ascendCopies, EQUIPMENT_BY_ID } from './EquipmentSystem';
-import { maxHeroHp } from './HeroStats';
+import { maxHeroHp } from './HeroStatProjection';
 
 export function createHudProjection(state: SaveData): {
   maxHp: number; attacks: { slot: WeaponSlotId; damage: number; damageType: import('../types').DamageType }[];

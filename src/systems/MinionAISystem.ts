@@ -5,7 +5,7 @@ import { statTotal } from '../domain/stats/StatSources';
 import { affinityDamage } from '../domain/combat/Affinity';
 import { CombatSystem } from './CombatSystem';
 import { attackProfile } from './EquipmentSystem';
-import { heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed } from './HeroStats';
+import { heroCriticalChance, heroCriticalDamageMultiplier, heroRegen, heroSpeed } from './HeroStatProjection';
 import type { GameplayRuntime, RuntimeSpawn } from '../game/GameplayRuntime';
 import type { DamageType, SavedMinion, SaveData, WeaponSlotId } from '../types';
 

@@ -16,7 +16,7 @@ try {
     assert.equal(reads, 0); assert.equal('save' in persistence, false);
   });
   const [{ GameEvents }, { heroSpeed }, { SimulationStepper }, { HudPresenter }, { createHudProjection, equipmentDropCopiesRequired }, { WorldAssetLibrary }, { WorldVisualStreamingManager }, { createLayoutVisualProvider }] = await Promise.all([
-    vite.ssrLoadModule('/src/game/GameEvents.ts'), vite.ssrLoadModule('/src/systems/HeroStats.ts'),
+    vite.ssrLoadModule('/src/game/GameEvents.ts'), vite.ssrLoadModule('/src/systems/HeroStatProjection.ts'),
     vite.ssrLoadModule('/src/game/SimulationStepper.ts'), vite.ssrLoadModule('/src/ui/HudPresenter.ts'),
     vite.ssrLoadModule('/src/systems/HudProjection.ts'), vite.ssrLoadModule('/src/rendering/environment/WorldAssetLibrary.ts'),
     vite.ssrLoadModule('/src/rendering/environment/WorldVisualStreamingManager.ts'), vite.ssrLoadModule('/src/rendering/environment/LayoutVisualProvider.ts'),

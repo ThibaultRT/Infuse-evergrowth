@@ -3,7 +3,7 @@ import { soulCost } from '../domain/soul-catcher';
 import { statAdditiveTotal, statTotal } from '../domain/stats/StatSources';
 import type { DamageType, EquipmentDefinition, EquipmentSlotId, MinionSlotId, OwnedEquipment, SaveData, SoulType, StatSources, Tier, WeaponSlotId } from '../types';
 import { EQUIPMENT_BY_ID, ascendCopies, attackProfile, defenseSources, equipmentAscendValue, equipmentCombatSummary, equipmentDamage, equipmentDefense, equipmentSlot, equipmentSlotUnlocked, equipmentValuePerLevel, type InventoryCombatSummary } from './EquipmentSystem';
-import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRawEvasionChance, heroSpeed, heroSpeedMultiplier } from './HeroStats';
+import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRawEvasionChance, heroSpeed, heroSpeedMultiplier } from './HeroStatProjection';
 import type { SoulCatcherSystem } from './SoulCatcherSystem';
 import { calculateInfusion, MINION_SLOTS, summonCost, type Infusion } from '../domain/minions';
 import type { MinionSummary, MinionSystem } from './MinionSystem';
@@ -46,7 +46,7 @@ export type ProgressionSnapshot = ReadonlyValues<{
     yields: { type: SoulType; unlocked: boolean; base: number; additional: number; total: number }[];
     layers: { layer: number; name: string; authored: boolean; unlocked: boolean; nodes: SoulNodeSnapshot[]; edges: [string, string][] }[];
   };
-  minions: { unlockedEver: boolean; slots: { slotId: MinionSlotId; unlocked: boolean; cost: { soulType: SoulType; amount: number }; minionId: string | null }[];
+  minions: { hasUnlockedSlots: boolean; slots: { slotId: MinionSlotId; unlocked: boolean; cost: { soulType: SoulType; amount: number }; minionId: string | null }[];
     roster: (MinionSummary & { activity: MinionActivitySnapshot; infusionPreview: Infusion })[] };
 }>;
 
@@ -117,7 +117,7 @@ export function createProgressionSnapshot(state: SaveData, souls: SoulCatcherSys
         }),
       })),
     },
-    minions: { unlockedEver: MINION_SLOTS.some((slotId) => state.minions.unlockedSlots[slotId]),
+    minions: { hasUnlockedSlots: MINION_SLOTS.some((slotId) => state.minions.unlockedSlots[slotId]),
       slots: MINION_SLOTS.map((slotId) => ({ slotId, unlocked: state.minions.unlockedSlots[slotId], cost: summonCost(slotId),
         minionId: state.minions.roster.find((entry) => entry.slotId === slotId)?.id ?? null })),
       roster: (minions?.summaries() ?? []).map((minion) => ({ ...minion, activity: activityForMinion?.(minion.id)

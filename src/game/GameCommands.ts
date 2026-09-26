@@ -6,7 +6,7 @@ import { statTotal } from '../domain/stats/StatSources';
 import type { EquipmentSlotId, MinionSlotId, SaveData } from '../types';
 import type { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import type { MinionSystem } from '../systems/MinionSystem';
-import { maxHeroHp } from '../systems/HeroStats';
+import { maxHeroHp } from '../systems/HeroStatProjection';
 
 export type GameCommand =
   | { type: 'move'; x: number; y: number }

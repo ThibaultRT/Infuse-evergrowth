@@ -1,4 +1,4 @@
-import { heroRegen, maxHeroHp } from './HeroStats';
+import { heroRegen, maxHeroHp } from './HeroStatProjection';
 import { statTotal } from '../domain/stats/StatSources';
 import type { ArmorSlotId, DamageType, EquipmentSlotId, OwnedEquipment, WeaponSlotId, SaveData, StatSources, InventoryState, PlayerStats } from '../types';
 import { EQUIPMENT, EQUIPMENT_BY_ID } from '../domain/items/EquipmentCatalog';

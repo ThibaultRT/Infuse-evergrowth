@@ -3,7 +3,7 @@ import { localDailyKey, nextLocalMidnightMs } from '../domain/time/LocalCalendar
 import type { CombatAffinity, SaveData, SpawnDefinition, WeaponSlotId } from '../types';
 import { CombatSystem } from '../systems/CombatSystem';
 import { attackProfile, equippedDefense } from '../systems/EquipmentSystem';
-import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed, maxHeroHp } from '../systems/HeroStats';
+import { heroBlockChance, heroCriticalChance, heroCriticalDamageMultiplier, heroEvasionChance, heroRegen, heroSpeed, maxHeroHp } from '../systems/HeroStatProjection';
 import { ProgressionSystem } from '../systems/ProgressionSystem';
 import { RespawnSystem } from '../systems/RespawnSystem';
 import { SoulCatcherSystem } from '../systems/SoulCatcherSystem';

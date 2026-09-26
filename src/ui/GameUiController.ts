@@ -72,7 +72,7 @@ export function mountGameUi(session: GameSession, quality: { current: () => Rend
   lifetime.listen(ui.soulCatcherClose, 'click', () => setSoulCatcherPanel(false));
   lifetime.listen(ui.soulCatcherPanel, 'pointerdown', (event) => { if (event.target === ui.soulCatcherPanel) setSoulCatcherPanel(false); });
   function setMinionPanel(open: boolean): void {
-    if (open && !readSnapshot().minions.unlockedEver) return;
+    if (open && !readSnapshot().minions.hasUnlockedSlots) return;
     if (open) closeOtherPanels('minions');
     ui.minionPanel.classList.toggle('visible', open);
     ui.minionPanel.setAttribute('aria-hidden', String(!open));
@@ -225,14 +225,14 @@ export function mountGameUi(session: GameSession, quality: { current: () => Rend
       }
       if (ui.soulCatcherPanel.classList.contains('visible')) renderSoulCatcher(snapshot, selectedSoulNode, selectedSoulLayer);
       if (ui.minionPanel.classList.contains('visible')) renderMinions(snapshot);
-      if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = snapshot.minions.unlockedEver;
+      if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = snapshot.minions.hasUnlockedSlots;
     });
   };
   for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'heroProgressReset', 'equipmentDropped', 'soulDropped', 'soulNodePurchased', 'soulCatcherReset', 'soulCatcherXpGained', 'soulCatcherLayerUnlocked', 'soulCatcherUnlocked', 'gateUnlocked', 'bossDefeated', 'minionSlotUnlocked', 'minionSummoned', 'minionDamaged', 'minionDefeated', 'minionRespawned', 'minionEquipmentChanged', 'minionProgressed', 'minionInfused'] as const) lifetime.add(events.on(event, refreshProgression));
   lifetime.add(events.on('minionVitalsChanged', () => { if (ui.minionPanel.classList.contains('visible')) refreshProgression(); }));
   renderQualityControls();
   renderProgressionHud(readSnapshot());
-  if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = readSnapshot().minions.unlockedEver;
+  if (ui.debugUnlockMinions) ui.debugUnlockMinions.hidden = readSnapshot().minions.hasUnlockedSlots;
   return () => {
     lifetime.dispose();
     if (minionCountdownTimer !== null) window.clearInterval(minionCountdownTimer);
