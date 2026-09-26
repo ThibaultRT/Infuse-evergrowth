@@ -112,7 +112,7 @@ export async function validateArea4Forest(vite) {
   assert.ok(placedTriangles < 80000 && placements.length + groveTrees.length <= 140, 'Forest population exceeds 80k triangles or 140 prop draws.');
   const prefetched = new Set();
   const missing = {
-    preload: async (keys) => keys.forEach((key) => prefetched.add(key)), loadTexture: async () => new THREE.Texture(),
+    retain: () => () => {}, preload: async (keys) => keys.forEach((key) => prefetched.add(key)), loadTexture: async () => new THREE.Texture(),
     instantiate: async (key) => { const mesh = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial()); mesh.userData.worldAssetFallback = key; return mesh; },
   };
   const materials = await createWorldMaterials(missing);

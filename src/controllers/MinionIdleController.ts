@@ -5,14 +5,17 @@ const STORAGE_KEY = 'infuse-minion-anti-idle-v1';
 
 /** Device-local input activity. Gameplay decides whether to advance minion AI. */
 export class MinionIdleController {
+  private readonly lifetime = new AbortController();
   private lastInputAt = performance.now();
   private enabledValue = this.loadEnabled();
 
   constructor() {
     for (const event of ['keydown', 'pointerdown', 'pointermove', 'wheel'] as const) {
-      window.addEventListener(event, this.recordInput, { passive: true });
+      window.addEventListener(event, this.recordInput, { passive: true, signal: this.lifetime.signal });
     }
   }
+
+  dispose(): void { this.lifetime.abort(); }
 
   get enabled(): boolean { return this.enabledValue; }
 

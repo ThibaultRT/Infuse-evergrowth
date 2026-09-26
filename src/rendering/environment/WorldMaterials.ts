@@ -18,6 +18,7 @@ export type WorldMaterialSet = {
   readonly ashTrail: THREE.MeshStandardMaterial;
   readonly abyss: THREE.MeshBasicMaterial;
   readonly area4: Area4MaterialSet;
+  readonly releaseAssets: () => void;
 };
 
 /** Reduced mode avoids transmission's extra scene pass; Full restores the authored look. */
@@ -54,6 +55,8 @@ async function tiledMaterial(
 }
 
 export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<WorldMaterialSet> {
+  const releaseAssets = assets.retain(['terrain.meadowColor', 'terrain.meadowNormal', 'terrain.forestColor', 'terrain.forestNormal',
+    'terrain.trailColor', 'terrain.trailNormal', 'terrain.cobbleColor', 'terrain.cobbleNormal']);
   const [meadow, forest, trail, cobble] = await Promise.all([
     tiledMaterial(assets, 'terrain.meadowColor', 'terrain.meadowNormal', 12, 0xb8c59e),
     tiledMaterial(assets, 'terrain.forestColor', 'terrain.forestNormal', 11, 0x626c50),
@@ -72,6 +75,7 @@ export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<W
   const abyss = new THREE.MeshBasicMaterial({ color: 0x000000, fog: false, toneMapped: false });
   const area4 = createArea4Materials();
   return {
+    releaseAssets,
     terrain: { meadow, forest, cobble, ash: area4.ground, rift: abyss },
     terrainUnderlay: { meadow: underlay(meadow), forest: underlay(forest), cobble: underlay(cobble) },
     area4,
@@ -91,4 +95,20 @@ export async function createWorldMaterials(assets: WorldAssetLibrary): Promise<W
       lava: new THREE.MeshStandardMaterial({ color: 0xff691c, emissive: 0xff3a08, emissiveIntensity: 0.75, roughness: 1 }),
     },
   };
+}
+
+export function disposeWorldMaterials(materials: WorldMaterialSet): void {
+  const unique = new Set<THREE.Material>();
+  const collect = (value: unknown): void => {
+    if (value instanceof THREE.Material) unique.add(value);
+    else if (value && typeof value === 'object') Object.values(value).forEach(collect);
+  };
+  collect(materials);
+  const textures = new Set<THREE.Texture>();
+  for (const material of unique) {
+    for (const value of Object.values(material)) if (value instanceof THREE.Texture) textures.add(value);
+    material.dispose();
+  }
+  textures.forEach((texture) => texture.dispose());
+  materials.releaseAssets();
 }

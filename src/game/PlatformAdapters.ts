@@ -1,4 +1,4 @@
-import { browserSaveStorage, type SaveStorage } from '../save';
+import { browserSaveStorage, type SaveStorage } from '../persistence/SaveStorage';
 
 export type GameClock = { now(): number; date(): Date };
 

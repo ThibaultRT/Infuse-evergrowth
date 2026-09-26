@@ -111,10 +111,10 @@ try {
     assert.deepEqual(runtime.update(.05, { x: 1, y: 0 }, true, 1), [{ type: 'heroRespawned', areaId: 1 }]);
   });
   await check('Flat defense includes every persistent source before adding armor', () => {
-    Object.assign(persistence.save, fresh());
-    assert.equal(equipment.equippedDefense(persistence.save, 'blunt'), 0);
-    persistence.save.stats.defense.blunt = { base: 3, additive: { kills: 4, other: 5, soulCatcher: 6 }, multiplicative: { other: 2 } };
-    assert.equal(equipment.equippedDefense(persistence.save, 'blunt'), 36);
+    const state = fresh();
+    assert.equal(equipment.equippedDefense(state, 'blunt'), 0);
+    state.stats.defense.blunt = { base: 3, additive: { kills: 4, other: 5, soulCatcher: 6 }, multiplicative: { other: 2 } };
+    assert.equal(equipment.equippedDefense(state, 'blunt'), 36);
   });
   await check('Reduced resolution is 70% of Full on DPR 1, 2 and 3 screens', () => {
     for (const dpr of [1, 2, 3]) {
@@ -154,7 +154,7 @@ try {
     assert.ok(input.movement.x === 0 && input.movement.y === 0);
   });
   await check('Missing terrain textures still yield usable world materials', async () => {
-    const materials = await createWorldMaterials({ loadTexture: async () => { throw new Error('Simulated missing texture'); } });
+    const materials = await createWorldMaterials({ retain: () => () => {}, loadTexture: async () => { throw new Error('Simulated missing texture'); } });
     assert.equal(materials.terrain.meadow.map, null);
     assert.equal(materials.terrain.forest.normalMap, null);
     assert.ok(materials.water.isMaterial);
@@ -381,7 +381,7 @@ try {
     assert.equal(equipment.ascendCopies(weapon, 3), 100);
   });
   await check('Commands and reset helpers mutate only the injected session', () => {
-    const globalBefore = structuredClone(persistence.save), first = fresh(), second = fresh();
+    const first = fresh(), second = fresh(), secondBefore = structuredClone(second);
     const session = new GameSession(first, new GameEvents(), () => {}, clock, () => .99);
     equipment.applyEquipmentCopies(first, 'sword-common', 101);
     assert.equal(session.commands.execute({ type: 'equip', itemId: 'sword-common', slot: 'hand1' }), true);
@@ -391,7 +391,7 @@ try {
     session.commands.execute({ type: 'resetHero', equipment: true });
     assert.deepEqual(first.inventory, second.inventory);
     assert.equal(first.stats.maxHp.additive.kills, 0);
-    assert.deepEqual(persistence.save, globalBefore);
+    assert.deepEqual(second, secondBefore);
   });
   await check('Resetting attributes reapplies owned Soul bonuses before clamping and saving HP', () => {
     const state = fresh();
@@ -544,11 +544,11 @@ try {
   await check('Storage access failures keep the game running and prevent overwriting unread progress', () => {
     mockGlobal('localStorage', { get: () => { throw new Error('Simulated storage denied'); } });
     assert.doesNotThrow(() => persistence.loadSave());
-    assert.equal(persistence.persist(), false);
+    assert.equal(persistence.persist(fresh()), false);
     assert.doesNotThrow(() => quality.saveRenderingQuality({ renderScale: .7, frameRateLimit: 30, showStats: false }));
     let writes = 0;
     mockGlobal('localStorage', { value: { getItem: () => null, setItem: () => writes++ } });
-    assert.equal(persistence.persist(), false);
+    assert.equal(persistence.persist(fresh()), false);
     assert.equal(writes, 0);
   }, 2);
 } finally {

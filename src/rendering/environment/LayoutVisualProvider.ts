@@ -12,18 +12,33 @@ export function createLayoutVisualProvider(
   builder: WorldBuilder | Promise<WorldBuilder>,
   hooks: LayoutVisualProviderHooks = {},
 ): VisualChunkProvider {
+  let releasePrefetch: (() => void) | undefined;
+  let generation = 0;
   return {
     id: layout.kind === 'area' ? `area:${layout.areaId}` : `transition:${layout.connectionId}`,
     kind: layout.kind,
-    prefetch: async () => (await builder).prefetch(layout),
+    prefetch: async () => {
+      const requestedGeneration = generation;
+      const ready = await builder;
+      if (requestedGeneration !== generation) return;
+      releasePrefetch ??= ready.retain(layout);
+      await ready.prefetch(layout);
+    },
+    evict: () => {
+      generation++;
+      releasePrefetch?.(); releasePrefetch = undefined;
+    },
     create: async () => {
       const view = await (await builder).build(layout);
-      hooks.onCreated?.(view);
+      try { hooks.onCreated?.(view); }
+      catch (error) { view.dispose(); throw error; }
+      let disposed = false;
       return {
         root: view.root,
         dispose: () => {
-          hooks.onDisposed?.(view);
-          view.dispose();
+          if (disposed) return;
+          disposed = true;
+          try { hooks.onDisposed?.(view); } finally { view.dispose(); }
         },
       };
     },

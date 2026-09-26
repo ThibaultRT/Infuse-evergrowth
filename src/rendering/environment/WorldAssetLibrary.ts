@@ -4,16 +4,63 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { WorldAssetKey } from '../../data/world/WorldAssetKeys';
 import { fitModelToFootprint } from '../AssetLoader';
 import type { WorldAssetResolver } from './WorldVisualAssetCatalog';
+import { WORLD_ASSET_CACHE_BYTES } from '../../config';
+import { assetResources, disposeAssetResources, estimatedAssetBytes, type AssetResources } from './WorldAssetResources';
 
 type LoadedModel = { readonly scene: THREE.Object3D; readonly definition: ReturnType<WorldAssetResolver['resolve']> };
+type Entry<T> = { request: Promise<T>; resources?: AssetResources; bytes: number; used: number };
 
 export class WorldAssetLibrary {
   private readonly modelLoader = new GLTFLoader();
   private readonly textureLoader = new THREE.TextureLoader();
-  private readonly models = new Map<WorldAssetKey, Promise<LoadedModel>>();
-  private readonly textures = new Map<WorldAssetKey, Promise<THREE.Texture>>();
+  private readonly models = new Map<WorldAssetKey, Entry<LoadedModel>>();
+  private readonly textures = new Map<WorldAssetKey, Entry<THREE.Texture>>();
+  private readonly users = new Map<WorldAssetKey, number>();
+  private serial = 0;
+  private disposed = false;
 
-  constructor(private readonly resolver: WorldAssetResolver) {}
+  constructor(private readonly resolver: WorldAssetResolver, private readonly budgetBytes = WORLD_ASSET_CACHE_BYTES) {}
+
+  /** Reserve before loading: in-flight builds and prefetched neighbours are users too. */
+  retain(keys: readonly WorldAssetKey[]): () => void {
+    if (this.disposed) throw new Error('World asset library is disposed.');
+    const unique = [...new Set(keys)];
+    unique.forEach((key) => this.users.set(key, (this.users.get(key) ?? 0) + 1));
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      unique.forEach((key) => {
+        const count = (this.users.get(key) ?? 1) - 1;
+        if (count > 0) this.users.set(key, count); else this.users.delete(key);
+      });
+      this.trim();
+    };
+  }
+
+  get snapshot(): { estimatedBytes: number; unusedBytes: number; budgetBytes: number; entries: number; users: number } {
+    const entries = [...this.models, ...this.textures];
+    return { estimatedBytes: entries.reduce((total, [, entry]) => total + entry.bytes, 0),
+      unusedBytes: entries.reduce((total, [key, entry]) => total + (this.users.has(key) ? 0 : entry.bytes), 0),
+      budgetBytes: this.budgetBytes, entries: entries.length, users: [...this.users.values()].reduce((total, count) => total + count, 0) };
+  }
+
+  trim(): void {
+    let bytes = this.snapshot.estimatedBytes;
+    for (const [key, entry] of [...this.models, ...this.textures].sort((a, b) => a[1].used - b[1].used)) {
+      if (bytes <= this.budgetBytes) break;
+      if (this.users.has(key) || !entry.resources) continue;
+      this.models.delete(key); this.textures.delete(key);
+      disposeAssetResources(entry.resources);
+      bytes -= entry.bytes;
+    }
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    for (const [, entry] of [...this.models, ...this.textures]) if (entry.resources) disposeAssetResources(entry.resources);
+    this.models.clear(); this.textures.clear(); this.users.clear();
+  }
 
   async preload(keys: readonly WorldAssetKey[]): Promise<void> {
     await Promise.all([...new Set(keys)].map(async (key) => {
@@ -58,27 +105,45 @@ export class WorldAssetLibrary {
       fallback.name = name;
       fallback.position.y = 0.7;
       fallback.userData.worldAssetFallback = key;
+      fallback.userData.worldOwnedGeometry = true;
+      fallback.userData.worldOwnedMaterial = true;
       return fallback;
     }
   }
 
   loadTexture(key: WorldAssetKey): Promise<THREE.Texture> {
     const existing = this.textures.get(key);
-    if (existing) return existing;
+    if (existing) { existing.used = ++this.serial; return existing.request; }
+    if (this.disposed) return Promise.reject(new Error('World asset library is disposed.'));
     const definition = this.resolver.resolve(key);
     if (definition.kind !== 'texture') return Promise.reject(new Error(`${key} is not a texture.`));
-    const request = this.textureLoader.loadAsync(definition.url);
-    this.textures.set(key, request);
-    return request;
+    const entry: Entry<THREE.Texture> = { request: this.textureLoader.loadAsync(definition.url), bytes: 0, used: ++this.serial };
+    entry.request = entry.request.then((texture) => {
+      const resources = assetResources(undefined, texture);
+      if (this.disposed) { disposeAssetResources(resources); throw new Error('World asset library is disposed.'); }
+      entry.resources = resources; entry.bytes = estimatedAssetBytes(resources);
+      queueMicrotask(() => this.trim());
+      return texture;
+    });
+    this.textures.set(key, entry);
+    return entry.request;
   }
 
   private loadModel(key: WorldAssetKey): Promise<LoadedModel> {
     const existing = this.models.get(key);
-    if (existing) return existing;
+    if (existing) { existing.used = ++this.serial; return existing.request; }
+    if (this.disposed) return Promise.reject(new Error('World asset library is disposed.'));
     const definition = this.resolver.resolve(key);
     if (definition.kind !== 'model') return Promise.reject(new Error(`${key} is not a model.`));
-    const request = this.modelLoader.loadAsync(definition.url).then((gltf) => ({ scene: gltf.scene, definition }));
-    this.models.set(key, request);
-    return request;
+    const entry: Entry<LoadedModel> = { request: this.modelLoader.loadAsync(definition.url).then((gltf) => ({ scene: gltf.scene, definition })), bytes: 0, used: ++this.serial };
+    entry.request = entry.request.then((model) => {
+      const resources = assetResources(model.scene);
+      if (this.disposed) { disposeAssetResources(resources); throw new Error('World asset library is disposed.'); }
+      entry.resources = resources; entry.bytes = estimatedAssetBytes(resources);
+      queueMicrotask(() => this.trim());
+      return model;
+    });
+    this.models.set(key, entry);
+    return entry.request;
   }
 }

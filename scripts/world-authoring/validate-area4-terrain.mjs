@@ -11,7 +11,7 @@ export async function validateArea4Terrain(vite) {
     vite.ssrLoadModule('/src/rendering/environment/WorldMaterials.ts'),
     vite.ssrLoadModule('/src/data/world/WorldPropCatalog.ts'),
   ]);
-  const materials = await createWorldMaterials({ loadTexture: async () => new THREE.Texture() });
+  const materials = await createWorldMaterials({ retain: () => () => {}, loadTexture: async () => new THREE.Texture() });
   assert.equal(materials.abyss.isMeshBasicMaterial, true);
   assert.equal(materials.abyss.color.getHex(), 0);
   assert.equal(materials.abyss.fog, false, 'Sky fog must not reveal the bottom.');

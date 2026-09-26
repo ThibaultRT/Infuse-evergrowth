@@ -2,6 +2,7 @@ export type MovementInput = Readonly<{ x: number; y: number }>;
 
 /** Normalizes keyboard and touch controls into one renderer-independent input. */
 export class InputController {
+  private readonly lifetime = new AbortController();
   private readonly keys = new Set<string>();
   private joystickPointer: number | null = null;
   private joystickX = 0;
@@ -11,16 +12,18 @@ export class InputController {
     private readonly joystick: HTMLElement,
     private readonly joystickKnob: HTMLElement
   ) {
-    addEventListener('keydown', this.onKeyDown);
-    addEventListener('keyup', this.onKeyUp);
-    addEventListener('blur', () => this.reset());
-    document.addEventListener('visibilitychange', () => { if (document.hidden) this.reset(); });
-    joystick.addEventListener('pointerdown', this.onPointerDown);
-    joystick.addEventListener('pointermove', this.onPointerMove);
-    joystick.addEventListener('pointerup', this.onPointerEnd);
-    joystick.addEventListener('pointercancel', this.onPointerEnd);
-    joystick.addEventListener('lostpointercapture', this.onPointerEnd);
+    addEventListener('keydown', this.onKeyDown, { signal: this.lifetime.signal });
+    addEventListener('keyup', this.onKeyUp, { signal: this.lifetime.signal });
+    addEventListener('blur', () => this.reset(), { signal: this.lifetime.signal });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.reset(); }, { signal: this.lifetime.signal });
+    joystick.addEventListener('pointerdown', this.onPointerDown, { signal: this.lifetime.signal });
+    joystick.addEventListener('pointermove', this.onPointerMove, { signal: this.lifetime.signal });
+    joystick.addEventListener('pointerup', this.onPointerEnd, { signal: this.lifetime.signal });
+    joystick.addEventListener('pointercancel', this.onPointerEnd, { signal: this.lifetime.signal });
+    joystick.addEventListener('lostpointercapture', this.onPointerEnd, { signal: this.lifetime.signal });
   }
+
+  dispose(): void { this.lifetime.abort(); this.reset(); }
 
   get movement(): MovementInput {
     let x = this.joystickX;

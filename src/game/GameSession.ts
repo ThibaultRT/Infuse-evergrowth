@@ -1,5 +1,5 @@
 import { AREAS, BASE_RESPAWN_MS, BLOCKED_DAMAGE_MULTIPLIER, ENEMY_AGGRO_RADIUS_METERS, ENEMY_ATTACK_COOLDOWN, ENEMY_ATTACK_RANGE_METERS, ENEMY_LEASH_RADIUS_METERS, ENEMY_POSITIONING_RANGE_METERS, HERO_ATTACK_RANGE_METERS, HERO_COMBAT_EXIT_DELAY_SECONDS, HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER, HERO_RESPAWN_DELAY_MS, SPAWNS, TIER_CONFIG, WORLD_CONNECTIONS, areaById } from '../config';
-import { localDailyKey, nextLocalMidnightMs } from '../save';
+import { localDailyKey, nextLocalMidnightMs } from '../domain/time/LocalCalendar';
 import type { CombatAffinity, SaveData, SpawnDefinition, WeaponSlotId } from '../types';
 import { CombatSystem } from '../systems/CombatSystem';
 import { attackProfile, equippedDefense } from '../systems/EquipmentSystem';
@@ -11,6 +11,7 @@ import { createProgressionSnapshot, type ProgressionSnapshot } from '../systems/
 import { MinionSystem } from '../systems/MinionSystem';
 import { MinionAISystem } from '../systems/MinionAISystem';
 import { statTotal } from '../domain/stats/StatSources';
+import { AUTOSAVE_INTERVAL_MS } from '../config';
 import { GameCommands } from './GameCommands';
 import { GameEvents } from './GameEvents';
 import { GameplayRuntime } from './GameplayRuntime';
@@ -27,15 +28,21 @@ export class GameSession {
   private readonly respawns: RespawnSystem;
   private readonly progression: ProgressionSystem;
   private healthPersistSeconds = 0;
+  private saveDirty = true;
+  private criticalSavePending = false;
+  private updating = false;
+  private lastSaveAt: number;
   private midnightSeconds = 0;
   private minionsPaused = false;
+  private readonly subscriptions: (() => void)[] = [];
 
-  constructor(readonly state: SaveData, readonly events: GameEvents, private readonly writeSave: () => void,
+  constructor(readonly state: SaveData, readonly events: GameEvents, private readonly writeSave: () => void | boolean,
     private readonly clock: GameClock = browserClock, private readonly random = Math.random) {
+    this.lastSaveAt = clock.now();
     this.respawns = new RespawnSystem(random);
     this.minions = new MinionSystem(state, random);
     this.minions.reviveDue(clock.now());
-    this.soulCatcher = new SoulCatcherSystem(state, events, () => this.persist(), (slotId) => this.minions.unlockSlot(slotId));
+    this.soulCatcher = new SoulCatcherSystem(state, events, () => this.persist(true), (slotId) => this.minions.unlockSlot(slotId));
     for (const definition of SPAWNS) {
       this.respawns.reviveIfDue(state.spawns[definition.id], definition, clock.now());
     }
@@ -50,22 +57,55 @@ export class GameSession {
       enemyLeashRadius: ENEMY_LEASH_RADIUS_METERS, enemyAttackRange: ENEMY_ATTACK_RANGE_METERS,
       enemyPositioningRange: ENEMY_POSITIONING_RANGE_METERS, enemyAttackCooldown: ENEMY_ATTACK_COOLDOWN,
     });
-    this.commands = new GameCommands(state, this.runtime, events, () => this.persist(), this.soulCatcher, this.minions);
-    this.progression = new ProgressionSystem(state, events, () => this.persist(), random, (rarity) => this.soulCatcher.equipmentQuantity(rarity),
+    this.commands = new GameCommands(state, this.runtime, events, () => this.persist(true), this.soulCatcher, this.minions);
+    this.progression = new ProgressionSystem(state, events, (critical) => this.persist(critical), random, (rarity) => this.soulCatcher.equipmentQuantity(rarity),
       (definition) => this.soulCatcher.credit(definition), this.minions);
     this.minionAI = new MinionAISystem(state, this.runtime, random);
-    events.on('minionInfused', ({ minionId }) => this.minionAI.remove(minionId));
+    this.subscriptions.push(events.on('minionInfused', ({ minionId }) => this.minionAI.remove(minionId)));
     const cooldown = (slot: WeaponSlotId): number => attackProfile(state, slot)?.cooldownSeconds ?? 0;
     this.combat = new CombatSystem({ orbit1: cooldown('orbit1') * .25, orbit2: cooldown('orbit2') * .5, orbit3: cooldown('orbit3') * .75 });
-    events.on('heroProgressReset', () => this.soulCatcher.syncEffects());
+    this.subscriptions.push(events.on('heroProgressReset', () => this.soulCatcher.syncEffects()));
     const syncStats = (): void => {
       this.runtime.setHeroSpeed(heroSpeed(state.stats));
       this.runtime.hero.hp = Math.min(this.runtime.hero.hp, maxHeroHp(state.stats));
     };
-    for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'soulNodePurchased', 'soulCatcherReset', 'heroProgressReset'] as const) events.on(event, syncStats);
+    for (const event of ['statGained', 'equipmentEquipped', 'equipmentUnequipped', 'weaponAscended', 'soulNodePurchased', 'soulCatcherReset', 'heroProgressReset', 'minionInfused'] as const) this.subscriptions.push(events.on(event, syncStats));
   }
 
-  persist(): void { this.state.heroHp = this.runtime.hero.hp; this.writeSave(); }
+  /** Routine mutations only mark dirty; critical commands flush after a complete update. */
+  persist(critical = false): void {
+    this.state.heroHp = this.runtime.hero.hp;
+    this.saveDirty = true;
+    this.criticalSavePending ||= critical;
+    if (critical && !this.updating) this.flushSave();
+  }
+
+  flushSave(): void {
+    if (!this.saveDirty) return;
+    this.state.heroHp = this.runtime.hero.hp;
+    this.lastSaveAt = this.clock.now();
+    this.criticalSavePending = false;
+    this.saveDirty = this.writeSave() === false;
+  }
+
+  dispose(): void { this.subscriptions.splice(0).forEach((unsubscribe) => unsubscribe()); }
+
+  /** Advance deadlines after suspension without simulating offline combat or movement. */
+  resumeWallClock(elapsedSeconds: number): void {
+    this.resetAtMidnightIfNeeded();
+    this.reviveDueSpawns();
+    for (const event of this.runtime.update(0, { x: 0, y: 0 }, false, elapsedSeconds, false)) {
+      if (event.type !== 'heroRespawned') continue;
+      this.runtime.hero.hp = maxHeroHp(this.state.stats);
+      this.events.emit('heroResurrected', { areaId: event.areaId });
+      this.persist();
+    }
+    for (const minionId of this.minions.reviveDue(this.clock.now())) {
+      this.minionAI.respawned(minionId);
+      this.events.emit('minionRespawned', { minionId });
+      this.persist();
+    }
+  }
 
   progressionSnapshot(): ProgressionSnapshot {
     return createProgressionSnapshot(this.state, this.soulCatcher, this.minions, (id) => {
@@ -77,50 +117,57 @@ export class GameSession {
   }
 
   update(dt: number, movement: Readonly<{ x: number; y: number }>, elapsedSeconds = dt, minionsPaused = false): void {
-    this.minionsPaused = minionsPaused;
-    this.combat.update(dt);
-    this.midnightSeconds += dt;
-    if (this.midnightSeconds >= 1) { this.midnightSeconds = 0; this.resetAtMidnightIfNeeded(); }
-    // Panels and camera presentations never pause simulation or wall-clock timers.
-    for (const event of this.runtime.update(dt, this.commands.movement({ type: 'move', ...movement }), true, elapsedSeconds, !minionsPaused)) {
-      if (event.type === 'enemyAttack') {
-        if (event.target.kind === 'hero') this.damageHero(event.amount, event.damageType);
-        else this.damageMinion(event.target.minionId, event.amount, event.damageType);
+    this.updating = true;
+    try {
+      this.saveDirty = true;
+      this.minionsPaused = minionsPaused;
+      this.combat.update(dt);
+      this.midnightSeconds += dt;
+      if (this.midnightSeconds >= 1) { this.midnightSeconds = 0; this.resetAtMidnightIfNeeded(); }
+      // Panels and camera presentations never pause simulation or wall-clock timers.
+      for (const event of this.runtime.update(dt, this.commands.movement({ type: 'move', ...movement }), true, elapsedSeconds, !minionsPaused)) {
+        if (event.type === 'enemyAttack') {
+          if (event.target.kind === 'hero') this.damageHero(event.amount, event.damageType);
+          else this.damageMinion(event.target.minionId, event.amount, event.damageType);
+        }
+        else if (event.type === 'areaEntered') this.commands.execute({ type: 'enterArea', areaId: event.areaId, connectionId: event.connectionId });
+        else {
+          this.runtime.hero.hp = maxHeroHp(this.state.stats);
+          this.events.emit('heroResurrected', { areaId: event.areaId });
+          this.persist();
+        }
       }
-      else if (event.type === 'areaEntered') this.commands.execute({ type: 'enterArea', areaId: event.areaId, connectionId: event.connectionId });
-      else {
-        this.runtime.hero.hp = maxHeroHp(this.state.stats);
-        this.events.emit('heroResurrected', { areaId: event.areaId });
+      this.reviveDueSpawns();
+      this.autoAttack();
+      for (const attack of minionsPaused ? [] : this.minionAI.update(dt)) {
+        const minion = this.minions.find(attack.minionId), target = this.runtime.spawnById.get(attack.spawnId);
+        if (!minion || minion.respawnAt !== null || !target?.alive) continue;
+        const hit = this.runtime.damageSpawn(attack.spawnId, attack.amount, { kind: 'minion', minionId: minion.id });
+        if (!hit) continue;
+        this.events.emit('enemyDamaged', { enemyId: attack.spawnId, owner: { kind: 'minion', minionId: minion.id }, amount: attack.amount, damageType: attack.damageType, itemId: attack.itemId, slot: attack.slot });
+        if (hit.defeated) {
+          const definition = target.definition;
+          this.progression.defeat(definition, TIER_CONFIG[definition.tier], this.runtime.hero, AREAS, WORLD_CONNECTIONS, this.clock.now(),
+            BASE_RESPAWN_MS / this.soulCatcher.respawnDivisor(definition.tier), nextLocalMidnightMs(this.clock.date()), { kind: 'minion', minionId: minion.id });
+          this.minionAI.afterKill(minion);
+        }
+      }
+      const revivedMinions = this.minions.reviveDue(this.clock.now());
+      if (revivedMinions.length) this.persist();
+      for (const minionId of revivedMinions) { this.minionAI.respawned(minionId); this.events.emit('minionRespawned', { minionId }); }
+      if (!this.runtime.hero.dead) {
+        const multiplier = this.runtime.hero.combatRemainingSeconds > 0 ? 1 : HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER;
+        this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + heroRegen(this.state.stats) * multiplier * dt);
+      }
+      this.healthPersistSeconds += dt;
+      if (this.healthPersistSeconds >= 1) {
+        this.healthPersistSeconds = 0;
         this.persist();
+        if (this.state.minions.roster.length) this.events.emit('minionVitalsChanged', undefined);
       }
-    }
-    this.reviveDueSpawns();
-    this.autoAttack();
-    for (const attack of minionsPaused ? [] : this.minionAI.update(dt)) {
-      const minion = this.minions.find(attack.minionId), target = this.runtime.spawnById.get(attack.spawnId);
-      if (!minion || minion.respawnAt !== null || !target?.alive) continue;
-      const hit = this.runtime.damageSpawn(attack.spawnId, attack.amount, { kind: 'minion', minionId: minion.id });
-      if (!hit) continue;
-      this.events.emit('enemyDamaged', { enemyId: attack.spawnId, owner: { kind: 'minion', minionId: minion.id }, amount: attack.amount, damageType: attack.damageType, itemId: attack.itemId, slot: attack.slot });
-      if (hit.defeated) {
-        const definition = target.definition;
-        this.progression.defeat(definition, TIER_CONFIG[definition.tier], this.runtime.hero, AREAS, WORLD_CONNECTIONS, this.clock.now(),
-          BASE_RESPAWN_MS / this.soulCatcher.respawnDivisor(definition.tier), nextLocalMidnightMs(this.clock.date()), { kind: 'minion', minionId: minion.id });
-        this.minionAI.afterKill(minion);
-      }
-    }
-    const revivedMinions = this.minions.reviveDue(this.clock.now());
-    if (revivedMinions.length) this.persist();
-    for (const minionId of revivedMinions) { this.minionAI.respawned(minionId); this.events.emit('minionRespawned', { minionId }); }
-    if (!this.runtime.hero.dead) {
-      const multiplier = this.runtime.hero.combatRemainingSeconds > 0 ? 1 : HERO_OUT_OF_COMBAT_REGEN_MULTIPLIER;
-      this.runtime.hero.hp = Math.min(maxHeroHp(this.state.stats), this.runtime.hero.hp + heroRegen(this.state.stats) * multiplier * dt);
-    }
-    this.healthPersistSeconds += dt;
-    if (this.healthPersistSeconds >= 1) {
-      this.healthPersistSeconds = 0;
-      this.persist();
-      if (this.state.minions.roster.length) this.events.emit('minionVitalsChanged', undefined);
+    } finally {
+      this.updating = false;
+      if (this.criticalSavePending || this.clock.now() - this.lastSaveAt >= AUTOSAVE_INTERVAL_MS) this.flushSave();
     }
   }
 
@@ -218,7 +265,7 @@ export class GameSession {
       this.revive(definition);
     }
     this.events.emit('dailyReset', undefined);
-    this.persist();
+    this.persist(true);
   }
 
   resetSpawnCooldowns(): number {
@@ -229,7 +276,7 @@ export class GameSession {
       this.respawns.reroll(spawn, definition);
       this.revive(definition); count++;
     }
-    this.persist();
+    this.persist(true);
     return count;
   }
 }

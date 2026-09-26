@@ -35,6 +35,7 @@ export class WorldVisualStreamingManager {
   private readonly chunks = new Map<string, ChunkRecord>();
   private readonly mountedAreaIds = new Set<number>();
   private readonly mountedTransitionIds = new Set<string>();
+  private disposed = false;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -54,6 +55,7 @@ export class WorldVisualStreamingManager {
   }
 
   update(currentAreaId: number, heroPosition: { x: number; z: number }): void {
+    if (this.disposed) return;
     const wanted = new Set<string>([`area:${currentAreaId}`]);
     const prefetch = new Set(wanted);
     for (const connection of this.connections) {
@@ -88,14 +90,14 @@ export class WorldVisualStreamingManager {
     if (chunk.request) return chunk.request;
     chunk.request = chunk.provider.prefetch()
       .catch((error: unknown) => console.warn(`${chunk.provider.id} visual prefetch failed; fallback remains available.`, error))
-      .then(() => { chunk.prefetched = true; chunk.request = undefined; });
+      .then(() => { chunk.prefetched = true; chunk.request = undefined; if (this.disposed) this.evictPrefetchIfIdle(chunk); });
     return chunk.request;
   }
 
   private async mount(chunk: ChunkRecord): Promise<void> {
     try {
       const instance = await chunk.provider.create();
-      if (!chunk.wanted || chunk.instance) { instance.dispose?.(); return; }
+      if (this.disposed || !chunk.wanted || chunk.instance) { instance.dispose?.(); return; }
       chunk.instance = instance;
       this.scene.add(instance.root);
       this.onMounted?.(instance.root);
@@ -105,6 +107,7 @@ export class WorldVisualStreamingManager {
       console.warn(`${chunk.provider.id} visual mount failed; gameplay remains authoritative.`, error);
     } finally {
       chunk.mountRequest = undefined;
+      if (this.disposed) this.evictPrefetchIfIdle(chunk);
     }
   }
 
@@ -144,4 +147,10 @@ export class WorldVisualStreamingManager {
   }
 
   areaIsMounted(areaId: number): boolean { return this.mountedAreaIds.has(areaId); }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    for (const chunk of this.chunks.values()) { chunk.wanted = false; this.unmount(chunk); this.evictPrefetchIfIdle(chunk); }
+  }
 }

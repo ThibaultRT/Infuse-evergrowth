@@ -3,6 +3,7 @@ import { MINION_PIT } from '../../src/data/world/minionPit';
 import { createMinion } from '../../src/domain/minions';
 import { MinionPresentation } from '../../src/rendering/MinionPresentation';
 import { WorldUiManager } from '../../src/rendering/WorldUiManager';
+import type { MinionSlotId } from '../../src/types';
 
 /** Static authored snapshots only: no session, combat advancement, or save writes. */
 export function minionPreview(scene: THREE.Scene, camera: THREE.Camera, renderer: THREE.WebGLRenderer): () => void {
@@ -11,7 +12,7 @@ export function minionPreview(scene: THREE.Scene, camera: THREE.Camera, renderer
   button.style.cssText = 'position:absolute;transform:translate(-50%,-100%);min-height:44px;min-width:44px;padding:8px 12px;background:#222030;color:#f2dfff;border:1px solid #a183af;border-radius:12px;pointer-events:auto';
   document.body.append(button);
   const roster = [0, .4, .8].map((random, index) => {
-    const minion = createMinion(`preview-${index}`, () => random);
+    const minion = createMinion(`preview-${index}`, (index + 1) as MinionSlotId, () => random);
     minion.position = { x: MINION_PIT.x - 1.6 + index * 1.6, z: MINION_PIT.z + 2.5 };
     return minion;
   });

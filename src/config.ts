@@ -127,3 +127,7 @@ export const VISUAL_STREAMING = {
   enemyActivateDistance: balance.visualStreaming.enemyActivateMeters,
   enemyDeactivateDistance: balance.visualStreaming.enemyDeactivateMeters
 } as const;
+
+export const AUTOSAVE_INTERVAL_MS = balance.persistence.autosaveSeconds * 1000;
+export const SIMULATION_TIMING = balance.simulation;
+export const WORLD_ASSET_CACHE_BYTES = balance.visualStreaming.assetCacheBudgetMiB * 1024 * 1024;

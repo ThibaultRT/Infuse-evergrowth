@@ -54,4 +54,6 @@ export class GameEvents {
   emit<K extends keyof GameEventMap>(type: K, event: GameEventMap[K]): void {
     this.listeners.get(type)?.forEach((listener) => listener(event as never));
   }
+
+  clear(): void { this.listeners.clear(); }
 }

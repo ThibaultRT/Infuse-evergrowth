@@ -37,4 +37,5 @@ export class WorldUiManager {
       }
     }
   }
+  dispose(): void { this.floatingTexts.splice(0).forEach(({ element }) => element.remove()); }
 }

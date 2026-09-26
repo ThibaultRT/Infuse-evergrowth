@@ -10,6 +10,8 @@ import { createWalkSurfaceView } from './WorldWalkSurfaceView';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { BlockoutMaterial, WorldBlockoutPart } from '../../data/world/area4';
 import { createArea4Ground, createLavaBasin, createArea4LavaLake, createRiftBanks } from './Area4TerrainView';
+import { disposeClonedSkeletons } from '../RenderingResourceDisposal';
+import type { WorldAssetKey } from '../../data/world/WorldAssetKeys';
 
 export type WorldBuildMode = 'runtime' | 'inspection';
 
@@ -17,8 +19,9 @@ export class WorldChunkView {
   readonly root = new THREE.Group();
   private readonly lockedGateVisuals: THREE.Object3D[] = [];
   private readonly gateLeaves: { object: THREE.Object3D; closed: THREE.Quaternion; openAngle: number }[] = [];
+  private disposed = false;
 
-  constructor(readonly layout: AnyWorldLayout) {
+  constructor(readonly layout: AnyWorldLayout, private readonly releaseAssets: () => void = () => {}) {
     this.root.name = layout.id.replace(':', '_');
     this.root.position.set(...layout.origin);
     this.root.userData = { chunkId: layout.id, chunkKind: layout.kind, editable: true, units: 'meters' };
@@ -44,10 +47,20 @@ export class WorldChunkView {
   update(_dt: number): void {}
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    disposeClonedSkeletons(this.root);
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
     this.root.traverse((object) => {
-      if (object instanceof THREE.Mesh && object.userData.worldOwnedGeometry) object.geometry.dispose();
+      if (!(object instanceof THREE.Mesh)) return;
+      if (object.userData.worldOwnedGeometry) geometries.add(object.geometry);
+      if (object.userData.worldOwnedMaterial) for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material);
     });
+    geometries.forEach((geometry) => geometry.dispose());
+    materials.forEach((material) => material.dispose());
     this.root.clear();
+    this.releaseAssets();
   }
 }
 
@@ -57,61 +70,70 @@ export class WorldBuilder {
     private readonly materials: WorldMaterialSet,
   ) {}
 
-  async prefetch(layout: AnyWorldLayout): Promise<void> {
+  private assetKeys(layout: AnyWorldLayout): WorldAssetKey[] {
     const placements = [...layout.props, ...layout.scatters.flatMap(expandWorldScatter)];
-    await this.assets.preload(placements.flatMap((placement) => worldPropAssetKeys(placement.prop)));
+    return placements.flatMap((placement) => worldPropAssetKeys(placement.prop));
+  }
+
+  retain(layout: AnyWorldLayout): () => void { return this.assets.retain(this.assetKeys(layout)); }
+  trim(): void { this.assets.trim(); }
+
+  async prefetch(layout: AnyWorldLayout): Promise<void> {
+    await this.assets.preload(this.assetKeys(layout));
   }
 
   async build(layout: AnyWorldLayout, mode: WorldBuildMode = 'runtime'): Promise<WorldChunkView> {
-    await this.prefetch(layout);
-    const view = new WorldChunkView(layout);
-    const terrain = new THREE.Group();
-    terrain.name = `${layout.id.replace(':', '_')}_TerrainAndRoads`;
-    if (layout.kind === 'area' && layout.areaId === 4) {
-      terrain.add(createArea4Ground(layout, this.materials.area4.ground));
-    } else {
-      // Rift transitions contain banks and a black closure, with no terrain mesh.
-      if (layout.terrain !== 'rift') {
-        const regions = layout.terrainRegions ?? [undefined];
-        for (const region of regions) {
-          const profile = region?.terrain ?? layout.terrain;
-          const material = region?.layer === 'underlay'
-            ? this.materials.terrainUnderlay[profile] ?? this.materials.terrain[profile]
-            : this.materials.terrain[profile];
-          terrain.add(createWorldTerrain(layout, material, region));
+    const view = new WorldChunkView(layout, this.retain(layout));
+    try {
+      await this.prefetch(layout);
+      const terrain = new THREE.Group();
+      terrain.name = `${layout.id.replace(':', '_')}_TerrainAndRoads`;
+      if (layout.kind === 'area' && layout.areaId === 4) {
+        terrain.add(createArea4Ground(layout, this.materials.area4.ground));
+      } else {
+        // Rift transitions contain banks and a black closure, with no terrain mesh.
+        if (layout.terrain !== 'rift') {
+          const regions = layout.terrainRegions ?? [undefined];
+          for (const region of regions) {
+            const profile = region?.terrain ?? layout.terrain;
+            const material = region?.layer === 'underlay'
+              ? this.materials.terrainUnderlay[profile] ?? this.materials.terrain[profile]
+              : this.materials.terrain[profile];
+            terrain.add(createWorldTerrain(layout, material, region));
+          }
         }
+        for (const road of layout.roads) terrain.add(createWorldRoad(layout, road, this.materials));
       }
-      for (const road of layout.roads) terrain.add(createWorldRoad(layout, road, this.materials));
-    }
-    if (layout.riftBanks) terrain.add(createRiftBanks(layout.riftBanks, layout.origin[0], this.materials.area4));
-    for (const surface of layout.surfaces ?? []) terrain.add(createWorldSurface(surface, this.materials));
-    view.root.add(terrain);
+      if (layout.riftBanks) terrain.add(createRiftBanks(layout.riftBanks, layout.origin[0], this.materials.area4));
+      for (const surface of layout.surfaces ?? []) terrain.add(createWorldSurface(surface, this.materials));
+      view.root.add(terrain);
 
-    const landmarks = new THREE.Group();
-    landmarks.name = `${layout.id.replace(':', '_')}_Props`;
-    const authored = await Promise.all(layout.props.map(async (placement) => this.createPlacement(layout, placement, mode)));
-    if (authored.length) landmarks.add(...authored);
-    view.root.add(landmarks);
+      const landmarks = new THREE.Group();
+      landmarks.name = `${layout.id.replace(':', '_')}_Props`;
+      const authored = await Promise.all(layout.props.map(async (placement) => this.createPlacement(layout, placement, mode)));
+      if (authored.length) landmarks.add(...authored);
+      view.root.add(landmarks);
 
-    const scatter = new THREE.Group();
-    scatter.name = `${layout.id.replace(':', '_')}_Scatter`;
-    const scattered = await Promise.all(layout.scatters.flatMap(expandWorldScatter).map(async (placement) => this.createPlacement(layout, placement, mode)));
-    if (scattered.length) scatter.add(...scattered);
-    view.root.add(scatter);
+      const scatter = new THREE.Group();
+      scatter.name = `${layout.id.replace(':', '_')}_Scatter`;
+      const scattered = await Promise.all(layout.scatters.flatMap(expandWorldScatter).map(async (placement) => this.createPlacement(layout, placement, mode)));
+      if (scattered.length) scatter.add(...scattered);
+      view.root.add(scatter);
 
-    if (layout.kind === 'transition') {
-      let hingedGate = false;
-      for (const placement of layout.props) {
-        const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
-        const object = view.root.getObjectByName(placement.name);
-        for (const leaf of definition.gate?.leaves ?? []) {
-          const node = object?.getObjectByName(leaf.node);
-          if (node) { view.addGateLeaf(node, leaf.openAngle); hingedGate = true; }
+      if (layout.kind === 'transition') {
+        let hingedGate = false;
+        for (const placement of layout.props) {
+          const definition: WorldPropDefinition = WORLD_PROP_CATALOG[placement.prop];
+          const object = view.root.getObjectByName(placement.name);
+          for (const leaf of definition.gate?.leaves ?? []) {
+            const node = object?.getObjectByName(leaf.node);
+            if (node) { view.addGateLeaf(node, leaf.openAngle); hingedGate = true; }
+          }
         }
+        if (!hingedGate) this.addLockedGateVisual(view, layout);
       }
-      if (!hingedGate) this.addLockedGateVisual(view, layout);
-    }
-    return view;
+      return view;
+    } catch (error) { view.dispose(); throw error; }
   }
 
   private async createPlacement(layout: AnyWorldLayout, placement: WorldPropPlacement, mode: WorldBuildMode, local = false): Promise<THREE.Object3D> {

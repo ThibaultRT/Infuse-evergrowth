@@ -1,7 +1,8 @@
 import type { GameEvents } from './GameEvents';
 import type { GameplayRuntime } from './GameplayRuntime';
 import { ascend, equip, unequip } from '../systems/EquipmentSystem';
-import { resetHeroProgress, resetPermanentStats, statTotal } from '../save';
+import { resetHeroProgress, resetPermanentStats } from '../persistence/SaveDefaults';
+import { statTotal } from '../domain/stats/StatSources';
 import type { EquipmentSlotId, MinionSlotId, SaveData } from '../types';
 import type { SoulCatcherSystem } from '../systems/SoulCatcherSystem';
 import type { MinionSystem } from '../systems/MinionSystem';

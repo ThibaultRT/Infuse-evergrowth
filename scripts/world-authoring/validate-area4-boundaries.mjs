@@ -91,7 +91,7 @@ export async function validateArea4Boundaries(vite) {
   }
   assert.ok(payload < 2.5 * 1048576 && placedTriangles <= 30000, 'Boundary assets exceed their runtime budget.');
   const missing = {
-    preload: async () => {}, loadTexture: async () => new THREE.Texture(),
+    retain: () => () => {}, preload: async () => {}, loadTexture: async () => new THREE.Texture(),
     instantiate: async (key) => { const mesh = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial()); mesh.userData.worldAssetFallback = key; return mesh; },
   };
   const materials = await createWorldMaterials(missing);

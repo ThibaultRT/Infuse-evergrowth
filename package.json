@@ -1,7 +1,7 @@
 {
   "name": "infuse-evergrowth",
   "private": true,
-  "version": "0.87.0",
+  "version": "0.87.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,7 +17,10 @@
     "authoring:world:build-debug": "node scripts/world-authoring/capture-layout.mjs",
     "authoring:world:validate": "node scripts/world-authoring/validate-layout.mjs",
     "authoring:world:smoke-runtime": "node scripts/world-authoring/smoke-runtime.mjs",
-    "authoring:viewer": "vite --config tools/world-authoring-viewer/vite.config.ts"
+    "authoring:viewer": "vite --config tools/world-authoring-viewer/vite.config.ts",
+    "validate:regressions": "node scripts/validate-code-review.mjs && node scripts/validate-review-fixes.mjs",
+    "validate:minions": "node scripts/validate-minions.mjs && node scripts/world-assets/validate-minions.mjs",
+    "check": "npm run build && npm run validate:regressions && npm run validate:minions && npm run validate:release"
   },
   "dependencies": {
     "jpeg-js": "^0.4.4",
@@ -26,6 +29,7 @@
     "three.terrain.js": "^3.1.1"
   },
   "devDependencies": {
+    "@types/node": "^24.19.0",
     "@types/three": "^0.185.4",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",

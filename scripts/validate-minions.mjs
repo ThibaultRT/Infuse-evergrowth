@@ -368,7 +368,7 @@ try {
     for (const spawn of config.SPAWNS) if (spawn.id !== target.id) combatState.spawns[spawn.id].respawnAt = now.getTime() + 60000;
     let defeatWrites = 0, minionProgress = 0;
     const combatEvents = new GameEvents();
-    combatEvents.on('minionProgressed', () => { minionProgress++; assert.equal(defeatWrites, 1); });
+    combatEvents.on('minionProgressed', () => { minionProgress++; assert.equal(defeatWrites, 0, 'routine rewards wait for the autosave interval'); });
     const combatSession = new GameSession(combatState, combatEvents, () => { defeatWrites++; }, clock, () => .99);
     const beforeHero = JSON.stringify(combatState.stats);
     combatSession.runtime.spawnById.get(target.id).hp = 1;
@@ -380,6 +380,8 @@ try {
     assert.equal(combatSession.progressionSnapshot().minions.roster[0].activity.mode, 'paused');
     combatSession.update(.05, { x: 0, y: 0 });
     assert.equal(minionProgress, 1);
+    combatSession.flushSave();
+    assert.equal(defeatWrites, 1, 'a lifecycle flush saves the complete remote reward once');
     assert.deepEqual(JSON.stringify(combatState.stats), beforeHero);
     assert.equal(combatState.spawns[target.id].killsToday, 1);
     assert.equal(combatState.minions.roster[0].soulContributions.common, combatState.soulCatcher.balances.common);

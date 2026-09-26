@@ -44,4 +44,5 @@ export class MinionPresentation {
   attack(id: string, target: Readonly<{ x: number; z: number }>): void { this.views.get(id)?.attack(target); }
   damaged(id: string): void { this.views.get(id)?.damaged(); }
   remove(id: string): void { this.views.get(id)?.dispose(); this.views.delete(id); }
+  dispose(): void { this.views.forEach((view) => view.dispose()); this.views.clear(); this.pit?.dispose(); this.pit = null; this.button.hidden = true; this.button.disabled = true; }
 }

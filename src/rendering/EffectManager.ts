@@ -53,4 +53,11 @@ export class EffectManager {
     }
     this.scene.add(root); this.effects.push({ root, age: 0, duration, velocity });
   }
+  dispose(): void {
+    for (const effect of this.effects.splice(0)) {
+      effect.root.removeFromParent();
+      const mesh = effect.root as THREE.Mesh;
+      mesh.geometry.dispose(); (mesh.material as THREE.Material).dispose();
+    }
+  }
 }

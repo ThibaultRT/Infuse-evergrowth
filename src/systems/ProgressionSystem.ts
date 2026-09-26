@@ -24,7 +24,7 @@ export class ProgressionSystem {
   constructor(
     private readonly state: SaveData,
     private readonly events: GameEvents,
-    private readonly persist: () => void,
+    private readonly persist: (critical?: boolean) => void,
     private readonly rng = Math.random,
     private readonly equipmentQuantity: (rarity: import('../types').EquipmentRarity) => number = () => 1,
     private readonly creditSouls: (definition: SpawnDefinition) => { soulType: SoulType; quantity: number } | null = () => null,
@@ -64,7 +64,7 @@ export class ProgressionSystem {
       boss = { bossId: definition.id, areaId: area.id, openedGateIds: opened.map((gate) => gate.id) };
     }
     this.state.heroHp = hero.hp;
-    this.persist();
+    this.persist(boss !== null);
     this.events.emit('enemyDefeated', { enemyId: definition.id, owner });
     if (owner.kind === 'hero') {
       this.events.emit('statGained', { sourceId: definition.id, ...reward });

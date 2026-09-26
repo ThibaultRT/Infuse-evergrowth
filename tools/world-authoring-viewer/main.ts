@@ -56,7 +56,7 @@ scene.add(spawnRoot);
 const clearanceRoot = new THREE.Group();
 clearanceRoot.name = 'GATE_CLEARANCE_HELPERS';
 scene.add(clearanceRoot);
-const selectionHelper = new THREE.BoxHelper(undefined, 0xffeb54);
+const selectionHelper = new THREE.BoxHelper(new THREE.Object3D(), 0xffeb54);
 selectionHelper.visible = false;
 scene.add(selectionHelper);
 
@@ -106,7 +106,7 @@ function buildDiagnostics(): void {
   // These rings reserve floor space only; they do not instantiate enemies.
   for (const layout of WORLD_LAYOUTS) {
     if (layout.kind !== 'area' || !('encounterSpots' in layout)) continue;
-    for (const spot of layout.encounterSpots) {
+    for (const spot of layout.encounterSpots ?? []) {
       const marker = new THREE.Mesh(new THREE.RingGeometry(spot.radius - .08, spot.radius, 48), new THREE.MeshBasicMaterial({ color: 0x7be4d1, side: THREE.DoubleSide }));
       marker.name = spot.id;
       marker.rotation.x = -Math.PI / 2;
