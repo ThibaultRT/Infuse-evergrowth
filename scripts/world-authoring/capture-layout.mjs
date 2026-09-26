@@ -8,13 +8,14 @@ import { availableDebugPort, closeBrowser } from './browser-lifecycle.mjs';
 
 const repositoryRoot = process.cwd();
 const minionsOnly = process.argv.includes('--minions');
+const greenhavenOnly = process.argv.includes('--greenhaven');
 const area4BridgesOnly = process.argv.includes('--area4-bridges');
 const area4ThroneOnly = process.argv.includes('--area4-throne');
 const area4TerrainOnly = process.argv.includes('--area4-terrain');
 const area4ForestOnly = process.argv.includes('--area4-forest');
 const area4BoundariesOnly = process.argv.includes('--area4-boundaries');
 const viewerPort = 4174;
-const viewerUrl = `http://127.0.0.1:${viewerPort}${minionsOnly ? '/?minions' : ''}`;
+const viewerUrl = `http://127.0.0.1:${viewerPort}${minionsOnly ? '/?minions' : greenhavenOnly ? '/?greenhaven' : ''}`;
 const capturesRoot = path.join(repositoryRoot, 'authoring', 'generated', 'captures');
 const debugRoot = path.join(repositoryRoot, 'authoring', 'generated', 'debug');
 const edgeCandidates = [
@@ -153,7 +154,28 @@ try {
   await Promise.all([client.send('Page.enable'), client.send('Runtime.enable')]);
   await waitForReady(client);
 
-  if (minionsOnly) {
+  if (greenhavenOnly) {
+    const assert = (await import('node:assert/strict')).default;
+    await capture(client, path.join(capturesRoot, 'area1-dressing-overview.png'), 'greenhaven', 1280, 1100);
+    const overview = await evaluate(client, 'window.__WORLD_AUTHORING_DIAGNOSTICS__()');
+    assert.equal(overview.fallbacks, 0, 'All production assets must load for the accepted capture.');
+    assert.equal(overview.batches, 4, 'Grass, two shrubs and mushrooms should use four shared batches.');
+    assert.ok(overview.instances >= 380);
+    await capture(client, path.join(capturesRoot, 'iphone-12-greenhaven-grove.png'), 'greenhaven:grove', 390, 844);
+    const portrait = await evaluate(client, 'window.__WORLD_AUTHORING_DIAGNOSTICS__()');
+    await capture(client, path.join(capturesRoot, 'iphone-12-greenhaven-village.png'), 'greenhaven:village', 390, 844);
+    await evaluate(client, 'window.__WORLD_AUTHORING_DIAGNOSTICS__(0.7)');
+    await capture(client, path.join(capturesRoot, 'iphone-12-greenhaven-reduced.png'), 'greenhaven:grove', 390, 844);
+    await client.send('Network.enable');
+    await client.send('Network.setBlockedURLs', { urls: ['*greenhaven-grass-patch.glb*', '*greenhaven-shrub-*.glb*', '*greenhaven-mushrooms.glb*', '*greenhaven-fallen-log.glb*', '*greenhaven-stump.glb*'] });
+    await client.send('Page.reload', { ignoreCache: true });
+    await wait(1000);
+    await waitForReady(client);
+    const fallback = await evaluate(client, 'window.__WORLD_AUTHORING_DIAGNOSTICS__()');
+    assert.ok(fallback.fallbacks >= overview.instances, 'Missing foliage should keep the chunk playable with fallback roots.');
+    await writeFile(path.join(capturesRoot, 'greenhaven-dressing-stats.json'), JSON.stringify({ overview, portrait, fallback }, null, 2) + '\n');
+    console.log(`Greenhaven: ${overview.instances} foliage placements in ${overview.batches} batches; overview/Full/Reduced captures and missing-asset fallback passed.`);
+  } else if (minionsOnly) {
     const assert = (await import('node:assert/strict')).default;
     const state = (mode) => evaluate(client, `window.__MINIONS_PREVIEW__(${JSON.stringify(mode)})`);
     assert.deepEqual(await state('locked'), { pit: false, minions: 0, buttonHidden: true });

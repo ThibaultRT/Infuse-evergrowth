@@ -196,3 +196,20 @@ Only the models used by the constrained in-game proof and their shared Dungeon/F
 - Runtime `imp.glb`: 1.5 m tall, grounded, +Z forward, 55 joints, 15,232 triangles, 512px embedded maps. The supplied GLB and FBX contain **no animation clips**; idle/move/attack/hit use procedural view motion and death removes the view. No third-party animation is claimed. The three supplied numbered base-color maps are shipped as `imp-variant-1.jpg` through `imp-variant-3.jpg`, matching persisted variant IDs (red, green, blue).
 - Pit: project-owner-supplied `authoring/local/assets/models/Summonning_pit.glb`, SHA-256 `22208e651e2b5894a9161003847f11ac4eecc6ab5aee2a0ff63ed6c74e547c6e`. Included for Infuse: Evergrowth under the owner's direction; no broader redistribution license is asserted. Runtime `summoning-pit.glb`: 3 m diameter, grounded pivot, 7,806 triangles and 512px embedded maps.
 - Reproduction: `scripts/world-assets/prepare-minions.py` runs in isolated background Blender, preserves editable sources and audit hashes under `authoring/local/minions/`, and writes only curated derivatives under `public/assets/world/shared/models/`. Raw sources and the full pack are not shipped.
+
+## Greenhaven foliage dressing (September 2026)
+
+- Six small runtime GLBs (`greenhaven-grass-patch`, `greenhaven-shrub-a/b`,
+  `greenhaven-mushrooms`, `greenhaven-fallen-log`, `greenhaven-stump`) derive from
+  [Kenney's Nature Kit](https://kenney.nl/assets/nature-kit), CC0 1.0.
+- Original source models: `grass`, `plant_bushSmall`, `plant_bushDetailed`,
+  `mushroom_redGroup`, `log`, and `stump_roundDetailed`. The grass patch arranges
+  ten copies of the original clump around a trunk opening. Geometry is fitted to
+  metres with ground pivots and a modest meadow palette adjustment.
+- Download: `https://kenney.nl/media/pages/assets/nature-kit/37ac38a37b-1677698939/kenney_nature-kit.zip`.
+  Archive SHA-256: `fa7974a0d342bfe63c38664ba9f8ec1a4aab8ea25f099bdc56870e33588c4d9d`.
+  Upstream notice: `public/assets/world/shared/licenses/kenney-nature-cc0.txt`.
+- Rebuild with `scripts/world-assets/prepare-greenhaven-dressing.py`, then
+  `scripts/world-assets/optimize-greenhaven-dressing.mjs`. The isolated editable
+  source stays at `authoring/local/greenhaven/greenhaven-dressing.blend`.
+  Existing Greenhaven pines and village props retain their documented provenance.

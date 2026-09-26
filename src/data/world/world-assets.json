@@ -1,4 +1,10 @@
 {
+  "nature.greenhavenGrassPatch": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/greenhaven-grass-patch.glb","runtime":"assets/world/shared/models/greenhaven-grass-patch.glb","castShadow":false},
+  "nature.greenhavenShrubA": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/greenhaven-shrub-a.glb","runtime":"assets/world/shared/models/greenhaven-shrub-a.glb","castShadow":false},
+  "nature.greenhavenShrubB": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/greenhaven-shrub-b.glb","runtime":"assets/world/shared/models/greenhaven-shrub-b.glb","castShadow":false},
+  "nature.greenhavenMushrooms": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/greenhaven-mushrooms.glb","runtime":"assets/world/shared/models/greenhaven-mushrooms.glb","castShadow":false},
+  "nature.greenhavenLog": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/greenhaven-fallen-log.glb","runtime":"assets/world/shared/models/greenhaven-fallen-log.glb","castShadow":false},
+  "nature.greenhavenStump": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/greenhaven-stump.glb","runtime":"assets/world/shared/models/greenhaven-stump.glb","castShadow":false},
   "minion.imp": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/imp.glb","runtime":"assets/world/shared/models/imp.glb"},
   "landmark.summoningPit": {"kind":"model","sourceRoot":"public","source":"assets/world/shared/models/summoning-pit.glb","runtime":"assets/world/shared/models/summoning-pit.glb"},
   "minion.impColor1": {"kind":"texture","sourceRoot":"public","source":"assets/world/shared/models/imp-variant-1.jpg","runtime":"assets/world/shared/models/imp-variant-1.jpg"},

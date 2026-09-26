@@ -11,7 +11,7 @@ import { compileWorldCollision } from '../../src/domain/world/WorldCollisionComp
 import type { WorldCollisionShape } from '../../src/domain/world/WorldCollision';
 import { WorldAssetLibrary } from '../../src/rendering/environment/WorldAssetLibrary';
 import { WorldBuilder } from '../../src/rendering/environment/WorldBuilder';
-import { createWorldMaterials } from '../../src/rendering/environment/WorldMaterials';
+import { applyWorldMaterialQuality, createWorldMaterials } from '../../src/rendering/environment/WorldMaterials';
 import { DevelopmentWorldAssetResolver, ProductionWorldAssetResolver } from '../../src/rendering/environment/WorldVisualAssetCatalog';
 import { minionPreview } from './minions';
 import { MINION_PIT } from '../../src/data/world/minionPit';
@@ -21,6 +21,7 @@ declare global {
     __WORLD_AUTHORING_READY__?: boolean;
     __WORLD_AUTHORING_CAMERA__?: (preset: string) => void;
     __WORLD_AUTHORING_GATES__?: (open: boolean) => void;
+    __WORLD_AUTHORING_DIAGNOSTICS__?: (scale?: 1 | 0.7) => { batches: number; instances: number; fallbacks: number; calls: number; triangles: number };
   }
 }
 
@@ -167,6 +168,12 @@ function framePreset(preset: string): void {
   } else if (preset === 'greenhaven') {
     controls.target.set(-2, 0, -2);
     camera.position.set(29, 77, 86);
+  } else if (preset === 'greenhaven:grove') {
+    controls.target.set(-2, 0.5, -17);
+    camera.position.set(5, 17, 2);
+  } else if (preset === 'greenhaven:village') {
+    controls.target.set(-10, 0.5, 11);
+    camera.position.set(-3, 16, 28);
   } else if (preset === 'highwood') {
     controls.target.set(34, 0, -61);
     camera.position.set(45, 102, 28);
@@ -271,8 +278,9 @@ async function loadWorld(): Promise<void> {
     const assets = new WorldAssetLibrary(resolver);
     const materials = await createWorldMaterials(assets);
     const builder = new WorldBuilder(assets, materials);
-    const layouts = new URLSearchParams(location.search).has('minions') ? WORLD_LAYOUTS.filter((layout) => layout.id === 'area:A01') : WORLD_LAYOUTS;
-    const views = await Promise.all(layouts.map(async (layout) => builder.build(layout, 'inspection')));
+    const params = new URLSearchParams(location.search);
+    const layouts = params.has('minions') || params.has('greenhaven') ? WORLD_LAYOUTS.filter((layout) => layout.id === 'area:A01') : WORLD_LAYOUTS;
+    const views = await Promise.all(layouts.map(async (layout) => builder.build(layout, params.has('greenhaven') ? 'runtime' : 'inspection')));
     if (generation !== loadingGeneration) return;
     window.__WORLD_AUTHORING_GATES__ = (open) => {
       for (const view of views) if (view.layout.kind === 'transition') view.setOpen(open);
@@ -284,6 +292,15 @@ async function loadWorld(): Promise<void> {
       label.querySelector('input')!.addEventListener('change', (event) => { view.root.visible = (event.target as HTMLInputElement).checked; });
       chunks.append(label);
     }
+    window.__WORLD_AUTHORING_DIAGNOSTICS__ = (scale) => {
+      if (scale) { renderer.setPixelRatio(Math.min(devicePixelRatio, 2) * scale); applyWorldMaterialQuality(materials, scale); }
+      let batches = 0, instances = 0, fallbacks = 0;
+      world.traverse((object) => {
+        if (object instanceof THREE.InstancedMesh) { batches++; instances += object.count; }
+        if (object.userData.worldAssetFallback) fallbacks++;
+      });
+      return { batches, instances, fallbacks, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles };
+    };
     const placementNames: string[] = [];
     world.traverse((object) => { if (object.userData.editableProp) placementNames.push(object.name); });
     for (const name of placementNames.sort()) {
@@ -306,7 +323,7 @@ async function loadWorld(): Promise<void> {
       if (!(object instanceof THREE.Mesh)) return;
       meshes += 1;
       const geometry = object.geometry;
-      triangles += geometry.index ? geometry.index.count / 3 : (geometry.getAttribute('position')?.count ?? 0) / 3;
+      triangles += (geometry.index ? geometry.index.count / 3 : (geometry.getAttribute('position')?.count ?? 0) / 3) * (object instanceof THREE.InstancedMesh ? object.count : 1);
     });
     stats.textContent = `${WORLD_LAYOUTS.length} chunks · ${placementNames.length} props · ${compiledCollision.all.length} colliders · ${meshes} meshes · ${Math.round(triangles).toLocaleString()} triangles`;
     status.textContent = `Ready — ${resolverSelect.value} resolver`;

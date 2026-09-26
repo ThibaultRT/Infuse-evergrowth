@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-24T10:06:47.270Z",
+  "generatedAt": "2026-09-26T18:20:36.140Z",
   "assets": [
     {
       "key": "boundary.area4Fence",
@@ -543,6 +543,48 @@
       }
     },
     {
+      "key": "nature.greenhavenGrassPatch",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-grass-patch.glb",
+      "runtime": "assets/world/shared/models/greenhaven-grass-patch.glb",
+      "sourceDigest": {
+        "bytes": 104964,
+        "sha256": "93c023bbcea452306a2c392b10cfa4207a1a0c8022fbaf5b339d4faa116df0f2"
+      },
+      "runtimeDigest": {
+        "bytes": 104964,
+        "sha256": "93c023bbcea452306a2c392b10cfa4207a1a0c8022fbaf5b339d4faa116df0f2"
+      }
+    },
+    {
+      "key": "nature.greenhavenLog",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-fallen-log.glb",
+      "runtime": "assets/world/shared/models/greenhaven-fallen-log.glb",
+      "sourceDigest": {
+        "bytes": 13568,
+        "sha256": "f197e9cb1b139be602b3e02145d69e5e6fa3e794be065ee5cd5daa573ba56390"
+      },
+      "runtimeDigest": {
+        "bytes": 13568,
+        "sha256": "f197e9cb1b139be602b3e02145d69e5e6fa3e794be065ee5cd5daa573ba56390"
+      }
+    },
+    {
+      "key": "nature.greenhavenMushrooms",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-mushrooms.glb",
+      "runtime": "assets/world/shared/models/greenhaven-mushrooms.glb",
+      "sourceDigest": {
+        "bytes": 11068,
+        "sha256": "46824d2f14d0a3f85881cf6e3a736221050883e9ae0cd4d7809f7d4422dd4ffe"
+      },
+      "runtimeDigest": {
+        "bytes": 11068,
+        "sha256": "46824d2f14d0a3f85881cf6e3a736221050883e9ae0cd4d7809f7d4422dd4ffe"
+      }
+    },
+    {
       "key": "nature.greenhavenPineA",
       "sourceRoot": "public",
       "source": "assets/world/shared/models/greenhaven-pine-a.glb",
@@ -568,6 +610,48 @@
       "runtimeDigest": {
         "bytes": 29008,
         "sha256": "b44beef41ddc3a6cf7829ba9e94d7353a0d6a5a9449f217b57c776467fb0bb12"
+      }
+    },
+    {
+      "key": "nature.greenhavenShrubA",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-shrub-a.glb",
+      "runtime": "assets/world/shared/models/greenhaven-shrub-a.glb",
+      "sourceDigest": {
+        "bytes": 2940,
+        "sha256": "8e770a71c6922087d6d2a26b86523570e2f48ba0251598fb7465207110edc5a9"
+      },
+      "runtimeDigest": {
+        "bytes": 2940,
+        "sha256": "8e770a71c6922087d6d2a26b86523570e2f48ba0251598fb7465207110edc5a9"
+      }
+    },
+    {
+      "key": "nature.greenhavenShrubB",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-shrub-b.glb",
+      "runtime": "assets/world/shared/models/greenhaven-shrub-b.glb",
+      "sourceDigest": {
+        "bytes": 10188,
+        "sha256": "57b326e344a76990acac887fa52373eaeea5e3b3d17843a1a31c31141ef341e4"
+      },
+      "runtimeDigest": {
+        "bytes": 10188,
+        "sha256": "57b326e344a76990acac887fa52373eaeea5e3b3d17843a1a31c31141ef341e4"
+      }
+    },
+    {
+      "key": "nature.greenhavenStump",
+      "sourceRoot": "public",
+      "source": "assets/world/shared/models/greenhaven-stump.glb",
+      "runtime": "assets/world/shared/models/greenhaven-stump.glb",
+      "sourceDigest": {
+        "bytes": 7424,
+        "sha256": "da8ed7c8ac1d4a8a65d20c40fc5c59ccf8e4aaee0ccd456475577afe4e5b1263"
+      },
+      "runtimeDigest": {
+        "bytes": 7424,
+        "sha256": "da8ed7c8ac1d4a8a65d20c40fc5c59ccf8e4aaee0ccd456475577afe4e5b1263"
       }
     },
     {

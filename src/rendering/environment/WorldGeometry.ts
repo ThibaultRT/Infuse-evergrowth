@@ -4,6 +4,7 @@ import type { WorldMaterialSet } from './WorldMaterials';
 import { greenhavenGroundHeight } from '../../data/world/greenhaven';
 import { highwoodGroundHeight } from '../../data/world/highwood';
 import { fallenKeepGroundHeight } from '../../data/world/fallenKeep';
+import { sampleRoadPoints } from '../../domain/world/WorldRoad';
 
 function insideCutout(cutout: WorldTerrainCutout, x: number, z: number): boolean {
   const rotation = cutout.rotation ?? 0;
@@ -80,8 +81,7 @@ export function createWorldTerrain(layout: AnyWorldLayout, material: THREE.Mater
 }
 
 export function sampleWorldRoad(road: WorldRoadPlacement): THREE.Vector3[] {
-  const curve = new THREE.CatmullRomCurve3(road.points.map(([x, z]) => new THREE.Vector3(x, 0, z)), false, 'centripetal');
-  return curve.getPoints(Math.max(10, (road.points.length - 1) * 8));
+  return sampleRoadPoints(road.points, Math.max(10, (road.points.length - 1) * 8)).map(([x, z]) => new THREE.Vector3(x, 0, z));
 }
 
 export function createWorldRoad(layout: AnyWorldLayout, road: WorldRoadPlacement, materials: WorldMaterialSet): THREE.Mesh {

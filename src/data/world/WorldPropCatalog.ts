@@ -17,6 +17,8 @@ export type WorldPropDefinition = ({ readonly asset: WorldAssetKey; readonly blo
   | { readonly asset?: never; readonly blockout?: never; readonly procedural: 'lava-basin' | 'area4-lava-lake' }) & {
   readonly collision: readonly CollisionProxy[];
   readonly cameraOccluder?: boolean;
+  /** Small static dressing only; keep individual roots in the inspection editor. */
+  readonly batchInstances?: boolean;
   readonly absoluteElevation?: boolean;
   /** Cosmetic lift for a model whose deck would otherwise be coplanar with authored terrain. */
   readonly visualElevationOffset?: number;
@@ -85,6 +87,12 @@ export const WORLD_PROP_CATALOG = {
   'nature.greenhavenPineA': occludingProp('nature.greenhavenPineA', [circle(0.45)]),
   'nature.greenhavenPineB': occludingProp('nature.greenhavenPineB', [circle(0.45)]),
   'nature.greenhavenBoulder': prop('nature.greenhavenBoulder', [circle(0.9)]),
+  'nature.greenhavenGrassPatch': { asset: 'nature.greenhavenGrassPatch', collision: [], batchInstances: true },
+  'nature.greenhavenShrubA': { asset: 'nature.greenhavenShrubA', collision: [], batchInstances: true },
+  'nature.greenhavenShrubB': { asset: 'nature.greenhavenShrubB', collision: [], batchInstances: true },
+  'nature.greenhavenMushrooms': { asset: 'nature.greenhavenMushrooms', collision: [], batchInstances: true },
+  'nature.greenhavenLog': prop('nature.greenhavenLog', [rectangle(0.75, 2.3)]),
+  'nature.greenhavenStump': prop('nature.greenhavenStump', [circle(0.48)]),
   'crossing.greenhavenFutureBridge': { asset: 'crossing.greenhavenFutureBridge', collision: [], absoluteElevation: true },
   'village.homeBlueA': occludingProp('village.homeBlueA', [rectangle(4.2, 3.7)]),
   'village.homeBlueB': occludingProp('village.homeBlueB', [rectangle(4.2, 3.7)]),

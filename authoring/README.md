@@ -154,6 +154,27 @@ settings, and verify playable loading fallback with the landscape request blocke
 occlusion fade to keep the followed hero visible.
 These are desktop browser checks; a real iPhone performance pass remains necessary.
 
+### Greenhaven foliage dressing
+
+Area 1's small dressing assets reuse Kenney's CC0 Nature Kit (source URL and checksum
+in `ASSET-LICENSES.md`). Save the ZIP under
+`authoring/local/greenhaven/source/kenney_nature-kit.zip`, then run:
+
+```powershell
+& 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --python-exit-code 1 --python scripts/world-assets/prepare-greenhaven-dressing.py
+node scripts/world-assets/optimize-greenhaven-dressing.mjs --tool-root <gltf-transform-installation>
+node scripts/world-assets/promote.mjs nature.greenhavenGrassPatch nature.greenhavenShrubA nature.greenhavenShrubB nature.greenhavenMushrooms nature.greenhavenLog nature.greenhavenStump
+npm run authoring:world:capture -- --greenhaven
+```
+
+`greenhavenDressing.ts` reserves the actual curved lanes, encounters, homes, plaza,
+pit and garden clearings. Grass patches derive from accepted tree transforms.
+The six assets use one vertex-color material each, no textures, and less than
+160 KiB combined. Runtime batches the small foliage; inspection mode keeps named
+editable roots. Tree occlusion stays individual. The focused static capture uses
+the runtime builder and never starts gameplay or writes saves. World validation
+checks route reachability, curved-road/rift clearance, budgets and batch transforms.
+
 ## Highwood reference layout
 
 Area A02 follows the northern woodland in `Layout.png`: darker forest soil, more

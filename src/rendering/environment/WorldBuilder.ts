@@ -12,6 +12,7 @@ import type { BlockoutMaterial, WorldBlockoutPart } from '../../data/world/area4
 import { createArea4Ground, createLavaBasin, createArea4LavaLake, createRiftBanks } from './Area4TerrainView';
 import { disposeClonedSkeletons } from '../RenderingResourceDisposal';
 import type { WorldAssetKey } from '../../data/world/WorldAssetKeys';
+import { batchWorldDressing } from './WorldDressingInstances';
 
 export type WorldBuildMode = 'runtime' | 'inspection';
 
@@ -54,6 +55,7 @@ export class WorldChunkView {
     const materials = new Set<THREE.Material>();
     this.root.traverse((object) => {
       if (!(object instanceof THREE.Mesh)) return;
+      if (object instanceof THREE.InstancedMesh) object.dispose();
       if (object.userData.worldOwnedGeometry) geometries.add(object.geometry);
       if (object.userData.worldOwnedMaterial) for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material);
     });
@@ -119,6 +121,10 @@ export class WorldBuilder {
       const scattered = await Promise.all(layout.scatters.flatMap(expandWorldScatter).map(async (placement) => this.createPlacement(layout, placement, mode)));
       if (scattered.length) scatter.add(...scattered);
       view.root.add(scatter);
+      if (mode === 'runtime') {
+        batchWorldDressing(landmarks);
+        batchWorldDressing(scatter);
+      }
 
       if (layout.kind === 'transition') {
         let hingedGate = false;
